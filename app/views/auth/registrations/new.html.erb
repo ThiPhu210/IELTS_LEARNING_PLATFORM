@@ -1,0 +1,28 @@
+<h1>Register</h1>
+
+<% if flash[:alert] %>
+  <div class="flash"><%= flash[:alert] %></div>
+<% end %>
+
+<%= form_with model: @user, url: register_path, local: true do |f| %>
+
+  <div>
+    <%= f.label :full_name %>
+    <%= f.text_field :full_name %>
+  </div>
+
+  <div>
+    <%= f.label :email %>
+    <%= f.email_field :email %>
+  </div>
+
+  <div>
+    <%= f.label :password %>
+    <%= f.password_field :password %>
+  </div>
+
+  <%= f.submit "Register" %>
+<% end %>
+
+
+<p class="center">Already have an account? <a href="<%= login_path %>">Login</a></p>

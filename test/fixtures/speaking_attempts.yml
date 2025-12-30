@@ -1,0 +1,33 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  course: one
+  speaking_topic: one
+  part: MyString
+  audio_url: MyString
+  transcript: MyText
+  overall_band: 1.5
+  fluency_score: 1.5
+  lexical_score: 1.5
+  grammar_score: 1.5
+  pronunciation_score: 1.5
+  feedback: MyText
+  graded_by: MyString
+  status: MyString
+
+two:
+  user: two
+  course: two
+  speaking_topic: two
+  part: MyString
+  audio_url: MyString
+  transcript: MyText
+  overall_band: 1.5
+  fluency_score: 1.5
+  lexical_score: 1.5
+  grammar_score: 1.5
+  pronunciation_score: 1.5
+  feedback: MyText
+  graded_by: MyString
+  status: MyString

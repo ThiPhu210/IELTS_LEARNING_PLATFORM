@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<body>
+  <nav>
+    <%= link_to "Users", "#" %> |
+    <%= link_to "Courses", "#" %> |
+    <%= button_to "Logout", logout_path, method: :delete %>
+  </nav>
+
+  <%= yield %>
+</body>
+</html>

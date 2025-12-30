@@ -1,0 +1,34 @@
+Rails.application.routes.draw do
+  root "auth/sessions#new"
+
+  # ================= AUTH =================
+  scope module: "auth" do
+    get    "/login",  to: "sessions#new"
+    post   "/login",  to: "sessions#create"
+    delete "/logout", to: "sessions#destroy"
+
+    get  "/register", to: "registrations#new"
+    post "/register", to: "registrations#create"
+  end
+
+  # ================= DASHBOARDS =================
+  namespace :student do
+    get "dashboard", to: "dashboard#index"
+  end
+
+  namespace :teacher do
+    get "dashboard", to: "dashboard#index"
+  end
+
+  namespace :admin do
+    get "dashboard", to: "dashboard#index"
+
+    # sau này mở rộng
+    resources :teachers, only: [:index, :new, :create]
+    resources :courses
+    resources :students
+  end
+
+  # ================= GENERIC =================
+  get "/dashboard", to: "dashboard#index"
+end

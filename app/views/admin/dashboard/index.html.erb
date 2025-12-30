@@ -1,0 +1,27 @@
+<div class="admin-dashboard">
+  <h1>Admin Dashboard</h1>
+  <p class="subtitle">Tổng quan hệ thống</p>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <h3>Total Users</h3>
+      <p class="number"><%= @total_users %></p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Teachers</h3>
+      <p class="number"><%= @teachers_count %></p>
+      <%= link_to "Quản lý", admin_teachers_path, class: "action-link" %>
+    </div>
+
+    <div class="stat-card">
+      <h3>Students</h3>
+      <p class="number"><%= @students_count %></p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Admins</h3>
+      <p class="number"><%= @admins_count %></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+</head>
+<body>
+  <nav>
+    <%= link_to "Speaking Practice", "#" %> |
+    <%= link_to "Progress", "#" %> |
+    <%= button_to "Logout", logout_path, method: :delete %>
+  </nav>
+
+  <%= yield %>
+</body>
+</html>
