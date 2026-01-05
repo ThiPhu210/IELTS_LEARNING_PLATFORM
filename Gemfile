@@ -1,16 +1,16 @@
 source "https://rubygems.org"
 
-gem 'dotenv-rails', groups: [:development, :test]
+gem "dotenv-rails", groups: [ :development, :test ]
 gem "bcrypt", "~> 3.1"
 gem "tailwindcss-rails"
 gem "cssbundling-rails"
 
 
 group :development, :test do
-  gem 'rspec-rails', '~> 7.0'
-  gem 'capybara'
-  gem 'selenium-webdriver' # nếu muốn test JS
-  gem 'factory_bot_rails'
+  gem "rspec-rails", "~> 7.0"
+  gem "capybara"
+  gem "selenium-webdriver" # nếu muốn test JS
+  gem "factory_bot_rails"
 end
 
 

@@ -31,11 +31,10 @@ class SpeakingAttempt < ApplicationRecord
   validates :graded_by, presence: true
   validates :status, presence: true
   validates :audio_url, presence: true
-  validates :audio_url, format: { with: URI::regexp(%w[http https]), message: "must be a valid URL" }
+  validates :audio_url, format: { with: URI.regexp(%w[http https]), message: "must be a valid URL" }
   validates :overall_band, numericality: { greater_than: 0, less_than: 9 }
   validates :fluency_score, numericality: { greater_than: 0, less_than: 9 }
   validates :lexical_score, numericality: { greater_than: 0, less_than: 9 }
   validates :grammar_score, numericality: { greater_than: 0, less_than: 9 }
   validates :pronunciation_score, numericality: { greater_than: 0, less_than: 9 }
-
 end

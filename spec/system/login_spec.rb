@@ -17,7 +17,6 @@ RSpec.describe "User login", type: :system do
 
     expect(page).to have_current_path(admin_dashboard_path)
     expect(page).to have_content(/Admin Dashboard/i)
-
   end
 
   it "allows teacher to login and redirect to teacher dashboard" do
@@ -47,6 +46,5 @@ RSpec.describe "User login", type: :system do
     click_button "Login"
 
     expect(page).to have_content("Email hoặc mật khẩu không đúng")
-
   end
 end

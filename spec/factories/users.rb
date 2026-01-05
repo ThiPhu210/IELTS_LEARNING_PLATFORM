@@ -6,4 +6,3 @@ FactoryBot.define do
       role { :student } # admin, teacher, student
     end
   end
-  

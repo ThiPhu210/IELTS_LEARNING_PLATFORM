@@ -1,5 +1,4 @@
 class Course < ApplicationRecord
-  
   has_many :course_accesses
   has_many :users, through: :course_accesses
   has_many :lessons

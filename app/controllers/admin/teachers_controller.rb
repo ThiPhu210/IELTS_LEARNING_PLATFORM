@@ -1,7 +1,7 @@
 class Admin::TeachersController < ApplicationController
   before_action :require_login
   before_action :require_admin
-  before_action :set_teacher, only: [:show, :update, :destroy]
+  before_action :set_teacher, only: [ :show, :update, :destroy ]
 
   def index
     @teachers = User.teacher_role.includes(:teacher_profile)
@@ -11,11 +11,11 @@ class Admin::TeachersController < ApplicationController
     @teacher = User.teacher_role.find(params[:id])
     @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
   end
-  
+
 
   def update
     Rails.logger.debug params.inspect
-  
+
     if @teacher.update(teacher_params)
       flash[:success] = "Thay đổi thông tin giáo viên thành công !"
       redirect_to admin_teacher_path(@teacher), notice: "Cập nhật thành công"
@@ -24,7 +24,7 @@ class Admin::TeachersController < ApplicationController
       render :show
     end
   end
-  
+
 
   def destroy
     @teacher.destroy

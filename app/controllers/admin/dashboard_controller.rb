@@ -9,6 +9,5 @@ class Admin::DashboardController < ApplicationController
     @total_users = User.count
     @courses_count = Course.count
     @lessons_count = Lesson.count
- 
   end
 end
