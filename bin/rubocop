@@ -7,5 +7,14 @@ ARGV.unshift("--config", File.expand_path("../.rubocop.yml", __dir__))
 
 load Gem.bin_path("rubocop", "rubocop")
 
+AllCops:
+  NewCops: enable
+
 Style/StringLiterals:
   EnforcedStyle: single_quotes
+
+Layout/SpaceInsideArrayLiteralBrackets:
+  EnforcedStyle: space
+
+Layout/TrailingWhitespace:
+  Enabled: true

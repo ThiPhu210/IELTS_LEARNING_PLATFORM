@@ -45,7 +45,8 @@ class Admin::TeachersController < ApplicationController
         :id,
         :bio,
         :expertise,
-        :experience_years
+        :experience_years,
+        :avatar
       ]
     )
   end

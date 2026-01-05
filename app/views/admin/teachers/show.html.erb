@@ -22,6 +22,21 @@
 
     <!-- PROFILE -->
     <%= f.fields_for :teacher_profile do |p| %>
+
+      <div class="mt-6">
+        <%= p.label :avatar, "Avatar", class: "label" %>
+
+        <% if p.object.avatar.attached? %>
+          <div class="mb-3">
+            <%= image_tag p.object.avatar,
+                  class: "w-24 h-24 rounded-full object-cover border" %>
+          </div>
+        <% end %>
+
+        <%= p.file_field :avatar, class: "input" %>
+      </div>
+
+      
       <div class="mt-6">
         <%= p.label :expertise, "Chuyên môn", class: "label" %>
         <%= p.text_field :expertise, class: "input" %>
