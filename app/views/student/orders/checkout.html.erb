@@ -1,0 +1,9 @@
+<h1>Thanh toán khóa học: <%= @course_access.course.title %></h1>
+<p>Giá: <%= number_to_currency(@course_access.course.price) %></p>
+
+<%= form_with url: pay_student_orders_path, method: :post do |f| %>
+  <%= hidden_field_tag :course_access_id, @course_access.id %>
+  <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+    Thanh toán (Mock)
+  </button>
+<% end %>

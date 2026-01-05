@@ -35,4 +35,38 @@ end
   )
 end
 
+Course.destroy_all
+Course.create!([
+  {
+    title: "IELTS Speaking Band 5.0 → 6.0",
+    band_min: 5.0,
+    band_max: 6.0,
+    price: 499_000,
+    duration_days: 30,
+    description: "Luyện Speaking Part 1,2,3 cho người mất gốc",
+    status: 1
+  },
+  {
+    title: "IELTS Speaking Band 6.0 → 7.0",
+    band_min: 6.0,
+    band_max: 7.0,
+    price: 799_000,
+    duration_days: 45,
+    description: "Chiến thuật nâng band Speaking",
+    status: 1
+  },
+  {
+    title: "IELTS Speaking Band 7.0 → 8.0",
+    band_min: 7.0,
+    band_max: 8.0,
+    price: 899_000,
+    duration_days: 45,
+    description: "Chiến thuật nâng band Speaking",
+    status: 1
+  }
+
+])
+
+
+
 puts "Done seeding!"

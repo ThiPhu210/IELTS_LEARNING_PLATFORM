@@ -3,16 +3,23 @@ class CourseAccess < ApplicationRecord
   belongs_to :course
   has_many :payments, dependent: :destroy
 
-  enum status: {
-    active: "active",
-    expired: "expired",
-    revoked: "revoked"
-  }
+  enum :status, { pending: 0, active: 1, expired: 2 }, suffix: true
 
-  validates :start_date, :end_date, presence: true
-  validates :status, presence: true
+  scope :active_access, -> { where(status: statuses[:active]) }
+
+  validates :start_date, :end_date, :status, presence: true
   validates :user_id, uniqueness: { scope: :course_id }
-  validates :start_date, :end_date, comparison: { greater_than: :start_date }
-  validates :start_date, :end_date, comparison: { less_than: :end_date }
-  validates :start_date, :end_date, comparison: { greater_than: Time.current }
+
+  validates :end_date,
+            comparison: { greater_than: :start_date }
+
+  validate :start_date_not_in_past
+
+  private
+
+  def start_date_not_in_past
+    if start_date.present? && start_date < Time.current - 1.minute
+      errors.add(:start_date, "không được ở quá khứ")
+    end
+  end
 end

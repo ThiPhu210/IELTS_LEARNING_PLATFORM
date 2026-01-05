@@ -1,0 +1,2 @@
+      resources :orders, only: [:create]
+    end

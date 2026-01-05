@@ -2,7 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :course_accesses
   has_many :courses, through: :course_accesses
-
+  has_many :orders
   has_many :speaking_attempts
   has_many :course_progresses
   has_one :teacher_profile, dependent: :destroy

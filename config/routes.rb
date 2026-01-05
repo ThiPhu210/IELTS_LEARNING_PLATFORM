@@ -14,6 +14,18 @@ Rails.application.routes.draw do
   # ================= DASHBOARDS =================
   namespace :student do
     get "dashboard", to: "dashboard#index"
+
+    # MUA KHÓA HỌC
+    resources :courses, only: [] do
+      resources :orders, only: [:create]
+    end
+
+    # FAKE PAYMENT
+    resources :payments, only: [] do
+      member do
+        patch :mark_paid
+      end
+    end
   end
 
   namespace :teacher do

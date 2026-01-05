@@ -28,8 +28,11 @@
 
         <% if p.object.avatar.attached? %>
           <div class="mb-3">
-            <%= image_tag p.object.avatar,
-                  class: "w-24 h-24 rounded-full object-cover border" %>
+          <%= image_tag p.object.avatar.variant(resize_to_fill: [80, 80]).processed,
+          class: "rounded-full object-cover border",
+          alt: "Avatar",
+          srcset: "#{url_for(p.object.avatar.variant(resize_to_fill: [80, 80]).processed)}?#{Time.current.to_i}" %>
+
           </div>
         <% end %>
 
@@ -81,7 +84,6 @@
 <% end %>
 
 </div>
-
 <style>
 .label {
   display: block;
@@ -95,4 +97,25 @@
   border-radius: 8px;
   border: 1px solid #ddd;
 }
+
+.avatar-wrapper {
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f3f4f6;
+}
+
+.avatar-img {
+  width: 50%;
+  height: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: #e5e7eb;
+}
+
 </style>

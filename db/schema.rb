@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_02_063011) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_05_091016) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -47,7 +47,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_02_063011) do
     t.bigint "course_id", null: false
     t.datetime "start_date"
     t.datetime "end_date"
-    t.string "status"
+    t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_course_accesses_on_course_id"
@@ -87,6 +87,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_02_063011) do
     t.index ["course_id"], name: "index_lessons_on_course_id"
   end
 
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "course_id", null: false
+    t.decimal "total_price", precision: 10, scale: 2
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_orders_on_course_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "payments", force: :cascade do |t|
     t.bigint "course_access_id", null: false
     t.decimal "amount"
@@ -96,7 +107,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_02_063011) do
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "order_id", null: false
     t.index ["course_access_id"], name: "index_payments_on_course_access_id"
+    t.index ["order_id"], name: "index_payments_on_order_id"
   end
 
   create_table "speaking_attempts", force: :cascade do |t|
@@ -169,7 +182,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_02_063011) do
   add_foreign_key "course_progresses", "courses"
   add_foreign_key "course_progresses", "users"
   add_foreign_key "lessons", "courses"
+  add_foreign_key "orders", "courses"
+  add_foreign_key "orders", "users"
   add_foreign_key "payments", "course_accesses"
+  add_foreign_key "payments", "orders"
   add_foreign_key "speaking_attempts", "courses"
   add_foreign_key "speaking_attempts", "speaking_topics"
   add_foreign_key "speaking_attempts", "users"

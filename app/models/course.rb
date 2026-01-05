@@ -7,7 +7,7 @@ class Course < ApplicationRecord
   has_many :course_progresses
 
   enum :status, { draft: 0, published: 1 }, suffix: true
-
+  scope :published_courses, -> { where(status: statuses[:published]) }
   validates :title, presence: true
   validates :band_min, :band_max, presence: true
   validates :price, presence: true

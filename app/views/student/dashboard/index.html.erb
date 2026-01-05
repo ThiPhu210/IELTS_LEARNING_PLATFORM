@@ -1,2 +1,69 @@
-<h1>Welcome, <%= current_user.full_name %>!</h1>
-<p>Your role: <%= current_user.role %></p>
+<div class="max-w-7xl mx-auto p-6">
+
+  <h1 class="text-3xl font-bold mb-8">
+    👋 Welcome, <%= current_user.full_name %>
+  </h1>
+
+  <!-- ================== ĐÃ MUA ================== -->
+  <section class="mb-12">
+  <h2>🎓 Các khóa học Speaking đã mua</h2>
+
+  <% if @purchased_courses.any? %>
+    <% @purchased_courses.each do |course| %>
+      <div class="border p-4 mb-4 bg-green-100">
+        <h3><%= course.title %></h3>
+        <p>Trạng thái: Đã mua</p>
+      </div>
+    <% end %>
+  <% else %>
+    <p>Bạn chưa mua khóa học nào.</p>
+  <% end %>
+  
+
+    <% if @purchased_courses.any? %>
+      <div class="grid grid-cols-3 gap-6">
+        <% @purchased_courses.each do |course| %>
+          <div class="bg-white p-5 rounded-xl shadow">
+            <h3 class="font-bold text-lg mb-2"><%= course.title %></h3>
+            <p class="text-sm text-gray-600 mb-2">
+              Band <%= course.band_min %> – <%= course.band_max %>
+            </p>
+            <p class="text-sm mb-4"><%= truncate(course.description, length: 80) %></p>
+
+            <span class="inline-block px-3 py-1 text-sm bg-green-100 text-green-700 rounded">
+              Đã mua
+            </span>
+
+            <div class="mt-4">
+              <%= link_to "▶ Vào học",
+                    "#",
+                    class: "text-indigo-600 font-semibold" %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500">Bạn chưa mua khóa học nào.</p>
+    <% end %>
+  </section>
+
+  <!-- ================== CHƯA MUA ================== -->
+  <section>
+  <h2>🆕 Các khóa học Speaking mới</h2>
+
+  <% @new_courses.each do |course| %>
+    <div class="border p-4 mb-4">
+      <h3><%= course.title %></h3>
+      <p>Band: <%= course.band_min %> → <%= course.band_max %></p>
+      <p>Giá: <%= number_to_currency(course.price, unit: "₫") %></p>
+      <%= button_to "🛒 Mua khóa học",
+      student_course_orders_path(course),
+      method: :post,
+      class: "px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-500" %>
+
+    </div>
+  <% end %>
+  
+  </section>
+
+</div>
