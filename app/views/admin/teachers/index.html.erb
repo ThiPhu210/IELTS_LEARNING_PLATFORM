@@ -1,0 +1,60 @@
+<div class="bg-white py-24 sm:py-32">
+  <div class="mx-auto grid max-w-7xl gap-20 px-6 lg:px-8 xl:grid-cols-3">
+
+    <!-- LEFT INTRO -->
+    <div class="max-w-xl">
+      <h2 class="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
+        Danh sách Teachers
+      </h2>
+      <p class="mt-6 text-lg text-gray-600">
+        Quản lý đội ngũ giảng viên: thêm, sửa, xoá thông tin giáo viên.
+      </p>
+    </div>
+
+    <!-- RIGHT LIST -->
+    <ul role="list"
+        class="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
+
+      <% @teachers.each do |teacher| %>
+        <% profile = teacher.teacher_profile %>
+
+        <li>
+          <%= link_to admin_teacher_path(teacher),
+              class: "flex items-start gap-x-6 hover:bg-gray-50 p-4 rounded-lg transition" do %>
+
+            <!-- AVATAR -->
+            <% if profile&.avatar&.attached? %>
+              <%= image_tag profile.avatar,
+                    class: "size-16 rounded-full object-cover outline-1 -outline-offset-1 outline-black/5" %>
+            <% else %>
+              <%= image_tag "default-avatar.png",
+                    class: "size-16 rounded-full object-cover opacity-70" %>
+            <% end %>
+
+            <!-- INFO -->
+            <div>
+              <h3 class="text-base font-semibold text-gray-900">
+                <%= teacher.full_name %>
+              </h3>
+
+              <p class="text-sm font-medium text-indigo-600">
+                <%= profile&.expertise || "Chưa cập nhật chuyên môn" %>
+              </p>
+
+              <p class="mt-2 text-sm text-gray-600">
+                <%= profile&.bio || "Chưa có mô tả" %>
+              </p>
+
+              <p class="mt-1 text-sm text-gray-500">
+                Kinh nghiệm:
+                <%= profile&.experience_years || "Chưa cập nhật" %>
+              </p>
+            </div>
+
+          <% end %>
+        </li>
+      <% end %>
+
+    </ul>
+  </div>
+</div>

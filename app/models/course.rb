@@ -7,10 +7,7 @@ class Course < ApplicationRecord
   has_many :speaking_attempts
   has_many :course_progresses
 
-  enum status: {
-    draft: "draft",
-    published: "published"
-  }
+  enum :status, { draft: 0, published: 1 }, suffix: true
 
   validates :title, presence: true
   validates :band_min, :band_max, presence: true

@@ -6,6 +6,15 @@ gem "tailwindcss-rails"
 gem "cssbundling-rails"
 
 
+group :development, :test do
+  gem 'rspec-rails', '~> 7.0'
+  gem 'capybara'
+  gem 'selenium-webdriver' # nếu muốn test JS
+  gem 'factory_bot_rails'
+end
+
+
+
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.0.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
@@ -60,10 +69,4 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-end
-
-group :test do
-  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
-  gem "selenium-webdriver"
 end

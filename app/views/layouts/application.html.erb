@@ -19,11 +19,29 @@
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
   <body>
     <main class="flex justify-center mt-28 px-5 w-full">
-      <%= yield %>
+    <%= yield %>
+
+    <% if flash[:success] %>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          Swal.fire({
+            icon: 'success',
+            title: 'Thành công 🎉',
+            text: "<%= j flash[:success] %>",
+            confirmButtonText: 'OK'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href = "/admin/teachers";
+            }
+          });
+        });
+      </script>
+    <% end %>
     </main>
  
 

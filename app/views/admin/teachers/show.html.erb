@@ -1,0 +1,83 @@
+<div class="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow">
+  <h2 class="text-2xl font-bold mb-6">Thông tin Giáo viên</h2>
+
+  <!-- ===== FORM UPDATE (PATCH) ===== -->
+  <%= form_with model: @teacher,
+                url: admin_teacher_path(@teacher),
+                method: :patch,
+                local: true do |f| %>
+
+    <!-- BASIC INFO -->
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <%= f.label :full_name, "Họ tên", class: "label" %>
+        <%= f.text_field :full_name, class: "input" %>
+      </div>
+
+      <div>
+        <%= f.label :email, "Email", class: "label" %>
+        <%= f.email_field :email, class: "input" %>
+      </div>
+    </div>
+
+    <!-- PROFILE -->
+    <%= f.fields_for :teacher_profile do |p| %>
+      <div class="mt-6">
+        <%= p.label :expertise, "Chuyên môn", class: "label" %>
+        <%= p.text_field :expertise, class: "input" %>
+      </div>
+
+      <div class="mt-4">
+        <%= p.label :experience_years, "Số năm kinh nghiệm", class: "label" %>
+        <%= p.number_field :experience_years, class: "input" %>
+      </div>
+
+      <div class="mt-4">
+        <%= p.label :bio, "Giới thiệu", class: "label" %>
+        <%= p.text_area :bio, rows: 4, class: "input" %>
+      </div>
+    <% end %>
+
+    <!-- SAVE BUTTON -->
+    <div class="mt-8 text-right">
+      <%= f.submit "💾 Lưu thay đổi",
+            class: "px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500" %>
+    </div>
+
+  <% end %>
+
+  <!-- ===== DELETE (PHẢI NẰM NGOÀI FORM) ===== -->
+  <div class="mt-6 flex justify-end">
+    <%= button_to "🗑 Xóa giáo viên",
+          admin_teacher_path(@teacher),
+          method: :delete,
+          data: { confirm: "Bạn chắc chắn muốn xóa giáo viên này?" },
+          class: "px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500" %>
+  </div>
+
+  <% if @teacher.errors.any? %>
+  <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+    <ul>
+      <% @teacher.errors.full_messages.each do |msg| %>
+        <li>• <%= msg %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+</div>
+
+<style>
+.label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+</style>

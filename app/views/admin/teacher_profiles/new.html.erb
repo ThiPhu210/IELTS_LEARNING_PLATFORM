@@ -1,0 +1,11 @@
+<h1>Tạo hồ sơ giáo viên</h1>
+
+<p>
+  Giáo viên: <strong><%= @teacher.full_name %></strong>
+</p>
+
+<%= render "form" %>
+
+<%= link_to "← Quay lại",
+    admin_teacher_path(@teacher),
+    class: "btn btn-secondary" %>

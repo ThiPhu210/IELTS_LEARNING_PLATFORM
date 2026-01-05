@@ -22,9 +22,12 @@ Rails.application.routes.draw do
 
   namespace :admin do
     get "dashboard", to: "dashboard#index"
+    
 
     # sau này mở rộng
-    resources :teachers, only: [:index, :new, :create]
+    resources :teachers do
+      resource :teacher_profile, except: [:show]
+    end
     resources :courses
     resources :students
   end
