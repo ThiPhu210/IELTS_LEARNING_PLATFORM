@@ -65,9 +65,10 @@ jobs:
       - name: Lint code for consistent style
         run: bundle exec rubocop -f github
 
+
   test:
     runs-on: ubuntu-latest
-
+  
     services:
       postgres:
         image: postgres
@@ -81,43 +82,50 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-
+  
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+  
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
+  
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-          
-      - name: Install Tailwind CLI
-        run: npm install -g tailwindcss
-
+  
       - name: Install system packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config google-chrome-stable
-
+  
+      - name: Install JS dependencies
+        run: |
+          npm ci
+          npm install -g tailwindcss
+  
       - name: Install gems
         run: bundle install --jobs 4 --retry 3
-
+  
       - name: Prepare database
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bundle exec rails db:prepare
-
-      - name: Run tests
+  
+      - name: Build CSS
+        env:
+          RAILS_ENV: test
+        run: bundle exec rails css:build
+  
+      - name: Run system tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bundle exec rails test test:system
-
+  
       - name: Keep screenshots from failed system tests
         uses: actions/upload-artifact@v4
         if: failure()
@@ -125,3 +133,4 @@ jobs:
           name: screenshots
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
+
