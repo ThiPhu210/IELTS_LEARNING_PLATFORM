@@ -49,7 +49,7 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompile assets (Tailwind sẽ chạy ở đây nếu có)
-ENV RAILS_MASTER_KEY=dummy
+ENV RAILS_MASTER_KEY=$RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile || echo "Skip assets precompile (no JS deps)"
 
 # Stage cuối cho app image
