@@ -9,66 +9,42 @@ jobs:
   scan_ruby:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Install gems
-        run: bundle install --jobs 4 --retry 3
-
-      - name: Scan for common Rails security vulnerabilities
-        run: bundle exec brakeman --no-pager
+      - run: bundle install --jobs 4 --retry 3
+      - run: bundle exec brakeman --no-pager
 
   scan_js:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '20'
-
-      - name: Install gems
-        run: bundle install --jobs 4 --retry 3
-
-      - name: Scan JavaScript dependencies
-        run: yarn install && yarn audit --level moderate
+      - run: bundle install --jobs 4 --retry 3
+      - run: yarn install && yarn audit --level moderate
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-
-      - name: Install gems
-        run: bundle install --jobs 4 --retry 3
-
-      - name: Lint code for consistent style
-        run: bundle exec rubocop -f github
-
+      - run: bundle install --jobs 4 --retry 3
+      - run: bundle exec rubocop -f github
 
   test:
+    needs: [scan_ruby, scan_js, lint]
     runs-on: ubuntu-latest
-  
     services:
       postgres:
         image: postgres
@@ -82,38 +58,24 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
-  
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-  
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-          
-      - name: Install gems
-        run: bundle install --jobs 4 --retry 3
-  
+      - run: bundle install --jobs 4 --retry 3
       - name: Prepare database
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
         run: bundle exec rails db:prepare
-  
-      - name: Build CSS
-        env:
-          RAILS_ENV: test
-        run: bundle exec rails css:build
-  
-      - name: Run system tests
+      - name: Run RSpec tests
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432
-        run: bundle exec rails test test:system
-  
-      - name: Keep screenshots from failed system tests
+        run: bundle exec rspec
+      - name: Upload screenshots if failed
         uses: actions/upload-artifact@v4
         if: failure()
         with:
@@ -121,3 +83,27 @@ jobs:
           path: ${{ github.workspace }}/tmp/screenshots
           if-no-files-found: ignore
 
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build Docker image
+        run: docker build -t myapp:latest .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ secrets.APP_PATH }}
+            git pull origin main
+            docker build -t myapp:latest .
+            docker-compose down
+            docker-compose up -d
