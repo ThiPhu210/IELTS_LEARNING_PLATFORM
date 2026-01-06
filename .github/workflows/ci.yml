@@ -101,10 +101,12 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          timeout: 30s
+          command_timeout: 10m
           script: |
             cd ${{ secrets.APP_PATH }}
             git pull origin main
             docker build -t myapp:latest .
             docker-compose down
             docker-compose up -d
-
