@@ -45,7 +45,7 @@ jobs:
         run: bundle install --jobs 4 --retry 3
 
       - name: Scan JavaScript dependencies
-        run: bin/importmap audit
+        run: yarn install && yarn audit --level moderate
 
   lint:
     runs-on: ubuntu-latest
