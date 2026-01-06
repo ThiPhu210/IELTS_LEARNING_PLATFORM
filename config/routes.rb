@@ -17,7 +17,7 @@ Rails.application.routes.draw do
 
     # MUA KHÓA HỌC
     resources :courses, only: [] do
-      resources :orders, only: [:create] do
+      resources :orders, only: [ :create ] do
         collection do
           get :checkout  # trang thanh toán
           post :pay      # xử lý thanh toán

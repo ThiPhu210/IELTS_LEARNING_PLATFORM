@@ -8,7 +8,7 @@ class Student::DashboardController < ApplicationController
     .where(course_accesses: { user_id: current_user.id })
     .merge(CourseAccess.active_access)
     .merge(Payment.paid_payments)
-  
+
 
     # Các khóa chưa mua
     @new_courses = Course
@@ -24,5 +24,4 @@ class Student::DashboardController < ApplicationController
       redirect_to root_path
     end
   end
-
 end

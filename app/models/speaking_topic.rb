@@ -3,11 +3,11 @@ class SpeakingTopic < ApplicationRecord
   has_many :speaking_questions, dependent: :destroy
   has_many :speaking_attempts
 
-  enum part: {
-    part1: "part1",
-    part2: "part2",
-    part3: "part3"
-  }
+  # enum part: {
+  #   part1: "part1",
+  #   part2: "part2",
+  #   part3: "part3"
+  # }
 
   validates :title, presence: true
   validates :part, presence: true

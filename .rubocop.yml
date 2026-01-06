@@ -6,3 +6,9 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+
+AllCops:
+  Exclude:
+    # Ignore ERB view templates, which are not plain Ruby and can trigger
+    # parser errors like "unexpected token tLT" when linted as Ruby.
+    - 'app/views/**/*.erb'
