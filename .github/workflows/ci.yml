@@ -107,3 +107,4 @@ jobs:
             docker build -t myapp:latest .
             docker-compose down
             docker-compose up -d
+
