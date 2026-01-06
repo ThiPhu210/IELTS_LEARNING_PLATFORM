@@ -45,3 +45,22 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
 
       - run: rails test
+      
+  cd:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd ${{ secrets.APP_PATH }}
+            git pull origin main
+            bundle install
+            rails assets:precompile
+            rails db:migrate
+            sudo systemctl restart puma
