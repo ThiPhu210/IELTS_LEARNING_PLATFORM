@@ -103,7 +103,7 @@ jobs:
   
       - name: Install JS dependencies
         run: |
-          npm ci
+          npm install
           npm install -g tailwindcss
   
       - name: Install gems
