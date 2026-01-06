@@ -108,5 +108,4 @@ jobs:
             cd ${{ secrets.APP_PATH }}
             git pull origin main
             docker build -t myapp:latest .
-            docker-compose down
-            docker-compose up -d
+            docker run -d --name myapp_container -p 3000:3000 myapp:latest
