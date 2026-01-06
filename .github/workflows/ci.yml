@@ -92,20 +92,7 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-  
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-  
-      - name: Install system packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config google-chrome-stable
-  
-      - name: Install JS dependencies
-        run: |
-          npm install
-          npm install -g tailwindcss
-  
+          
       - name: Install gems
         run: bundle install --jobs 4 --retry 3
   
