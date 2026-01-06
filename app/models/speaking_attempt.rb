@@ -3,22 +3,22 @@ class SpeakingAttempt < ApplicationRecord
   belongs_to :course
   belongs_to :speaking_topic
 
-  enum part: {
-    part1: "part1",
-    part2: "part2",
-    part3: "part3"
-  }
+  # enum part: {
+  #   part1: "part1",
+  #   part2: "part2",
+  #   part3: "part3"
+  # }
 
-  enum graded_by: {
-    ai: "AI",
-    teacher: "TEACHER"
-  }
+  # enum graded_by: {
+  #   ai: "AI",
+  #   teacher: "TEACHER"
+  # }
 
-  enum status: {
-    processing: "processing",
-    completed: "completed",
-    failed: "failed"
-  }
+  # enum status: {
+  #   processing: "processing",
+  #   completed: "completed",
+  #   failed: "failed"
+  # }
 
   validates :part, :graded_by, :status, presence: true
 
