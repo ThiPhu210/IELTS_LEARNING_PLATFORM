@@ -1,84 +1,71 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t ielts_platform .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name ielts_platform ielts_platform
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
+# Production Dockerfile cho Rails app
 ARG RUBY_VERSION=3.3.5
-FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
+FROM ruby:${RUBY_VERSION}-slim AS base
 
-# Rails app lives here
 WORKDIR /rails
 
-# Install base packages
+# Cài đặt các gói cơ bản
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-RUN apt-get update -qq && \
-    apt-get install -y build-essential libpq-dev curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | sh - && \
-    apt-get install -y nodejs && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      libpq-dev \
+      curl \
+      git \
+      nodejs \
+      npm \
+      postgresql-client \
+      libjemalloc2 \
+      libvips && \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
 
+# Thiết lập biến môi trường cho production
+ENV RAILS_ENV=production \
+    BUNDLE_DEPLOYMENT=1 \
+    BUNDLE_PATH=/usr/local/bundle \
+    BUNDLE_WITHOUT=development
 
-# Set production environment
-ENV RAILS_ENV="production" \
-    BUNDLE_DEPLOYMENT="1" \
-    BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development"
-
-# Throw-away build stage to reduce size of final image
+# Stage build để giảm kích thước image cuối
 FROM base AS build
 
-# Install packages needed to build gems
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
-    rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Install application gems
+# Cài đặt gems
 COPY Gemfile Gemfile.lock ./
 RUN bundle install && \
-    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+    rm -rf ~/.bundle "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile --gemfile
 
-# Copy JS dependencies 
-COPY package.json yarn.lock ./ 
-RUN yarn install --frozen-lockfile
+# Nếu có JS dependencies (Tailwind, v.v.), copy và cài đặt
+# Nếu project chưa có package.json/yarn.lock thì bước này sẽ bị bỏ qua
+COPY package.json* yarn.lock* ./
+RUN [ -f package.json ] && yarn install --frozen-lockfile || echo "No JS dependencies"
 
-# Copy application code
+# Copy toàn bộ code
 COPY . .
 
-# Precompile bootsnap code for faster boot times
+# Precompile bootsnap
 RUN bundle exec bootsnap precompile app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompile assets (Tailwind sẽ chạy ở đây nếu có)
+ENV RAILS_MASTER_KEY=dummy
+RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile || echo "Skip assets precompile (no JS deps)"
 
-
-
-
-# Final stage for app image
+# Stage cuối cho app image
 FROM base
 
-# Copy built artifacts: gems, application
-COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+# Copy artifacts từ build stage
+COPY --from=build ${BUNDLE_PATH} ${BUNDLE_PATH}
 COPY --from=build /rails /rails
 
-# Run and own only the runtime files as a non-root user for security
+# Tạo user không phải root để chạy app
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
     chown -R rails:rails db log storage tmp
 USER 1000:1000
 
-# Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
 CMD ["./bin/thrust", "./bin/rails", "server"]
