@@ -141,10 +141,25 @@ jobs:
             whoami
             docker --version
             cd ${{ secrets.APP_PATH }}
-            git pull origin main
+            if [ -d ".git" ]; then
+              git fetch --all
+              git reset --hard origin/main
+            else
+              git clone https://github.com/ThiPhu210/IELTS_LEARNING_PLATFORM.git .
+            fi
             docker rm -f myapp_container || true
-            docker build -t myapp:latest .
-            docker run -d   --name myapp_container   -p 3000:3000   -e RAILS_ENV=${{ secrets.RAILS_ENV }}   -e RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}   -e DB_HOST=${{ secrets.EC2_HOST }}   -e DB_PORT=5432   -e DB_USERNAME=${{ secrets.DB_USERNAME }}   -e DB_PASSWORD=${{ secrets.DB_PASSWORD }}   myapp:latest
+            docker build --no-cache -t myapp:latest .
+            docker run -d \
+              --name myapp_container \
+              -p 3000:3000 \
+              -e RAILS_ENV=${{ secrets.RAILS_ENV }} \
+              -e RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} \
+              -e DB_HOST=${{ secrets.EC2_HOST }} \
+              -e DB_PORT=5432 \
+              -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
+              -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              myapp:latest
+
   
 
 
