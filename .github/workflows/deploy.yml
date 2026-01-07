@@ -138,4 +138,4 @@ jobs:
               -e DB_USERNAME=$DB_USERNAME \
               -e DB_PASSWORD=$DB_PASSWORD \
               $DOCKER_USER/myapp:latest \
-              sh -c "bundle exec rails db:migrate && bundle exec rails db:seed && bundle exec rails server -b 0.0.0.0 -p 3000"
+              sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
