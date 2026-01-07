@@ -103,7 +103,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           timeout: 30s
-          command_timeout: 10m
+          command_timeout: 35m
           script: |
             cd ${{ secrets.APP_PATH }}
             git pull origin main
