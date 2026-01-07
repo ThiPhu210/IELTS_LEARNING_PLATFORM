@@ -109,7 +109,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker pull mydockerhubuser/myapp:latest
+            docker pull {{ secrets.DOCKER_USERNAME }}/myapp:latest
             docker rm -f myapp_container || true
             docker run -d \
               --name myapp_container \
@@ -120,6 +120,6 @@ jobs:
               -e DB_PORT=5432 \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              mydockerhubuser/myapp:latest
+              {{ secrets.DOCKER_USERNAME }}/myapp:latest
 
 
