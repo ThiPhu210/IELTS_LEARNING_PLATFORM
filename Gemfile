@@ -3,7 +3,6 @@ source "https://rubygems.org"
 gem "dotenv-rails", groups: [ :development, :test ]
 gem "bcrypt", "~> 3.1"
 gem "tailwindcss-rails"
-gem "cssbundling-rails"
 
 gem "image_processing", "~> 1.12"
 gem "mini_magick"
