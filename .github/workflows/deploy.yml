@@ -84,82 +84,41 @@ jobs:
           if-no-files-found: ignore
 
   build:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Build Docker image
-        run: docker build -t myapp:latest .
+      - uses: docker/setup-buildx-action@v3
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build and push Docker image
+        run: |
+          docker build -t myapp:latest .
+          docker push mydockerhubuser/myapp:latest
   deploy:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: Debug secrets
-        run: |
-          echo "=== DEBUG SECRETS ==="
-          echo "EC2_HOST=${{ secrets.EC2_HOST }}"
-          echo "EC2_USER=${{ secrets.EC2_USER }}"
-          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
-            echo "❌ EC2_SSH_KEY is EMPTY"
-          else
-            echo "✅ EC2_SSH_KEY is SET"
-            echo "${{ secrets.EC2_SSH_KEY }}" | head -n 5
-            echo "...(truncated)..."
-          fi
-          echo "APP_PATH=${{ secrets.APP_PATH }}"
-          echo "======================"
-  
-      - name: Validate secrets
-        run: |
-          if [ -z "${{ secrets.EC2_HOST }}" ]; then
-            echo "❌ ERROR: EC2_HOST is missing"
-            exit 1
-          fi
-          if [ -z "${{ secrets.EC2_USER }}" ]; then
-            echo "❌ ERROR: EC2_USER is missing"
-            exit 1
-          fi
-          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
-            echo "❌ ERROR: EC2_SSH_KEY is missing"
-            exit 1
-          fi
-          if [ -z "${{ secrets.APP_PATH }}" ]; then
-            echo "⚠️ WARNING: APP_PATH is empty"
-          fi
-          echo "✅ All required secrets are set"
-  
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.4
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          debug: true
           script: |
-            echo "=== Running on EC2 ==="
-            whoami
-            docker --version
-            cd ${{ secrets.APP_PATH }}
-            if [ -d ".git" ]; then
-              git fetch --all
-              git reset --hard origin/main
-            else
-              git clone https://github.com/ThiPhu210/IELTS_LEARNING_PLATFORM.git .
-            fi
+            docker pull mydockerhubuser/myapp:latest
             docker rm -f myapp_container || true
-            docker build --no-cache -t myapp:latest .
             docker run -d \
               --name myapp_container \
               -p 3000:3000 \
               -e RAILS_ENV=${{ secrets.RAILS_ENV }} \
               -e RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }} \
-              -e DB_HOST=${{ secrets.EC2_HOST }} \
+              -e DB_HOST=${{ secrets.DB_HOST }} \
               -e DB_PORT=5432 \
               -e DB_USERNAME=${{ secrets.DB_USERNAME }} \
               -e DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-              myapp:latest
-
-  
+              mydockerhubuser/myapp:latest
 
 
