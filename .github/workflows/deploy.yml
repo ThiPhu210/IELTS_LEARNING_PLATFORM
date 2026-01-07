@@ -49,7 +49,7 @@ jobs:
       - run: bundle exec rubocop -f github
 
   test:
-    needs: [scan_ruby, scan_js, lint]
+    needs: [scan_ruby, scan_js]
     runs-on: ubuntu-latest
     services:
       postgres:
