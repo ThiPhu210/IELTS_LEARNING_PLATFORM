@@ -127,7 +127,9 @@ jobs:
             docker system prune -a -f
             docker pull $DOCKER_USER/myapp:latest
             docker rm -f myapp_container || true
+
             docker run -d \
+               --name myapp_container \
               -p 3000:3000 \
               -e RAILS_ENV=$RAILS_ENV \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
