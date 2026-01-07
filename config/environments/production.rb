@@ -89,7 +89,8 @@ Rails.application.configure do
   #   /.*\.example\.com/
   # ]
   config.hosts << "184.72.213.33"
-
+  config.hosts << "d34ute7tylgmox.cloudfront.net"
+  config.hosts << "ec2-184-72-213-33.compute-1.amazonaws.com"
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 
