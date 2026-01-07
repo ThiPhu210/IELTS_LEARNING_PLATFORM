@@ -109,7 +109,7 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            docker rmi -f $(docker images -aq) || true
+            docker images -q | grep . && docker rmi -f $(docker images -aq) || true
             docker pull {{ secrets.DOCKER_USERNAME }}/myapp:latest
             docker rm -f myapp_container || true
             docker run -d \
