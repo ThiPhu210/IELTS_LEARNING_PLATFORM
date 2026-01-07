@@ -96,21 +96,37 @@ jobs:
     steps:
       - name: Debug secrets
         run: |
+          echo "=== DEBUG SECRETS ==="
           echo "EC2_HOST=${{ secrets.EC2_HOST }}"
           echo "EC2_USER=${{ secrets.EC2_USER }}"
           if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
             echo "❌ EC2_SSH_KEY is EMPTY"
           else
             echo "✅ EC2_SSH_KEY is SET"
+            echo "${{ secrets.EC2_SSH_KEY }}" | head -n 5
+            echo "...(truncated)..."
           fi
           echo "APP_PATH=${{ secrets.APP_PATH }}"
+          echo "======================"
   
-      - name: Setup SSH key
+      - name: Validate secrets
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          if [ -z "${{ secrets.EC2_HOST }}" ]; then
+            echo "❌ ERROR: EC2_HOST is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.EC2_USER }}" ]; then
+            echo "❌ ERROR: EC2_USER is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.EC2_SSH_KEY }}" ]; then
+            echo "❌ ERROR: EC2_SSH_KEY is missing"
+            exit 1
+          fi
+          if [ -z "${{ secrets.APP_PATH }}" ]; then
+            echo "⚠️ WARNING: APP_PATH is empty"
+          fi
+          echo "✅ All required secrets are set"
   
       - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.2.4
@@ -121,6 +137,7 @@ jobs:
           port: 22
           debug: true
           script: |
+            echo "=== Running on EC2 ==="
             whoami
             docker --version
             cd ${{ secrets.APP_PATH }}
@@ -128,5 +145,6 @@ jobs:
             docker rm -f myapp_container || true
             docker build -t myapp:latest .
             docker run -d --name myapp_container -p 3000:3000 myapp:latest
+  
 
 
