@@ -86,8 +86,7 @@ Rails.application.configure do
   config.hosts << "184.72.213.33"
   # Skip DNS rebinding protection for the default health check endpoint.
   # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
-  config.action_dispatch.trusted_proxies = [
-  IPAddr.new("0.0.0.0/0")
-]
+  config.action_dispatch.trusted_proxies = [IPAddr.new("0.0.0.0/0")]
+  config.action_controller.forgery_protection_origin_check = true
 
 end
