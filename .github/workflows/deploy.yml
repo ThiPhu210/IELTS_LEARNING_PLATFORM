@@ -136,6 +136,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           port: 22
           debug: true
+          command_timeout: 30m
           script: |
             echo "=== Running on EC2 ==="
             whoami
