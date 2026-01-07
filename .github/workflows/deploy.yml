@@ -95,8 +95,8 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build and push Docker image
         run: |
-          docker build -t mydockerhubuser/myapp:latest .
-          docker push mydockerhubuser/myapp:latest
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/myapp:latest .
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
 
   deploy:
     needs: build
