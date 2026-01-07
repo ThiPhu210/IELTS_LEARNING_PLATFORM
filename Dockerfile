@@ -40,7 +40,7 @@ COPY . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompile assets (dùng dummy key để bỏ qua master.key)
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile || echo "Skip assets precompile (no JS deps)"
+RUN SECRET_KEY_BASE=1 RAILS_ENV=production bin/rails assets:precompile
 
 FROM base
 
