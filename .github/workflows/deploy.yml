@@ -8,12 +8,10 @@ env:
   DB_USERNAME: ${{ secrets.DB_USERNAME }}
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
 
-
 on:
   pull_request:
   push:
     branches: [ main ]
-
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
@@ -25,7 +23,6 @@ jobs:
           bundler-cache: true
       - run: bundle install --jobs 4 --retry 3
       - run: bundle exec brakeman --no-pager
-
   scan_js:
     runs-on: ubuntu-latest
     steps:
@@ -128,13 +125,9 @@ jobs:
             DB_USERNAME=${{ secrets.DB_USERNAME }}
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             echo "Deploying Docker container on EC2..."
-
             docker image prune -af
             docker pull $DOCKER_USER/myapp:latest
-
-           
             docker rm -f myapp_container || true
-
             docker run -d \
               -p 3000:3000 \
               -e RAILS_ENV=$RAILS_ENV \
