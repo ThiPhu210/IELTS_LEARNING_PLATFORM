@@ -97,7 +97,7 @@ jobs:
       - name: Build and push Docker image
         run: |
           docker build -t myapp:latest .
-          docker push mydockerhubuser/myapp:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
   deploy:
     needs: build
     runs-on: ubuntu-latest
