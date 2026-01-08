@@ -40,13 +40,14 @@ Rails.application.routes.draw do
   namespace :admin do
     get "dashboard", to: "dashboard#index"
 
-
-    # sau này mở rộng
+    resources :users, only: [:index]
     resources :teachers do
       resource :teacher_profile, except: [ :show ]
     end
-    resources :courses
-    resources :students
+    resources :courses, only: [:index]
+    resources :lessons, only: [:index]
+    resources :payments, only: [:index]
+    resources :students, only: [:index]
   end
 
   # ================= GENERIC =================
