@@ -1,60 +1,59 @@
-<div class="bg-white py-24 sm:py-32">
-  <div class="mx-auto grid max-w-7xl gap-20 px-6 lg:px-8 xl:grid-cols-3">
-
-    <!-- LEFT INTRO -->
-    <div class="max-w-xl">
-      <h2 class="text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
-        Danh sách Teachers
-      </h2>
-      <p class="mt-6 text-lg text-gray-600">
-        Quản lý đội ngũ giảng viên: thêm, sửa, xoá thông tin giáo viên.
-      </p>
-    </div>
-
-    <!-- RIGHT LIST -->
-    <ul role="list"
-        class="grid gap-x-8 gap-y-12 sm:grid-cols-2 sm:gap-y-16 xl:col-span-2">
-
-      <% @teachers.each do |teacher| %>
-        <% profile = teacher.teacher_profile %>
-
-        <li>
-          <%= link_to admin_teacher_path(teacher),
-              class: "flex items-start gap-x-6 hover:bg-gray-50 p-4 rounded-lg transition" do %>
-
-            <!-- AVATAR -->
-            <% if profile&.avatar&.attached? %>
-              <%= image_tag profile.avatar,
-                    class: "size-16 rounded-full object-cover outline-1 -outline-offset-1 outline-black/5" %>
-            <% else %>
-              <%= image_tag "default-avatar.png",
-                    class: "size-16 rounded-full object-cover opacity-70" %>
-            <% end %>
-
-            <!-- INFO -->
-            <div>
-              <h3 class="text-base font-semibold text-gray-900">
-                <%= teacher.full_name %>
-              </h3>
-
-              <p class="text-sm font-medium text-indigo-600">
-                <%= profile&.expertise || "Chưa cập nhật chuyên môn" %>
-              </p>
-
-              <p class="mt-2 text-sm text-gray-600">
-                <%= profile&.bio || "Chưa có mô tả" %>
-              </p>
-
-              <p class="mt-1 text-sm text-gray-500">
-                Kinh nghiệm:
-                <%= profile&.experience_years || "Chưa cập nhật" %>
-              </p>
+<div class="w-full relative flex ct-docs-disable-sidebar-content overflow-x-hidden">
+  <%= render "admin/shared/sidebar" %>
+  
+  <div class="relative md:ml-64 bg-blueGray-100 w-full">
+    <div class="px-4 md:px-6 mx-auto w-full -mt-24 pt-24">
+      <div class="flex flex-wrap">
+        <div class="w-full px-4">
+          <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white">
+            <div class="rounded-t mb-0 px-4 py-3 border-0">
+              <div class="flex flex-wrap items-center">
+                <div class="relative w-full max-w-full flex-grow flex-1">
+                  <h3 class="font-bold text-lg text-blueGray-700">Teachers List</h3>
+                </div>
+              </div>
             </div>
-
-          <% end %>
-        </li>
-      <% end %>
-
-    </ul>
+  <div class="block w-full overflow-x-auto">
+    <table class="items-center w-full bg-transparent border-collapse">
+      <thead>
+        <tr>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">ID</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Full Name</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Email</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Expertise</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Experience</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @teachers.each do |teacher| %>
+          <tr>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= teacher.id %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= teacher.full_name %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= teacher.email %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= teacher.teacher_profile&.expertise || "N/A" %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= teacher.teacher_profile&.experience_years || 0 %> years
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= link_to "View", admin_teacher_path(teacher), class: "text-blue-500 hover:text-blue-700" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

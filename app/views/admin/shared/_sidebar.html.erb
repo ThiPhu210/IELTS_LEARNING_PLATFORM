@@ -1,0 +1,31 @@
+<nav class="fixed top-0 left-0 h-screen w-64 bg-white shadow-xl flex flex-col z-50">
+  <div class="flex-col min-h-full flex flex-wrap items-center justify-between w-full mx-auto overflow-y-auto">
+    <div class="flex flex-col items-stretch mt-4 flex-1 w-full">
+      <%= link_to admin_dashboard_path, class: "flex items-center text-blueGray-700 text-sm uppercase font-bold p-4" do %>
+        <img src="https://png.pngtree.com/png-clipart/20230930/original/pngtree-man-avatar-isolated-png-image_13022170.png" class="max-w-full rounded">
+        
+      <% end %>
+
+      <hr class="my-4">
+      <h6 class="text-blueGray-500 text-xs uppercase font-bold pt-1 pb-4">USERS MANAGEMENT</h6>
+      <%= link_to admin_students_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+        <i class="fas fa-newspaper mr-2 text-sm text-blueGray-400"></i>Students
+      <% end %>
+      <%= link_to admin_teachers_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+        <i class="fas fa-user-circle mr-2 text-sm text-blueGray-400"></i>Teachers
+      <% end %>
+
+      <hr class="my-4">
+      <h6 class="text-blueGray-500 text-xs uppercase font-bold pt-1 pb-4">MATERIAL MANAGEMENT</h6>
+      <%= link_to admin_courses_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+        <i class="fab fa-angular mr-2 text-sm text-blueGray-400"></i>Courses
+      <% end %>
+      <%= link_to admin_lessons_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+        <i class="fab fa-react mr-2 text-sm text-blueGray-400"></i>Lessons
+      <% end %>
+      <%= link_to admin_payments_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+        <i class="fab fa-vuejs mr-2 text-sm text-blueGray-400"></i>Payment
+      <% end %>
+    </div>
+  </div>
+</nav>

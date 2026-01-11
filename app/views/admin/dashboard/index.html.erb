@@ -1,91 +1,519 @@
-<div class="admin-dashboard">
-  <h1 class="dashboard-title">ADMIN DASHBOARD</h1>
-  <p class="subtitle">Tổng quan hệ thống</p>
+<%
+  current_year = Time.current.year
+  data_current = @chart_data[current_year] || Array.new(12, 0)
+  data_last    = @chart_data[current_year - 1] || Array.new(12, 0)
+%>
 
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h3>Total Users</h3>
-      <p class="number"><%= @total_users %></p>
+
+<script>
+  window.chartData = {
+    labels: <%= raw @months.to_json %>,
+    currentYear: <%= current_year %>,
+    lastYear: <%= current_year - 1 %>,
+    dataCurrent: <%= raw data_current.to_json %>,
+    dataLast: <%= raw data_last.to_json %>
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
+<script
+function reloadStudentChart() {
+  fetch("/admin/charts/students")
+    .then(res => res.json())
+    .then(data => {
+      window.studentChart.data.datasets[0].data = data.current;
+      window.studentChart.data.datasets[1].data = data.last;
+      window.studentChart.update();
+    });
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var data = window.chartData;
+
+  var config = {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [
+        {
+          label: "Students-" + data.currentYear,
+          backgroundColor: "#4c51bf",
+          borderColor: "#4c51bf",
+          borderWidth: 3,
+          data: data.dataCurrent,
+          fill: false,
+        },
+        {
+          label: "Students-" + data.lastYear,
+          backgroundColor: "#ed64a6",
+          borderColor: "#ed64a6",
+          borderWidth: 3,
+          data: data.dataLast,
+          fill: false,
+        },
+      ],
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      title: {
+         display: true,
+         text: "Student Registrations (" + data.lastYear + " vs " + data.currentYear + ")",
+         fontColor: "000",
+         fontSize: 16,
+       },
+      legend: {
+        labels: { fontColor: "#000" },
+        align: "end",
+        position: "bottom",
+      },
+      scales: {
+         xAxes: [
+           {
+             scaleLabel: {
+               display: true,
+               labelString: "Month",
+               fontColor: "white",
+               fontSize: 12,
+             },
+             ticks: {
+               fontColor: "#000",
+             },
+             gridLines: {
+               color: "rgba(0,0,0,0.1)",
+             },
+           },
+         ],
+         yAxes: [
+            {
+              scaleLabel: {
+                display: true,
+                labelString: "Student Count",
+                fontColor: "#000",
+                fontSize: 12,
+              },
+              ticks: {
+                beginAtZero: true,
+                precision: 0,
+                autoSkip: false,
+                maxTicksLimit: 10,
+                fontColor: "#000",
+              },
+              gridLines: {
+                color: "rgba(0,0,0,0.1)",
+              },
+            },
+          ],
+          
+       },
+       
+    },
+  };
+
+  var ctx = document.getElementById("line-chart");
+  if (ctx) {
+    new Chart(ctx.getContext("2d"), config);
+  }
+});
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const btn = document.getElementById("avatarMenuButton");
+    const dropdown = document.getElementById("avatarDropdown");
+
+    btn.addEventListener("click", function(e) {
+      e.stopPropagation();
+      dropdown.classList.toggle("hidden");
+    });
+
+    document.addEventListener("click", function(e) {
+      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
+        dropdown.classList.add("hidden");
+      }
+    });
+  });
+</script>
+
+
+<div class="w-full relative flex ct-docs-disable-sidebar-content overflow-x-hidden">
+    <nav class="block py-4 px-6 top-0 bottom-0 w-64 bg-white shadow-xl left-0 absolute flex-row flex-nowrap md:z-10 z-9999 transition-all duration-300 ease-in-out transform md:translate-x-0 -translate-x-full">
+       <button class="md:hidden flex items-center justify-center cursor-pointer text-blueGray-700 w-6 h-10 border-l-0 border-r border-t border-b border-solid border-blueGray-100 text-xl leading-none bg-white rounded-r border border-solid border-transparent absolute top-1/2 -right-24-px focus:outline-none z-9998"><i class="fas fa-ellipsis-v"></i></button>
+       <div class="flex-col min-h-full px-0 flex flex-wrap items-center justify-between w-full mx-auto overflow-y-auto overflow-x-hidden">
+          <div class="flex bg-white flex-col items-stretch opacity-100 relative mt-4 overflow-y-auto overflow-x-hidden h-auto z-40 items-center flex-1 rounded w-full">
+             <img src="https://png.pngtree.com/png-clipart/20230930/original/pngtree-man-avatar-isolated-png-image_13022170.png" alt="..." class="max-w-full rounded">
+             <div class="md:flex-col md:min-w-full flex flex-col list-none">
+                <hr class="my-4 md:min-w-full">
+                <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">USERS MANAGEMENT</h6>
+                <%= link_to admin_students_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+                  <i class="fas fa-newspaper mr-2 text-sm text-blueGray-400"></i>Students
+                <% end %>
+                <%= link_to admin_teachers_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+                  <i class="fas fa-user-circle mr-2 text-sm text-blueGray-400"></i>Teachers
+                <% end %>
+                <hr class="my-4 md:min-w-full">
+                <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">MATERIAL MANAGEMENT</h6>
+                <%= link_to admin_courses_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+                  <i class="fab fa-angular mr-2 text-sm text-blueGray-400"></i>Courses
+                <% end %>
+                <%= link_to admin_lessons_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+                  <i class="fab fa-react mr-2 text-sm text-blueGray-400"></i>Lessons
+                <% end %>
+                <%= link_to admin_payments_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
+                  <i class="fab fa-vuejs mr-2 text-sm text-blueGray-400"></i>Payment
+                <% end %>
+             </div>
+          </div>
+       </div>
+    </nav>
+    <div class="relative md:ml-64 bg-blueGray-100 w-full"> <!-- Navbar --> <nav class="absolute top-0 right-0 w-full z-10 bg-white flex items-center justify-end py-1 px-4"> <!-- Avatar + Dropdown --> <div class="relative" id="avatarWrapper"> <!-- Avatar --> <button id="avatarMenuButton" class="w-12 h-12 rounded-full overflow-hidden focus:outline-none"> <img alt="avatar" class="w-full h-full object-cover shadow-lg" src="https://demos.creative-tim.com/notus-pro-react/static/media/team-1-800x800.fa5a7ac2.jpg"> </button> <!-- Dropdown --> <div id="avatarDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50"> <ul class="py-1"> <li> <%= button_to "Đăng xuất", logout_path, method: :delete, class: "w-full text-left px-25 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap" %> </li> </ul> </div> </div> </nav>
+       <div class="relative pt-32 pb-32 bg-lightBlue-500">
+          <div class="px-4 md:px-6 mx-auto w-full">
+             <div>
+                <div class="flex flex-wrap">
+                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
+                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                         <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">Traffic</h5>
+                                  <span class="font-bold text-xl">350,897</span>
+                               </div>
+                               <div class="relative w-auto pl-4 flex-initial">
+                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500"><i class="far fa-chart-bar"></i></div>
+                               </div>
+                            </div>
+                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-emerald-500 mr-2"><i class="fas fa-arrow-up"></i> 3.48%</span><span class="whitespace-nowrap">Since last month</span></p>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
+                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                         <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">NEW USERS</h5>
+                                  <span class="font-bold text-xl">2,356</span>
+                               </div>
+                               <div class="relative w-auto pl-4 flex-initial">
+                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-orange-500"><i class="fas fa-chart-pie"></i></div>
+                               </div>
+                            </div>
+                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-red-500 mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span><span class="whitespace-nowrap">Since last week</span></p>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
+                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                         <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">SALES</h5>
+                                  <span class="font-bold text-xl">924</span>
+                               </div>
+                               <div class="relative w-auto pl-4 flex-initial">
+                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-pink-500"><i class="fas fa-users"></i></div>
+                               </div>
+                            </div>
+                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-orange-500 mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span><span class="whitespace-nowrap">Since yesterday</span></p>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
+                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
+                         <div class="flex-auto p-4">
+                            <div class="flex flex-wrap">
+                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
+                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">PERFORMANCE</h5>
+                                  <span class="font-bold text-xl">49,65%</span>
+                               </div>
+                               <div class="relative w-auto pl-4 flex-initial">
+                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-lightBlue-500"><i class="fas fa-percent"></i></div>
+                               </div>
+                            </div>
+                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-emerald-500 mr-2"><i class="fas fa-arrow-up"></i> 12%</span><span class="whitespace-nowrap">Since last month</span></p>
+                          
+                            </div>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+       </div>
+       <div class="px-4 md:px-6 mx-auto w-full -mt-24">
+          <div class="flex flex-wrap">
+             <div class="w-full xl:w-8/12 px-4">
+                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-blueGray-800">
+                   <div class="rounded-t mb-0 px-4 py-3 bg-transparent">
+                      <div class="flex flex-wrap items-center">
+                         <div class="relative w-full max-w-full flex-grow flex-1">
+                            <h6 class="uppercase mb-1 text-xs font-semibold text-blueGray-200">Overview</h6>
+                            <h2 class="text-xl font-semibold text-white">Students Chart</h2>
+                            <div class="p-4 flex-auto">
+                            <div class="relative h-350-px">
+                               <canvas width="500" height="300" style="display: block; box-sizing: border-box; height: 350px; width: 595.5px;" id="line-chart"></canvas>
+                            </div>
+
+                         </div>
+                      </div>
+                   </div>
+
+                   </div>
+                </div>
+             </div>
+             <div class="w-full xl:w-4/12 px-4">
+                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white">
+                   <div class="rounded-t mb-0 px-4 py-3 bg-transparent">
+                      <div class="flex flex-wrap items-center">
+                         <div class="relative w-full max-w-full flex-grow flex-1">
+                            <h6 class="uppercase mb-1 text-xs font-semibold text-blueGray-500">Performance</h6>
+                            <h2 class="text-xl font-semibold text-blueGray-800">Total orders</h2>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="p-4 flex-auto">
+                      <div class="relative h-350-px">
+                         <canvas width="221" height="291" style="display: block; box-sizing: border-box; height: 350px; width: 265.7px;" id="bar-chart"></canvas>
+                      </div>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <div class="flex flex-wrap">
+             <div class="w-full xl:w-8/12 px-4">
+                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white text-blueGray-700">
+                   <div class="px-6 py-4 border-0">
+                      <div class="flex flex-wrap items-center">
+                         <div class="relative w-full max-w-full flex-grow flex-1">
+                            <h3 class="font-bold text-lg text-blueGray-700">Page visits</h3>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="block w-full overflow-x-auto">
+                      <table class="items-center w-full bg-transparent border-collapse">
+                         <thead>
+                            <tr>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Page name</th>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Visitors</th>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Unique Users</th>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Bounce Rate</th>
+                            </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">4,569</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">340</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-emerald-500"></i>46,53%</div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/index.html</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">3,985</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">319</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><i class="fas fa-arrow-down mr-2 text-orange-500"></i>46,53%</div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/charts.html</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">3,513</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">294</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><i class="fas fa-arrow-down mr-2 text-orange-500"></i>36,49%</div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/tables.html</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">2,050</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">147</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-emerald-500"></i>50,87%</div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/profile.html</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">1,795</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">190</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-red-500"></i>46,53%</div>
+                               </td>
+                            </tr>
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+             </div>
+             <div class="w-full xl:w-4/12 px-4">
+                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white text-blueGray-700">
+                   <div class="px-6 py-4 border-0">
+                      <div class="flex flex-wrap items-center">
+                         <div class="relative w-full max-w-full flex-grow flex-1">
+                            <h3 class="font-bold text-lg text-blueGray-700">Social traffic</h3>
+                         </div>
+                      </div>
+                   </div>
+                   <div class="block w-full overflow-x-auto">
+                      <table class="items-center w-full bg-transparent border-collapse">
+                         <thead>
+                            <tr>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Referral</th>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Visitors</th>
+                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200"></th>
+                            </tr>
+                         </thead>
+                         <tbody>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Facebook</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">1,480</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
+                                  <div class="flex items-center">
+                                     <span class="mr-2">60%</span>
+                                     <div class="relative w-full">
+                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-red-200">
+                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500" style="width: 60%;"></div>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Facebook</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">5,480</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
+                                  <div class="flex items-center">
+                                     <span class="mr-2">70%</span>
+                                     <div class="relative w-full">
+                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-emerald-200">
+                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-emerald-500" style="width: 70%;"></div>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Google</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">4,807</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
+                                  <div class="flex items-center">
+                                     <span class="mr-2">80%</span>
+                                     <div class="relative w-full">
+                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-indigo-200">
+                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500" style="width: 80%;"></div>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Instagram</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">3,678</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
+                                  <div class="flex items-center">
+                                     <span class="mr-2">75%</span>
+                                     <div class="relative w-full">
+                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-lightBlue-200">
+                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-lightBlue-500" style="width: 75%;"></div>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </td>
+                            </tr>
+                            <tr>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Twitter</span></div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <div class="flex items-center">2,645	</div>
+                               </td>
+                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
+                                  <div class="flex items-center">
+                                     <span class="mr-2">30%</span>
+                                     <div class="relative w-full">
+                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-amber-200">
+                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-amber-500" style="width: 30%;"></div>
+                                        </div>
+                                     </div>
+                                  </div>
+                               </td>
+                            </tr>
+                         </tbody>
+                      </table>
+                   </div>
+                </div>
+             </div>
+          </div>
+          <footer class="block py-4">
+             <div class="container mx-auto px-4">
+                <hr class="mb-4 border-b-1 border-blueGray-200">
+                <div class="flex flex-wrap items-center md:justify-between justify-center">
+                   <div class="w-full md:w-4/12 px-4">
+                      <div class="text-center mb-2 md:text-left md:mb-0"><a href="https://www.creative-tim.com/?ref=npr-footeradmin" target="_blank" class="text-sm text-blueGray-500 font-semibold py-1 text-center md:text-left">Copyright © 2021 Creative Tim</a></div>
+                   </div>
+                   <div class="w-full md:w-8/12 px-4">
+                      <ul class="flex flex-wrap list-none md:justify-end  justify-center">
+                         <li><a href="https://www.creative-tim.com?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Creative Tim</a></li>
+                         <li><a href="https://www.creative-tim.com/presentation?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">About Us</a></li>
+                         <li><a href="https://www.creative-tim.com/blog/?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Blog</a></li>
+                         <li><a href="https://www.creative-tim.com/license?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Licenses</a></li>
+                      </ul>
+                   </div>
+                </div>
+             </div>
+          </footer>
+       </div>
     </div>
-
-    <div class="stat-card">
-      <h3>Teachers</h3>
-      <p class="number"><%= @teachers_count %></p>
-      <%= link_to "Quản lý", admin_teachers_path, class: "action-link" %>
-    </div>
-
-    <div class="stat-card">
-      <h3>Students</h3>
-      <p class="number"><%= @students_count %></p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Admins</h3>
-      <p class="number"><%= @admins_count %></p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Courses</h3>
-      <p class="number"><%= @courses_count %></p>
-    </div>
-
-    <div class="stat-card">
-      <h3>Lessons</h3>
-      <p class="number"><%= @lessons_count %></p>
-    </div>
-  </div>
-</div>
-
-<style>
-.admin-dashboard {
-  padding: 20px;
-  font-family: sans-serif;
-}
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr); 
-  grid-template-rows: repeat(2, auto);  
-  gap: 20px;
-}
-
-
-.stat-card {
-  background-color: #fcfff2;
-  padding: 100px;
-  border-radius: 20px;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.stat-card h3 {
-  margin-bottom: 10px;
-  font-size: 30px;
-  color: #333;
-}
-
-.stat-card .number {
-  font-size: 40px;
-  font-weight: bold;
-  color: #111;
-}
-
-.action-link {
-  display: inline-block;
-  margin-top: 10px;
-  color: #1d4ed8;
-  text-decoration: underline;
-}
-
-
-.dashboard-title {
-  font-weight: bold;     
-  font-size: 50px;       
-  text-transform: uppercase;
-  margin-bottom: 10px;    
-}
+ </div>
 
 
 
-</style>
 
+
+
+ 

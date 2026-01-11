@@ -1,30 +1,38 @@
 <!DOCTYPE html>
 <html>
   <head>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <title><%= content_for(:title) || "Ielts Platform" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
+    <!-- Icons -->
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+
+    <!-- Rails CSS -->
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
-  <body>
-    <main class="flex justify-center mt-28 px-5 w-full">
-    <%= yield %>
+  <body class="g-sidenav-show bg-gray-100">
+
+  
+  <%= yield %>
 
     <% if flash[:success] %>
       <script>
@@ -34,16 +42,10 @@
             title: 'Thành công 🎉',
             text: "<%= j flash[:success] %>",
             confirmButtonText: 'OK'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.href = "/admin/teachers";
-            }
           });
         });
       </script>
     <% end %>
-    </main>
- 
 
   </body>
 </html>

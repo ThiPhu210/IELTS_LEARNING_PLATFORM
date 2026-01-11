@@ -1,0 +1,29 @@
+<div class="relative">
+  <button
+    onclick="toggleDropdown(<%= course.id %>)"
+    class="px-4 py-2 border rounded-md bg-white shadow hover:shadow-lg">
+    <i class="fas fa-cog"></i>
+  </button>
+
+  <div
+    id="dropdown-<%= course.id %>"
+    class="hidden absolute right-0 mt-2 bg-white rounded-lg shadow-lg min-w-40 z-50">
+
+    <!-- EDIT -->
+    <%= link_to "Edit",
+      edit_admin_course_path(course),
+      class: "block px-4 py-2 hover:bg-gray-100" %>
+
+    <!-- DELETE -->
+    <%= link_to "Delete",
+      admin_course_path(course),
+      method: :delete,
+      data: { confirm: "Bạn chắc chắn muốn xóa khóa học này?" },
+      class: "block px-4 py-2 text-red-500 hover:bg-gray-100" %>
+  </div>
+</div>
+<script>
+  function toggleDropdown(id) {
+    document.getElementById(`dropdown-${id}`).classList.toggle("hidden")
+  }
+</script>
