@@ -34,7 +34,6 @@ RUN apt-get update -qq && \
       git \
       nodejs \
       npm && \
-      imagemagick \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
     
