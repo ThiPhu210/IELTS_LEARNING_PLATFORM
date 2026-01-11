@@ -65,14 +65,19 @@ Rails.application.configure do
     host: "example.com"
   }
 
-  # Specify outgoing SMTP server.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+
+  config.action_mailer.smtp_settings = {
+    address: "smtp.gmail.com",
+    port: 587,
+    domain: "gmail.com",
+    user_name: ENV["GMAIL_USERNAME"],
+    password: ENV["GMAIL_APP_PASSWORD"],
+    authentication: "plain",
+    enable_starttls_auto: true
+  }
 
   # Enable locale fallbacks for I18n.
   config.i18n.fallbacks = true
