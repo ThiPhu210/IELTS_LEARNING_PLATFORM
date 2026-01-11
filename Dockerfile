@@ -37,8 +37,14 @@ RUN apt-get update -qq && \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
 
+# Copy Gemfile + Gemfile.lock để đảm bảo version gem ổn định
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
+
+# Cấu hình Bundler chuẩn cho production
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle config set --local frozen 'true' && \
+    bundle install && \
     bundle exec bootsnap precompile --gemfile && \
     rm -rf ~/.bundle "${BUNDLE_PATH}"/ruby/*/cache
 
