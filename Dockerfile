@@ -14,7 +14,8 @@ RUN apt-get update -qq && \
       curl \
       postgresql-client \
       libjemalloc2 \
-      libvips && \
+      libvips \
+      imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
 ENV RAILS_ENV=production \
