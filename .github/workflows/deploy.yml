@@ -10,6 +10,8 @@ env:
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
+  GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
 on:
   pull_request:
   push:
@@ -127,6 +129,8 @@ jobs:
             DB_PASSWORD=${{ secrets.DB_PASSWORD }}
             AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
             AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            GMAIL_USERNAME=${{ secrets.GMAIL_USERNAME }}
+            GMAIL_APP_PASSWORD=${{ secrets.GMAIL_APP_PASSWORD }}
             echo "Deploying Docker container on EC2..."
             docker system prune -a -f
             docker pull $DOCKER_USER/myapp:latest
@@ -142,5 +146,7 @@ jobs:
               -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
               -e AWS_REGION=us-east-1 \
               -e AWS_BUCKET=ielts-learning-platform-uploads \
+              -e GMAIL_USERNAME=$GMAIL_USERNAME
+              -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               $DOCKER_USER/myapp:latest \
               sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
