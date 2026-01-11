@@ -9,6 +9,7 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DATABASE_URL: ${{ secrets.DATABASE_URL }}
 on:
   pull_request:
   push:
@@ -133,10 +134,7 @@ jobs:
               -p 3000:3000 \
               -e RAILS_ENV=$RAILS_ENV \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
-              -e DB_HOST=$DB_HOST \
-              -e DB_PORT=$DB_PORT \
-              -e DB_USERNAME=$DB_USERNAME \
-              -e DB_PASSWORD=$DB_PASSWORD \
+              -e DATABASE_URL="$DATABASE_URL" \
               -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
               -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
               -e AWS_REGION=us-east-1 \
