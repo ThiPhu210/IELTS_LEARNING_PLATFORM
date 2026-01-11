@@ -37,16 +37,15 @@ RUN apt-get update -qq && \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy Gemfile + Gemfile.lock để đảm bảo version gem ổn định
 COPY Gemfile Gemfile.lock ./
 
-# Cấu hình Bundler chuẩn cho production
 RUN bundle config set --local deployment 'true' && \
     bundle config set --local without 'development test' && \
-    bundle config set --local frozen 'true' && \
+    bundle config set --local frozen 'false' && \
     bundle install && \
     bundle exec bootsnap precompile --gemfile && \
     rm -rf ~/.bundle "${BUNDLE_PATH}"/ruby/*/cache
+
 
 COPY package.json* yarn.lock* ./
 RUN [ -f package.json ] && yarn install --frozen-lockfile || echo "No JS deps"
