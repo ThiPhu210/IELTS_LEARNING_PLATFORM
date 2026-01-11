@@ -141,5 +141,6 @@ jobs:
               -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
               -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
               -e AWS_REGION=us-east-1 \
+              -e AWS_BUCKET=ielts-learning-platform-uploads \
               $DOCKER_USER/myapp:latest \
               sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
