@@ -9,7 +9,7 @@ gem "groupdate"
 gem "image_processing", "~> 1.12"
 gem "mini_magick"
 group :development, :test do
-  gem "rspec-rails", "~> 7.0"
+  gem "rspec-rails", "~> 8.0"
   gem "capybara"
   gem "selenium-webdriver" # nếu muốn test JS
   gem "factory_bot_rails"
