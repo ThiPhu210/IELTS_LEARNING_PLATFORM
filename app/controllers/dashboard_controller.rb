@@ -1,5 +1,6 @@
 class DashboardController < ApplicationController
   before_action :require_login
+  before_action :disable_cache
 
   def index
     case current_user.role

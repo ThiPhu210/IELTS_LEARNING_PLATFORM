@@ -1,0 +1,66 @@
+<div class="w-full relative flex ct-docs-disable-sidebar-content overflow-x-hidden">
+  <%= render "admin/shared/sidebar" %>
+  
+  <div class="relative md:ml-64 bg-blueGray-100 w-full">
+    <div class="px-4 md:px-6 mx-auto w-full -mt-24 pt-24">
+      <div class="flex flex-wrap">
+        <div class="w-full px-4">
+          <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-white">
+            <div class="rounded-t mb-0 px-4 py-3 border-0">
+              <div class="flex flex-wrap items-center">
+                <div class="relative w-full max-w-full flex-grow flex-1">
+                  <h3 class="font-bold text-lg text-blueGray-700">Payments List</h3>
+                </div>
+              </div>
+            </div>
+  <div class="block w-full overflow-x-auto">
+    <table class="items-center w-full bg-transparent border-collapse">
+      <thead>
+        <tr>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">ID</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Transaction Code</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Amount</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Payment Method</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Status</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Order ID</th>
+          <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Created At</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @payments.each do |payment| %>
+          <tr>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= payment.id %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= payment.transaction_code %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              $<%= payment.amount %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= payment.payment_method %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <span class="px-2 py-1 text-xs font-semibold rounded-full <%= payment.status == 'paid' ? 'bg-green-200 text-green-800' : payment.status == 'pending' ? 'bg-yellow-200 text-yellow-800' : 'bg-red-200 text-red-800' %>">
+                <%= payment.status.capitalize %>
+              </span>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= payment.order_id %>
+            </td>
+            <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+              <%= payment.created_at.strftime("%Y-%m-%d %H:%M") %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

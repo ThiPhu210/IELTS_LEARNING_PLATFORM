@@ -1,15 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Admin Dashboard</title>
-</head>
-<body>
-  <nav>
-    <%= link_to "Users", "#" %> |
-    <%= link_to "Courses", "#" %> |
-    <%= button_to "Logout", logout_path, method: :delete %>
-  </nav>
+  <title>Admin</title>
 
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+</head>
+
+<body class="bg-gray-50">
   <%= yield %>
 </body>
 </html>

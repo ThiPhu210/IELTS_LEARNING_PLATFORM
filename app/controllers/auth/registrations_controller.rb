@@ -10,10 +10,11 @@ class Auth::RegistrationsController < ApplicationController
     @user.role = "student" # default role
     if @user.save
       session[:user_id] = @user.id
-      redirect_to student_dashboard_path, notice: "Đăng ký thành công!"
+      UserMailer.welcome_email(@user).deliver_now
+      redirect_to login_path, notice: "Đăng ký thành công!"
     else
       flash.now[:alert] = @user.errors.full_messages.join(", ")
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 

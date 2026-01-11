@@ -31,7 +31,8 @@
 
   <body class="g-sidenav-show bg-gray-100">
 
-    <%= yield %>
+  
+  <%= yield %>
 
     <% if flash[:success] %>
       <script>
@@ -45,5 +46,6 @@
         });
       </script>
     <% end %>
+
   </body>
 </html>

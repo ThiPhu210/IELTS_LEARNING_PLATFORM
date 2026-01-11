@@ -1,0 +1,38 @@
+<h2 class="text-2xl font-semibold text-blueGray-700 mb-6">
+  Edit Course
+</h2>
+
+<%= form_with model: [:admin, @course], local: true do |f| %>
+
+  <!-- IMAGE -->
+  <div class="w-full text-center mb-6">
+    <% if @course.thumbnail.attached? %>
+      <%= image_tag @course.thumbnail,
+        class: "rounded-lg shadow-lg max-w-200-px mx-auto mb-4" %>
+    <% end %>
+
+    <%= f.file_field :thumbnail, class: "hidden", id: "course-image" %>
+
+    <label for="course-image"
+      class="cursor-pointer inline-block px-4 py-2 bg-blueGray-800 text-white rounded-md shadow">
+      Change image
+    </label>
+  </div>
+
+  <!-- TITLE -->
+  <div class="mb-4">
+    <%= f.text_field :title,
+      class: "border-blueGray-300 px-3 py-3 text-sm w-full rounded-md focus:ring-lightBlue-500" %>
+  </div>
+
+  <!-- DESCRIPTION -->
+  <div class="mb-4">
+    <%= f.text_area :description,
+      rows: 5,
+      class: "border-blueGray-300 px-3 py-2 text-sm w-full rounded-md focus:ring-lightBlue-500" %>
+  </div>
+
+  <%= f.submit "Update Course",
+    class: "bg-lightBlue-500 text-white px-6 py-2 rounded-md shadow hover:shadow-lg" %>
+
+<% end %>
