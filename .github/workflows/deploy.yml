@@ -146,7 +146,7 @@ jobs:
               -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
               -e AWS_REGION=us-east-1 \
               -e AWS_BUCKET=ielts-learning-platform-uploads \
-              -e GMAIL_USERNAME=$GMAIL_USERNAME
+              -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               $DOCKER_USER/myapp:latest \
               sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
