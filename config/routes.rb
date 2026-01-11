@@ -44,7 +44,7 @@ Rails.application.routes.draw do
     resources :teachers do
       resource :teacher_profile, except: [ :show ]
     end
-    resources :courses, only: [:index]
+    resources :courses, only: [:index, :edit, :update, :destroy]
     resources :lessons, only: [:index]
     resources :payments, only: [:index]
     resources :students, only: [:index]
