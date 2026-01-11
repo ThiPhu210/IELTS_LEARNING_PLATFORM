@@ -34,9 +34,10 @@ RUN apt-get update -qq && \
       git \
       nodejs \
       npm && \
+      imagemagick \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
-
+    
 COPY Gemfile Gemfile.lock ./
 
 RUN bundle config set --local deployment 'true' && \
