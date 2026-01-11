@@ -149,4 +149,4 @@ jobs:
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               $DOCKER_USER/myapp:latest \
-              sh -c "bundle exec rails db:drop db:create db:migrate db:seed && bundle exec rails server -b 0.0.0.0 -p 3000"
+              sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
