@@ -1,4 +1,4 @@
-host = ENV.fetch("APP_HOST") || "ielts-learning-platform.duckdns.org"
+host = "ielts-learning-platform.duckdns.org"
 
 Rails.application.routes.default_url_options[:host] = host
 Rails.application.routes.default_url_options[:protocol] = "https"
