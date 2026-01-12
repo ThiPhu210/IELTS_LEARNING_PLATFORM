@@ -1,0 +1,25 @@
+FROM ruby:3.3.5
+
+WORKDIR /rails
+
+# OS deps
+RUN apt-get update -qq && apt-get install -y \
+  build-essential \
+  libpq-dev \
+  nodejs \
+  npm \
+  git \
+  curl
+
+RUN npm install -g yarn
+
+# Copy gem files first
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# Copy source
+COPY . .
+
+EXPOSE 3000
+
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

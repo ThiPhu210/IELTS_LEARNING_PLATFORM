@@ -1,20 +1,27 @@
 class Auth::SessionsController < ApplicationController
-  # before_action :require_login
-  # before_action :redirect_if_logged_in, only: [ :new, :create ]
   before_action :disable_cache
+
   def new
   end
 
   def create
     user = User.find_by(email: params[:email])
 
-    if user&.authenticate(params[:password])
-      session[:user_id] = user.id
-      redirect_to dashboard_path
-    else
+    # ❌ Sai email hoặc mật khẩu
+    unless user&.authenticate(params[:password])
       flash.now[:alert] = "Email hoặc mật khẩu không đúng"
-      render :new
+      return render :new, status: :unprocessable_entity
     end
+
+    # 🚫 CHƯA CONFIRM EMAIL
+    unless user.confirmed?
+      flash.now[:alert] = "Vui lòng kiểm tra email và xác nhận tài khoản trước khi đăng nhập"
+      return render :new, status: :unprocessable_entity
+    end
+
+    # ✅ LOGIN OK
+    session[:user_id] = user.id
+    redirect_to after_login_path
   end
 
   def destroy
@@ -34,10 +41,8 @@ class Auth::SessionsController < ApplicationController
       root_path
     end
   end
+
   private
-  # def redirect_if_logged_in
-  #   redirect_to after_login_path if logged_in?
-  # end
 
   def disable_cache
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"

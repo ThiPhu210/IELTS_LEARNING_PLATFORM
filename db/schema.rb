@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_05_091016) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_12_035458) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "action_text_rich_texts", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "body"
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "record_id", "name"], name: "index_action_text_rich_texts_uniqueness", unique: true
+  end
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -63,6 +73,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_091016) do
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_course_progresses_on_course_id"
     t.index ["user_id"], name: "index_course_progresses_on_user_id"
+  end
+
+  create_table "course_sections", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.string "title"
+    t.string "description"
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_course_sections_on_course_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -173,6 +193,10 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_091016) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "confirmed", default: false, null: false
+    t.string "confirmation_token"
+    t.datetime "confirmed_at"
+    t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -181,6 +205,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_05_091016) do
   add_foreign_key "course_accesses", "users"
   add_foreign_key "course_progresses", "courses"
   add_foreign_key "course_progresses", "users"
+  add_foreign_key "course_sections", "courses"
   add_foreign_key "lessons", "courses"
   add_foreign_key "orders", "courses"
   add_foreign_key "orders", "users"
