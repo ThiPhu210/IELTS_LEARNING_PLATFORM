@@ -64,6 +64,11 @@ Rails.application.configure do
   config.action_mailer.default_url_options = {
     host: "example.com"
   }
+  Rails.application.routes.default_url_options = {
+  host: ENV.fetch("APP_HOST", "ielts-learning-platform.duckdns.org"),
+  protocol: "https"
+}
+
 
   Rails.application.configure do
     config.action_mailer.default_url_options = {
