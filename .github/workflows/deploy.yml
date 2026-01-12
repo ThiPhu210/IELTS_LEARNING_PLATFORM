@@ -149,7 +149,7 @@ jobs:
               -e AWS_BUCKET=ielts-learning-platform-uploads \
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
-              -e REDIS_URL=redis://172.31.18.246:6379/0 \
+              -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0
               $DOCKER_USER/myapp:latest \
               sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:drop db:create db:migrate db:seed && bundle exec rails server -b 0.0.0.0 -p 3000"
 
@@ -164,7 +164,7 @@ jobs:
               -e AWS_BUCKET=ielts-learning-platform-uploads \
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
-              -e REDIS_URL=redis://172.31.18.246:6379/0 \
+              -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0
               $DOCKER_USER/myapp:latest \
               bash -c "bundle exec rake sidekiq:clear && bundle exec sidekiq"
           
