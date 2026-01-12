@@ -65,21 +65,30 @@ Rails.application.configure do
     host: "example.com"
   }
 
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.perform_deliveries = true
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.logger = Logger.new(STDOUT)
+  Rails.application.configure do
+    config.action_mailer.default_url_options = {
+      host: ENV.fetch("APP_HOST", "ielts-learning-platform.duckdns.org"),
+      protocol: "https"
+    }
 
-  config.action_mailer.smtp_settings = {
-    address: "smtp.gmail.com",
-    port: 587,
-    domain: "gmail.com",
-    user_name: ENV["GMAIL_USERNAME"],
-    password: ENV["GMAIL_APP_PASSWORD"],
-    authentication: "plain",
-    enable_starttls_auto: true
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.logger = Logger.new(STDOUT)
+    config.action_mailer.smtp_settings = {
+      address: "smtp.gmail.com",
+      port: 587,
+      domain: "gmail.com",
+      user_name: ENV["GMAIL_USERNAME"],
+      password: ENV["GMAIL_APP_PASSWORD"],
+      authentication: "plain",
+      enable_starttls_auto: true
   }
-
+    config.cache_classes = true
+    config.eager_load = true
+    config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  end
+  
   # Enable locale fallbacks for I18n.
   config.i18n.fallbacks = true
 
