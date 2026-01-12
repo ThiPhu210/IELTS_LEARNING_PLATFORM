@@ -15,7 +15,7 @@ env:
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ Mailing Register Edit ]
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
