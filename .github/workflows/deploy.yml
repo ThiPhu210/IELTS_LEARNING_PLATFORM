@@ -15,7 +15,7 @@ env:
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [Mailing-Register-Edit]
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
@@ -148,5 +148,6 @@ jobs:
               -e AWS_BUCKET=ielts-learning-platform-uploads \
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
+              -e APP_HOST=ielts-learning-platform.duckdns.org \
               $DOCKER_USER/myapp:latest \
               sh -c "bundle exec rails db:prepare && bundle exec rails server -b 0.0.0.0 -p 3000"
