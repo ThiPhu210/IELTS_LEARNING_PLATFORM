@@ -67,5 +67,6 @@ courses.each do |attrs|
     c.assign_attributes(attrs)
   end
 end
+Rails.application.config.action_mailer.perform_deliveries = false
 
 puts "Done seeding!"
