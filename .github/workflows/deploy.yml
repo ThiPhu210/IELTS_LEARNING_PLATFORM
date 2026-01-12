@@ -158,6 +158,12 @@ jobs:
               -e RAILS_ENV=$RAILS_ENV \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
               -e DATABASE_URL="$DATABASE_URL" \
+              -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+              -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+              -e AWS_REGION=us-east-1 \
+              -e AWS_BUCKET=ielts-learning-platform-uploads \
+              -e GMAIL_USERNAME=$GMAIL_USERNAME \
+              -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               -e REDIS_URL=redis://172.31.18.246:6379/0 \
               $DOCKER_USER/myapp:latest \
               bundle exec sidekiq
