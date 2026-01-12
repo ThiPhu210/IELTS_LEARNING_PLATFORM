@@ -149,7 +149,7 @@ jobs:
               -e AWS_BUCKET=ielts-learning-platform-uploads \
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
-              -e REDIS_URL=redis://redis:6379/0 \
+              -e REDIS_URL=redis://host.docker.internal:6379/0 \
               $DOCKER_USER/myapp:latest \
               sh -c "bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
 
@@ -159,7 +159,7 @@ jobs:
               -e RAILS_ENV=$RAILS_ENV \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
               -e DATABASE_URL="$DATABASE_URL" \
-              -e REDIS_URL=redis://localhost:6379/0 \
+              -e REDIS_URL=redis://host.docker.internal:6379/0 \
               $DOCKER_USER/myapp:latest \
               bundle exec sidekiq
           
