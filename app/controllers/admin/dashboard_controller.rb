@@ -13,7 +13,7 @@ class Admin::DashboardController < ApplicationController
 
 
     adapter = ActiveRecord::Base.connection.adapter_name
-    years = [Time.current.year, Time.current.year - 1]
+    years = [ Time.current.year, Time.current.year - 1 ]
     @months = Date::MONTHNAMES[1..12]
     @chart_data = {}
 

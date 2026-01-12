@@ -6,4 +6,3 @@ class Admin::StudentsController < ApplicationController
     @students = User.student_role.order(created_at: :desc)
   end
 end
-

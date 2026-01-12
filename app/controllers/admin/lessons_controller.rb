@@ -6,4 +6,3 @@ class Admin::LessonsController < ApplicationController
     @lessons = Lesson.all.includes(:course).order(created_at: :desc)
   end
 end
-

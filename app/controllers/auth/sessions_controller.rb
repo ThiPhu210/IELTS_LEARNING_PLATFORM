@@ -1,5 +1,5 @@
 class Auth::SessionsController < ApplicationController
-  #before_action :require_login
+  # before_action :require_login
   # before_action :redirect_if_logged_in, only: [ :new, :create ]
   before_action :disable_cache
   def new

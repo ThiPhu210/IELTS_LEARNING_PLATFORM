@@ -9,9 +9,9 @@ class ApplicationController < ActionController::Base
     current_user.present?
   end
 
-  def require_login 
-    unless session[:user_id] 
-      redirect_to login_path 
+  def require_login
+    unless session[:user_id]
+      redirect_to login_path
     end
   end
 

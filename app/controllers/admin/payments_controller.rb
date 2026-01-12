@@ -6,4 +6,3 @@ class Admin::PaymentsController < ApplicationController
     @payments = Payment.all.includes(:order, :course_access).order(created_at: :desc)
   end
 end
-
