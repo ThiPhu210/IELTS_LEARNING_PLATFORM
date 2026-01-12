@@ -1,9 +1,7 @@
-Rails.application.routes.default_url_options = {
-  host: ENV.fetch("MAILER_HOST", "ielts-learning-platform.duckdns.org"),
-  port: ENV.fetch("MAILER_PORT", 3000)
-}
+if Rails.env.production?
+  Rails.application.config.action_mailer.default_url_options = {
+    host: ENV.fetch("ielts-learning-platform.duckdns.org"),
+    protocol: "https"
+  }
+end
 
-Rails.application.config.action_mailer.default_url_options = {
-  host: ENV.fetch("MAILER_HOST", "ielts-learning-platform.duckdns.org"),
-  port: ENV.fetch("MAILER_PORT", 3000)
-}
