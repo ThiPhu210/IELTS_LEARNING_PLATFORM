@@ -1,0 +1,13 @@
+{
+  "name": "Rails Dev",
+  "dockerFile": "Dockerfile",
+  "forwardPorts": [3000, 5432],
+  "features": {
+    "ghcr.io/devcontainers/features/postgres:1": {
+      "version": "15",
+      "database": "myapp_development",
+      "user": "postgres",
+      "password": "postgres"
+    }
+  }
+}
