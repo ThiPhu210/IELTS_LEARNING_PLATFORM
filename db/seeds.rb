@@ -76,8 +76,4 @@ courses.each do |attrs|
     c.assign_attributes(attrs)
   end
 end
-
-Rails.application.config.action_mailer.perform_deliveries = false
-Sidekiq::Testing.inline! if defined?(Sidekiq::Testing)
-
 puts "Done seeding!"
