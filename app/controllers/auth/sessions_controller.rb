@@ -35,10 +35,6 @@ class Auth::SessionsController < ApplicationController
     end
   end
   private
-  # def redirect_if_logged_in
-  #   redirect_to after_login_path if logged_in?
-  # end
-
   def disable_cache
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
