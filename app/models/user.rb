@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   before_create :set_confirmation_token
-  after_commit :send_confirmation_email, on: :create
+  after_commit :send_confirmation_email, on: :create, unless: :confirmed?
 
   has_secure_password
   has_many :course_accesses
