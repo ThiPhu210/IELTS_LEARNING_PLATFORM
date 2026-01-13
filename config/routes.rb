@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
     get  "/register", to: "registrations#new"
     post "/register", to: "registrations#create"
-    get "/confirm", to: "confirmations#show", as: :confirm_email
+    get "/confirm", to: "confirmations#show", as: :confirm_account
   end
 
   # ================= DASHBOARDS =================
