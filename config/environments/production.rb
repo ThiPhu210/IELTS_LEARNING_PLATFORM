@@ -15,6 +15,11 @@ Rails.application.configure do
   config.active_storage.service = :amazon
   config.assume_ssl = true
   config.force_ssl = true
+  config.session_store :cookie_store,
+    key: "_ielts_session",
+    secure: true,       
+    same_site: :lax      
+
 
   config.log_tags = [:request_id]
   config.logger = ActiveSupport::TaggedLogging.logger($stdout)
