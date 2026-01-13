@@ -24,7 +24,7 @@ Rails.application.configure do
 
   # ActionMailer
   config.action_mailer.default_url_options = {
-    host: ENV.fetch("APP_HOST", "ielts-learning-platform.duckdns.org"),
+    host: "https://d34ute7tylgmox.cloudfront.net",
     protocol: "https"
   }
   config.action_mailer.delivery_method = :smtp
