@@ -2,24 +2,25 @@ class Auth::SessionsController < ApplicationController
   before_action :disable_cache
 
   def new
+    if current_user
+      redirect_to after_login_path
+    end
   end
+
 
   def create
     user = User.find_by(email: params[:email])
 
-    # ❌ Sai email hoặc mật khẩu
     unless user&.authenticate(params[:password])
       flash.now[:alert] = "Email hoặc mật khẩu không đúng"
       return render :new, status: :unprocessable_entity
     end
 
-    # 🚫 CHƯA CONFIRM EMAIL
     unless user.confirmed?
       flash.now[:alert] = "Vui lòng kiểm tra email và xác nhận tài khoản trước khi đăng nhập"
       return render :new, status: :unprocessable_entity
     end
 
-    # ✅ LOGIN OK
     session[:user_id] = user.id
     redirect_to after_login_path
   end
