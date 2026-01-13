@@ -1,4 +1,4 @@
-host = "ielts-learning-platform.duckdns.org"
+host = "https://d34ute7tylgmox.cloudfront.net"
 
 Rails.application.routes.default_url_options[:host] = host
 Rails.application.routes.default_url_options[:protocol] = "https"
