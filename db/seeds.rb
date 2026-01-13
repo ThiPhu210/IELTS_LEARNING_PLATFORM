@@ -5,6 +5,9 @@ admin = User.find_or_create_by!(email: "admin@ielts.com") do |u|
   u.full_name = "System Admin"
   u.password  = "123456"
   u.role      = :admin
+  u.confirmed = true
+  u.confirmed_at = Time.current
+  u.confirmation_token = nil
 end
 
 # ========== TEACHERS ==========
@@ -13,6 +16,9 @@ end
     u.full_name = "Teacher #{i + 1}"
     u.password  = "123456"
     u.role      = :teacher
+    u.confirmed = true
+    u.confirmed_at = Time.current
+    u.confirmation_token = nil
   end
 
   TeacherProfile.find_or_create_by!(user: teacher) do |tp|
@@ -28,6 +34,9 @@ end
     u.full_name = "Student #{i + 1}"
     u.password  = "123456"
     u.role      = :student
+    u.confirmed = true
+    u.confirmed_at = Time.current
+    u.confirmation_token = nil
   end
 end
 
@@ -67,5 +76,8 @@ courses.each do |attrs|
     c.assign_attributes(attrs)
   end
 end
+
+Rails.application.config.action_mailer.perform_deliveries = false
+Sidekiq::Testing.inline! if defined?(Sidekiq::Testing)
 
 puts "Done seeding!"
