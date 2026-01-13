@@ -1,10 +1,11 @@
 class Auth::ConfirmationsController < ApplicationController
   def show
-    user = User.find_by!(confirmation_token: params[:token])
-    user.confirm!  # ✅ set confirmed = true, confirmed_at, xóa token
-    redirect_to login_path, notice: "Account confirmed successfully"
+    begin
+      user = User.find_by!(confirmation_token: params[:confirmation_token])
+      user.confirm!
+      redirect_to login_path, notice: "Account confirmed successfully"
     rescue ActiveRecord::RecordNotFound
-      redirect_to root_path, alert: "Invalid or expired token"
+      redirect_to root_path, alert: "Invalid or expired confirmation link"
     end
   end
 end
