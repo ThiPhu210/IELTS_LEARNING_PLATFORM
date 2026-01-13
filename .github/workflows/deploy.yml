@@ -150,7 +150,7 @@ jobs:
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0 \
-              -e APP_HOST=ielts-learning-platform.duckdns.org \
+              -e APP_HOST=d34ute7tylgmox.cloudfront.net \
               $DOCKER_USER/myapp:latest \
               sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:drop db:create db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
             docker rm -f sidekiq_worker || true
@@ -166,6 +166,6 @@ jobs:
               -e GMAIL_USERNAME=$GMAIL_USERNAME \
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0 \
-              -e APP_HOST=ielts-learning-platform.duckdns.org \
+              -e APP_HOST=d34ute7tylgmox.cloudfront.net \
               $DOCKER_USER/myapp:latest \
               bundle exec sidekiq
