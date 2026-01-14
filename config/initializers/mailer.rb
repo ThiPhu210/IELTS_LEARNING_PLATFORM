@@ -4,4 +4,3 @@ if Rails.env.production?
     protocol: "https"
   }
 end
-

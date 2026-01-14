@@ -7,6 +7,8 @@ gem "sidekiq"
 gem "groupdate"
 gem "image_processing", "~> 1.12"
 gem "mini_magick"
+gem "kaminari"
+
 group :development, :test do
   gem "rspec-rails", "~> 7.0"
   gem "capybara"

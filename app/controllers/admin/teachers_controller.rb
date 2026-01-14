@@ -4,7 +4,7 @@ class Admin::TeachersController < ApplicationController
   before_action :set_teacher, only: [ :show, :update, :destroy ]
 
   def index
-    @teachers = User.teacher_role.includes(:teacher_profile)
+    @teachers = User.teacher_role.page(params[:page]).per(5).includes(:teacher_profile)
   end
 
   def show

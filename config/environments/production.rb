@@ -17,11 +17,11 @@ Rails.application.configure do
   config.force_ssl = true
   config.session_store :cookie_store,
     key: "_ielts_session",
-    secure: true,       
-    same_site: :lax      
+    secure: true,
+    same_site: :lax
 
 
-  config.log_tags = [:request_id]
+  config.log_tags = [ :request_id ]
   config.logger = ActiveSupport::TaggedLogging.logger($stdout)
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
   config.silence_healthcheck_path = "/up"
@@ -47,17 +47,17 @@ Rails.application.configure do
   }
 
   config.cache_classes = true
-  config.public_file_server.enabled = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   config.i18n.fallbacks = true
   config.active_record.dump_schema_after_migration = false
-  config.active_record.attributes_for_inspect = [:id]
+  config.active_record.attributes_for_inspect = [ :id ]
 
   # Hosts
   config.hosts << "184.72.213.33"
   config.hosts << "d34ute7tylgmox.cloudfront.net"
   config.hosts << "ec2-184-72-213-33.compute-1.amazonaws.com"
 
-  config.action_dispatch.trusted_proxies = [IPAddr.new("0.0.0.0/0")]
+  config.action_dispatch.trusted_proxies = [ IPAddr.new("0.0.0.0/0") ]
   config.action_controller.forgery_protection_origin_check = true
 end

@@ -3,7 +3,7 @@ default: &default
   encoding: unicode
   host: localhost
   port: 5432
-  username: ielts_admin
+  username: ielts_user
   password: secret123
   pool: 5
 
