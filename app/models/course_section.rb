@@ -1,31 +1,24 @@
 class CourseSection < ApplicationRecord
   belongs_to :course
-  has_rich_text :title
+  has_many :lessons, dependent: :destroy
+
   has_rich_text :description
-  has_many_attached :files
 
   validates :title, presence: true
-  validate :files_size_limit
-  validate :files_type
+  validates :order_index,
+            numericality: { greater_than: 0 },
+            uniqueness: { scope: :course_id }
 
-def files_type
-  files.each do |file|
-    unless file.content_type.in?(%w[
-      application/pdf
-      image/png
-      image/jpg
-      image/jpeg
-    ])
-      errors.add(:files, "Chỉ cho phép PDF hoặc hình ảnh")
-    end
-  end
-end
+  before_validation :set_order_index, on: :create
 
-  def files_size_limit
-    files.each do |file|
-      if file.byte_size > 200.megabytes
-        errors.add(:files, "File tối đa 200MB")
-      end
-    end
+  default_scope { order(order_index: :asc) }
+
+  accepts_nested_attributes_for :lessons, allow_destroy: true
+
+  private
+
+  def set_order_index
+    return if order_index.present?
+    self.order_index = course.course_sections.maximum(:order_index).to_i + 1
   end
 end

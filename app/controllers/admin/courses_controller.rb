@@ -5,15 +5,28 @@ class Admin::CoursesController < Admin::BaseController
 
   def edit
     @course = Course.find(params[:id])
+  
+    if @course.course_sections.empty?
+      section = @course.course_sections.build
+      section.lessons.build
+    else
+      @course.course_sections.each do |section|
+        section.lessons.build if section.lessons.empty?
+      end
+    end
   end
+  
 
   def update
     @course = Course.find(params[:id])
+
     if @course.update(course_params)
-      redirect_to admin_courses_path, notice: "Cập nhật khóa học thành công"
+      redirect_to edit_admin_course_path(@course), notice: "Updated"
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
+    Rails.logger.debug params[:course]
+
   end
 
   def destroy
@@ -23,13 +36,27 @@ class Admin::CoursesController < Admin::BaseController
   end
 
   private
-
   def course_params
     params.require(:course).permit(
-      :title, :description,
-      :band_min, :band_max,
-      :price, :duration_days,
-      :status, :thumbnail
+      :title,
+      :description,
+      :thumbnail,
+
+      course_sections_attributes: [
+        :id,
+        :title,
+        :order_index,
+        :_destroy,
+
+        lessons_attributes: [
+          :id,
+          :title,
+          :duration,
+          :video,
+          { pdfs: [] },
+          :_destroy
+        ]
+      ]
     )
   end
 end

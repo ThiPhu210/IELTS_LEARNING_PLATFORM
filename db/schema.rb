@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_12_035458) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_14_094625) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -77,11 +77,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_035458) do
 
   create_table "course_sections", force: :cascade do |t|
     t.bigint "course_id", null: false
-    t.string "title"
     t.string "description"
     t.integer "position"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "order_index"
+    t.string "title"
     t.index ["course_id"], name: "index_course_sections_on_course_id"
   end
 
@@ -98,13 +99,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_035458) do
   end
 
   create_table "lessons", force: :cascade do |t|
-    t.bigint "course_id", null: false
+    t.bigint "course_section_id", null: false
     t.string "title"
-    t.string "video_url"
-    t.integer "order_index"
+    t.integer "duration"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["course_id"], name: "index_lessons_on_course_id"
+    t.index ["course_section_id"], name: "index_lessons_on_course_section_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -206,7 +206,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_035458) do
   add_foreign_key "course_progresses", "courses"
   add_foreign_key "course_progresses", "users"
   add_foreign_key "course_sections", "courses"
-  add_foreign_key "lessons", "courses"
+  add_foreign_key "lessons", "course_sections"
   add_foreign_key "orders", "courses"
   add_foreign_key "orders", "users"
   add_foreign_key "payments", "course_accesses"

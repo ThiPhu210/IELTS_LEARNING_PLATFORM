@@ -1,11 +1,12 @@
 class Course < ApplicationRecord
   has_many :course_accesses
   has_many :users, through: :course_accesses
-  has_many :lessons
   has_many :speaking_topics
   has_many :speaking_attempts
   has_many :course_progresses
   has_one_attached :thumbnail
+  has_many :course_sections
+
   enum :status, { draft: 0, published: 1 }, suffix: true
   scope :published_courses, -> { where(status: statuses[:published]) }
   validates :title, presence: true
@@ -13,4 +14,5 @@ class Course < ApplicationRecord
   validates :price, presence: true
   validates :duration_days, presence: true
   validates :status, presence: true
+  accepts_nested_attributes_for :course_sections, allow_destroy: true
 end

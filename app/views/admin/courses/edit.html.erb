@@ -2,37 +2,153 @@
   Edit Course
 </h2>
 
-<%= form_with model: [:admin, @course], local: true do |f| %>
+<%= form_with model: [:admin, @course],
+              local: true,
+              multipart: true do |f| %>
 
-  <!-- IMAGE -->
-  <div class="w-full text-center mb-6">
-    <% if @course.thumbnail.attached? %>
-      <%= image_tag @course.thumbnail,
-        class: "rounded-lg shadow-lg max-w-200-px mx-auto mb-4" %>
+  <!-- ================= COURSE INFO ================= -->
+
+  <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mb-16">
+
+    <!-- IMAGE -->
+    <div class="mb-8">
+      <label class="block text-sm font-semibold text-blueGray-600 mb-3">
+        Course Thumbnail
+      </label>
+
+      <% if @course.thumbnail.attached? %>
+        <div class="mb-3">
+          <%= image_tag @course.thumbnail.variant(resize_to_limit: [300, 200]),
+            class: "rounded-lg shadow" %>
+        </div>
+      <% end %>
+
+      <%= f.file_field :thumbnail,
+        accept: "image/png,image/jpg,image/jpeg",
+        class: "block w-full text-sm" %>
+    </div>
+
+    <!-- TITLE -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-blueGray-600 mb-2">
+        Course Title
+      </label>
+      <%= f.text_field :title,
+        class: "w-full border rounded-md px-4 py-3" %>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-blueGray-600 mb-2">
+        Description
+      </label>
+      <%= f.text_area :description,
+        rows: 5,
+        class: "w-full border rounded-md px-4 py-3" %>
+    </div>
+
+  </div>
+
+  <!-- ================= COURSE CONTENT ================= -->
+
+  <h2 class="text-2xl font-semibold text-blueGray-700 mb-6">
+    Course Content
+  </h2>
+
+  <div id="sections">
+    <%= f.fields_for :course_sections do |section| %>
+      <div class="mb-8 p-6 bg-blueGray-50 rounded-lg">
+
+        <!-- SECTION TITLE -->
+        <%= section.text_field :title,
+          placeholder: "Section title",
+          class: "w-full font-semibold text-lg border rounded-md px-4 py-2 mb-4" %>
+
+        <!-- LESSONS -->
+        <div class="space-y-4 ml-4">
+          <%= section.fields_for :lessons do |lesson| %>
+            <div class="p-4 bg-white rounded-md shadow">
+
+              <%= lesson.text_field :title,
+                placeholder: "Lesson title",
+                class: "w-full mb-2 border rounded px-3 py-2" %>
+
+              <%= lesson.number_field :duration,
+                placeholder: "Duration (min)",
+                class: "w-full mb-2 border rounded px-3 py-2" %>
+
+              <!-- ===== CURRENT VIDEO ===== -->
+              <% if lesson.object.video.attached? %>
+                <div class="mb-2 text-sm text-green-600">
+                  🎥 Current video:
+                  <%= link_to lesson.object.video.filename,
+                        rails_blob_path(lesson.object.video, disposition: "attachment"),
+                        class: "underline" %>
+                </div>
+              <% end %>
+
+              <!-- ===== CURRENT PDFS ===== -->
+              <% if lesson.object.pdfs.attached? %>
+                <div class="mb-2 text-sm text-blue-600">
+                  📄 PDFs:
+                  <ul class="list-disc ml-6">
+                    <% lesson.object.pdfs.each do |pdf| %>
+                      <li>
+                        <%= link_to pdf.filename,
+                              rails_blob_path(pdf, disposition: "attachment"),
+                              class: "underline" %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
+              <% end %>
+
+              <!-- ===== UPLOAD ===== -->
+              <div class="flex gap-4 mt-3">
+                <div>
+                  <label class="block text-xs text-blueGray-500 mb-1">
+                    Replace Video (MP4)
+                  </label>
+                  <%= lesson.file_field :video, accept: "video/mp4" %>
+                </div>
+
+                <div>
+                  <label class="block text-xs text-blueGray-500 mb-1">
+                    Add PDFs
+                  </label>
+                  <%= lesson.file_field :pdfs,
+                        multiple: true,
+                        accept: "application/pdf" %>
+                </div>
+              </div>
+
+              <label class="mt-3 inline-flex items-center text-sm text-red-500">
+                <%= lesson.check_box :_destroy %>
+                <span class="ml-2">Remove lesson</span>
+              </label>
+
+            </div>
+          <% end %>
+        </div>
+
+        <label class="mt-4 inline-flex items-center text-sm text-red-600">
+          <%= section.check_box :_destroy %>
+          <span class="ml-2">Remove section</span>
+        </label>
+
+      </div>
     <% end %>
-
-    <%= f.file_field :thumbnail, class: "hidden", id: "course-image" %>
-
-    <label for="course-image"
-      class="cursor-pointer inline-block px-4 py-2 bg-blueGray-800 text-white rounded-md shadow">
-      Change image
-    </label>
   </div>
 
-  <!-- TITLE -->
-  <div class="mb-4">
-    <%= f.text_field :title,
-      class: "border-blueGray-300 px-3 py-3 text-sm w-full rounded-md focus:ring-lightBlue-500" %>
-  </div>
+  <!-- ================= SAVE ================= -->
 
-  <!-- DESCRIPTION -->
-  <div class="mb-4">
-    <%= f.text_area :description,
-      rows: 5,
-      class: "border-blueGray-300 px-3 py-2 text-sm w-full rounded-md focus:ring-lightBlue-500" %>
-  </div>
+  <div class="flex justify-end mt-10 gap-3">
+    <%= link_to "Cancel",
+      admin_courses_path,
+      class: "px-5 py-2 border rounded-md" %>
 
-  <%= f.submit "Update Course",
-    class: "bg-lightBlue-500 text-white px-6 py-2 rounded-md shadow hover:shadow-lg" %>
+    <%= f.submit "Save Course & Content",
+      class: "px-6 py-3 bg-emerald-500 text-white rounded-md shadow hover:bg-emerald-600" %>
+  </div>
 
 <% end %>

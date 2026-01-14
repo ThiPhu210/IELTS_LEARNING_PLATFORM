@@ -1,0 +1,19 @@
+<h2 class="text-2xl font-semibold text-blueGray-700 mb-6">
+  <%= @course.title %>
+</h2>
+
+<div class="flex gap-4 mb-8">
+  <%= link_to "Edit course info",
+    edit_admin_course_path(@course),
+    class: "px-4 py-2 bg-blueGray-600 text-white rounded-md" %>
+
+  <%= link_to "Manage content",
+    admin_course_course_sections_path(@course),
+    class: "px-4 py-2 bg-emerald-500 text-white rounded-md" %>
+</div>
+
+<div class="bg-white rounded-lg shadow p-6">
+  <p class="text-blueGray-500">
+    <%= @course.description %>
+  </p>
+</div>
