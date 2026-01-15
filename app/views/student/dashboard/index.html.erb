@@ -3,6 +3,11 @@
   <h1 class="text-3xl font-bold mb-8">
     👋 Welcome, <%= current_user.full_name %>
   </h1>
+  <%= button_to "🚪 Đăng xuất",
+      destroy_user_session_path,
+      method: :delete,
+      data: { turbo_confirm: "Bạn chắc chắn muốn đăng xuất?" },
+      class: "px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition" %>
 
   <!-- ================== ĐÃ MUA ================== -->
   <section class="mb-12">

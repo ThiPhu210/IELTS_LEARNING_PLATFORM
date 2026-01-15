@@ -8,6 +8,7 @@ gem "groupdate"
 gem "image_processing", "~> 1.12"
 gem "mini_magick"
 gem "kaminari"
+gem "devise"
 
 group :development, :test do
   gem "rspec-rails", "~> 7.0"

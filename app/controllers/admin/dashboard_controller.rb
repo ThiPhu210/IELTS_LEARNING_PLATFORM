@@ -1,7 +1,5 @@
 class Admin::DashboardController < ApplicationController
-  before_action :require_login
-  before_action :require_admin
-  before_action :disable_cache
+  before_action :authenticate_user!
 
   def index
     @teachers_count = User.teacher_role.count

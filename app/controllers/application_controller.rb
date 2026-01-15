@@ -1,28 +1,29 @@
 class ApplicationController < ActionController::Base
-  helper_method :current_user, :logged_in?
-  protect_from_forgery with: :exception
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
-  end
-
-  def logged_in?
-    current_user.present?
-  end
-
-  def require_login
-    unless session[:user_id]
-      redirect_to login_path
+  before_action :authenticate_user!
+  before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_no_cache
+  def after_sign_in_path_for(resource)
+    case resource.role
+    when "admin"
+      admin_users_path
+    when "teacher"
+      teacher_dashboard_path
+    else
+      root_path
     end
   end
 
-  def require_admin
-    redirect_to dashboard_path unless current_user&.admin_role?
-  end
+  protected
 
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [ :full_name ])
+    devise_parameter_sanitizer.permit(:sign_in, keys: [:remember_me])
+  end
   private
-  def disable_cache
+
+  def set_no_cache
     response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
     response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
+    response.headers["Expires"] = "Fri, 01 Jan 1990 00:00:00 GMT"
   end
 end

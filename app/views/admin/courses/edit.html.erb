@@ -57,6 +57,7 @@
 
   <div id="sections">
     <%= f.fields_for :course_sections do |section| %>
+
       <div class="mb-8 p-6 bg-blueGray-50 rounded-lg">
 
         <!-- SECTION TITLE -->
@@ -67,6 +68,7 @@
         <!-- LESSONS -->
         <div class="space-y-4 ml-4">
           <%= section.fields_for :lessons do |lesson| %>
+
             <div class="p-4 bg-white rounded-md shadow">
 
               <%= lesson.text_field :title,
@@ -77,67 +79,79 @@
                 placeholder: "Duration (min)",
                 class: "w-full mb-2 border rounded px-3 py-2" %>
 
-              <!-- ===== CURRENT VIDEO ===== -->
-              <% if lesson.object.video.attached? %>
-                <div class="mb-2 text-sm text-green-600">
-                  🎥 Current video:
-                  <%= link_to lesson.object.video.filename,
-                        rails_blob_path(lesson.object.video, disposition: "attachment"),
-                        class: "underline" %>
-                </div>
-              <% end %>
+              <!-- ================= VIDEO ================= -->
+              <div class="mt-3">
+                <label class="block text-xs font-semibold text-blueGray-600 mb-1">
+                  Video (MP4)
+                </label>
 
-              <!-- ===== CURRENT PDFS ===== -->
-              <% if lesson.object.pdfs.attached? %>
-                <div class="mb-2 text-sm text-blue-600">
-                  📄 PDFs:
-                  <ul class="list-disc ml-6">
+                <% if lesson.object.video.attached? %>
+                  <div class="relative w-64 mb-2">
+
+                    <%= image_tag lesson.object.video_thumbnail,
+                      class: "rounded shadow" %>
+
+                    <button type="button"
+                      onclick="this.nextElementSibling.classList.toggle('hidden')"
+                      class="absolute inset-0 flex items-center justify-center bg-black/40 text-white rounded">
+                      ▶ Play
+                    </button>
+
+                    <video controls class="hidden mt-2 w-full rounded">
+                      <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
+                    </video>
+
+                  </div>
+                <% end %>
+
+                <%= lesson.file_field :video,
+                  accept: "video/mp4" %>
+              </div>
+
+              <!-- ================= PDF ================= -->
+              <div class="mt-4">
+                <label class="block text-xs font-semibold text-blueGray-600 mb-1">
+                  PDFs
+                </label>
+
+                <% if lesson.object.pdfs.attached? %>
+                  <ul class="text-sm text-blue-600 mb-2 space-y-1">
                     <% lesson.object.pdfs.each do |pdf| %>
                       <li>
-                        <%= link_to pdf.filename,
-                              rails_blob_path(pdf, disposition: "attachment"),
-                              class: "underline" %>
+                        📄 <%= link_to pdf.filename,
+                          url_for(pdf),
+                          target: "_blank",
+                          class: "underline" %>
                       </li>
                     <% end %>
                   </ul>
-                </div>
-              <% end %>
+                <% end %>
 
-              <!-- ===== UPLOAD ===== -->
-              <div class="flex gap-4 mt-3">
-                <div>
-                  <label class="block text-xs text-blueGray-500 mb-1">
-                    Replace Video (MP4)
-                  </label>
-                  <%= lesson.file_field :video, accept: "video/mp4" %>
-                </div>
-
-                <div>
-                  <label class="block text-xs text-blueGray-500 mb-1">
-                    Add PDFs
-                  </label>
-                  <%= lesson.file_field :pdfs,
-                        multiple: true,
-                        accept: "application/pdf" %>
-                </div>
+                <%= lesson.file_field :pdfs,
+                  multiple: true,
+                  accept: "application/pdf" %>
               </div>
 
+              <!-- REMOVE -->
               <label class="mt-3 inline-flex items-center text-sm text-red-500">
                 <%= lesson.check_box :_destroy %>
                 <span class="ml-2">Remove lesson</span>
               </label>
 
             </div>
-          <% end %>
+
+          <% end %> <!-- END lessons -->
         </div>
 
+        <!-- REMOVE SECTION -->
         <label class="mt-4 inline-flex items-center text-sm text-red-600">
           <%= section.check_box :_destroy %>
           <span class="ml-2">Remove section</span>
         </label>
 
       </div>
-    <% end %>
+
+    <% end %> <!-- END sections -->
   </div>
 
   <!-- ================= SAVE ================= -->

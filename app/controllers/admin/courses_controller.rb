@@ -1,11 +1,13 @@
 class Admin::CoursesController < Admin::BaseController
+  before_action :authenticate_user!
+  before_action :require_admin
   def index
     @courses = Course.order(created_at: :desc)
   end
 
   def edit
     @course = Course.find(params[:id])
-  
+
     if @course.course_sections.empty?
       section = @course.course_sections.build
       section.lessons.build
@@ -15,7 +17,7 @@ class Admin::CoursesController < Admin::BaseController
       end
     end
   end
-  
+
 
   def update
     @course = Course.find(params[:id])
@@ -26,7 +28,6 @@ class Admin::CoursesController < Admin::BaseController
       render :edit, status: :unprocessable_entity
     end
     Rails.logger.debug params[:course]
-
   end
 
   def destroy
@@ -41,13 +42,10 @@ class Admin::CoursesController < Admin::BaseController
       :title,
       :description,
       :thumbnail,
-
       course_sections_attributes: [
         :id,
         :title,
-        :order_index,
         :_destroy,
-
         lessons_attributes: [
           :id,
           :title,
@@ -59,4 +57,5 @@ class Admin::CoursesController < Admin::BaseController
       ]
     )
   end
+  
 end

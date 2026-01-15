@@ -21,6 +21,15 @@ class Lesson < ApplicationRecord
     errors.add(:video, "phải được upload") unless video.attached?
   end
 
+  def video_thumbnail
+    return unless video.attached?
+
+    video.preview(
+      resize_to_limit: [640, 360],
+      format: "jpg"
+    )
+  end
+  
   def video_type
     return unless video.attached?
 

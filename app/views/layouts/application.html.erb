@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-  <link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <title><%= content_for(:title) || "Ielts Platform" %></title>
 
@@ -21,8 +22,7 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-
-    <!-- Rails CSS -->
+    <!-- Tailwind CSS -->
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 
     <!-- SweetAlert -->
@@ -30,9 +30,10 @@
   </head>
 
   <body class="g-sidenav-show bg-gray-100">
+    <%= yield %>
 
-  
-  <%= yield %>
+    <!-- Flowbite JS (BẮT BUỘC) -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.3/dist/flowbite.min.js"></script>
 
     <% if flash[:success] %>
       <script>
@@ -46,6 +47,5 @@
         });
       </script>
     <% end %>
-
   </body>
 </html>

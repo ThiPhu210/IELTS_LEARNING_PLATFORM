@@ -1,6 +1,5 @@
 class Admin::TeachersController < ApplicationController
-  before_action :require_login
-  before_action :require_admin
+  before_action :authenticate_user!
   before_action :set_teacher, only: [ :show, :update, :destroy ]
 
   def index

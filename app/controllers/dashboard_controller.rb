@@ -1,8 +1,7 @@
 class DashboardController < ApplicationController
-  before_action :require_login
-  before_action :disable_cache
+  before_action :authenticate_user!
 
-  def index
+  def redirect
     case current_user.role
     when "admin"
       redirect_to admin_dashboard_path

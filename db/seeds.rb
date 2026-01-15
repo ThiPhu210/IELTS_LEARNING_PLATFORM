@@ -2,23 +2,19 @@ puts "Seeding database..."
 
 # ========== ADMIN ==========
 admin = User.find_or_create_by!(email: "admin@ielts.com") do |u|
-  u.full_name = "System Admin"
-  u.password  = "123456"
-  u.role      = :admin
-  u.confirmed = true
-  u.confirmed_at = Time.current
-  u.confirmation_token = nil
+  u.full_name     = "System Admin"
+  u.password      = "123456"
+  u.role          = :admin
+  u.confirmed_at  = Time.current   # quan trọng
 end
 
 # ========== TEACHERS ==========
 10.times do |i|
   teacher = User.find_or_create_by!(email: "teacher#{i + 1}@ielts.com") do |u|
-    u.full_name = "Teacher #{i + 1}"
-    u.password  = "123456"
-    u.role      = :teacher
-    u.confirmed = true
-    u.confirmed_at = Time.current
-    u.confirmation_token = nil
+    u.full_name     = "Teacher #{i + 1}"
+    u.password      = "123456"
+    u.role          = :teacher
+    u.confirmed_at  = Time.current
   end
 
   TeacherProfile.find_or_create_by!(user: teacher) do |tp|
@@ -31,12 +27,10 @@ end
 # ========== STUDENTS ==========
 30.times do |i|
   User.find_or_create_by!(email: "student#{i + 1}@ielts.com") do |u|
-    u.full_name = "Student #{i + 1}"
-    u.password  = "123456"
-    u.role      = :student
-    u.confirmed = true
-    u.confirmed_at = Time.current
-    u.confirmation_token = nil
+    u.full_name     = "Student #{i + 1}"
+    u.password      = "123456"
+    u.role          = :student
+    u.confirmed_at  = Time.current
   end
 end
 
@@ -77,4 +71,4 @@ courses.each do |attrs|
   end
 end
 
-puts "Done seeding!"
+puts "✅ Done seeding!"

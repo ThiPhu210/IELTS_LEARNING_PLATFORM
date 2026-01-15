@@ -1,5 +1,7 @@
 # controllers/admin/charts_controller.rb
 class Admin::ChartsController < ApplicationController
+  before_action :authenticate_user!
+  before_action :require_admin
     def students
       year = Time.current.year
       data = User
