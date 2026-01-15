@@ -39,8 +39,9 @@ RUN bundle install && \
     bundle exec bootsnap precompile --gemfile
 
 # JS deps (Tailwind + Flowbite)
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+COPY package.json* yarn.lock* ./
+RUN [ -f package.json ] && yarn install --frozen-lockfile || true
+
 
 # App code
 COPY . .
