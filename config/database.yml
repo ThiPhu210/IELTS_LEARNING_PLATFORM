@@ -1,12 +1,20 @@
 default: &default
   adapter: postgresql
   encoding: unicode
+  host: localhost
+  port: 5432
+  username: ielts_user
+  password: secret123
   pool: 5
 
 development:
   <<: *default
-  url: <%= ENV["DATABASE_URL"] %>
+  database: ielts_dev
 
 test:
   <<: *default
   database: ielts_test
+
+
+production:
+  url: <%= ENV["DATABASE_URL"] %>
