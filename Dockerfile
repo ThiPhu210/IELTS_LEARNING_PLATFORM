@@ -1,82 +1,80 @@
 ARG RUBY_VERSION=3.3.5
 
-########################
-# BUILD STAGE
-########################
-FROM ruby:${RUBY_VERSION}-slim AS build
+############################
+# Base
+############################
+FROM ruby:${RUBY_VERSION}-slim AS base
+
 WORKDIR /rails
 
-# ===== System deps + NodeJS + Yarn =====
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-    build-essential \
-    git \
-    curl \
-    libpq-dev \
-    postgresql-client \
-    libjemalloc2 \
-    libvips \
-    ffmpeg \
-    imagemagick \
-    nodejs \
-    npm && \
-    npm install -g yarn && \
+      libpq-dev \
+      curl \
+      postgresql-client \
+      libjemalloc2 \
+      libvips \
+      imagemagick && \
     rm -rf /var/lib/apt/lists/*
 
-# ===== Rails ENV =====
 ENV RAILS_ENV=production \
-    NODE_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
     BUNDLE_PATH=/usr/local/bundle \
     BUNDLE_WITHOUT=development:test
 
-# ===== Ruby deps =====
+############################
+# Build
+############################
+FROM base AS build
+
+# Build deps
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      git \
+      nodejs \
+      npm && \
+    npm install --global yarn && \
+    rm -rf /var/lib/apt/lists/*
+    
 COPY Gemfile Gemfile.lock ./
-RUN bundle install && \
-    bundle exec bootsnap precompile --gemfile
 
-# ===== JS deps (Tailwind / Flowbite) =====
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN bundle config set --local deployment 'true' && \
+    bundle config set --local without 'development test' && \
+    bundle config set --local frozen 'false' && \
+    bundle install && \
+    bundle exec bootsnap precompile --gemfile && \
+    rm -rf ~/.bundle "${BUNDLE_PATH}"/ruby/*/cache
 
-# ===== App code =====
+COPY package.json ./
+COPY yarn.lock* ./
+RUN yarn install
+
+
 COPY . .
 
-# ===== Bootsnap + Assets =====
+# 🔥 Quan trọng: tạo thư mục cho Tailwind build
+RUN mkdir -p app/assets/builds
+
 RUN bundle exec bootsnap precompile app/ lib/
 
-RUN SECRET_KEY_BASE=dummy \
-    RAILS_ENV=production \
-    NODE_ENV=production \
-    bin/rails assets:precompile
+# Precompile assets (dummy key)
+RUN SECRET_KEY_BASE=1 RAILS_ENV=production bin/rails assets:precompile
 
-########################
-# RUNTIME STAGE
-########################
-FROM ruby:${RUBY_VERSION}-slim AS runtime
-WORKDIR /rails
+############################
+# Final
+############################
+FROM base
 
-# ===== Runtime deps ONLY =====
-RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y \
-    libpq-dev \
-    postgresql-client \
-    libjemalloc2 \
-    libvips \
-    ffmpeg \
-    imagemagick && \
-    rm -rf /var/lib/apt/lists/*
-
-ENV RAILS_ENV=production \
-    BUNDLE_DEPLOYMENT=1 \
-    BUNDLE_PATH=/usr/local/bundle \
-    BUNDLE_WITHOUT=development:test
-
-# ===== Copy from build =====
-COPY --from=build /usr/local/bundle /usr/local/bundle
+# Copy runtime artifacts only
+COPY --from=build ${BUNDLE_PATH} ${BUNDLE_PATH}
 COPY --from=build /rails /rails
 
-# ===== Non-root user =====
+# Copy precompiled assets
+COPY --from=build /rails/public/assets /rails/public/assets
+COPY --from=build /rails/public/packs /rails/public/packs
+
+# Create non-root user
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
     chown -R rails:rails /rails
@@ -84,5 +82,6 @@ RUN groupadd --system --gid 1000 rails && \
 USER rails
 
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+
 EXPOSE 3000
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0"]
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3000"]
