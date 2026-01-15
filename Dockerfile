@@ -57,9 +57,12 @@ COPY . .
 RUN mkdir -p app/assets/builds
 
 RUN bundle exec bootsnap precompile app/ lib/
+RUN SECRET_KEY_BASE=dummy \
+    RAILS_ENV=production \
+    NODE_ENV=production \
+    DATABASE_URL=postgresql://dummy:dummy@localhost/dummy \
+    bin/rails assets:precompile
 
-# Precompile assets (dummy key)
-RUN SECRET_KEY_BASE=1 RAILS_ENV=production bin/rails assets:precompile
 
 ############################
 # Final
