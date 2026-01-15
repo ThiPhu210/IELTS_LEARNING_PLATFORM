@@ -56,6 +56,7 @@ RUN SECRET_KEY_BASE=dummy \
     NODE_ENV=production \
     bin/rails assets:precompile
 
+
 ########################
 # RUNTIME STAGE
 ########################
