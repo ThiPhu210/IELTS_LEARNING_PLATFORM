@@ -75,7 +75,7 @@ COPY --from=build /rails /rails
 
 # Copy precompiled assets
 COPY --from=build /rails/public/assets /rails/public/assets
-COPY --from=build /rails/public/packs /rails/public/packs
+
 
 # Create non-root user
 RUN groupadd --system --gid 1000 rails && \
