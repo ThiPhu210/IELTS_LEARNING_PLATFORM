@@ -22,10 +22,13 @@ RUN apt-get update -qq && apt-get install --no-install-recommends -y \
     rm -rf /var/lib/apt/lists/*
 
 # Node + Yarn (Flowbite cần)
-RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash - && \
-    apt-get install -y nodejs && \
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    nodejs \
+    npm && \
     npm install -g yarn && \
     rm -rf /var/lib/apt/lists/*
+
 
 ENV RAILS_ENV=production \
     NODE_ENV=production \
