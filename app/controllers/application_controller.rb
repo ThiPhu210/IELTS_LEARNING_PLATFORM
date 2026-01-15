@@ -5,7 +5,7 @@ class ApplicationController < ActionController::Base
   def after_sign_in_path_for(resource)
     case resource.role
     when "admin"
-      admin_users_path
+      admin_dashboard_path
     when "teacher"
       teacher_dashboard_path
     else

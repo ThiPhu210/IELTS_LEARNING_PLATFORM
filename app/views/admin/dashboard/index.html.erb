@@ -133,109 +133,17 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 </script>
+<div class="min-h-screen bg-gray-100">
 
+  <!-- NAVBAR -->
+  <%= render "admin/shared/navbar" %>
 
-<div class="w-full relative flex ct-docs-disable-sidebar-content overflow-x-hidden">
-    <nav class="block py-4 px-6 top-0 bottom-0 w-64 bg-white shadow-xl left-0 absolute flex-row flex-nowrap md:z-10 z-9999 transition-all duration-300 ease-in-out transform md:translate-x-0 -translate-x-full">
-       <button class="md:hidden flex items-center justify-center cursor-pointer text-blueGray-700 w-6 h-10 border-l-0 border-r border-t border-b border-solid border-blueGray-100 text-xl leading-none bg-white rounded-r border border-solid border-transparent absolute top-1/2 -right-24-px focus:outline-none z-9998"><i class="fas fa-ellipsis-v"></i></button>
-       <div class="flex-col min-h-full px-0 flex flex-wrap items-center justify-between w-full mx-auto overflow-y-auto overflow-x-hidden">
-          <div class="flex bg-white flex-col items-stretch opacity-100 relative mt-4 overflow-y-auto overflow-x-hidden h-auto z-40 items-center flex-1 rounded w-full">
-             <img src="https://png.pngtree.com/png-clipart/20230930/original/pngtree-man-avatar-isolated-png-image_13022170.png" alt="..." class="max-w-full rounded">
-             <div class="md:flex-col md:min-w-full flex flex-col list-none">
-                <hr class="my-4 md:min-w-full">
-                <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">USERS MANAGEMENT</h6>
-                <%= link_to admin_students_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
-                  <i class="fas fa-newspaper mr-2 text-sm text-blueGray-400"></i>Students
-                <% end %>
-                <%= link_to admin_teachers_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
-                  <i class="fas fa-user-circle mr-2 text-sm text-blueGray-400"></i>Teachers
-                <% end %>
-                <hr class="my-4 md:min-w-full">
-                <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4 no-underline">MATERIAL MANAGEMENT</h6>
-                <%= link_to admin_courses_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
-                  <i class="fab fa-angular mr-2 text-sm text-blueGray-400"></i>Courses
-                <% end %>
-                <%= link_to admin_payments_path, class: "text-xs uppercase py-3 font-bold block text-blueGray-800 hover:text-blueGray-500" do %>
-                  <i class="fab fa-vuejs mr-2 text-sm text-blueGray-400"></i>Payment
-                <% end %>
-             </div>
-          </div>
-       </div>
-    </nav>
-    <div class="relative md:ml-64 bg-blueGray-100 w-full"> <!-- Navbar --> <nav class="absolute top-0 right-0 w-full z-10 bg-white flex items-center justify-end py-1 px-4"> <!-- Avatar + Dropdown --> <div class="relative" id="avatarWrapper"> <!-- Avatar --> <button id="avatarMenuButton" class="w-12 h-12 rounded-full overflow-hidden focus:outline-none"> <img alt="avatar" class="w-full h-full object-cover shadow-lg" src="https://demos.creative-tim.com/notus-pro-react/static/media/team-1-800x800.fa5a7ac2.jpg"> </button> <!-- Dropdown --> <div id="avatarDropdown" class="hidden absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50"> <ul class="py-1"> <li> <%= button_to "Đăng xuất", destroy_user_session_path, method: :delete, class: "w-full text-left px-25 py-2 text-sm text-gray-700 hover:bg-gray-100 whitespace-nowrap" %> </li> </ul> </div> </div> </nav>
-       <div class="relative pt-32 pb-32 bg-lightBlue-500">
-          <div class="px-4 md:px-6 mx-auto w-full">
-             <div>
-                <div class="flex flex-wrap">
-                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
-                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
-                         <div class="flex-auto p-4">
-                            <div class="flex flex-wrap">
-                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">Traffic</h5>
-                                  <span class="font-bold text-xl">350,897</span>
-                               </div>
-                               <div class="relative w-auto pl-4 flex-initial">
-                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-red-500"><i class="far fa-chart-bar"></i></div>
-                               </div>
-                            </div>
-                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-emerald-500 mr-2"><i class="fas fa-arrow-up"></i> 3.48%</span><span class="whitespace-nowrap">Since last month</span></p>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
-                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
-                         <div class="flex-auto p-4">
-                            <div class="flex flex-wrap">
-                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">NEW USERS</h5>
-                                  <span class="font-bold text-xl">2,356</span>
-                               </div>
-                               <div class="relative w-auto pl-4 flex-initial">
-                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-orange-500"><i class="fas fa-chart-pie"></i></div>
-                               </div>
-                            </div>
-                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-red-500 mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span><span class="whitespace-nowrap">Since last week</span></p>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
-                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
-                         <div class="flex-auto p-4">
-                            <div class="flex flex-wrap">
-                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">SALES</h5>
-                                  <span class="font-bold text-xl">924</span>
-                               </div>
-                               <div class="relative w-auto pl-4 flex-initial">
-                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-pink-500"><i class="fas fa-users"></i></div>
-                               </div>
-                            </div>
-                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-orange-500 mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span><span class="whitespace-nowrap">Since yesterday</span></p>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="w-full lg:w-6/12 xl:w-3/12 px-4">
-                      <div class="relative flex flex-col min-w-0 break-words bg-white rounded-lg mb-6 xl:mb-0 shadow-lg">
-                         <div class="flex-auto p-4">
-                            <div class="flex flex-wrap">
-                               <div class="relative w-full pr-4 max-w-full flex-grow flex-1">
-                                  <h5 class="text-blueGray-400 uppercase font-bold text-xs">PERFORMANCE</h5>
-                                  <span class="font-bold text-xl">49,65%</span>
-                               </div>
-                               <div class="relative w-auto pl-4 flex-initial">
-                                  <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 shadow-lg rounded-full bg-lightBlue-500"><i class="fas fa-percent"></i></div>
-                               </div>
-                            </div>
-                            <p class="text-sm text-blueGray-500 mt-4"><span class="text-emerald-500 mr-2"><i class="fas fa-arrow-up"></i> 12%</span><span class="whitespace-nowrap">Since last month</span></p>
-                          
-                            </div>
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </div>
-       </div>
+  <!-- SIDEBAR -->
+  <%= render "admin/shared/sidebar" %>
+
+  <!-- MAIN CONTENT -->
+<main class="pt-16 sm:ml-64 p-6">
+
        <div class="px-4 md:px-6 mx-auto w-full -mt-24">
           <div class="flex flex-wrap">
              <div class="w-full xl:w-8/12 px-4">
@@ -507,6 +415,9 @@ document.addEventListener("DOMContentLoaded", function () {
        </div>
     </div>
  </div>
+  </main>
+
+</div>
 
 
 

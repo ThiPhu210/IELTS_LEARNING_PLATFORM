@@ -29,9 +29,10 @@ Rails.application.routes.draw do
 
   # ================= ADMIN =================
   namespace :admin do
+    root to: "dashboard#index"   
     get "dashboard", to: "dashboard#index"
 
-    resources :users, only: [:index]
+    resources :users
     resources :students, only: [:index]
     resources :payments, only: [:index]
 
