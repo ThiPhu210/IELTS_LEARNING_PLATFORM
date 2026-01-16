@@ -1,28 +1,27 @@
 class Admin::TeachersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_teacher, only: [ :show, :update, :destroy ]
+  before_action :set_teacher, only: [ :show, :edit, :update, :destroy ]
+
 
   def index
     @teachers = User.teacher_role.page(params[:page]).per(5).includes(:teacher_profile)
   end
 
   def show
-    @teacher = User.teacher_role.find(params[:id])
+  end
+
+  def edit
+  @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
+  end
+
+def update
+  if @teacher.update(teacher_params)
+    redirect_to admin_teachers_path, notice: "Cập nhật thành công"
+  else
     @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
+    render partial: "form", locals: { teacher: @teacher }, status: :unprocessable_entity
   end
-
-
-  def update
-    Rails.logger.debug params.inspect
-
-    if @teacher.update(teacher_params)
-      flash[:success] = "Thay đổi thông tin giáo viên thành công !"
-      redirect_to admin_teacher_path(@teacher), notice: "Cập nhật thành công"
-    else
-      Rails.logger.debug @teacher.errors.full_messages
-      render :show
-    end
-  end
+end
 
 
   def destroy
