@@ -2,8 +2,8 @@
   <h2 class="text-2xl font-bold mb-6">Thông tin Giáo viên</h2>
 
   <!-- ===== FORM UPDATE (PATCH) ===== -->
-  <%= form_with model: @teacher,
-                url: admin_teacher_path(@teacher),
+  <%= form_with model: teacher,
+                url: admin_teacher_path(teacher),
                 method: :patch,
                 local: true do |f| %>
 
@@ -26,7 +26,7 @@
       <div class="mt-6">
         <%= p.label :avatar, "Avatar", class: "label" %>
 
-        <% if p.object.avatar.attached? %>
+        <% if p.object&.avatar&.attached? %>
           <div class="mb-3">
           <%= image_tag p.object.avatar.variant(resize_to_fill: [80, 80]).processed,
           class: "rounded-full object-cover border",
@@ -67,16 +67,16 @@
   <!-- ===== DELETE (PHẢI NẰM NGOÀI FORM) ===== -->
   <div class="mt-6 flex justify-end">
     <%= button_to "🗑 Xóa giáo viên",
-          admin_teacher_path(@teacher),
+          admin_teacher_path(teacher),
           method: :delete,
           data: { confirm: "Bạn chắc chắn muốn xóa giáo viên này?" },
           class: "px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500" %>
   </div>
 
-  <% if @teacher.errors.any? %>
+  <% if teacher.errors.any? %>
   <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
     <ul>
-      <% @teacher.errors.full_messages.each do |msg| %>
+      <% teacher.errors.full_messages.each do |msg| %>
         <li>• <%= msg %></li>
       <% end %>
     </ul>
