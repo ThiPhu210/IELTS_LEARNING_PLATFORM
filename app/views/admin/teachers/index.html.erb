@@ -99,13 +99,20 @@
 
               <!-- ACTIONS -->
               <td class="p-4 flex gap-2">
-                <%= link_to "View",
-                    admin_teacher_path(teacher),
-                    class: "px-3 py-1 text-sm text-white bg-indigo-600 rounded hover:bg-indigo-700" %>
+   <%= link_to "Edit",
+    edit_admin_teacher_path(teacher),
+    data: { turbo: false },
+    class: "px-3 py-1 text-sm text-white bg-blue-600 rounded" %>
 
-                <%= link_to "Edit",
-                    edit_admin_teacher_path(teacher),
-                    class: "px-3 py-1 text-sm text-white bg-blue-600 rounded hover:bg-blue-700" %>
+
+<%= button_to "Destroy",
+    admin_teacher_path(teacher),
+    method: :delete,
+    data: { confirm: "Bạn chắc chắn?" },
+    class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
+
+
+
               </td>
 
             </tr>
@@ -136,3 +143,48 @@ nav.pagination .current {
   color: white;
 }   
 </style>
+
+<!-- EDIT MODAL -->
+<div id="edit-modal"
+     class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
+    <button id="close-modal"
+            class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
+      ✕
+    </button>
+
+    <div id="modal-body" class="p-8">
+      <!-- form load vào đây -->
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const editButtons = document.querySelectorAll(".btn-edit");
+    const modal = document.getElementById("edit-modal");
+    const modalBody = document.getElementById("modal-body");
+    const closeModalBtn = document.getElementById("close-modal");
+
+    editButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        const teacherId = button.getAttribute("data-teacher-id");
+
+        fetch(`/admin/teachers/${teacherId}/edit`, {
+          headers: { "Accept": "text/vnd.turbo-stream.html" }
+        })
+        .then(response => response.text())
+        .then(html => {
+          modalBody.innerHTML = html;
+          modal.classList.remove("hidden");
+        });
+      });
+    });
+
+    closeModalBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+      modalBody.innerHTML = "";
+    });
+  });
+</script>
