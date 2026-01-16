@@ -68,6 +68,7 @@ RUN SECRET_KEY_BASE=dummy \
 # Final
 ############################
 FROM base
+ENV RAILS_SERVE_STATIC_FILES=true
 
 # Copy runtime artifacts only
 COPY --from=build ${BUNDLE_PATH} ${BUNDLE_PATH}
