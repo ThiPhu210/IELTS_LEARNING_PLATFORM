@@ -1,0 +1,15 @@
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
+
+    <!-- Close -->
+    <%= link_to "✕",
+        admin_teachers_path,
+        data: { turbo_frame: "modal" },
+        class: "absolute top-3 right-4 text-xl text-gray-500 hover:text-black" %>
+
+    <div class="p-8">
+      <%= render "form", teacher: @teacher %>
+    </div>
+
+  </div>
+</div>
