@@ -37,7 +37,7 @@ Rails.application.routes.draw do
     resources :payments, only: [:index]
 
     resources :teachers do
-      resource :teacher_profile, except: [:show]
+      resource :teacher_profile
     end
 
     resources :courses do
