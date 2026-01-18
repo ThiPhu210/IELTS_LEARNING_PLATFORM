@@ -3,4 +3,5 @@ class TeacherProfile < ApplicationRecord
   has_one_attached :avatar
   validates :expertise, presence: true
   validates :experience_years, numericality: { greater_than_or_equal_to: 0 }
+  delegate :full_name, :email, to: :user
 end
