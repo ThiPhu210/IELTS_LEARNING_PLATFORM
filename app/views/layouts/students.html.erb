@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <title><%= content_for(:title) || "Ielts Platform - Student" %></title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <!-- Icons -->
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <!-- ✅ Tailwind CSS (QUAN TRỌNG) -->
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <!-- SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  </head>
+
+  <body class="bg-gray-100">
+    <!-- ✅ STUDENT NAVBAR -->
+    <%= render "students/shared/navbar" %>
+
+    <!-- CONTENT -->
+    <main class="pt-20">
+      <%= yield %>
+    </main>
+
+    <!-- ✅ Flowbite JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.3/dist/flowbite.min.js"></script>
+
+    <% if flash[:success] %>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          Swal.fire({
+            icon: 'success',
+            title: 'Thành công 🎉',
+            text: "<%= j flash[:success] %>",
+            confirmButtonText: 'OK'
+          });
+        });
+      </script>
+    <% end %>
+  </body>
+</html>
