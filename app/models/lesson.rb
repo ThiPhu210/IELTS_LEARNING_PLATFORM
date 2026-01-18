@@ -3,7 +3,6 @@ class Lesson < ApplicationRecord
 
   has_one_attached  :video
   has_many_attached :pdfs
-
   validates :title,
             presence: true,
             length: { maximum: 255 }
@@ -41,8 +40,8 @@ class Lesson < ApplicationRecord
   def video_size
     return unless video.attached?
 
-    if video.byte_size > 500.megabytes
-      errors.add(:video, "tối đa 500MB")
+    if video.byte_size > 5.megabytes
+      errors.add(:video, "tối đa 5MB")
     end
   end
 
@@ -56,8 +55,8 @@ class Lesson < ApplicationRecord
 
   def pdfs_size
     pdfs.each do |pdf|
-      if pdf.byte_size > 100.megabytes
-        errors.add(:pdfs, "mỗi file tối đa 100MB")
+      if pdf.byte_size > 500.kilobytes
+        errors.add(:pdfs, "mỗi file tối đa 500KB")
       end
     end
   end
