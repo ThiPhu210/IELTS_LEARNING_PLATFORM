@@ -2,8 +2,12 @@ class Admin::CoursesController < Admin::BaseController
   before_action :authenticate_user!
   before_action :require_admin
   def index
-    @courses = Course.order(created_at: :desc)
+  @courses = Course
+              .order(created_at: :desc)
+              .page(params[:page])
+              .per(1)
   end
+
 
   def edit
     @course = Course.find(params[:id])
@@ -23,8 +27,11 @@ class Admin::CoursesController < Admin::BaseController
     @course = Course.find(params[:id])
 
     if @course.update(course_params)
-      redirect_to edit_admin_course_path(@course), notice: "Updated"
+      flash[:success] = "✅ Bạn vừa thay đổi thành công thông tin khóa học"
+      redirect_to admin_courses_path, notice: "Cập nhật khóa học thành công"
+
     else
+      Rails.logger.debug @course.errors.full_messages
       render :edit, status: :unprocessable_entity
     end
     Rails.logger.debug params[:course]
@@ -38,24 +45,26 @@ class Admin::CoursesController < Admin::BaseController
 
   private
   def course_params
-    params.require(:course).permit(
+  params.require(:course).permit(
+    :title,
+    :description,
+    :price,
+    :thumbnail,
+    course_sections_attributes: [
+      :id,
       :title,
-      :description,
-      :thumbnail,
-      course_sections_attributes: [
+      :_destroy,
+      lessons_attributes: [
         :id,
         :title,
+        :duration,
+        :video,
         :_destroy,
-        lessons_attributes: [
-          :id,
-          :title,
-          :duration,
-          :video,
-          { pdfs: [] },
-          :_destroy
-        ]
+        { pdfs: [] }
       ]
-    )
+    ]
+  )
+end
+
   end
   
-end
