@@ -107,11 +107,11 @@
 
                       <label class="cursor-pointer bg-emerald-100 px-3 py-1 rounded text-sm">
                         📄 Upload PDF
-                        <%= lesson.file_field :pdfs,
-                              multiple: true,
-                              accept: "application/pdf",
-                              class: "hidden",
-                              onchange: "handlePDFUpload(this)" %>
+                    <%= lesson.file_field :pdfs,
+      multiple: true,
+      accept: "application/pdf",
+      class: "pdf-input hidden" %>
+
                       </label>
                     </div>
 
@@ -121,6 +121,48 @@
                   </div>
                 <% end %>
               </div>
+<template class="lesson-template">
+  <div class="lesson-item bg-white p-4 rounded shadow-sm">
+    <input type="hidden" name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][_destroy]" value="false">
+
+    <div class="grid grid-cols-2 gap-4 mb-3">
+      <input type="text"
+             name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][title]"
+             placeholder="Lesson title"
+             class="border rounded px-3 py-2">
+
+      <input type="number"
+             name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][duration]"
+             placeholder="Duration"
+             class="border rounded px-3 py-2">
+    </div>
+
+    <div class="flex gap-4 mt-3">
+      <label class="cursor-pointer bg-blue-100 px-3 py-1 rounded text-sm">
+        🎬 Upload video
+        <input type="file"
+               name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][video]"
+               accept="video/mp4"
+               class="hidden"
+               onchange="handleVideoUpload(this)">
+      </label>
+
+      <label class="cursor-pointer bg-emerald-100 px-3 py-1 rounded text-sm">
+        📄 Upload PDF
+      <input type="file"
+  name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][pdfs][]"
+  multiple
+  accept="application/pdf"
+  class="pdf-input hidden">
+
+      </label>
+    </div>
+
+    <button type="button" class="remove-lesson mt-3 text-sm text-red-500">
+      Remove lesson
+    </button>
+  </div>
+</template>
 
               <button type="button" class="add-lesson mt-4 text-indigo-600 text-sm">
                 + Add lesson
@@ -141,8 +183,9 @@
 
 <!-- JS -->
 <script>
-const MAX_VIDEO = 5 * 1024 * 1024
-const MAX_PDF   = 5 * 1024 * 1024
+const MAX_VIDEO = 5 * 1024 * 1024   // 5MB
+const MAX_PDF   = 500 * 1024        // 500KB
+ 
 
 function showAlert(type, message) {
   const div = document.createElement("div")
@@ -175,16 +218,28 @@ function handleVideoUpload(input) {
 }
 
 function handlePDFUpload(input) {
-  const files = input.files
-  for (let f of files) {
-    if (f.size > MAX_PDF) {
-      showAlert("danger", "❌ PDF không được vượt quá 5MB")
-      input.value = ""
-      return
+  const files = Array.from(input.files)
+  if (files.length === 0) return
+
+  let hasError = false
+  let html = "❌ <b>File PDF vượt quá 5MB:</b><br>"
+
+  files.forEach(file => {
+    if (file.size > MAX_PDF) {
+      hasError = true
+      html += `📄 ${file.name}<br>`
     }
+  })
+
+  // ❌ CÓ FILE LỖI
+  if (hasError) {
+    showAlert("danger", html)
+    input.value = "" // reset toàn bộ
+    return
   }
 
-  showAlert("success", `📄 Đã upload ${files.length} file PDF`)
+  // ✅ HỢP LỆ
+  showAlert("success", `📄 Đã upload <b>${files.length}</b> file PDF`)
 
   const wrapper = input.closest(".lesson-item")
   wrapper.querySelector(".pdf-preview")?.remove()
@@ -192,10 +247,53 @@ function handlePDFUpload(input) {
   const list = document.createElement("div")
   list.className = "pdf-preview mt-2 text-sm"
 
-  Array.from(files).forEach(f => {
-    list.innerHTML += `📄 <b>${f.name}</b><br>`
+  files.forEach(file => {
+    list.innerHTML += `📄 <b>${file.name}</b><br>`
   })
 
   wrapper.appendChild(list)
 }
+
+</script>
+<script>
+document.addEventListener("click", function (e) {
+
+  // ADD LESSON
+  if (e.target.classList.contains("add-lesson")) {
+    const sectionBox = e.target.closest(".border")
+    const lessonsBox = sectionBox.querySelector(".lessons")
+    const template   = sectionBox.querySelector(".lesson-template")
+
+    const sectionIndex = Array.from(
+      document.querySelectorAll("#sections > div")
+    ).indexOf(sectionBox)
+
+    const lessonIndex = Date.now()
+
+    let html = template.innerHTML
+      .replace(/__SECTION__/g, sectionIndex)
+      .replace(/__INDEX__/g, lessonIndex)
+
+    lessonsBox.insertAdjacentHTML("beforeend", html)
+  }
+
+  // REMOVE LESSON
+  if (e.target.classList.contains("remove-lesson")) {
+    const lesson = e.target.closest(".lesson-item")
+    const destroy = lesson.querySelector('input[name*="_destroy"]')
+
+    if (destroy) {
+      destroy.value = "1"
+      lesson.style.display = "none"
+    } else {
+      lesson.remove()
+    }
+  }
+})
+document.addEventListener("change", function (e) {
+  if (e.target.classList.contains("pdf-input")) {
+    handlePDFUpload(e.target)
+  }
+})
+
 </script>
