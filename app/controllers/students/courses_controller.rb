@@ -1,7 +1,6 @@
 class Students::CoursesController < ApplicationController
   layout "students"
   before_action :authenticate_user!
-  before_action :ensure_student!
   
   def index
     @courses = Course
