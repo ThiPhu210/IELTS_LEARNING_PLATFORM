@@ -8,7 +8,7 @@ class DashboardController < ApplicationController
     when "teacher"
       redirect_to teacher_dashboard_path
     else
-      redirect_to student_dashboard_path
+      redirect_to students_dashboard_path
     end
   end
 end
