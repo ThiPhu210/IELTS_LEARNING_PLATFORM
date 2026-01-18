@@ -14,10 +14,9 @@ Rails.application.routes.draw do
   end
 
   # ================= STUDENT =================
-  namespace :student do
+  namespace :students do
     get "dashboard", to: "dashboard#index"
-
-    resources :courses, only: [] do
+    resources :courses, only: [:index, :show] do
       resources :orders, only: [:create] do
         collection do
           get  :checkout
