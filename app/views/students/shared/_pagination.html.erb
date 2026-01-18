@@ -1,0 +1,24 @@
+<nav class="block">
+  <ul class="flex pl-0 rounded list-none flex-wrap">
+
+    <% collection.each_page do |page| %>
+      <% if page %>
+        <li>
+          <%= link_to page,
+                url_for(page: page),
+                class: "w-8 h-8 text-xs font-semibold flex mx-1 rounded-full items-center justify-center border transition-all duration-150
+                #{page == collection.current_page ?
+                  'bg-pink-500 border-pink-500 text-white hover:bg-pink-700' :
+                  'bg-transparent border-pink-500 text-pink-500 hover:border-pink-700 hover:text-pink-700'}" %>
+        </li>
+      <% else %>
+        <li>
+          <span class="w-8 h-8 text-xs font-semibold flex mx-1 rounded-full items-center justify-center border border-pink-200 bg-pink-200 text-white">
+            …
+          </span>
+        </li>
+      <% end %>
+    <% end %>
+
+  </ul>
+</nav>
