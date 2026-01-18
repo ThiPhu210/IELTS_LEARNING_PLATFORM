@@ -1,6 +1,6 @@
 class CourseSection < ApplicationRecord
   belongs_to :course
-  has_many :lessons, dependent: :destroy
+  has_many :lessons, inverse_of: :course_section, dependent: :destroy
 
   has_rich_text :description
 
