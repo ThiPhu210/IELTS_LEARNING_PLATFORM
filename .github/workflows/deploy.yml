@@ -16,7 +16,7 @@ on:
   pull_request:
   push:
     branches:
-      - Upload-Frontend
+      - Update-Frontend
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
