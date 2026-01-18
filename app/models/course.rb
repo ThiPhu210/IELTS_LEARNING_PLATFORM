@@ -5,7 +5,7 @@ class Course < ApplicationRecord
   has_many :speaking_attempts
   has_many :course_progresses
   has_one_attached :thumbnail
-  has_many :course_sections
+  has_many :course_sections, inverse_of: :course, dependent: :destroy
 
   enum :status, { draft: 0, published: 1 }, suffix: true
   scope :published_courses, -> { where(status: statuses[:published]) }
