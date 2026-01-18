@@ -12,6 +12,7 @@ class User < ApplicationRecord
   has_many :speaking_attempts
   has_many :course_progresses
   has_one :teacher_profile, dependent: :destroy
+  
   has_one_attached :thumbnail
   accepts_nested_attributes_for :teacher_profile, allow_destroy: true
 
