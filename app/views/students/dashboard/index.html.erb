@@ -112,7 +112,7 @@
   </div>
 
   <% courses = @courses.to_a %>
-  <% return if courses.empty? %>
+  <% if courses.present? %>
 
   <!-- SLIDER VIEWPORT -->
 <div id="slider"
