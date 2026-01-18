@@ -1,7 +1,6 @@
 class Admin::TeachersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_teacher, only: [ :show, :edit, :update, :destroy ]
-
+  before_action :set_teacher, only: [:show, :edit, :update, :destroy]
 
   def index
     @teachers = User.teacher_role.page(params[:page]).per(5).includes(:teacher_profile)
@@ -11,18 +10,17 @@ class Admin::TeachersController < ApplicationController
   end
 
   def edit
-  @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
+    render partial: "form", locals: { teacher: @teacher }
   end
 
-def update
-  if @teacher.update(teacher_params)
-    redirect_to admin_teachers_path, notice: "Cập nhật thành công"
-  else
-    @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
-    render partial: "form", locals: { teacher: @teacher }, status: :unprocessable_entity
+  def update
+    if @teacher.update(teacher_params)
+      redirect_to admin_teachers_path, notice: "Cập nhật thành công"
+    else
+      @teacher.build_teacher_profile if @teacher.teacher_profile.nil?
+      render partial: "form", locals: { teacher: @teacher }, status: :unprocessable_entity
+    end
   end
-end
-
 
   def destroy
     @teacher.destroy
