@@ -3,15 +3,18 @@ class ApplicationController < ActionController::Base
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_no_cache
   def after_sign_in_path_for(resource)
-    case resource.role
-    when "admin"
-      admin_dashboard_path
-    when "teacher"
-      teacher_dashboard_path
-    else
-      root_path
-    end
+  case resource.role
+  when "admin"
+    admin_dashboard_path
+  when "teacher"
+    teacher_dashboard_path
+  when "student"
+    students_dashboard_path 
+  else
+    root_path
   end
+end
+
 
   protected
 
