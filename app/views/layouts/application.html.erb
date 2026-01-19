@@ -49,4 +49,75 @@
       </script>
     <% end %>
   </body>
+  <footer class="bg-gray-900 text-gray-300 mt-24">
+  <div class="max-w-7xl mx-auto px-6 py-16">
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
+
+      <!-- BRAND -->
+      <div>
+        <h3 class="text-2xl font-bold text-white mb-4">
+          IELTS AI
+        </h3>
+        <p class="text-sm leading-relaxed">
+          Nền tảng luyện IELTS Speaking kết hợp
+          giảng viên & Trí tuệ nhân tạo.
+        </p>
+      </div>
+
+      <!-- COURSES -->
+      <div>
+        <h4 class="text-white font-semibold mb-4">
+          Khóa học
+        </h4>
+        <ul class="space-y-2 text-sm">
+          <li>
+            <%= link_to "IELTS Speaking", students_courses_path,
+              class: "hover:text-white transition" %>
+          </li>
+          <li>
+            <%= link_to "IELTS Writing", students_courses_path,
+              class: "hover:text-white transition" %>
+          </li>
+          <li>
+            <%= link_to "AI Speaking Test", students_courses_path,
+              class: "hover:text-white transition" %>
+          </li>
+        </ul>
+      </div>
+
+      <!-- SUPPORT -->
+      <div>
+        <h4 class="text-white font-semibold mb-4">
+          Hỗ trợ
+        </h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#" class="hover:text-white">FAQ</a></li>
+          <li><a href="#" class="hover:text-white">Điều khoản</a></li>
+          <li><a href="#" class="hover:text-white">Chính sách</a></li>
+        </ul>
+      </div>
+
+      <!-- CONTACT -->
+      <div>
+        <h4 class="text-white font-semibold mb-4">
+          Liên hệ
+        </h4>
+        <ul class="space-y-2 text-sm">
+          <li>📧 support@ielts-ai.com</li>
+          <li>📞 0909 123 456</li>
+          <li>📍 Việt Nam</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- DIVIDER -->
+    <div class="border-t border-gray-700 mt-12 pt-6 text-sm text-center text-gray-400">
+      © <%= Time.current.year %> IELTS AI Platform. All rights reserved.
+    </div>
+
+  </div>
+</footer>
+
 </html>

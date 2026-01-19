@@ -1,16 +1,20 @@
-class Students::DashboardController < ApplicationController
+class Students::CoursesController < ApplicationController
   before_action :authenticate_user!
   layout "students"
 
   def index
-    @courses = Course
-      .includes(:thumbnail_attachment)
-      .order(created_at: :desc)
-      .page(params[:page])
-      .per(9)
-  @teacher_profiles = TeacherProfile
-  .joins(:avatar_attachment)
-  .includes(:user)
+    Rails.logger.info "PAID PARAM = #{params[:paid]}"
 
+    @courses = Course
+      .joins(:orders)
+      .where(
+        orders: {
+          user_id: current_user.id,
+          status: Order.statuses[:paid]
+        }
+      )
+      .distinct
+
+    Rails.logger.info "COURSES FOUND = #{@courses.pluck(:id)}"
   end
 end

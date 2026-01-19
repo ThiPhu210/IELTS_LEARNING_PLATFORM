@@ -9,7 +9,7 @@ class ApplicationController < ActionController::Base
   when "teacher"
     teacher_dashboard_path
   when "student"
-    students_dashboard_path 
+    students_dashboard_path
   else
     root_path
   end
@@ -20,7 +20,7 @@ end
 
   def configure_permitted_parameters
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :full_name ])
-    devise_parameter_sanitizer.permit(:sign_in, keys: [:remember_me])
+    devise_parameter_sanitizer.permit(:sign_in, keys: [ :remember_me ])
   end
   private
 

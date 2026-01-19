@@ -16,9 +16,11 @@ Rails.application.routes.draw do
   # ================= STUDENT =================
   namespace :students do
     get "dashboard", to: "dashboard#index"
-    resources :courses, only: [:index, :show] do
-      resources :orders, only: [:create] do
-        collection do
+    resources :payments, only: [ :create ]
+    get "vnpay/return", to: "payments#vnpay_return"
+    resources :courses, only: [ :index, :show ] do
+      resources :orders, only: [ :new, :create, :show ] do
+        member do
           get  :checkout
           post :pay
         end
@@ -26,14 +28,15 @@ Rails.application.routes.draw do
     end
   end
 
+
   # ================= ADMIN =================
   namespace :admin do
-    root to: "dashboard#index"   
+    root to: "dashboard#index"
     get "dashboard", to: "dashboard#index"
 
     resources :users
-    resources :students, only: [:index]
-    resources :payments, only: [:index]
+    resources :students, only: [ :index ]
+    resources :payments, only: [ :index ]
 
     resources :teachers do
       resource :teacher_profile

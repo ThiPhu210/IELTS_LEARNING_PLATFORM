@@ -3,61 +3,46 @@ class Lesson < ApplicationRecord
 
   has_one_attached  :video
   has_many_attached :pdfs
+
   validates :title,
-            presence: true,
             length: { maximum: 255 }
 
   validates :duration,
             numericality: { greater_than: 0 },
             allow_nil: true
 
-  validate :video_presence
-  validate :video_type
-  validate :video_size
-  validate :pdfs_type
-  validate :pdfs_size
-  def video_presence
-    errors.add(:video, "phải được upload") unless video.attached?
-  end
+  # ✅ chỉ validate khi CÓ FILE
+  validate :video_type, if: -> { video.attached? }
+  validate :video_size, if: -> { video.attached? }
+  validate :pdfs_type,  if: -> { pdfs.attached? }
+  validate :pdfs_size,  if: -> { pdfs.attached? }
 
   def video_thumbnail
     return unless video.attached?
 
     video.preview(
-      resize_to_limit: [640, 360],
+      resize_to_limit: [ 640, 360 ],
       format: "jpg"
     )
   end
-  
-  def video_type
-    return unless video.attached?
 
-    unless video.content_type == "video/mp4"
-      errors.add(:video, "chỉ cho phép MP4")
-    end
+  def video_type
+    errors.add(:video, "chỉ cho phép MP4") unless video.content_type == "video/mp4"
   end
 
   def video_size
-    return unless video.attached?
-
-    if video.byte_size > 5.megabytes
-      errors.add(:video, "tối đa 5MB")
-    end
+    errors.add(:video, "tối đa 5MB") if video.byte_size > 5.megabytes
   end
 
   def pdfs_type
     pdfs.each do |pdf|
-      unless pdf.content_type == "application/pdf"
-        errors.add(:pdfs, "chỉ cho phép file PDF")
-      end
+      errors.add(:pdfs, "chỉ cho phép file PDF") unless pdf.content_type == "application/pdf"
     end
   end
 
   def pdfs_size
     pdfs.each do |pdf|
-      if pdf.byte_size > 500.kilobytes
-        errors.add(:pdfs, "mỗi file tối đa 500KB")
-      end
+      errors.add(:pdfs, "mỗi file tối đa 500KB") if pdf.byte_size > 500.kilobytes
     end
   end
 end

@@ -1,6 +1,6 @@
 class Admin::TeachersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_teacher, only: [:show, :edit, :update, :destroy]
+  before_action :set_teacher, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @teachers = User.teacher_role.page(params[:page]).per(5).includes(:teacher_profile)

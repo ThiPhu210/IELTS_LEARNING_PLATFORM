@@ -1,7 +1,7 @@
 module UsersHelper
   def user_avatar(user, size: 40)
     if user.thumbnail.attached?
-      image_tag user.thumbnail.variant(resize_to_fill: [size, size]),
+      image_tag user.thumbnail.variant(resize_to_fill: [ size, size ]),
         class: "w-#{size} h-#{size} rounded-full object-cover"
     else
       content_tag :div,

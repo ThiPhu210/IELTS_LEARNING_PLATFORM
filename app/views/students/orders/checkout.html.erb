@@ -1,0 +1,83 @@
+<%= form_with(
+      url: pay_students_course_order_path(@course, @order),
+      method: :post,
+      local: true,
+      class: "mt-8"
+    ) do %>
+
+  <div class="bg-pink-50 border border-pink-100 rounded-2xl p-6 shadow-sm space-y-6">
+
+    <!-- TITLE -->
+    <div>
+      <h3 class="text-lg font-semibold text-gray-900">
+        Thanh toán bằng VNPay
+      </h3>
+      <p class="text-sm text-gray-500 mt-1">
+        Vui lòng kiểm tra lại thông tin trước khi thanh toán
+      </p>
+    </div>
+
+    <!-- INFO GRID -->
+    <div class="grid grid-cols-2 gap-4 text-sm">
+
+      <div>
+        <p class="text-gray-500">Học viên</p>
+        <p class="font-medium text-gray-900">
+          <%= @current_user.full_name %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-gray-500">Email</p>
+        <p class="font-medium text-gray-900">
+          <%= @current_user.email %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-gray-500">Khoá học</p>
+        <p class="font-medium text-gray-900">
+          <%= @course.title %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-gray-500">Giá tiền</p>
+        <p class="font-semibold text-pink-600">
+        <%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %>
+
+        </p>
+      </div>
+
+      <div>
+        <p class="text-gray-500">Mã giao dịch</p>
+        <p class="font-mono text-gray-900">
+          #<%= @order.id %>
+        </p>
+      </div>
+
+      <div>
+        <p class="text-gray-500">Ngày tạo đơn</p>
+        <p class="text-gray-900">
+          <%= l(@order.created_at, format: :long) %>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- VNPay BUTTON -->
+    <button
+      type="submit"
+      class="w-full flex items-center justify-center gap-3
+             bg-pink-500 hover:bg-pink-600
+             text-white text-lg font-semibold
+             py-4 rounded-xl
+             transition shadow-md hover:shadow-lg">
+
+      <%= image_tag "vnpay-logo.jpg", alt: "VNPay", class: "h-6 w-auto" %>
+      Thanh toán VNPay
+    </button>
+
+  </div>
+
+<% end %>

@@ -15,8 +15,6 @@ end
     u.password      = "123456"
     u.role          = :teacher
     u.confirmed_at  = Time.current
-
-
   end
 
   TeacherProfile.find_or_create_by!(user: teacher) do |tp|
@@ -32,8 +30,6 @@ end
     u.password      = "123456"
     u.role          = :student
     u.confirmed_at  = Time.current
-
-
   end
 end
 

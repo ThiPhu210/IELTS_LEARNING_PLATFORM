@@ -5,7 +5,7 @@ class Admin::CoursesController < Admin::BaseController
   @courses = Course
               .order(created_at: :desc)
               .page(params[:page])
-              .per(1)
+              .per(5)
   end
 
 
@@ -65,6 +65,4 @@ class Admin::CoursesController < Admin::BaseController
     ]
   )
 end
-
-  end
-  
+end

@@ -4,7 +4,6 @@ class CourseSection < ApplicationRecord
 
   has_rich_text :description
 
-  validates :title, presence: true
   validates :order_index,
             numericality: { greater_than: 0 },
             uniqueness: { scope: :course_id }

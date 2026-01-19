@@ -1,0 +1,86 @@
+<section class="min-h-screen bg-pink-50 flex items-center justify-center px-6 py-16">
+
+  <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10">
+
+    <!-- LEFT: COURSE INFO -->
+    <div class="bg-white rounded-3xl shadow-lg p-8">
+
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        Thông tin khóa học
+      </h2>
+
+      <% if @course.thumbnail.attached? %>
+        <%= image_tag @course.thumbnail.variant(resize_to_fill: [600, 300]),
+              class: "rounded-2xl mb-6 w-full object-cover" %>
+      <% end %>
+
+      <h3 class="text-xl font-semibold text-gray-900 mb-2">
+        <%= @course.title %>
+      </h3>
+
+      <% if @course.band_min.present? && @course.band_max.present? %>
+        <p class="text-sm font-semibold text-pink-600 mb-4">
+          IELTS <%= @course.band_min %> – <%= @course.band_max %>
+        </p>
+      <% end %>
+
+      <p class="text-gray-600 leading-relaxed">
+        Học IELTS với AI cá nhân hóa lộ trình, chấm Speaking – Writing tự động,
+        phản hồi chi tiết theo band score.
+      </p>
+    </div>
+
+    <!-- RIGHT: PAYMENT BOX -->
+    <div class="bg-white rounded-3xl shadow-xl p-8">
+
+      <h2 class="text-2xl font-bold text-gray-900 mb-6">
+        Thanh toán
+      </h2>
+
+      <!-- PRICE -->
+      <div class="flex items-center justify-between mb-6">
+        <span class="text-gray-600 text-lg">Giá khóa học</span>
+        <span class="text-3xl font-bold text-gray-900">
+          <%= number_to_currency(@course.price, unit: "₫", precision: 0) %>
+        </span>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="border-t my-6"></div>
+
+      <!-- PAYMENT METHODS -->
+      <div class="space-y-4 mb-8">
+
+        <div class="flex items-center gap-3 p-4 border rounded-xl">
+          <input type="radio" checked class="accent-pink-500">
+          <span class="font-medium">Chuyển khoản ngân hàng</span>
+        </div>
+
+        <div class="flex items-center gap-3 p-4 border rounded-xl opacity-50">
+          <input type="radio" disabled>
+          <span class="font-medium">VNPay (sắp ra mắt)</span>
+        </div>
+
+        <div class="flex items-center gap-3 p-4 border rounded-xl opacity-50">
+          <input type="radio" disabled>
+          <span class="font-medium">Momo (sắp ra mắt)</span>
+        </div>
+
+      </div>
+
+      <!-- PAY BUTTON -->
+      <%= button_to "Xác nhận thanh toán",
+            students_course_orders_path(@course),
+            method: :post,
+            class: "w-full py-4 text-lg font-semibold text-white
+                    bg-pink-500 rounded-xl hover:bg-pink-600
+                    transition shadow-lg" %>
+
+      <p class="text-sm text-gray-500 mt-4 text-center">
+        Bằng việc thanh toán, bạn đồng ý với điều khoản sử dụng
+      </p>
+
+    </div>
+
+  </div>
+</section>
