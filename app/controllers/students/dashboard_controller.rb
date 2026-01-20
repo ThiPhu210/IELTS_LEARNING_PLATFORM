@@ -1,11 +1,11 @@
-class Students::CoursesController < ApplicationController
+class Students::DashboardController < ApplicationController
   before_action :authenticate_user!
   layout "students"
 
   def index
     Rails.logger.info "PAID PARAM = #{params[:paid]}"
-
-    @courses = Course
+    @courses = Course.all 
+    @courses_paid = Course
       .joins(:orders)
       .where(
         orders: {
