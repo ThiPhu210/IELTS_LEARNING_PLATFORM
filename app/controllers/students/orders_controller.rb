@@ -26,7 +26,7 @@ class Students::OrdersController < ApplicationController
     )
     
 
-    flash[:success] = "Đơn hàng đã được tạo thành công, bạn chờ tí nha!"
+    flash[:success] = "Đang tiến hành thanh toán, vui lòng kiểm tra thông tin trước khi nhấn thanh toán"
     redirect_to checkout_students_course_order_path(@course, @order)
   end
 
@@ -45,12 +45,9 @@ class Students::OrdersController < ApplicationController
     vnp_tmn_code    = "9APTANC1"
     vnp_hash_secret = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
     vnp_url         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    return_url = Rails.application.routes.url_helpers
-                .students_payments_vnpay_return_url(
-                  host: request.base_url
-                )
-
-
+    return_url = students_payments_vnpay_return_url(
+    host: request.base_url
+  )
     order = Order.find(params[:id])
 
     # ====== Params gửi sang VNPay ======
@@ -88,7 +85,8 @@ class Students::OrdersController < ApplicationController
     payment_url = "#{vnp_url}?#{query_string}&vnp_SecureHash=#{secure_hash}"
 
     # ====== Redirect sang VNPay ======
-    redirect_to payment_url, allow_other_host: true
+    redirect_to "#{VN_PAY[:url]}?#{query}&vnp_SecureHash=#{secure_hash}",
+              allow_other_host: true
   end
 
   private
