@@ -22,12 +22,11 @@ class Students::OrdersController < ApplicationController
       user: current_user,
       course: @course,
       status: :paid,
-      amount: @course.price
+      total_price: @course.price
     )
     
-    )
 
-    flash[:success] = "Đơn hàng đã được tạo thành công!"
+    flash[:success] = "Đơn hàng đã được tạo thành công, bạn chờ tí nha!"
     redirect_to checkout_students_course_order_path(@course, @order)
   end
 
@@ -43,26 +42,28 @@ class Students::OrdersController < ApplicationController
   # ======================
   def pay
     # ====== VNPay config (sandbox) ======
-    vnp_tmn_code    = ENV["VNP_TMN_CODE"]
-    vnp_hash_secret = ENV["VNP_HASH_SECRET"]
+    vnp_tmn_code    = "9APTANC1"
+    vnp_hash_secret = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
     vnp_url         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
     return_url      = students_vnpay_return_url
+    order = Order.find(params[:id])
 
     # ====== Params gửi sang VNPay ======
-    vnp_params = {
-      vnp_Version: "2.1.0",
-      vnp_Command: "pay",
-      vnp_TmnCode: vnp_tmn_code,
-      vnp_Amount: (@order.total_price * 100).to_i, # VNPay x100
-      vnp_CurrCode: "VND",
-      vnp_TxnRef: @order.id, # 🔥 QUAN TRỌNG: gắn order_id
-      vnp_OrderInfo: "Thanh toan khoa hoc #{@course.title}",
-      vnp_OrderType: "education",
-      vnp_Locale: "vn",
-      vnp_ReturnUrl: return_url,
-      vnp_IpAddr: request.remote_ip,
-      vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
-    }
+  vnp_params = {
+    vnp_Version: "2.1.0",
+    vnp_Command: "pay",
+    vnp_TmnCode: "9APTANC1",
+    vnp_Amount: (order.total_price * 100).to_i,
+    vnp_CurrCode: "VND",
+    vnp_TxnRef: order.id.to_s,
+    vnp_OrderInfo: "Thanh toan don hang #{order.id}",
+    vnp_OrderType: "other",
+    vnp_Locale: "vn",
+    vnp_ReturnUrl: students_vnpay_return_url(host: request.base_url),
+    vnp_IpAddr: request.remote_ip,
+    vnp_CreateDate: Time.now.strftime("%Y%m%d%H%M%S")
+  }.compact
+
 
     # ====== Sort params ======
     sorted_params = vnp_params.sort.to_h
@@ -75,7 +76,7 @@ class Students::OrdersController < ApplicationController
     # ====== Secure hash ======
     secure_hash = OpenSSL::HMAC.hexdigest(
       "SHA512",
-      vnp_hash_secret,
+      "OV71K9S7ITDX3J2HF113O886GMZR72ZP",
       query_string
     )
 
