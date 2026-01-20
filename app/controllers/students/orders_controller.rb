@@ -45,7 +45,8 @@ class Students::OrdersController < ApplicationController
     vnp_tmn_code    = "9APTANC1"
     vnp_hash_secret = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
     vnp_url         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    return_url      = students_vnpay_return_url
+    return_url = students_payments_vnpay_return_url
+
     order = Order.find(params[:id])
 
     # ====== Params gửi sang VNPay ======
