@@ -45,7 +45,7 @@ class Students::OrdersController < ApplicationController
     vnp_tmn_code    = "9APTANC1"
     vnp_hash_secret = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
     vnp_url         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    vnpay_return_students_payments_url = vnpay_return_students_payments_url(
+    return_url = vnpay_return_students_payments_url(
   host: "https://d34ute7tylgmox.cloudfront.net"
 )
 
@@ -62,7 +62,7 @@ class Students::OrdersController < ApplicationController
     vnp_OrderInfo: "Thanh toan don hang #{order.id}",
     vnp_OrderType: "other",
     vnp_Locale: "vn",
-    vnp_ReturnUrl: vnpay_return_students_payments_url,
+    vnp_ReturnUrl: return_url,
     vnp_IpAddr: request.remote_ip,
     vnp_CreateDate: Time.now.strftime("%Y%m%d%H%M%S")
   }.compact
@@ -86,8 +86,8 @@ class Students::OrdersController < ApplicationController
     payment_url = "#{vnp_url}?#{query_string}&vnp_SecureHash=#{secure_hash}"
 
     # ====== Redirect sang VNPay ======
-    redirect_to "#{VN_PAY[:url]}?#{query}&vnp_SecureHash=#{secure_hash}",
-              allow_other_host: true
+    redirect_to payment_url, allow_other_host: true
+
   end
 
   private
