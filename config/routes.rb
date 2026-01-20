@@ -14,19 +14,28 @@ Rails.application.routes.draw do
   end
 
   # ================= STUDENT =================
-  namespace :students do
-    get "dashboard", to: "dashboard#index"
-    resources :payments, only: [ :create ]
-    get "vnpay/return", to: "payments#vnpay_return"
-    resources :courses, only: [ :index, :show ] do
-      resources :orders, only: [ :new, :create, :show ] do
-        member do
-          get  :checkout
-          post :pay
-        end
+namespace :students do
+  get "dashboard", to: "dashboard#index"
+
+  # ================== PAYMENTS ==================
+  resources :payments, only: [:create] do
+    collection do
+      get :vnpay_return
+      get :vnpay_ipn
+    end
+  end
+
+  # ================== COURSES ==================
+  resources :courses, only: [:index, :show] do
+    resources :orders, only: [:new, :create, :show] do
+      member do
+        get  :checkout
+        post :pay
       end
     end
   end
+end
+
 
 
   # ================= ADMIN =================
