@@ -45,7 +45,7 @@ class Students::OrdersController < ApplicationController
     vnp_tmn_code    = "9APTANC1"
     vnp_hash_secret = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
     vnp_url         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    vnpay_return_students_payments_url(
+    vnpay_return_students_payments_url = vnpay_return_students_payments_url(
   host: "https://d34ute7tylgmox.cloudfront.net"
 )
 
@@ -62,7 +62,7 @@ class Students::OrdersController < ApplicationController
     vnp_OrderInfo: "Thanh toan don hang #{order.id}",
     vnp_OrderType: "other",
     vnp_Locale: "vn",
-    vnp_ReturnUrl: students_vnpay_return_url(host: request.base_url),
+    vnp_ReturnUrl: vnpay_return_students_payments_url,
     vnp_IpAddr: request.remote_ip,
     vnp_CreateDate: Time.now.strftime("%Y%m%d%H%M%S")
   }.compact
