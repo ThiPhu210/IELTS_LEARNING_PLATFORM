@@ -92,7 +92,7 @@ def vnpay_ipn
     )
 
     Rails.logger.info "✅ IPN CONFIRMED – Order #{order.id}"
-
+    InvoiceMailer.invoice_email(order).deliver_later
     render json: { RspCode: "00", Message: "Confirm Success" }
   else
     render json: { RspCode: "02", Message: "Payment Failed" }

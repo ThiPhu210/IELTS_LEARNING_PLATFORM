@@ -1,0 +1,63 @@
+<div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen dark:bg-gray-900">
+
+  <!-- Logo -->
+  <%= link_to root_path,
+      class: "flex items-center justify-center mb-8 text-2xl font-semibold lg:mb-10 dark:text-white" do %>
+    <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" class="h-12"/>
+  <% end %>
+
+  <div class="w-full max-w-xl p-6 space-y-8 sm:p-8 bg-white rounded-lg shadow dark:bg-gray-800">
+
+    <h2 class="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
+      Edit Profile
+    </h2>
+
+    <%= form_with model: @user,
+                  url: admin_profile_path,
+                  method: :patch,
+                  local: true,
+                  multipart: true do |f| %>
+
+     <!-- AVATAR --> 
+     <div class="flex flex-col items-center mb-8"> 
+     <% if @user.thumbnail&.attached? %> 
+     <%= image_tag @user.thumbnail.variant(resize_to_fill: [60, 60]).processed, 
+     id: "avatar-preview", 
+     class: "w-[60px] h-[60px] rounded-full object-cover border mb-3" %> 
+        <% else %> 
+        <img id="avatar-preview" class="w-[60px] h-[60px] rounded-full object-cover border mb-3" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"> 
+        <% end %>
+         <label class="text-sm font-medium text-blue-600 cursor-pointer hover:underline"> Change avatar <%= f.file_field :thumbnail, accept: "image/*", class: "hidden" %> </label> 
+
+      <!-- FULL NAME -->
+      <div class="mb-5">
+        <%= f.label :full_name,
+            class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+
+        <%= f.text_field :full_name,
+            class: "w-full rounded-lg border border-gray-300 px-3 py-2
+                    focus:ring-blue-500 focus:border-blue-500
+                    dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="mb-6 mt-6">
+        <%= f.label :email,
+            class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+
+        <%= f.email_field :email,
+            class: "w-full rounded-lg border border-gray-300 px-3 py-2
+                    focus:ring-blue-500 focus:border-blue-500
+                    dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+      </div>
+
+      <!-- SUBMIT -->
+      <%= f.submit "Save changes",
+          class: "w-full py-3 text-white font-medium rounded-lg
+                  bg-red-600 hover:bg-red-700
+                  focus:ring-4 focus:ring-red-300" %>
+
+    <% end %>
+  </div>
+</div>
+

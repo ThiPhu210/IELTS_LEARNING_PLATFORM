@@ -13,12 +13,16 @@ Rails.application.routes.draw do
     root to: redirect("/users/sign_in")
   end
 
-  # ================= STUDENT =================
+
+  namespace :teacher do
+    get "dashboard", to: "dashboard#index"
+  end
+# ================= STUDENT =================
 namespace :students do
   get "dashboard", to: "dashboard#index"
-
+  resource :profile, only: [ :edit, :update ]
   # ================== PAYMENTS ==================
-  resources :payments, only: [:create] do
+  resources :payments, only: [ :create ] do
     collection do
       get :vnpay_return
       get :vnpay_ipn
@@ -26,8 +30,8 @@ namespace :students do
   end
 
   # ================== COURSES ==================
-  resources :courses, only: [:index, :show] do
-    resources :orders, only: [:new, :create, :show] do
+  resources :courses, only: [ :index, :show ] do
+    resources :orders, only: [ :new, :create, :show ] do
       member do
         get  :checkout
         post :pay
@@ -42,7 +46,7 @@ end
   namespace :admin do
     root to: "dashboard#index"
     get "dashboard", to: "dashboard#index"
-
+    resource :profile, only: [ :edit, :update ]
     resources :users
     resources :students, only: [ :index ]
     resources :payments, only: [ :index ]

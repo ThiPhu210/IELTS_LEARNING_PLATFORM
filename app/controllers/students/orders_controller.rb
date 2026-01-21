@@ -1,7 +1,7 @@
 class Students::OrdersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_course
-  before_action :set_order, only: [:checkout, :pay]
+  before_action :set_order, only: [ :checkout, :pay ]
 
   # ======================
   # GET /students/courses/:course_id/orders/new
@@ -24,7 +24,7 @@ class Students::OrdersController < ApplicationController
       status: :paid,
       total_price: @course.price
     )
-    
+
 
     flash[:success] = "Đang tiến hành thanh toán, vui lòng kiểm tra thông tin trước khi nhấn thanh toán"
     redirect_to checkout_students_course_order_path(@course, @order)
@@ -51,7 +51,7 @@ class Students::OrdersController < ApplicationController
 
     order = Order.find(params[:id])
 
-    # ====== Params gửi sang VNPay ======
+  # ====== Params gửi sang VNPay ======
   vnp_params = {
     vnp_Version: "2.1.0",
     vnp_Command: "pay",
@@ -87,7 +87,6 @@ class Students::OrdersController < ApplicationController
 
     # ====== Redirect sang VNPay ======
     redirect_to payment_url, allow_other_host: true
-
   end
 
   private
@@ -108,5 +107,4 @@ class Students::OrdersController < ApplicationController
   def order_params
     params.require(:order).permit(:course_id, :status)
   end
-  
 end

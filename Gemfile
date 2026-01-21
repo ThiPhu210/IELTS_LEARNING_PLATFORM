@@ -16,6 +16,7 @@ group :development, :test do
   gem "selenium-webdriver" # nếu muốn test JS
   gem "factory_bot_rails"
   gem "sqlite3", ">= 2.1"
+  
 end
 
 

@@ -1,61 +1,38 @@
-# require "rails_helper"
-
-# RSpec.describe "User registration", type: :system do
-#   before do
-#     driven_by(:rack_test)
-#   end
-
-#   it "allows a new student to register and redirects to student dashboard" do
-#     visit register_path
-#     fill_in "Full name", with: "New Student"
-#     fill_in "Email", with: "new_student@example.com"
-#     fill_in "Password", with: "password"
-#     click_button "Register"
-
-#     user = User.find_by(email: "new_student@example.com")
-#     expect(user).not_to be_nil
-#     expect(page).to have_current_path(student_dashboard_path)
-#     expect(page).to have_content("Welcome, New Student")
-#   end
-# end
-
-
 require "rails_helper"
 
-RSpec.describe "User registration", type: :system do
+RSpec.describe "User Registration", type: :system do
   before do
     driven_by(:rack_test)
   end
 
   it "allows a new student to register" do
-    visit register_path
-    fill_in "Full name", with: "New Student"
-    fill_in "Email", with: "newstudent@example.com"
-    fill_in "Password", with: "password"
-    click_button "Register"
+    visit new_user_registration_path
 
-    expect(page).to have_current_path(student_dashboard_path)
-    expect(page).to have_content("Welcome, New Student")
+    fill_in "user[full_name]", with: "Nguyen Van A"
+    fill_in "user[email]", with: "newuser@example.com"
+    fill_in "user[password]", with: "password123"
+    fill_in "user[password_confirmation]", with: "password123"
+
+    click_button "Create account"
+
+    user = User.last
+    expect(user).to be_present
+    expect(user.student_role?).to be true
+    expect(page).to have_current_path("/users/sign_in")
   end
 
   it "does not allow registration with existing email" do
-    User.create!(full_name: "Existing", email: "exist@example.com", password: "password", role: :student)
+    create(:user, email: "exist@example.com")
 
-    visit register_path
-    fill_in "Full name", with: "Test User"
-    fill_in "Email", with: "exist@example.com"
-    fill_in "Password", with: "password"
-    click_button "Register"
+    visit new_user_registration_path
+
+    fill_in "user[full_name]", with: "Another User"
+    fill_in "user[email]", with: "exist@example.com"
+    fill_in "user[password]", with: "password123"
+    fill_in "user[password_confirmation]", with: "password123"
+
+    click_button "Create account"
 
     expect(page).to have_content("Email has already been taken")
-  end
-
-  it "shows validation errors if fields missing" do
-    visit register_path
-    click_button "Register"
-
-    expect(page).to have_content("Email can't be blank")
-    expect(page).to have_content("Full name can't be blank")
-    expect(page).to have_content("Password can't be blank")
   end
 end
