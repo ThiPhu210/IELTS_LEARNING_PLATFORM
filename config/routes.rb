@@ -21,7 +21,7 @@ namespace :students do
   resources :payments, only: [:create] do
     collection do
       get :vnpay_return
-      get :vnpay_ipn
+      post :vnpay_ipn 
     end
   end
 
