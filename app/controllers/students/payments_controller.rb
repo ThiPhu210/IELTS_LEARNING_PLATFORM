@@ -2,8 +2,6 @@ class Students::PaymentsController < ApplicationController
   require "openssl"
   require "cgi"
   skip_before_action :verify_authenticity_token, only: :vnpay_ipn
-  protect_from_forgery with: :exception
-  before_action :authenticate_user!, only: :vnpay_ipn
 
   # ================== CREATE PAYMENT ==================
   def create
@@ -53,51 +51,54 @@ class Students::PaymentsController < ApplicationController
     redirect_to "#{VN_PAY[:url]}?#{query}&vnp_SecureHash=#{secure_hash}",
                 allow_other_host: true
   end
+
 def vnpay_ipn
-  Rails.logger.info "🔥🔥 VNPAY IPN 🔥🔥"
+    Rails.logger.info "🔥🔥 VNPAY IPN 🔥🔥"
 
-  vnp_params = params
-    .to_unsafe_h
-    .select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
+    vnp_params = params
+      .to_unsafe_h
+      .select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
 
-  secure_hash = params[:vnp_SecureHash]
+    secure_hash = params[:vnp_SecureHash]
 
-  query = vnp_params
-            .sort
-            .map { |k, v| "#{k}=#{v}" }
-            .join("&")
+    query = vnp_params
+              .sort
+              .map { |k, v| "#{k}=#{v}" }
+              .join("&")
 
-  check_hash = OpenSSL::HMAC.hexdigest(
-    "SHA512",
-    VN_PAY[:hash_secret],
-    query
-  )
-
-  unless secure_hash == check_hash
-    return render json: { RspCode: "97", Message: "Invalid Signature" }
-  end
-
-  order = Order.find_by(id: params[:vnp_TxnRef])
-
-  unless order
-    return render json: { RspCode: "01", Message: "Order Not Found" }
-  end
-
-  if params[:vnp_ResponseCode] == "00" &&
-     params[:vnp_TransactionStatus] == "00"
-
-    order.update!(
-      status: :paid,
-      paid_at: Time.current
+    check_hash = OpenSSL::HMAC.hexdigest(
+      "SHA512",
+      VN_PAY[:hash_secret],
+      query
     )
 
-    Rails.logger.info "✅ IPN CONFIRMED – Order #{order.id}"
-    InvoiceMailer.invoice_email(order).deliver_later 
-    render json: { RspCode: "00", Message: "Confirm Success" }
-  else
-    render json: { RspCode: "02", Message: "Payment Failed" }
+    unless secure_hash == check_hash
+      return render json: { RspCode: "97", Message: "Invalid Signature" }
+    end
+
+    order = Order.find_by(id: params[:vnp_TxnRef])
+
+    unless order
+      return render json: { RspCode: "01", Message: "Order Not Found" }
+    end
+
+    if params[:vnp_ResponseCode] == "00" &&
+       params[:vnp_TransactionStatus] == "00"
+
+      order.update!(
+        status: :paid,
+        paid_at: Time.current
+      )
+
+      Rails.logger.info "✅ IPN CONFIRMED – Order #{order.id}"
+      InvoiceMailer.invoice_email(order).deliver_later
+      render json: { RspCode: "00", Message: "Confirm Success" }
+    else
+      render json: { RspCode: "02", Message: "Payment Failed" }
+    end
   end
-end
+
+  
   # ================== VNPAY RETURN ==================
   def vnpay_return
   Rails.logger.info "🔥🔥 VNPAY RETURN 🔥🔥"
