@@ -1,8 +1,8 @@
 class CourseAccess < ApplicationRecord
   belongs_to :user
   belongs_to :course
+  belongs_to :order
   has_many :payments, dependent: :destroy
-
   enum :status, { pending: 0, active: 1, expired: 2 }, suffix: true
 
   scope :active_access, -> { where(status: statuses[:active]) }

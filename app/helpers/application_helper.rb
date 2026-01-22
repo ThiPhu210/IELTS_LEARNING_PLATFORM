@@ -12,7 +12,7 @@ module ApplicationHelper
        user.thumbnail.blob&.persisted?
 
       image_tag(
-        user.thumbnail.variant(resize_to_fill: [size, size]),
+        user.thumbnail.variant(resize_to_fill: [ size, size ]),
         class: "rounded-full object-cover",
         width: size,
         height: size

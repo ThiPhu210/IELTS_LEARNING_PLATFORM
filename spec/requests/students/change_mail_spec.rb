@@ -18,13 +18,10 @@ RSpec.describe "Students::Profiles", type: :request do
 
       student.reload
 
-      # 1️⃣ email CHƯA đổi
       expect(student.email).to eq(old_email)
 
-      # 2️⃣ unconfirmed_email được set
       expect(student.unconfirmed_email).to eq("new@mail.com")
 
-      # 3️⃣ gửi email
       expect(ActionMailer::Base.deliveries.size).to eq(1)
 
       mail = ActionMailer::Base.deliveries.last

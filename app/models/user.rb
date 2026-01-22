@@ -27,7 +27,7 @@ class User < ApplicationRecord
   def has_course_access?(course)
     course_accesses.exists?(
       course_id: course.id,
-      status: "active"
+      status: CourseAccess.statuses[:active]
     )
   end
 end
