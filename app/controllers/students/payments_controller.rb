@@ -47,7 +47,7 @@ class Students::PaymentsController < ApplicationController
 
         payment = order.create_payment!(
           amount: order.total_price,
-          status: :success,
+          status: :paid,
           gateway: "vnpay",
           transaction_no: params[:vnp_TransactionNo]
         )
@@ -100,7 +100,7 @@ class Students::PaymentsController < ApplicationController
 
         payment = order.create_payment!(
           amount: order.total_price,
-          status: :success,
+          status: :paid,
           gateway: "vnpay",
           transaction_no: params[:vnp_TransactionNo]
         )
