@@ -34,7 +34,7 @@ namespace :students do
     resources :orders, only: [ :new, :create, :show ] do
       member do
         get  :checkout
-        post :pay
+        
       end
     end
   end
