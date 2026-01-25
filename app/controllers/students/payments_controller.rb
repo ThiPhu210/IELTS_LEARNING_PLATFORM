@@ -21,7 +21,8 @@ class Students::PaymentsController < ApplicationController
       vnp_Locale: "vn",
       vnp_ReturnUrl: VN_PAY[:return_url],
       vnp_IpAddr: request.remote_ip,
-      vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
+      vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S"),
+      vnp_SecureHashType: "HmacSHA512"
     }
 
     query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
