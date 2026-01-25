@@ -62,14 +62,15 @@ end
     Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
 
     vnp_params = params.to_unsafe_h
-                      .select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
+                  .select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
 
-    secure_hash = params[:vnp_SecureHash]
-    query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
+secure_hash = params[:vnp_SecureHash]
+hash_data = vnp_params.sort.map { |k, v| "#{k}=#{v}" }.join("&")
 
-    check_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], query)
+check_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], hash_data)
 
-    return render(json: { RspCode: "97", Message: "Invalid Signature" }) if secure_hash != check_hash
+return render(json: { RspCode: "97", Message: "Invalid Signature" }) if secure_hash != check_hash
+
 
     order = Order.find_by(id: params[:vnp_TxnRef])
     return render(json: { RspCode: "01", Message: "Order Not Found" }) unless order
