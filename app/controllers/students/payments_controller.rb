@@ -100,7 +100,7 @@ class Students::PaymentsController < ApplicationController
         payment = order.create_payment!(
           amount: order.total_price,
           status: :paid,
-          transaction_no: params[:vnp_TransactionNo]
+          transaction_code: params[:vnp_TransactionNo]
         )
 
         CourseAccess.create!(
