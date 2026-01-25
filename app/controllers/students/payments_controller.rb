@@ -1,10 +1,8 @@
 class Students::PaymentsController < ApplicationController
   require "openssl"
   require "cgi"
-
   skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
   before_action :authenticate_user!, except: [:vnpay_return, :vnpay_ipn]
-
   # ================== CREATE PAYMENT ==================
   def create
   order = current_user.orders.find(params[:order_id])
