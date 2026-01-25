@@ -464,7 +464,8 @@ function openPaymentModal(courseId, title, price) {
   document.getElementById("modal-course-id").value = courseId
 
   const form = document.getElementById("payment-form")
-  form.action = `/students/courses/${courseId}/orders`
+  form.action = `/students/payments?order_id=${orderId}`
+
 
   const modal = document.getElementById("payment-modal")
   modal.classList.remove("hidden")
@@ -485,7 +486,8 @@ function closePaymentModal() {
       document.getElementById("selected-course-id").value = courseId
 
       const form = document.getElementById("payment-form")
-      form.action = `/students/courses/${courseId}/orders`
+      form.action = `/students/payments?order_id=${orderId}`
+
     })
   })
 </script>
