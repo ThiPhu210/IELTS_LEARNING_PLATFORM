@@ -167,33 +167,22 @@
                   <%= number_to_currency(course.price, unit: "₫", precision: 0) %>
                 </span>
 
-                <% access = current_user&.course_accesses.find_by(course: course) %>
-<% paid_order = current_user&.orders&.paid_status&.find_by(course: course) %>
+           <% access = current_user.course_accesses.active_status.find_by(course: course) %>
+<% pending = current_user.orders.pending_status.find_by(course: course) %>
 
-<% if paid_order %>
-  <%= link_to "Vào học",
-    students_course_path(course),
-    class: "px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700" %>
+<% if access %>
+  <%= link_to "Vào học", students_course_path(course), class: "btn btn-primary" %>
 
-<% elsif access&.status == "pending" %>
-  <span class="px-4 py-2 text-sm font-semibold text-yellow-700 bg-yellow-100 rounded-md">
-    ⏳ Đang xử lý
-  </span>
+<% elsif pending %>
+  <span class="btn btn-warning">⏳ Đang chờ thanh toán</span>
 
 <% else %>
-  <button
-    onclick="openPaymentModal(
-      '<%= course.id %>',
-      '<%= j course.title %>',
-      '<%= number_to_currency(course.price, unit: "₫", precision: 0) %>'
-    )"
-    class="inline-flex items-center px-4 py-3
-           text-sm font-semibold text-white
-           bg-green-600 rounded-lg
-           hover:bg-green-700 transition">
-    💳 Thanh toán
-  </button>
+  <%= button_to "Thanh toán",
+      students_course_orders_path(course),
+      method: :post,
+      class: "btn btn-success" %>
 <% end %>
+
 
 
               </div>
