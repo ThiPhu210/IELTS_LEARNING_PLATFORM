@@ -39,11 +39,18 @@ jobs:
   
       - run: npm ci
       - run: npm audit --audit-level=moderate || true
-
-
+  
   test:
     needs: [scan_ruby, scan_js]
     runs-on: ubuntu-latest
+  
+    strategy:
+      matrix:
+        folder:
+          - spec/models
+          - spec/controllers
+          - spec/services
+          - spec/requests  
   
     steps:
       - uses: actions/checkout@v4
@@ -57,17 +64,15 @@ jobs:
       - name: Install gems
         run: bundle install --jobs 4 --retry 3
   
-      - name: Run RSpec tests
+      - name: Run RSpec (split groups)
         env:
           RAILS_ENV: test
           AWS_BUCKET: fake
           AWS_ACCESS_KEY_ID: fake
           AWS_SECRET_ACCESS_KEY: fake
-        run: bundle exec rspec
+          SKIP_SYSTEM_TESTS: true
+        run: bundle exec rspec ${{ matrix.folder }}
 
-
-
-  
 
   build:
     runs-on: ubuntu-latest
