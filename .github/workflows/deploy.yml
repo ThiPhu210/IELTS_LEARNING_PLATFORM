@@ -59,10 +59,7 @@ jobs:
         run: bundle install --jobs 4 --retry 3
   
       - name: Run RSpec (no DB)
-        env:
-          RAILS_ENV: test
-          DISABLE_DATABASE_ENVIRONMENT_CHECK: 1
-        run: bundle exec rspec --tag ~db
+        run: bundle exec rspec 
 
   
 
