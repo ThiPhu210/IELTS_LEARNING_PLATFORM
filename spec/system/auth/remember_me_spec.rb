@@ -1,3 +1,4 @@
+require 'rails_helper'
 RSpec.describe "Remember me", type: :system do
   let(:student) do
     create(:user, password: "password123", confirmed_at: Time.current)
