@@ -7,31 +7,33 @@ class Students::PaymentsController < ApplicationController
 
   # ================== CREATE PAYMENT ==================
   def create
-    order = current_user.orders.find(params[:order_id])
+  order = current_user.orders.find(params[:order_id])
 
-    vnp_params = {
-      vnp_Version: "2.1.0",
-      vnp_Command: "pay",
-      vnp_TmnCode: VN_PAY[:tmn_code],
-      vnp_Amount: (order.total_price * 100).to_i,
-      vnp_CurrCode: "VND",
-      vnp_TxnRef: order.id,
-      vnp_OrderInfo: "Thanh toán khóa học #{order.course.title}",
-      vnp_OrderType: "education",
-      vnp_Locale: "vn",
-      vnp_ReturnUrl: VN_PAY[:return_url],
-      vnp_IpAddr: request.remote_ip,
-      vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S"),
-      vnp_SecureHashType: "HmacSHA512"
-    }
+  vnp_params = {
+    "vnp_Version" => "2.1.0",
+    "vnp_Command" => "pay",
+    "vnp_TmnCode" => VN_PAY[:tmn_code],
+    "vnp_Amount" => (order.total_price * 100).to_i,
+    "vnp_CurrCode" => "VND",
+    "vnp_TxnRef" => order.id.to_s,
+    "vnp_OrderInfo" => "Thanh toan khoa hoc #{order.course.title}",
+    "vnp_OrderType" => "education",
+    "vnp_Locale" => "vn",
+    "vnp_ReturnUrl" => VN_PAY[:return_url],
+    "vnp_IpAddr" => request.remote_ip,
+    "vnp_CreateDate" => Time.current.strftime("%Y%m%d%H%M%S")
+  }
 
-    query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
+  sorted = vnp_params.sort.to_h
 
-    secure_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], query)
+  hash_data = sorted.map { |k, v| "#{k}=#{v}" }.join("&")
+  secure_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], hash_data)
 
-    redirect_to "#{VN_PAY[:url]}?#{query}&vnp_SecureHash=#{secure_hash}",
-                allow_other_host: true
-  end
+  query_string = sorted.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
+
+  redirect_to "#{VN_PAY[:url]}?#{query_string}&vnp_SecureHash=#{secure_hash}", allow_other_host: true
+end
+
 
   # ================== RETURN URL ==================
   def vnpay_return
@@ -65,7 +67,7 @@ class Students::PaymentsController < ApplicationController
     secure_hash = params[:vnp_SecureHash]
     query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
 
-    check_hash = OpenSSL::HMAC.hexdigest("SHA512", ENV["VNP_HASH_SECRET"], query)
+    check_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], query)
 
     return render(json: { RspCode: "97", Message: "Invalid Signature" }) if secure_hash != check_hash
 
