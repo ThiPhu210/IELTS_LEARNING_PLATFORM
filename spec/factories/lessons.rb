@@ -1,7 +1,7 @@
 FactoryBot.define do
-  factory :lesson do
-    course_section { nil }
-    title { "MyString" }
-    duration { 1 }
+    factory :lesson do
+      association :course_section
+      title { "Sample Lesson" }
+      duration { 45 } # phút
+    end
   end
-end

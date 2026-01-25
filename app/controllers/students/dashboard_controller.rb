@@ -4,7 +4,7 @@ class Students::DashboardController < ApplicationController
 
   def index
     Rails.logger.info "PAID PARAM = #{params[:paid]}"
-    @courses = Course.all 
+    @courses = Course.all
     @courses_paid = Course
       .joins(:orders)
       .where(

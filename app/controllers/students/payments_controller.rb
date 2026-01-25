@@ -85,17 +85,11 @@ def vnpay_ipn
     if params[:vnp_ResponseCode] == "00" &&
        params[:vnp_TransactionStatus] == "00"
 
-      order.update!(
-        status: :paid,
-        paid_at: Time.current
-      )
-
-      Rails.logger.info "✅ IPN CONFIRMED – Order #{order.id}"
-      InvoiceMailer.invoice_email(order).deliver_later
-      render json: { RspCode: "00", Message: "Confirm Success" }
-    else
-      render json: { RspCode: "02", Message: "Payment Failed" }
-    end
+    Rails.logger.info "✅ IPN CONFIRMED – Order #{order.id}"
+    InvoiceMailer.invoice_email(order).deliver_later
+    render json: { RspCode: "00", Message: "Confirm Success" }
+  else
+    render json: { RspCode: "02", Message: "Payment Failed" }
   end
 
   
@@ -129,5 +123,4 @@ def vnpay_ipn
 
   redirect_to students_dashboard_path
 end
-
 end
