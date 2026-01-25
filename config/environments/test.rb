@@ -5,12 +5,6 @@
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  require "aws-sdk-s3"
-
-  Aws.config.update(
-  stub_responses: true,
-  credentials: Aws::Credentials.new("fake", "fake")
-)
 
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
