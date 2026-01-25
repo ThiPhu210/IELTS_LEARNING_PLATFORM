@@ -47,10 +47,9 @@ jobs:
     strategy:
       matrix:
         folder:
-          - spec/models
-          - spec/controllers
-          - spec/services
-          - spec/requests  
+          - spec/models/
+          - spec/helpers/
+          - spec/requests/  
   
     steps:
       - uses: actions/checkout@v4
