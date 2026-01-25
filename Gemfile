@@ -15,7 +15,7 @@ group :development, :test do
   gem "capybara"
   gem "selenium-webdriver" # nếu muốn test JS
   gem "factory_bot_rails"
-  gem "sqlite3", ">= 2.1"
+  gem "shoulda-matchers", "~> 5.0"
 end
 
 
