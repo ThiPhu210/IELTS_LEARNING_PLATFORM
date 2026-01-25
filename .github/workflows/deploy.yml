@@ -60,7 +60,11 @@ jobs:
       - name: Run RSpec tests
         env:
           RAILS_ENV: test
+          AWS_BUCKET: fake
+          AWS_ACCESS_KEY_ID: fake
+          AWS_SECRET_ACCESS_KEY: fake
         run: bundle exec rspec
+
 
 
   
