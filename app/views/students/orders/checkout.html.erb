@@ -1,5 +1,5 @@
 <%= form_with(
-      url: pay_students_course_order_path(@course, @order),
+      url: students_payments_path(order_id: @order.id),
       method: :post,
       local: true,
       class: "mt-8"
@@ -23,14 +23,14 @@
       <div>
         <p class="text-gray-500">Học viên</p>
         <p class="font-medium text-gray-900">
-          <%= @current_user.full_name %>
+          <%= current_user.full_name %>
         </p>
       </div>
 
       <div>
         <p class="text-gray-500">Email</p>
         <p class="font-medium text-gray-900">
-          <%= @current_user.email %>
+          <%= current_user.email %>
         </p>
       </div>
 
@@ -44,8 +44,7 @@
       <div>
         <p class="text-gray-500">Giá tiền</p>
         <p class="font-semibold text-pink-600">
-        <%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %>
-
+          <%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %>
         </p>
       </div>
 
