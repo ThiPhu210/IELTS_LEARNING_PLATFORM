@@ -1,6 +1,6 @@
 class Payment < ApplicationRecord
   belongs_to :order
-  has_one :course_access
+  has_one :course_access, dependent: :destroy
 
   enum :status, { pending: 0, paid: 1, failed: 2 }, suffix: true
   scope :paid_payments, -> { where(status: statuses[:paid]) }
