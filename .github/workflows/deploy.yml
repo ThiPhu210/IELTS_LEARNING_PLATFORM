@@ -1,7 +1,6 @@
 name: CI
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
-  RAILS_ENV: ${{ secrets.RAILS_ENV }}
   RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_PORT: ${{ secrets.DB_PORT }}
@@ -94,7 +93,7 @@ jobs:
           script: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             DOCKER_USER=${{ secrets.DOCKER_USERNAME }}
-            RAILS_ENV=${{ secrets.RAILS_ENV }}
+            RAILS_ENV=production
             RAILS_MASTER_KEY=${{ secrets.RAILS_MASTER_KEY }}
             DB_HOST=${{ secrets.DB_HOST }}
             DB_PORT=${{ secrets.DB_PORT }}
@@ -112,7 +111,7 @@ jobs:
             docker run -d \
                --name myapp_container \
               -p 3000:3000 \
-              -e RAILS_ENV=$RAILS_ENV \
+              -e RAILS_ENV=production \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
               -e DATABASE_URL="$DATABASE_URL" \
               -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
@@ -128,7 +127,7 @@ jobs:
             docker rm -f sidekiq_worker || true
             docker run -d \
               --name sidekiq_worker \
-              -e RAILS_ENV=$RAILS_ENV \
+              -e RAILS_ENV=production \
               -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
               -e DATABASE_URL="$DATABASE_URL" \
               -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
