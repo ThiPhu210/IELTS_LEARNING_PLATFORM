@@ -17,7 +17,7 @@ class Students::PaymentsController < ApplicationController
       "vnp_TmnCode"    => VN_PAY[:tmn_code],
       "vnp_Amount"     => (order.total_price * 100).to_i,
       "vnp_CurrCode"   => "VND",
-      "vnp_TxnRef"     => order.id.to_s,
+      "vnp_TxnRef"     => "#{order.id}_#{Time.current.to_i}"
       "vnp_OrderInfo"  => order_info,
       "vnp_OrderType"  => "education",
       "vnp_Locale"     => "vn",
