@@ -14,7 +14,7 @@ class Students::OrdersController < ApplicationController
   # POST /students/courses/:course_id/orders
   # ======================
   def create
-    if current_user.course_accesses.active.exists?(course: @course)
+    if current_user.course_accesses.active_status.exists?(course: @course)
       return redirect_to students_course_path(@course), alert: "Bạn đã sở hữu khóa học này"
     end
 
