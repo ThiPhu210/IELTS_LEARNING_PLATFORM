@@ -16,7 +16,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - VNPay
 jobs:
   scan_ruby:
     runs-on: ubuntu-latest
