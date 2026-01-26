@@ -10,10 +10,11 @@ default: &default
 development:
   <<: *default
   database: ielts_dev
-
+  
 test:
-  <<: *default
-  database: ielts_test
+  adapter: sqlite3
+  database: ":memory:"
+
 
 
 production:
