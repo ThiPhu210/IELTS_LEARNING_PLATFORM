@@ -65,14 +65,22 @@ jobs:
         with:
           ruby-version: .ruby-version
           bundler-cache: true
-  
+      - name: Install gems
+       run: bundle install --jobs 4 --retry 3
       - name: Setup DB
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
         run: |
           bundle exec rails db:create db:schema:load
 
-
+      - name: Run RSpec tests
+       env:
+       RAILS_ENV: test
+       AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
+       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+       AWS_REGION: ${{ secrets.AWS_REGION }}
+       run: bundle exec rspec
 
 
 
