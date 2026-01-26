@@ -11,7 +11,7 @@ RSpec.describe "User Logout", type: :request do
     it "logs out successfully" do
       delete destroy_user_session_path
 
-      expect(response).to redirect_to("/users/sign_in")
+      expect(response).to redirect_to(root_path)
     end
   end
 end

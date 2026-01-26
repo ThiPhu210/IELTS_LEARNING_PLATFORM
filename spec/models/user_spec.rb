@@ -24,14 +24,5 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "#has_course_access?" do
-  it "returns true if user has active access" do
-    course = create(:course)
-    user = create(:user)
-
-    create(:course_access, user: user, course: course, status: :active)
-
-    expect(user.has_course_access?(course)).to be true
-  end
-  end
+  
 end

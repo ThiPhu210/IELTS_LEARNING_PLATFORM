@@ -1,10 +1,9 @@
 FactoryBot.define do
-    factory :payment do
-      association :order
-      association :course_access
-      amount { 100.0 }
-      payment_method { "credit_card" }
-      sequence(:transaction_code) { |n| "TX#{n}" }
-      status { :paid }
-    end
+  factory :payment do
+    order
+    amount { 100 }
+    payment_method { "card" }
+    transaction_code { SecureRandom.hex(8) }
+    status { :paid }
   end
+end

@@ -1,8 +1,8 @@
 FactoryBot.define do
-    factory :order do
-      user
-      course
-      total_price { course.price }
-      status { :pending }
-    end
+  factory :order do
+    user
+    course
+    total_price { 100 }
+    status { :paid }
   end
+end
