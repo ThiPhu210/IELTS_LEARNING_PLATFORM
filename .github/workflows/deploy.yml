@@ -40,7 +40,7 @@ jobs:
       - run: npm ci
       - run: npm audit --audit-level=moderate || true
 
-  test:
+test:
     runs-on: ubuntu-latest
   
     services:
@@ -61,28 +61,32 @@ jobs:
     steps:
       - uses: actions/checkout@v4
   
-      - uses: ruby/setup-ruby@v1
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
+  
       - name: Install gems
-       run: bundle install --jobs 4 --retry 3
+        run: bundle install --jobs 4 --retry 3
+  
       - name: Setup DB
         env:
+          RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
         run: |
-          bundle exec rails db:create db:schema:load
-
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+  
       - name: Run RSpec tests
-       env:
-       RAILS_ENV: test
-       AWS_BUCKET: ${{ secrets.AWS_BUCKET }}
-       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-       AWS_REGION: ${{ secrets.AWS_REGION }}
-       run: bundle exec rspec
-
-
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
+          AWS_BUCKET: fake
+          AWS_ACCESS_KEY_ID: fake
+          AWS_SECRET_ACCESS_KEY: fake
+          AWS_REGION: us-east-1
+        run: bundle exec rspec
 
   build:
     runs-on: ubuntu-latest
