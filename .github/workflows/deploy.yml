@@ -67,8 +67,11 @@ jobs:
           bundler-cache: true
   
       - name: Setup DB
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
         run: |
           bundle exec rails db:create db:schema:load
+
 
 
 
