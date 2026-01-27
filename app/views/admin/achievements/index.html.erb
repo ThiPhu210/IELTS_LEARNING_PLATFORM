@@ -1,17 +1,19 @@
 <!-- NAVBAR -->
-<%= render "admin/shared/navbar" %>
+  <%= render "admin/shared/navbar" %>
 
-<!-- SIDEBAR -->
-<%= render "admin/shared/sidebar" %>
+  <!-- SIDEBAR -->
+  <%= render "admin/shared/sidebar" %>
 
-<!-- MAIN CONTENT -->
-<main class="pt-16 sm:ml-64 p-6">
+  <!-- MAIN CONTENT -->
+  <main class="pt-16 sm:ml-64 p-6">
 
   <!-- PAGE TITLE -->
-  <h1 class="text-2xl font-bold mb-6">🎓 Student Management</h1>
+  <h1 class="text-2xl font-bold mb-6">Achievement Management</h1>
 
   <!-- CARD -->
   <div class="p-4 bg-white border-b border-gray-200 rounded-lg mb-6">
+
+    <!-- BREADCRUMB -->
     <nav class="flex mb-4 text-sm font-medium">
       <ol class="inline-flex items-center space-x-1 md:space-x-2">
         <li class="inline-flex items-center">
@@ -27,81 +29,58 @@
           <svg class="w-6 h-6 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
             <path d="M7.293 14.707L10.586 11 7.293 7.293 8.707 5.879 13.828 11 8.707 16.121z"/>
           </svg>
-          <span class="text-gray-500">Students</span>
+          <span class="text-gray-500">Achievements</span>
         </li>
       </ol>
     </nav>
 
+    <!-- TITLE + ACTION -->
     <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold text-gray-900">All students</h2>
+      <h2 class="text-xl font-semibold text-gray-900">All Achievements</h2>
     </div>
   </div>
+  
 
-  <!-- TABLE -->
-  <div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="w-full text-sm text-left text-gray-500">
-      <thead class="bg-gray-100 text-xs uppercase">
-        <tr>
-          <th class="p-4">Student</th>
-          <th class="p-4">Email</th>
-          <th class="p-4">Phone</th>
-          <th class="p-4">Actions</th>
+<div class="overflow-x-auto bg-white rounded-lg shadow">
+  <table class="w-full text-sm text-left text-gray-500">
+    <thead class="bg-gray-100 text-xs uppercase">
+      <tr>
+        <th class="p-4">Student</th>
+        <th class="p-4">Title</th>
+        <th class="p-4">Year</th>
+        <th class="p-4">Band</th>
+        <th class="p-4">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y">
+      <% @achievements.each do |achievement| %>
+        <tr class="hover:bg-gray-50">
+          <td class="p-4"><%= achievement.user.full_name %></td>
+          <td class="p-4"><%= achievement.title %></td>
+          <td class="p-4"><%= achievement.year %></td>
+          <td class="p-4"><%= achievement.ielts_overall_band %></td>
+          <td class="p-4 flex gap-2">
+            <%= link_to "Edit",
+                "#",
+                class: "btn-edit px-3 py-1 text-sm text-white bg-blue-600 rounded",
+                data: { achievement_id: achievement.id } %>
+
+            <%= button_to "Destroy",
+                admin_achievement_path(achievement),
+                method: :delete,
+                data: { confirm: "Bạn chắc chắn?" },
+                class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
+          </td>
         </tr>
-      </thead>
-
-      <tbody class="divide-y">
-        <% @students.each do |student| %>
-          <tr class="hover:bg-gray-50">
-
-            <!-- AVATAR + NAME -->
-            <td class="p-4 flex items-center gap-3">
-  <% if student.thumbnail.attached? %>
-    <%= image_tag student.thumbnail.variant(resize_to_fill: [40, 40]),
-        class: "w-10 h-10 rounded-full object-cover" %>
-  <% else %>
-    <div class="w-10 h-10 rounded-full bg-indigo-500
-                flex items-center justify-center text-white font-bold">
-      <%= student.full_name.first.upcase %>
-    </div>
-  <% end %>
-
-  <div>
-    <div class="font-medium text-gray-900"><%= student.full_name %></div>
-    <div class="text-xs text-gray-500">ID: <%= student.id %></div>
+      <% end %>
+    </tbody>
+  </table>
+ 
+  <div class="p-4">
+    <%= paginate @achievements %>
   </div>
-</td>
-
-
-            <!-- EMAIL -->
-            <td class="p-4"><%= student.email %></td>
-
-            <!-- PHONE -->
-            <td class="p-4"><%= student.phone || "N/A" %></td>
-
-            <!-- ACTIONS -->
-            <td class="p-4 flex gap-2">
-              <%= link_to "Edit",
-                  "#",
-                  class: "btn-edit px-3 py-1 text-sm text-white bg-blue-600 rounded",
-                  data: { student_id: student.id } %>
-
-              <%= button_to "Destroy",
-    admin_student_path(student),
-    method: :delete,
-    data: { confirm: "Bạn chắc chắn?" },
-    class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
-
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-
-    <!-- PAGINATION -->
-    <div class="p-4">
-      <%= paginate @students %>
-    </div>
-  </div>
+</div>
 </main>
 <style>
 nav.pagination {
@@ -118,14 +97,17 @@ nav.pagination .current {
   color: white;
 }   
 </style>
+
 <!-- EDIT MODAL -->
 <div id="edit-modal"
      class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+
   <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
     <button id="close-modal"
             class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
       ✕
     </button>
+
     <div id="modal-body" class="p-2">
       <!-- form load vào đây -->
     </div>
@@ -141,9 +123,11 @@ nav.pagination .current {
 
     editButtons.forEach(button => {
       button.addEventListener("click", () => {
-        const studentId = button.getAttribute("data-student-id");
+        // đổi sang data-achievement-id
+        const achievementId = button.getAttribute("data-achievement-id");
 
-        fetch(`/admin/students/${studentId}/edit`, {
+        // fetch đúng URL của achievements
+        fetch(`/admin/achievements/${achievementId}/edit`, {
           headers: { "Accept": "text/html" }
         })
         .then(response => response.text())

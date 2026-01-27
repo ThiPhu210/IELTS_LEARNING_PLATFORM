@@ -2,8 +2,8 @@ class Students::PaymentsController < ApplicationController
   require "openssl"
   require "uri"
 
-  skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
-  before_action :authenticate_user!, except: [:vnpay_return, :vnpay_ipn]
+  skip_before_action :verify_authenticity_token, only: [ :vnpay_ipn ]
+  before_action :authenticate_user!, except: [ :vnpay_return, :vnpay_ipn ]
 
   # ================== CREATE PAYMENT ==================
   def create

@@ -46,7 +46,6 @@
         <thead class="bg-gray-100 text-xs uppercase">
           <tr>
             <th class="p-4">Teacher</th>
-            <th class="p-4">Email</th>
             <th class="p-4">Expertise</th>
             <th class="p-4">Experience</th>
             <th class="p-4">Actions</th>
@@ -60,7 +59,8 @@
               <!-- AVATAR + NAME -->
               <td class="p-4 flex items-center gap-3">
 
-                <% avatar = teacher.teacher_profile&.avatar %>
+              <% avatar = teacher.avatar %>
+
 
                 <% if avatar&.attached? %>
                   <%= image_tag avatar.variant(resize_to_fill: [40, 40]),
@@ -68,7 +68,7 @@
                 <% else %>
                   <div class="w-10 h-10 rounded-full bg-indigo-500
                               flex items-center justify-center text-white font-bold">
-                    <%= teacher.full_name.first.upcase %>
+                    <%= teacher.full_name.first.upcase || "Teacher" %>
                   </div>
                 <% end %>
 
@@ -82,17 +82,15 @@
                 </div>
               </td>
 
-              <!-- EMAIL -->
-              <td class="p-4"><%= teacher.email %></td>
-
+  
               <!-- EXPERTISE -->
               <td class="p-4">
-                <%= teacher.teacher_profile&.expertise || "N/A" %>
+                <%= teacher.expertise || "N/A" %>
               </td>
 
               <!-- EXPERIENCE -->
               <td class="p-4">
-                <%= teacher.teacher_profile&.experience_years || 0 %> years
+                <%= teacher.experience_years || 0 %> years
               </td>
 
               <!-- ACTIONS -->

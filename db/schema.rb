@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_25_150003) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_27_033254) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "achievements", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "title"
+    t.text "description"
+    t.integer "year"
+    t.decimal "ielts_overall_band"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_achievements_on_user_id"
+  end
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -178,13 +189,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_25_150003) do
   end
 
   create_table "teacher_profiles", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.text "bio"
     t.string "expertise"
     t.integer "experience_years"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_teacher_profiles_on_user_id"
+    t.string "full_name"
   end
 
   create_table "users", force: :cascade do |t|
@@ -201,10 +211,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_25_150003) do
     t.datetime "remember_created_at"
     t.datetime "confirmation_sent_at"
     t.string "unconfirmed_email"
+    t.string "school"
+    t.text "feedback"
+    t.text "bio"
+    t.string "phone"
+    t.string "country"
+    t.string "city"
+    t.string "province"
+    t.string "postal_code"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "achievements", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "course_accesses", "courses"
@@ -223,5 +242,4 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_25_150003) do
   add_foreign_key "speaking_attempts", "users"
   add_foreign_key "speaking_questions", "speaking_topics"
   add_foreign_key "speaking_topics", "courses"
-  add_foreign_key "teacher_profiles", "users"
 end
