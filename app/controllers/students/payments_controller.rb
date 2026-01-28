@@ -27,6 +27,7 @@ class Students::PaymentsController < ApplicationController
       vnp_Locale: "vn",
       vnp_ReturnUrl: VNP_RETURN_URL,
       vnp_IpAddr: request.headers["X-Forwarded-For"] || request.remote_ip,
+      vnp_IpnUrl: "https://d34ute7tylgmox.cloudfront.net/students/payments/vnpay_ipn",
       vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
     }
 
