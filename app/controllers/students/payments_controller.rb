@@ -2,8 +2,8 @@ class Students::PaymentsController < ApplicationController
   require "openssl"
   require "uri"
 
-  skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
-  before_action :authenticate_user!, except: [:vnpay_return, :vnpay_ipn]
+  skip_before_action :verify_authenticity_token, only: [ :vnpay_ipn ]
+  before_action :authenticate_user!, except: [ :vnpay_return, :vnpay_ipn ]
 
   # ================== CREATE PAYMENT ==================
   def create
@@ -38,35 +38,18 @@ class Students::PaymentsController < ApplicationController
 
   # ================== RETURN URL ==================
   def vnpay_return
-    order = Order.find_by(id: params[:vnp_TxnRef])
-    return redirect_to root_path, alert: "Order not found" unless order
+    txn_ref = params[:vnp_TxnRef]
+    order_id = txn_ref.split("_").first
+    order = Order.find_by(id: order_id)
+    return redirect_to root_path unless order
 
     if params[:vnp_ResponseCode] == "00"
-      ActiveRecord::Base.transaction do
-        order.update!(status: :paid)
-
-        payment = order.create_payment!(
-          amount: order.total_price,
-          status: :paid,
-          transaction_code: params[:vnp_TransactionNo]
-        )
-
-        CourseAccess.create!(
-          user: order.user,
-          course: order.course,
-          payment: payment,
-          start_date: Time.current,
-          end_date: 1.year.from_now,
-          status: :active
-        )
-      end
-
-      redirect_to students_course_path(order.course), notice: "Thanh toán thành công"
+      redirect_to students_course_path(order.course), notice: "Đã nhận yêu cầu thanh toán, đang xác nhận..."
     else
-      order.update!(status: :failed)
       redirect_to students_course_path(order.course), alert: "Thanh toán thất bại"
     end
   end
+
 
   # ================== IPN (SERVER TO SERVER) ==================
   def vnpay_ipn
