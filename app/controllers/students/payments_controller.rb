@@ -53,54 +53,50 @@ class Students::PaymentsController < ApplicationController
 
   # ================== IPN (SERVER TO SERVER) ==================
   def vnpay_ipn
-    Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
+  Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
 
-    vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") }
-    secure_hash = vnp_params.delete("vnp_SecureHash")
-    vnp_params.delete("vnp_SecureHashType")
+  vnp_params = params.to_unsafe_h
+                    .select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
 
-    sorted = vnp_params.sort.to_h
-    hash_data = URI.encode_www_form(sorted)
-    check_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], hash_data)
+  secure_hash = params[:vnp_SecureHash]
 
-    Rails.logger.info "VNPay IPN HASH DATA: #{hash_data}"
-    Rails.logger.info "VNPay IPN HASH CHECK: #{check_hash}"
+  query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
 
-    return render json: { RspCode: "97", Message: "Invalid Signature" } if secure_hash != check_hash
+  check_hash = OpenSSL::HMAC.hexdigest("SHA512", ENV["VNP_HASH_SECRET"], query)
 
-    order = Order.find_by(id: params[:vnp_TxnRef])
-    return render json: { RspCode: "01", Message: "Order Not Found" } unless order
+  return render(json: { RspCode: "97", Message: "Invalid Signature" }) if secure_hash != check_hash
 
-    expected_amount = (order.total_price * 100).to_i
-    return render json: { RspCode: "04", Message: "Invalid Amount" } if params[:vnp_Amount].to_i != expected_amount
+  order = Order.find_by(id: params[:vnp_TxnRef])
+  return render(json: { RspCode: "01", Message: "Order Not Found" }) unless order
 
-    if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
-      return render json: { RspCode: "00", Message: "Already Processed" } if order.paid_status?
+  # Check amount
+  expected_amount = order.total_price * 100
+  if params[:vnp_Amount].to_i != expected_amount
+    return render json: { RspCode: "04", Message: "Invalid Amount" }
+  end
 
-      ActiveRecord::Base.transaction do
-        order.update!(status: :paid)
+  # Success
+  if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
 
-        payment = order.create_payment!(
-          amount: order.total_price,
-          status: :paid,
-          transaction_code: params[:vnp_TransactionNo]
-        )
+    # Idempotent check
+    return render(json: { RspCode: "00", Message: "Already Processed" }) if order.paid_status?
 
-        CourseAccess.create!(
-          user: order.user,
-          course: order.course,
-          payment: payment,
-          start_date: Time.current,
-          end_date: 1.year.from_now,
-          status: :active
-        )
+    ActiveRecord::Base.transaction do
+      order.update!(status: :paid)
+
+      CourseAccess.find_or_create_by!(user: order.user, course: order.course) do |ca|
+        ca.start_date = Time.current
+        ca.end_date   = 1.year.from_now
+        ca.status     = :active
       end
-
-      InvoiceMailer.invoice_email(order).deliver_later rescue nil
-
-      return render json: { RspCode: "00", Message: "Confirm Success" }
     end
 
-    render json: { RspCode: "02", Message: "Payment Failed" }
+    InvoiceMailer.invoice_email(order).deliver_later
+
+    return render json: { RspCode: "00", Message: "Confirm Success" }
   end
+
+  render json: { RspCode: "02", Message: "Payment Failed" }
+end
+
 end
