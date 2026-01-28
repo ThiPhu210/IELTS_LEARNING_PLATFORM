@@ -10,7 +10,7 @@ class Students::PaymentsController < ApplicationController
   VNP_TMNCODE = "9APTANC1"
   VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
   VNP_RETURN_URL = "https://d34ute7tylgmox.cloudfront.net/students/payments/vnpay_return"
-
+  VNP_IPN_URL = "https://d34ute7tylgmox.cloudfront.net/students/payments/vnpay_ipn"
   # ================= CREATE PAYMENT =================
   def create
     order = current_user.orders.find(params[:order_id])
@@ -27,7 +27,7 @@ class Students::PaymentsController < ApplicationController
       vnp_Locale: "vn",
       vnp_ReturnUrl: VNP_RETURN_URL,
       vnp_IpAddr: request.headers["X-Forwarded-For"] || request.remote_ip,
-      vnp_IpnUrl: "https://d34ute7tylgmox.cloudfront.net/students/payments/vnpay_ipn",
+      vnp_IpnUrl: VNP_IPN_URL,
       vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
     }
 
