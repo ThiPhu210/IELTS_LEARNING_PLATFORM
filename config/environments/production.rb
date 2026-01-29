@@ -53,13 +53,15 @@ Rails.application.configure do
   config.i18n.fallbacks = true
   config.active_record.dump_schema_after_migration = false
   config.active_record.attributes_for_inspect = [ :id ]
-Rails.application.routes.default_url_options[:host] = "184.72.213.33:3000"
-Rails.application.routes.default_url_options[:protocol] = "http"
 
   # Hosts
+  config.hosts << "resigned-unincreased-agnus.ngrok-free.dev"
   config.hosts << "184.72.213.33"
 config.hosts << "localhost"
-
+Rails.application.routes.default_url_options = {
+  host: "resigned-unincreased-agnus.ngrok-free.dev",
+  protocol: "https"
+}
   config.hosts << "d34ute7tylgmox.cloudfront.net"
   config.hosts << "ec2-184-72-213-33.compute-1.amazonaws.com"
 
