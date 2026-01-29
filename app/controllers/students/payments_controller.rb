@@ -2,6 +2,7 @@ class Students::PaymentsController < ApplicationController
   require "openssl"
   require "uri"
   require "cgi"
+  skip_before_action :authenticate_user!, only: [:vnpay_ipn]
   skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
   VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE = "9APTANC1"
