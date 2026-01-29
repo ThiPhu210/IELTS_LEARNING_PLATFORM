@@ -61,9 +61,4 @@ class Students::PaymentsController < ApplicationController
   render json: { RspCode: "00", Message: "Confirm Success" }
 end
 
-    end
-
-    order.update!(status: :failed)
-    render json: { RspCode: "02", Message: "Payment Failed" }
-  end
 end
