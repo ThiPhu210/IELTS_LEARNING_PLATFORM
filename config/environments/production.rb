@@ -54,7 +54,7 @@ Rails.application.configure do
   config.active_record.dump_schema_after_migration = false
   config.active_record.attributes_for_inspect = [ :id ]
 Rails.application.routes.default_url_options[:host] = "184.72.213.33:3000"
-Rails.application.routes.default_url_options[:protocol] = "https"
+Rails.application.routes.default_url_options[:protocol] = "http"
 
   # Hosts
   config.hosts << "184.72.213.33"
