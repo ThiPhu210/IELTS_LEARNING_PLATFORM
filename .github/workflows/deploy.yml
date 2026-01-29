@@ -166,7 +166,6 @@ jobs:
               sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
 
             docker rm -f sidekiq_worker || true
-
             docker run -d \
               --name sidekiq_worker \
               -e RAILS_ENV=$RAILS_ENV \
