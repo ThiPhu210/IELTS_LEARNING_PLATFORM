@@ -51,12 +51,7 @@ class Students::PaymentsController < ApplicationController
   end
 
   # ================= IPN (REAL PAYMENT CONFIRM) =================
- def vnpay_ipn
-  Rails.logger.info "🔥🔥🔥 VNPAY IPN CALLED"
-  Rails.logger.info params.inspect
-
-  # TEST MODE: luôn trả thành công
-  render json: { RspCode: "00", Message: "Confirm Success" }
-end
+ def vnpay_ipn 
+   Rails.logger.info "🔥 VNPAY IPN #{params.inspect}" vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" } secure_hash = params[:vnp_SecureHash] query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&") check_hash = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET, query) if secure_hash != check_hash Rails.logger.error "❌ INVALID SIGNATURE" return render json: { RspCode: "97", Message: "Invalid Signature" } end order = Order.find_by(id: params[:vnp_TxnRef]) return render(json: { RspCode: "01", Message: "Order Not Found" }) unless order # Check amount expected_amount = (order.total_price * 100).to_i if params[:vnp_Amount].to_i != expected_amount Rails.logger.error "❌ AMOUNT MISMATCH" return render json: { RspCode: "04", Message: "Invalid Amount" } end # Already paid if order.paid_status? return render json: { RspCode: "00", Message: "Already Processed" } end # Success if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00" ActiveRecord::Base.transaction do order.update!(status: :paid) CourseAccess.find_or_create_by!(user: order.user, course: order.course) do |ca| ca.status = :active ca.start_date = Time.current ca.end_date = 1.year.from_now end end Rails.logger.info "✅ PAYMENT CONFIRMED ORDER #{order.id}" return render json: { RspCode: "00", Message: "Confirm Success" } end order.update!(status: :failed) render json: { RspCode: "02", Message: "Payment Failed" } end
 
 end
