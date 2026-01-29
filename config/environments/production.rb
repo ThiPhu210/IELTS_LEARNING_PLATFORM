@@ -58,6 +58,8 @@ Rails.application.routes.default_url_options[:protocol] = "https"
 
   # Hosts
   config.hosts << "184.72.213.33"
+config.hosts << "localhost"
+
   config.hosts << "d34ute7tylgmox.cloudfront.net"
   config.hosts << "ec2-184-72-213-33.compute-1.amazonaws.com"
 
