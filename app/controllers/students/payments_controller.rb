@@ -3,9 +3,6 @@ class Students::PaymentsController < ApplicationController
   require "uri"
   require "cgi"
 
-  skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
-  before_action :authenticate_user!, except: [:vnpay_return, :vnpay_ipn]
-
   VNP_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE = "9APTANC1"
   VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
