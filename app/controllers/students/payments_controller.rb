@@ -12,7 +12,7 @@ class Students::PaymentsController < ApplicationController
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
   VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
-  VNP_RETURN_URL  = "https://d34ute7tylgmox.cloudfront.net/students/payments/vnpay_return"
+  VNP_RETURN_URL  = "http://184.72.213.33:3000/students/payments/vnpay_return"
 
   # ================= CREATE PAYMENT =================
   def create
