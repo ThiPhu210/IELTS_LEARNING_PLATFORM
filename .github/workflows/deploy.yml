@@ -164,7 +164,12 @@ jobs:
               -e APP_HOST=https://resigned-unincreased-agnus.ngrok-free.dev \
               $DOCKER_USER/myapp:latest \
               sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
-
+              echo "Starting ngrok..."
+              pkill ngrok || true
+              nohup ngrok http 3000 > ngrok.log 2>&1 &
+              sleep 3
+              curl http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url'
+              
             docker rm -f sidekiq_worker || true
             docker run -d \
               --name sidekiq_worker \
