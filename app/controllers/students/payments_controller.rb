@@ -55,14 +55,21 @@ class Students::PaymentsController < ApplicationController
     end
   end
 
-  # ================= IPN (REAL CONFIRMATION) =================
-  def vnpay_ipn
-    Rails.logger.info "🔥🔥🔥 VNPAY IPN CALLED"
-    Rails.logger.info params.inspect
+def vnpay_ipn
+  Rails.logger.info "🔥 IPN #{params.inspect}"
 
   if params[:test] == "1"
     return render json: { RspCode: "00", Message: "TEST OK" }
   end
+
+  # verify hash thật
+end
+
+  
+  # ================= IPN (REAL CONFIRMATION) =================
+  # def vnpay_ipn
+  #   Rails.logger.info "🔥🔥🔥 VNPAY IPN CALLED"
+  #   Rails.logger.info params.inspect
     
   #   # 1️⃣ Lấy params VNPay
   #   vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
