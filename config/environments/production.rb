@@ -53,6 +53,8 @@ Rails.application.configure do
   config.i18n.fallbacks = true
   config.active_record.dump_schema_after_migration = false
   config.active_record.attributes_for_inspect = [ :id ]
+Rails.application.routes.default_url_options[:host] = "d34ute7tylgmox.cloudfront.net"
+Rails.application.routes.default_url_options[:protocol] = "https"
 
   # Hosts
   config.hosts << "184.72.213.33"
