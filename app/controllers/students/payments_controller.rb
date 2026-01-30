@@ -1,123 +1,116 @@
+# frozen_string_literal: true
+
 class Students::PaymentsController < ApplicationController
   require "openssl"
   require "uri"
+  require "cgi"
 
-  skip_before_action :verify_authenticity_token, only: [ :vnpay_ipn ]
-  before_action :authenticate_user!, except: [ :vnpay_return, :vnpay_ipn ]
+  # ❗ IPN + RETURN không cần login + không CSRF
+  skip_before_action :authenticate_user!, only: [:vnpay_return, :vnpay_ipn]
+  skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
 
-  # ================== CREATE PAYMENT ==================
+  VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  VNP_TMNCODE     = "9APTANC1"
+  VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
+  VNP_RETURN_URL  = "https://resigned-unincreased-agnus.ngrok-free.dev/students/payments/vnpay_return"
+
+  # ================= CREATE PAYMENT =================
   def create
     order = current_user.orders.find(params[:order_id])
 
-    order_info = "Order_#{order.id}"
-
     vnp_params = {
-      "vnp_Version"    => "2.1.0",
-      "vnp_Command"    => "pay",
-      "vnp_TmnCode"    => VN_PAY[:tmn_code],
-      "vnp_Amount"     => (order.total_price * 100).to_i,
-      "vnp_CurrCode"   => "VND",
-      "vnp_TxnRef"     => "#{order.id}_#{Time.current.to_i}",
-      "vnp_OrderInfo"  => order_info,
-      "vnp_OrderType"  => "education",
-      "vnp_Locale"     => "vn",
-      "vnp_ReturnUrl"  => VN_PAY[:return_url],
-      "vnp_IpAddr"     => request.headers["X-Forwarded-For"] || request.remote_ip,
-      "vnp_CreateDate" => Time.current.strftime("%Y%m%d%H%M%S")
+      vnp_Version: "2.1.0",
+      vnp_Command: "pay",
+      vnp_TmnCode: VNP_TMNCODE,
+      vnp_Amount: (order.total_price * 100).to_i,
+      vnp_CurrCode: "VND",
+      vnp_TxnRef: order.id.to_s,
+      vnp_OrderInfo: "Order_#{order.id}",
+      vnp_OrderType: "education",
+      vnp_Locale: "vn",
+      vnp_ReturnUrl: VNP_RETURN_URL,
+      vnp_IpAddr: request.headers["X-Forwarded-For"] || request.remote_ip,
+      vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
     }
 
     sorted = vnp_params.sort.to_h
     query_string = URI.encode_www_form(sorted)
-    secure_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], query_string)
+    secure_hash  = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET, query_string)
 
     Rails.logger.info "VNPay HASH DATA: #{query_string}"
     Rails.logger.info "VNPay HASH: #{secure_hash}"
 
-    redirect_to "#{VN_PAY[:url]}?#{query_string}&vnp_SecureHash=#{secure_hash}", allow_other_host: true
+    redirect_to "#{VNP_URL}?#{query_string}&vnp_SecureHash=#{secure_hash}", allow_other_host: true
   end
 
-  # ================== RETURN URL ==================
+  # ================= RETURN URL (UI ONLY) =================
   def vnpay_return
     order = Order.find_by(id: params[:vnp_TxnRef])
-    return redirect_to root_path, alert: "Order not found" unless order
+    return redirect_to root_path unless order
 
     if params[:vnp_ResponseCode] == "00"
-      ActiveRecord::Base.transaction do
-        order.update!(status: :paid)
-
-        payment = order.create_payment!(
-          amount: order.total_price,
-          status: :paid,
-          transaction_code: params[:vnp_TransactionNo]
-        )
-
-        CourseAccess.create!(
-          user: order.user,
-          course: order.course,
-          payment: payment,
-          start_date: Time.current,
-          end_date: 1.year.from_now,
-          status: :active
-        )
-      end
-
-      redirect_to students_course_path(order.course), notice: "Thanh toán thành công"
+      redirect_to students_course_path(order.course), notice: "Thanh toán thành công. Đang xác nhận..."
     else
-      order.update!(status: :failed)
       redirect_to students_course_path(order.course), alert: "Thanh toán thất bại"
     end
   end
 
-  # ================== IPN (SERVER TO SERVER) ==================
-  def vnpay_ipn
-    Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
 
-    vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") }
-    secure_hash = vnp_params.delete("vnp_SecureHash")
-    vnp_params.delete("vnp_SecureHashType")
+  
+  # ================= IPN (REAL CONFIRMATION) =================
+ def vnpay_ipn
+  Rails.logger.info "🔥 VNPAY IPN CALLED"
+  vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
+  secure_hash = params[:vnp_SecureHash]
 
-    sorted = vnp_params.sort.to_h
-    hash_data = URI.encode_www_form(sorted)
-    check_hash = OpenSSL::HMAC.hexdigest("SHA512", VN_PAY[:hash_secret], hash_data)
+  query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
+  check_hash = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET, query)
+  return render json: { RspCode: "97", Message: "Invalid Signature" } if secure_hash != check_hash
 
-    Rails.logger.info "VNPay IPN HASH DATA: #{hash_data}"
-    Rails.logger.info "VNPay IPN HASH CHECK: #{check_hash}"
+  order = Order.find_by(id: params[:vnp_TxnRef])
+  return render json: { RspCode: "01", Message: "Order Not Found" } unless order
 
-    return render json: { RspCode: "97", Message: "Invalid Signature" } if secure_hash != check_hash
+  if order.payment&.status == "success"
+    return render json: { RspCode: "00", Message: "Already Processed" }
+  end
 
-    order = Order.find_by(id: params[:vnp_TxnRef])
-    return render json: { RspCode: "01", Message: "Order Not Found" } unless order
+  if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
+    ActiveRecord::Base.transaction do
+      # 1️⃣ Create Payment
+      payment = Payment.create!(
+        order: order,
+        amount: params[:vnp_Amount].to_i / 100,
+        payment_method: "vnpay",
+        transaction_code: params[:vnp_TransactionNo],
+        paid_at: Time.current,
+        status: "paid"
+      )
 
-    expected_amount = (order.total_price * 100).to_i
-    return render json: { RspCode: "04", Message: "Invalid Amount" } if params[:vnp_Amount].to_i != expected_amount
+      # 2️⃣ Create CourseAccess
+      CourseAccess.create!(
+        user: order.user,
+        course: order.course,
+        payment: payment,
+        status: :active,
+        start_date: Time.current,
+        end_date: 1.year.from_now
+      )
 
-    if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
-      return render json: { RspCode: "00", Message: "Already Processed" } if order.paid_status?
-
-      ActiveRecord::Base.transaction do
-        order.update!(status: :paid)
-
-        payment = order.create_payment!(
-          amount: order.total_price,
-          status: :paid,
-          transaction_code: params[:vnp_TransactionNo]
-        )
-
-        CourseAccess.create!(
-          user: order.user,
-          course: order.course,
-          payment: payment,
-          start_date: Time.current,
-          end_date: 1.year.from_now,
-          status: :active
-        )
-      end
-
-      InvoiceMailer.invoice_email(order).deliver_later rescue nil
-
-      return render json: { RspCode: "00", Message: "Confirm Success" }
+      order.update!(status: :paid)
     end
 
-    render json: { RspCode: "02", Message: "Payment Failed" }
+    return render json: { RspCode: "00", Message: "Confirm Success" }
   end
+
+  Payment.create!(
+    order: order,
+    amount: params[:vnp_Amount].to_i / 100,
+    payment_method: "vnpay",
+    transaction_code: params[:vnp_TransactionNo],
+    status: "failed"
+  )
+
+  render json: { RspCode: "02", Message: "Payment Failed" }
+end
+
 end
