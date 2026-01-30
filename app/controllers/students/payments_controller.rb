@@ -96,7 +96,7 @@ class Students::PaymentsController < ApplicationController
     # 7️⃣ Payment success
     if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
       ActiveRecord::Base.transaction do
-        order.update!(status: :paid, paid_at: Time.current)
+        order.update!(status: :paid)
 
         CourseAccess.find_or_create_by!(user: order.user, course: order.course) do |ca|
           ca.status = :active
