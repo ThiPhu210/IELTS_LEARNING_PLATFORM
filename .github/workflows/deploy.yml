@@ -85,7 +85,7 @@ jobs:
         run: |
           bundle exec rails db:drop db:create 
           bundle exec rails db:schema:load
-          bundle exec rails db:migrate db:seed
+          bundle exec rails db:migrate
 
       - name: Run RSpec
         env:
