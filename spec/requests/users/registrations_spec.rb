@@ -11,7 +11,8 @@ RSpec.describe "User Registration", type: :request do
               email: "test@example.com",
               password: "password123",
               password_confirmation: "password123",
-              role: "student"
+              role: "student",
+              school: "IELTS University"
             }
           }
         }.to change(User, :count).by(1)
