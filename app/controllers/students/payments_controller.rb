@@ -88,7 +88,8 @@ class Students::PaymentsController < ApplicationController
     end
 
     # 6️⃣ Idempotent (VNPay gọi nhiều lần)
-    if order.paid?
+    if order.paid_status?
+
       return render json: { RspCode: "00", Message: "Already Processed" }
     end
 
