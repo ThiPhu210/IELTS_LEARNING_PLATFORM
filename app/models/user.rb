@@ -20,7 +20,8 @@ class User < ApplicationRecord
   validates :role, presence: true
   validates :full_name, presence: true
   validates :password, presence: true, on: :create
-  validates :school, presence: true, if: :student_role?
+  validates :school, presence: true, on: :update, if: :student_role?
+
 
 
 
