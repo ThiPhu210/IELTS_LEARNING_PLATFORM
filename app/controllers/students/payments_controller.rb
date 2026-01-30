@@ -83,7 +83,7 @@ class Students::PaymentsController < ApplicationController
         payment_method: "vnpay",
         transaction_code: params[:vnp_TransactionNo],
         paid_at: Time.current,
-        status: "success"
+        status: "paid"
       )
 
       # 2️⃣ Create CourseAccess
