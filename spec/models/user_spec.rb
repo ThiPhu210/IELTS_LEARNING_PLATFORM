@@ -23,6 +23,4 @@ RSpec.describe User, type: :model do
       expect(user.confirmed?).to eq(false)
     end
   end
-
-  
 end

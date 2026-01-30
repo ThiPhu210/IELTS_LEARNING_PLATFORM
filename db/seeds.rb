@@ -10,28 +10,33 @@ end
 
 # ========== TEACHERS ==========
 10.times do |i|
-  teacher = User.find_or_create_by!(email: "teacher#{i + 1}@ielts.com") do |u|
-    u.full_name     = "Teacher #{i + 1}"
-    u.password      = "123456"
-    u.role          = :teacher
-    u.confirmed_at  = Time.current
-  end
-
-  TeacherProfile.find_or_create_by!(user: teacher) do |tp|
-    tp.bio              = "Giáo viên IELTS với hơn #{i + 3} năm kinh nghiệm"
-    tp.expertise        = "IELTS Speaking"
-    tp.experience_years = i + 3
-  end
+  TeacherProfile.create!(
+    full_name: "Giảng viên IELTS #{i}",
+    expertise: [ "IELTS Speaking", "IELTS Writing", "IELTS Listening", "IELTS Reading" ].sample,
+    experience_years: rand(3..15),
+    bio: "Giảng viên với nhiều năm kinh nghiệm giảng dạy IELTS, giúp học viên đạt điểm cao."
+  )
 end
+
 # ========== STUDENTS ==========
+# Tạo 30 học viên
 30.times do |i|
-  User.find_or_create_by!(email: "student#{i + 1}@ielts.com") do |u|
-    u.full_name     = "Student #{i + 1}"
+  student = User.find_or_create_by!(email: "student#{i}@ielts.com") do |u|
+    u.full_name     = "Student #{i}"
     u.password      = "123456"
+    u.school        = "THPT Nguyen Van A #{i}"
     u.role          = :student
     u.confirmed_at  = Time.current
   end
+
+  # Tạo thành tích cho mỗi học viên
+  Achievement.find_or_create_by!(user: student, title: "IELTS Achievement #{i}") do |a|
+    a.description        = "Student #{i} đạt thành tích nổi bật trong kỳ thi IELTS."
+    a.year               = 2025
+    a.ielts_overall_band = rand(5.0..8.5).round(1) # random band từ 5.0 đến 8.5
+  end
 end
+
 
 
 # ========== COURSES ==========\
