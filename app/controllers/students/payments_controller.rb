@@ -6,8 +6,15 @@ class Students::PaymentsController < ApplicationController
   require "cgi"
 
   # ❗ IPN + RETURN không cần login + không CSRF
-  skip_before_action :authenticate_user!, only: [:vnpay_return, :vnpay_ipn]
-  skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
+  # skip_before_action :authenticate_user!, only: [:vnpay_return, :vnpay_ipn]
+  # skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
+  # ❗ IPN + RETURN không cần login + không CSRF
+skip_before_action :authenticate_user!,
+                   only: [:vnpay_return, :vnpay_ipn],
+                   if: -> { respond_to?(:authenticate_user!) }
+
+skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
+
 
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
