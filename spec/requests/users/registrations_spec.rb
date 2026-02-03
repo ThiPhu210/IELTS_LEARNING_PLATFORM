@@ -11,6 +11,7 @@ RSpec.describe "User Registration", type: :request do
               email: "test@example.com",
               password: "password123",
               password_confirmation: "password123",
+              phone: "0906270067",
               role: "student",
               school: "IELTS University"
             }
