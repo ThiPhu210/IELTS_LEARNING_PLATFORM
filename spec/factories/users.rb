@@ -4,7 +4,8 @@ FactoryBot.define do
     sequence(:email) { |n| "user#{n}@example.com" }
     password { "password123" }
     role { "student" } # ✅ default role
-    school { "IELTS University" } # ✅ default school cho student
+    school { "IELTS University" } 
+    phone { "0901234567" } # ✅ default school cho student
     confirmed_at { Time.current }
 
     trait :student do
