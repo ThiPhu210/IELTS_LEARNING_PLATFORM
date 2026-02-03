@@ -122,5 +122,5 @@ class Students::PaymentsController < ApplicationController
 
   render json: { RspCode: "02", Message: "Payment Failed" }
 end
-
+  end
 end
