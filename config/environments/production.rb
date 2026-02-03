@@ -13,11 +13,11 @@ Rails.application.configure do
   }
 
   config.active_storage.service = :amazon
-  config.assume_ssl = true
-  config.force_ssl = true
+  #config.assume_ssl = true
+  #config.force_ssl = true
   config.session_store :cookie_store,
     key: "_ielts_session",
-    secure: true,
+    secure: false,
     same_site: :lax
 
 
@@ -55,7 +55,13 @@ Rails.application.configure do
   config.active_record.attributes_for_inspect = [ :id ]
 
   # Hosts
+  config.hosts << "resigned-unincreased-agnus.ngrok-free.dev"
   config.hosts << "184.72.213.33"
+config.hosts << "localhost"
+Rails.application.routes.default_url_options = {
+  host: "resigned-unincreased-agnus.ngrok-free.dev",
+  protocol: "https"
+}
   config.hosts << "d34ute7tylgmox.cloudfront.net"
   config.hosts << "ec2-184-72-213-33.compute-1.amazonaws.com"
 

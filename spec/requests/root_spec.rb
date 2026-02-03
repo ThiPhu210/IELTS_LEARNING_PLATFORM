@@ -1,16 +1,16 @@
 require "rails_helper"
 
-RSpec.describe "Root redirect", type: :request do
+RSpec.describe "Root homepage", type: :request do
   let(:user) { create(:user, role: :student) }
 
-  it "redirects authenticated student to students dashboard" do
+  it "renders homepage for authenticated student" do
     sign_in user
     get root_path
-    expect(response).to redirect_to(students_dashboard_path)
+    expect(response).to have_http_status(:ok)
   end
 
-  it "redirects unauthenticated user to sign in" do
+  it "renders homepage for unauthenticated user" do
     get root_path
-    expect(response).to redirect_to("/users/sign_in")
+    expect(response).to have_http_status(:ok)
   end
 end
