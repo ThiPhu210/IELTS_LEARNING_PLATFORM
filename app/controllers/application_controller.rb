@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  before_action :authenticate_user!, unless: :devise_controller?
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_no_cache
 
@@ -7,8 +6,6 @@ class ApplicationController < ActionController::Base
     case resource.role
     when "admin"
       admin_dashboard_path
-    when "teacher"
-      teacher_dashboard_path
     when "student"
       students_dashboard_path
     else

@@ -4,13 +4,15 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     passwords: "users/passwords"
   }
-  root "home#index"
 
-  # ================= DASHBOARD =================
+  # ================= DASHBOARD REDIRECT ROOT =================
   authenticated :user do
     root to: "dashboard#redirect", as: :authenticated_root
   end
 
+  unauthenticated do
+    root "home#index"
+  end
 
 
 # ================= STUDENT =================

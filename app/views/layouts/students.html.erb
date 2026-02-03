@@ -6,7 +6,7 @@
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <title><%= content_for(:title) || "Ielts Platform - Student" %></title>
+    <title><%= content_for(:title) || "Ielts Platform" %></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -22,25 +22,21 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <!-- ✅ Tailwind CSS (QUAN TRỌNG) -->
+    <!-- Tailwind CSS -->
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
 
     <!-- SweetAlert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </head>
 
-  <body class="bg-gray-100">
-    <!-- ✅ STUDENT NAVBAR -->
-    <%= render "students/shared/navbar" %>
+  <body class="g-sidenav-show bg-gray-100">
+    <%= yield %>
 
-    <!-- CONTENT -->
-    <main class="pt-20">
-      <%= yield %>
-    </main>
+    <!-- Flowbite JS (BẮT BUỘC) -->
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.3/dist/flowbite.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.3/flowbite.min.js"></script>
 
-    <!-- ✅ Flowbite JS -->
-    <script src="https://cdn.jsdelivr.net/npm/flowbite/dist/flowbite.min.js"></script>
-
+   
 
     <% if flash[:success] %>
       <script>
@@ -55,71 +51,6 @@
       </script>
     <% end %>
   </body>
-  <footer class="text-gray-800 py-12 relative z-50"
-  style="background-color: #f9c5d1;">
-
-  <div class="max-w-7xl mx-auto px-6 py-10">
-
-    <!-- TOP ROW -->
-    <div class="flex flex-col md:flex-row items-center justify-between gap-6">
-
-      <!-- BRAND -->
-      <div class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-full bg-white/20
-                    flex items-center justify-center
-                    text-xl font-bold">
-          AI
-        </div>
-
-        <div>
-          <p class="text-lg font-bold">IELTS AI</p>
-          <p class="text-sm text-white/80">
-            Learn IELTS smarter with AI
-          </p>
-        </div>
-      </div>
-
-      <!-- NAV -->
-      <nav class="flex flex-wrap gap-6 text-sm font-medium">
-        <%= link_to "Courses", students_courses_path,
-          class: "hover:text-white/80 transition" %>
-
-        <%= link_to "AI Speaking", "#",
-          class: "hover:text-white/80 transition" %>
-
-        <%= link_to "Teachers", "#",
-          class: "hover:text-white/80 transition" %>
-
-        <%= link_to "Blog", "#",
-          class: "hover:text-white/80 transition" %>
-      </nav>
-
-
-    <!-- DIVIDER -->
-    <div class="border-t border-white/20 my-6"></div>
-
-    <!-- BOTTOM ROW -->
-    <div class="flex flex-col md:flex-row
-                items-center justify-between
-                text-sm text-white/80 gap-4">
-
-      <p>
-        © <%= Time.current.year %> IELTS AI Platform. All rights reserved.
-      </p>
-
-      <!-- SOCIAL -->
-      <div class="flex items-center gap-4 text-lg">
-        <a href="#" class="hover:text-white transition">🌐</a>
-        <a href="#" class="hover:text-white transition">📘</a>
-        <a href="#" class="hover:text-white transition">📸</a>
-        <a href="#" class="hover:text-white transition">🐦</a>
-      </div>
-
-    </div>
-
-  </div>
-</footer>
-
-
+ 
 
 </html>
