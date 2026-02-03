@@ -28,7 +28,7 @@ class User < ApplicationRecord
   format: {
     with: /\A0\d{9,10}\z/,
     message: "Phone number must have 10 digits"
-  }
+  }, allow_blank: true
 
   def has_course_access?(course)
     course_accesses.exists?(
