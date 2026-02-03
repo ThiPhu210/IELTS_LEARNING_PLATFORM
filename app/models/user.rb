@@ -20,14 +20,15 @@ class User < ApplicationRecord
   validates :role, presence: true
   validates :full_name, presence: true
   validates :password, presence: true, on: :create
-  validates :school, presence: true, on: :update, if: :student_role?
-
-
-
-
+  validates :school, presence: true, if: :student_role?, allow_blank: true
   validates :bio, length: { maximum: 500 }, allow_blank: true
   validates :feedback, length: { maximum: 1000 }, allow_blank: true
   validates :phone, length: { maximum: 10 }, allow_blank: true
+  validates :phone,
+  format: {
+    with: /\A0\d{9,10}\z/,
+    message: "Phone number must have 10 digits"
+  }
 
   def has_course_access?(course)
     course_accesses.exists?(

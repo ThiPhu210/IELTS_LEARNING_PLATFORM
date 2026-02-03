@@ -8,9 +8,9 @@ class Admin::ProfilesController < Admin::BaseController
         @user.skip_reconfirmation! if email_changed?
 
         if @user.update(user_params)
+          flash[:success] = "Cập nhật thông tin thành công 🎉"
           redirect_to admin_dashboard_path,
-                      notice: "Cập nhật thông tin thành công"
-            flash[:success] = "Cập nhật thông tin thành công 🎉"
+                      notice: "Cập nhật thông tin thành công 🎉"
         else
           render :edit, status: :unprocessable_entity
         end
@@ -20,16 +20,25 @@ class Admin::ProfilesController < Admin::BaseController
     private
 
     def set_user
-      @user = current_user   # ✅ QUAN TRỌNG
+      @user = current_user
     end
 
     def user_params
       params.require(:user).permit(
         :email,
         :full_name,
-        :thumbnail
+        :thumbnail,
+        :school,
+        :feedback,
+        :bio,
+        :phone,
+        :country,
+        :city,
+        :province,
+        :postal_code
       )
     end
+
 
     def email_changed?
       params[:user][:email].present? &&

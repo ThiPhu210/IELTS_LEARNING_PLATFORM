@@ -31,7 +31,15 @@ class Students::ProfilesController < Students::BaseController
       params.require(:user).permit(
         :email,
         :full_name,
-        :thumbnail
+        :thumbnail,
+        :school,
+        :feedback,
+        :bio,
+        :phone,
+        :country,
+        :city,
+        :province,
+        :postal_code
       )
     end
 end

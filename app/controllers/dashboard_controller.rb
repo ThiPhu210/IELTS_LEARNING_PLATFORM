@@ -5,10 +5,10 @@ class DashboardController < ApplicationController
     case current_user.role
     when "admin"
       redirect_to admin_dashboard_path
-    when "teacher"
-      redirect_to teacher_dashboard_path
-    else
+    when "student"
       redirect_to students_dashboard_path
+    else
+      redirect_to root_path
     end
   end
 end

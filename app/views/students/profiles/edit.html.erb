@@ -1,4 +1,4 @@
-<div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen dark:bg-gray-900">
+<div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto min-h-screen dark:bg-gray-900">
 
   <!-- Logo -->
   <%= link_to root_path,
@@ -18,39 +18,10 @@
                   local: true,
                   multipart: true do |f| %>
 
-      <!-- AVATAR -->
-      <div class="flex flex-col items-center mb-8">
-      <% if @user.thumbnail.attached? && @user.thumbnail.blob.persisted? %>
-  <%= image_tag @user.thumbnail.variant(resize_to_fill: [60, 60]),
-        id: "avatar-preview",
-        class: "w-[60px] h-[60px] rounded-full object-cover border mb-3" %>
-<% else %>
-  <img id="avatar-preview"
-       class="w-[60px] h-[60px] rounded-full object-cover border mb-3"
-       src="https://flowbite.com/docs/images/people/profile-picture-5.jpg">
-<% end %>
-
-    
-
-        <label class="text-sm font-medium text-blue-600 cursor-pointer hover:underline">
-          Change avatar
-          <%= f.file_field :thumbnail, accept: "image/*", class: "hidden" %>
-        </label>
-      </div>
-
-      <!-- FULL NAME -->
-      <div class="mb-5">
-        <%= f.label :full_name,
-            class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-
-        <%= f.text_field :full_name,
-            class: "w-full rounded-lg border border-gray-300 px-3 py-2
-                    focus:ring-blue-500 focus:border-blue-500
-                    dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-      </div>
-
+    <!-- AVATAR --> 
+    <div class="flex flex-col items-center mb-8"> <% if @user.thumbnail&.attached? %> <%= image_tag @user.thumbnail.variant(resize_to_fill: [150, 150]).processed, id: "avatar-preview", class: "w-[150px] h-[150px] rounded-full object-cover border mb-3" %> <% else %> <img id="avatar-preview" class="w-[150px] h-[150px] rounded-full object-cover border mb-3" src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"> <% end %> <label class="text-sm font-medium text-blue-600 cursor-pointer hover:underline"> Change avatar <%= f.file_field :thumbnail, accept: "image/*", class: "hidden" %> </label> </div> <!-- BASIC INFO --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Thông tin cơ bản </h3> <div class="space-y-6 mb-4"> <!-- FULL NAME --> <div> <%= f.label :full_name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :full_name, class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div>
       <!-- EMAIL -->
-      <div class="mb-6 mt-6">
+      <div>
         <%= f.label :email,
             class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
 
@@ -65,13 +36,5 @@
           </p>
         <% end %>
       </div>
-
-      <!-- SUBMIT -->
-      <%= f.submit "Save changes",
-          class: "w-full py-3 text-white font-medium rounded-lg
-                  bg-red-600 hover:bg-red-700
-                  focus:ring-4 focus:ring-red-300" %>
-
-    <% end %>
-  </div>
-</div>
+      </div>
+<!-- STUDENT INFO --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Student information </h3> <div class="grid grid-cols-2 gap-6 mb-4"> <div> <%= f.label :school, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :school, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :phone, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.telephone_field :phone, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> <% if @user.errors[:phone].any? %> <p class="mt-1 text-sm text-red-600"> <%= @user.errors[:phone].first %> </p> <% end %> </div> </div> <!-- ADDRESS --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Địa chỉ </h3> <div class="space-y-6 mb-4"> <!-- Country + City --> <div class="grid grid-cols-2 gap-6"> <div> <%= f.label :country, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :country, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :city, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :city, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> <!-- Province + Postal Code --> <div class="grid grid-cols-2 gap-6"> <div> <%= f.label :province, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :province, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :postal_code, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :postal_code, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> </div> <!-- DESCRIPTION --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Description </h3> <div class="space-y-6 mb-4"> <div> <%= f.label :bio, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_area :bio, rows: 3, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-3 mb-4"> <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"> All of the fields on this page are optional and can be deleted at any time, and by filling them out, you're giving us consent to share this data wherever your user profile appears. Please see our <a href="https://github.com/site/privacy" class="text-blue-600 hover:underline font-medium"> privacy statement </a> to learn more about how we use this information. </p> </div> <!-- BUTTONS --> <div class="flex gap-4 mt-6"> <%= link_to "Cancel", admin_dashboard_path, class: "w-1/2 text-center py-3 rounded-lg font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" %> <%= f.submit "Save changes", class: "w-1/2 py-3 text-white font-medium rounded-lg bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300" %> </div> <% end %> </div> </div> <script> document.addEventListener("DOMContentLoaded", () => { const phoneInput = document.querySelector("#user_phone"); if (!phoneInput) return; const error = document.createElement("p"); error.className = "mt-1 text-sm text-red-600 hidden"; phoneInput.parentNode.appendChild(error); phoneInput.addEventListener("input", () => { const value = phoneInput.value; const regex = /^0\d{9,10}$/; if (!regex.test(value)) { phoneInput.classList.add("border-red-500"); error.textContent = "Phone number begins with 0-letter and must have 10 digits"; error.classList.remove("hidden"); } else { phoneInput.classList.remove("border-red-500"); error.classList.add("hidden"); } }); }); </script>

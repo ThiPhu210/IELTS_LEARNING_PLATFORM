@@ -14,9 +14,6 @@ class Students::DashboardController < ApplicationController
         }
       )
       .distinct
-    @teacher_profiles = TeacherProfile
-  .joins(:avatar_attachment)
-  .includes(:user)
-    Rails.logger.info "COURSES FOUND = #{@courses.pluck(:id)}"
+      @teacher_profiles = TeacherProfile.all
   end
 end

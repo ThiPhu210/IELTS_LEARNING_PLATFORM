@@ -45,16 +45,26 @@ class Students::PaymentsController < ApplicationController
 
   # ================= RETURN URL (UI ONLY) =================
   def vnpay_return
-    order = Order.find_by(id: params[:vnp_TxnRef])
+    txn_ref = params[:vnp_TxnRef]
+    order_id = txn_ref.split("_").first
+    order = Order.find_by(id: order_id)
     return redirect_to root_path unless order
 
     if params[:vnp_ResponseCode] == "00"
-      redirect_to students_course_path(order.course), notice: "Thanh toán thành công. Đang xác nhận..."
+      redirect_to students_course_path(order.course), notice: "Đã nhận yêu cầu thanh toán, đang xác nhận..."
     else
       redirect_to students_course_path(order.course), alert: "Thanh toán thất bại"
     end
   end
 
+
+  # ================== IPN (SERVER TO SERVER) ==================
+  def vnpay_ipn
+    Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
+
+    vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") }
+    secure_hash = vnp_params.delete("vnp_SecureHash")
+    vnp_params.delete("vnp_SecureHashType")
 
   
   # ================= IPN (REAL CONFIRMATION) =================
