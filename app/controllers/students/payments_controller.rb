@@ -11,7 +11,8 @@ class Students::PaymentsController < ApplicationController
   # ❗ IPN + RETURN không cần login + không CSRF
 skip_before_action :authenticate_user!,
                    only: [:vnpay_return, :vnpay_ipn],
-                   if: -> { respond_to?(:authenticate_user!) }
+                   if: -> { respond_to?(:authenticate_user!) },
+                  raise: false
 
 skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
 
