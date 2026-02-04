@@ -2,21 +2,27 @@
   <%= params[:paid] == "true" ? "Khóa học của tôi" : "Tất cả khóa học" %>
 </h1>
 
-<% if params[:paid] == "true" && @courses.any? %>
-  <p class="text-gray-600 mb-6">
-    Bạn đã mua
-    <span class="font-semibold text-gray-800">
-      <%= @courses.count %>
-    </span>
-    khóa học:
-  </p>
+<% if params[:paid] == "true" %>
+  <% if @courses.any? %>
+    <p class="text-gray-600 mb-6">
+      Bạn đã mua
+      <span class="font-semibold text-gray-800">
+        <%= @courses.size %>
+      </span>
+      khóa học:
+    </p>
 
-  <ul class="mb-8 space-y-2">
-    <% @courses.each do |course| %>
-      <li class="flex items-center gap-2 text-lg text-gray-800">
-        <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-        <%= course.title %>
-      </li>
-    <% end %>
-  </ul>
+    <ul class="mb-8 space-y-2">
+      <% @courses.each do |course| %>
+        <li class="flex items-center gap-2 text-lg text-gray-800">
+          <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+          <%= link_to course.title, students_course_path(course), class: "hover:underline" %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+      <p class="text-yellow-700">Bạn chưa mua khóa học nào.</p>
+    </div>
+  <% end %>
 <% end %>

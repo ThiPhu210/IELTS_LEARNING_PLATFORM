@@ -6,8 +6,16 @@ class Students::PaymentsController < ApplicationController
   require "cgi"
 
   # ❗ IPN + RETURN không cần login + không CSRF
-  skip_before_action :authenticate_user!, only: [ :vnpay_return, :vnpay_ipn ]
-  skip_before_action :verify_authenticity_token, only: [ :vnpay_ipn ]
+  # skip_before_action :authenticate_user!, only: [:vnpay_return, :vnpay_ipn]
+  # skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
+  # ❗ IPN + RETURN không cần login + không CSRF
+skip_before_action :authenticate_user!,
+                   only: [:vnpay_return, :vnpay_ipn],
+                   if: -> { respond_to?(:authenticate_user!) },
+                  raise: false
+
+skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
+
 
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
@@ -66,8 +74,8 @@ class Students::PaymentsController < ApplicationController
     secure_hash = vnp_params.delete("vnp_SecureHash")
     vnp_params.delete("vnp_SecureHashType")
 
-
- # ================= IPN (REAL CONFIRMATION) =================
+  
+  # ================= IPN (REAL CONFIRMATION) =================
  def vnpay_ipn
   Rails.logger.info "🔥 VNPAY IPN CALLED"
   vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
@@ -122,5 +130,5 @@ class Students::PaymentsController < ApplicationController
 
   render json: { RspCode: "02", Message: "Payment Failed" }
 end
-end
+  end
 end

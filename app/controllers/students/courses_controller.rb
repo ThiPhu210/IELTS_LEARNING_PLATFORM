@@ -2,18 +2,18 @@ class Students::CoursesController < ApplicationController
   layout "students"
   before_action :authenticate_user!
   before_action :require_course_access!, only: [ :show ]
-  def index
-    if params[:paid] == "true"
-      @courses = Course.joins(:orders)
-                       .where(orders: {
-                         user_id: current_user.id,
-                         status: :paid
-                       })
-                       .distinct
-    else
-      @courses = Course.all
-    end
+def index
+  if params[:paid] == "true"
+    @courses = current_user
+      .course_accesses
+      .active_status
+      .includes(:course)
+      .map(&:course)
+  else
+    @courses = Course.all
   end
+end
+
   def show
     @course = Course.find(params[:id])
   end

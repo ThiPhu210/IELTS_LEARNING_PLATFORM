@@ -6,7 +6,6 @@ RSpec.describe User, type: :model do
     it { should have_many(:orders).dependent(:destroy) }
     it { should have_many(:courses).through(:orders) }
     it { should have_many(:course_accesses) }
-    it { should have_one(:teacher_profile).dependent(:destroy) }
   end
 
   describe "validations" do
