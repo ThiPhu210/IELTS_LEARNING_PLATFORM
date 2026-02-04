@@ -18,43 +18,224 @@
                   local: true,
                   multipart: true do |f| %>
 
-    <!-- AVATAR --> 
-    <div class="flex flex-col items-center mb-8"> 
-<% if @user.persisted? && @user.thumbnail&.blob&.persisted? %>
-  <%= image_tag(
-        rails_representation_url(
-          @user.thumbnail.variant(resize_to_fill: [150, 150]),
-          only_path: true
-        ),
-        id: "avatar-preview",
-        class: "w-[150px] h-[150px] rounded-full object-cover border mb-3"
-      )
-  %>
-<% else %>
-  <img
-    id="avatar-preview"
-    class="w-[150px] h-[150px] rounded-full object-cover border mb-3"
-    src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-  >
-<% end %>
+      <!-- AVATAR -->
+      <div class="flex flex-col items-center mb-8 relative">
 
-
-<label class="text-sm font-medium text-blue-600 cursor-pointer hover:underline"> Change avatar <%= f.file_field :thumbnail, accept: "image/*", class: "hidden" %> </label> </div> <!-- BASIC INFO --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Thông tin cơ bản </h3> <div class="space-y-6 mb-4"> <!-- FULL NAME --> <div> <%= f.label :full_name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :full_name, class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div>
-      <!-- EMAIL -->
-      <div>
-        <%= f.label :email,
-            class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-
-        <%= f.email_field :email,
-            class: "w-full rounded-lg border border-gray-300 px-3 py-2
-                    focus:ring-blue-500 focus:border-blue-500
-                    dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-
-        <% if @user.unconfirmed_email.present? %>
-          <p class="mt-2 text-sm text-yellow-600">
-            📩 Vui lòng kiểm tra email để xác nhận địa chỉ mới
-          </p>
+        <% if current_user.thumbnail.attached? %>
+          <%= safe_avatar(current_user, size: 128) %>
+        <% else %>
+          <img class="w-32 h-32 rounded-full"
+               src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+               alt="user photo">
         <% end %>
+
+        <label class="mt-3 text-sm font-medium text-blue-600 cursor-pointer hover:underline text-center">
+          Change avatar
+          <%= f.file_field :thumbnail,
+                accept: "image/png,image/jpeg,image/webp",
+                class: "hidden",
+                id: "avatar-input" %>
+        </label>
+
+        <!-- TOAST -->
+        <div
+          id="toast-file-error"
+          class="hidden mt-3 flex items-center max-w-xs p-4 text-sm
+                 text-red-800 bg-red-100 rounded-lg shadow"
+          role="alert"
+        >
+          <div class="inline-flex items-center justify-center w-8 h-8
+                      text-red-500 bg-red-200 rounded-lg">
+            ⚠️
+          </div>
+
+          <div class="ml-3 text-sm font-medium" id="file-error-message">
+            File không hợp lệ
+          </div>
+
+          <button type="button"
+                  class="ml-auto text-red-500 hover:text-red-700"
+                  onclick="hideFileToast()">
+            ✕
+          </button>
+        </div>
       </div>
+
+      <!-- BASIC INFO -->
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        Thông tin cơ bản
+      </h3>
+
+      <div class="space-y-6 mb-4">
+        <div>
+          <%= f.label :full_name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+          <%= f.text_field :full_name,
+                class: "w-full rounded-lg border border-gray-300 px-3 py-2
+                        focus:ring-blue-500 focus:border-blue-500
+                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+
+        <div>
+          <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+          <%= f.email_field :email,
+                class: "w-full rounded-lg border border-gray-300 px-3 py-2
+                        focus:ring-blue-500 focus:border-blue-500
+                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+
+          <% if current_user.unconfirmed_email.present? %>
+            <p class="mt-2 text-sm text-yellow-600">
+              📩 Vui lòng kiểm tra email để xác nhận địa chỉ mới
+            </p>
+          <% end %>
+        </div>
       </div>
-<!-- STUDENT INFO --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Student information </h3> <div class="grid grid-cols-2 gap-6 mb-4"> <div> <%= f.label :school, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :school, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :phone, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.telephone_field :phone, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> <% if @user.errors[:phone].any? %> <p class="mt-1 text-sm text-red-600"> <%= @user.errors[:phone].first %> </p> <% end %> </div> </div> <!-- ADDRESS --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Địa chỉ </h3> <div class="space-y-6 mb-4"> <!-- Country + City --> <div class="grid grid-cols-2 gap-6"> <div> <%= f.label :country, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :country, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :city, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :city, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> <!-- Province + Postal Code --> <div class="grid grid-cols-2 gap-6"> <div> <%= f.label :province, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :province, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> <div> <%= f.label :postal_code, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_field :postal_code, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> </div> <!-- DESCRIPTION --> <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4"> Description </h3> <div class="space-y-6 mb-4"> <div> <%= f.label :bio, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %> <%= f.text_area :bio, rows: 3, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %> </div> </div> <div class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md p-3 mb-4"> <p class="text-sm text-gray-600 dark:text-gray-400 leading-relaxed"> All of the fields on this page are optional and can be deleted at any time, and by filling them out, you're giving us consent to share this data wherever your user profile appears. Please see our <a href="https://github.com/site/privacy" class="text-blue-600 hover:underline font-medium"> privacy statement </a> to learn more about how we use this information. </p> </div> <!-- BUTTONS --> <div class="flex gap-4 mt-6"> <%= link_to "Cancel", admin_dashboard_path, class: "w-1/2 text-center py-3 rounded-lg font-medium border border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" %> <%= f.submit "Save changes", class: "w-1/2 py-3 text-white font-medium rounded-lg bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300" %> </div> <% end %> </div> </div> <script> document.addEventListener("DOMContentLoaded", () => { const phoneInput = document.querySelector("#user_phone"); if (!phoneInput) return; const error = document.createElement("p"); error.className = "mt-1 text-sm text-red-600 hidden"; phoneInput.parentNode.appendChild(error); phoneInput.addEventListener("input", () => { const value = phoneInput.value; const regex = /^0\d{9,10}$/; if (!regex.test(value)) { phoneInput.classList.add("border-red-500"); error.textContent = "Phone number begins with 0-letter and must have 10 digits"; error.classList.remove("hidden"); } else { phoneInput.classList.remove("border-red-500"); error.classList.add("hidden"); } }); }); </script>
+
+      <!-- STUDENT INFO -->
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        Student information
+      </h3>
+
+      <div class="grid grid-cols-2 gap-6 mb-4">
+        <div>
+          <%= f.label :school, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+          <%= f.text_field :school,
+                class: "w-full rounded-lg border px-3 py-2
+                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+
+        <div>
+          <%= f.label :phone, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+          <%= f.telephone_field :phone,
+                class: "w-full rounded-lg border px-3 py-2
+                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        </div>
+      </div>
+
+      <!-- ADDRESS -->
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        Địa chỉ
+      </h3>
+
+      <div class="space-y-6 mb-4">
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <%= f.label :country, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+            <%= f.text_field :country, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+
+          <div>
+            <%= f.label :city, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+            <%= f.text_field :city, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <div>
+            <%= f.label :province, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+            <%= f.text_field :province, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+
+          <div>
+            <%= f.label :postal_code, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
+            <%= f.text_field :postal_code, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+          </div>
+        </div>
+      </div>
+
+      <!-- DESCRIPTION -->
+      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
+        Description
+      </h3>
+
+      <div class="mb-6">
+        <%= f.text_area :bio, rows: 3,
+              class: "w-full rounded-lg border px-3 py-2
+                      dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+      </div>
+
+      <!-- BUTTONS -->
+      <div class="flex gap-4 mt-6">
+        <%= link_to "Cancel",
+            students_dashboard_path,
+            class: "w-1/2 text-center py-3 rounded-lg font-medium border border-gray-300
+                    text-gray-700 hover:bg-gray-100
+                    dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" %>
+
+        <%= f.submit "Save changes",
+            class: "w-1/2 py-3 text-white font-medium rounded-lg
+                    bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300" %>
+      </div>
+
+    <% end %>
+  </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const phoneInput = document.querySelector("#user_phone");
+
+  if (!phoneInput) return;
+
+  const error = document.createElement("p");
+  error.className = "mt-1 text-sm text-red-600 hidden";
+  phoneInput.parentNode.appendChild(error);
+
+  phoneInput.addEventListener("input", () => {
+    const value = phoneInput.value;
+    const regex = /^0\d{9,10}$/;
+
+    if (!regex.test(value)) {
+      phoneInput.classList.add("border-red-500");
+      error.textContent = "Phone number begins with 0-letter and must have 10 digits";
+      error.classList.remove("hidden");
+    } else {
+      phoneInput.classList.remove("border-red-500");
+      error.classList.add("hidden");
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("avatar-input");
+  if (!input) return;
+
+  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
+  const maxSize = 2 * 1024 * 1024; // 2MB
+
+  const toast = document.getElementById("toast-file-error");
+  const toastMessage = document.getElementById("file-error-message");
+  let toastTimeout;
+
+  window.showFileToast = (message) => {
+    toastMessage.textContent = message;
+    toast.classList.remove("hidden");
+
+    clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+      hideFileToast();
+    }, 3000);
+  };
+
+  window.hideFileToast = () => {
+    toast.classList.add("hidden");
+  };
+
+  input.addEventListener("change", () => {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!allowedTypes.includes(file.type)) {
+      input.value = "";
+      showFileToast("Chỉ chấp nhận PNG, JPG, JPEG, WEBP.");
+      return;
+    }
+
+    if (file.size > maxSize) {
+      input.value = "";
+      showFileToast("Dung lượng ảnh tối đa là 2MB.");
+      return;
+    }
+  });
+});
+</script>
