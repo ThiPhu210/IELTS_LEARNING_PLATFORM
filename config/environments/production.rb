@@ -7,7 +7,7 @@ Rails.application.configure do
   config.eager_load = true
   config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
-
+  config.action_controller.asset_host = "https://d1ta8bj5b408y4.cloudfront.net"
   config.public_file_server.headers = {
     "cache-control" => "public, max-age=#{1.year.to_i}"
   }

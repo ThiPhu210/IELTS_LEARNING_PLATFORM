@@ -7,34 +7,29 @@ module ApplicationHelper
   def open_dropdown?(paths)
     paths.any? { |p| request.path.start_with?(p) }
   end
-  def safe_avatar(user, size: 38)
-    if user&.thumbnail&.attached? &&
-       user.thumbnail.blob&.persisted?
+  def safe_avatar(user, size: 64)
+    return default_avatar(size) unless user.thumbnail.attached?
 
-      image_tag(
-        user.thumbnail.variant(resize_to_fill: [ size, size ]),
-        class: "rounded-full object-cover",
-        width: size,
-        height: size
-      )
+    attachment = user.thumbnail
+
+    if attachment.content_type == "image/svg+xml"
+      image_tag attachment,
+                class: "rounded-full",
+                width: size,
+                height: size,
+                alt: "user avatar"
     else
-      image_tag(
-        default_avatar,
-        class: "rounded-full object-cover",
-        width: size,
-        height: size
-      )
+      image_tag attachment.variant(resize_to_fill: [ size, size ]),
+                class: "rounded-full",
+                alt: "user avatar"
     end
-  rescue ActiveStorage::FileNotFoundError
-    image_tag(
-      default_avatar,
-      class: "rounded-full object-cover",
-      width: size,
-      height: size
-    )
   end
 
-  def default_avatar
-    "https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+  def default_avatar(size)
+    image_tag "https://flowbite.com/docs/images/people/profile-picture-5.jpg",
+              class: "rounded-full",
+              width: size,
+              height: size,
+              alt: "default avatar"
   end
 end
