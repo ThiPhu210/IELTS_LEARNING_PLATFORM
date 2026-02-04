@@ -17,6 +17,7 @@ skip_before_action :authenticate_user!,
 skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
 
 
+
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
   VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
@@ -53,26 +54,16 @@ skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
 
   # ================= RETURN URL (UI ONLY) =================
   def vnpay_return
-    txn_ref = params[:vnp_TxnRef]
-    order_id = txn_ref.split("_").first
-    order = Order.find_by(id: order_id)
+    order = Order.find_by(id: params[:vnp_TxnRef])
     return redirect_to root_path unless order
 
     if params[:vnp_ResponseCode] == "00"
-      redirect_to students_course_path(order.course), notice: "Đã nhận yêu cầu thanh toán, đang xác nhận..."
+      redirect_to students_course_path(order.course), notice: "Thanh toán thành công. Đang xác nhận..."
     else
       redirect_to students_course_path(order.course), alert: "Thanh toán thất bại"
     end
   end
 
-
-  # ================== IPN (SERVER TO SERVER) ==================
-  def vnpay_ipn
-    Rails.logger.info "🔥 VNPAY IPN #{params.inspect}"
-
-    vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") }
-    secure_hash = vnp_params.delete("vnp_SecureHash")
-    vnp_params.delete("vnp_SecureHashType")
 
   
   # ================= IPN (REAL CONFIRMATION) =================
@@ -130,5 +121,5 @@ skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
 
   render json: { RspCode: "02", Message: "Payment Failed" }
 end
-  end
+
 end
