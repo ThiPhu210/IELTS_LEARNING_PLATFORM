@@ -1,16 +1,11 @@
-<%= form_with(
-      url: students_payments_path(order_id: @order.id),
-      method: :post,
-      local: true,
-      class: "mt-8"
-    ) do %>
+<div class="mt-8">
 
   <div class="bg-pink-50 border border-pink-100 rounded-2xl p-6 shadow-sm space-y-6">
 
     <!-- TITLE -->
     <div>
       <h3 class="text-lg font-semibold text-gray-900">
-        Thanh toán bằng VNPay
+        Chọn phương thức thanh toán
       </h3>
       <p class="text-sm text-gray-500 mt-1">
         Vui lòng kiểm tra lại thông tin trước khi thanh toán
@@ -64,19 +59,34 @@
 
     </div>
 
-    <!-- VNPay BUTTON -->
-    <button
-      type="submit"
-      class="w-full flex items-center justify-center gap-3
-             bg-pink-500 hover:bg-pink-600
-             text-white text-lg font-semibold
-             py-4 rounded-xl
-             transition shadow-md hover:shadow-lg">
+    <!-- VNPay -->
+    <%= button_to students_payments_path(order_id: @order.id),
+          method: :post,
+          class: "w-full flex items-center justify-center gap-3
+                  bg-pink-500 hover:bg-pink-600
+                  text-white text-lg font-semibold
+                  py-4 rounded-xl
+                  transition shadow-md" do %>
 
-      <%= image_tag "vnpay-logo.jpg", alt: "VNPay", class: "h-6 w-auto" %>
-      Thanh toán VNPay
-    </button>
+        <%= image_tag "vnpay-logo.jpg", class: "h-6 w-auto" %>
+        Thanh toán VNPay
+
+    <% end %>
+
+    <!-- MOMO -->
+    <%= button_to momo_create_students_payments_path(order_id: @order.id),
+          method: :post,
+          class: "w-full flex items-center justify-center gap-3
+                  bg-red-500 hover:bg-red-600
+                  text-white text-lg font-semibold
+                  py-4 rounded-xl
+                  transition shadow-md" do %>
+
+        <%= image_tag "momo-logo.png", class: "h-6 w-auto" %>
+        Thanh toán MoMo
+
+    <% end %>
 
   </div>
 
-<% end %>
+</div>

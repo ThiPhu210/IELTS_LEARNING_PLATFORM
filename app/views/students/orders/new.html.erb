@@ -51,22 +51,23 @@
       <!-- PAYMENT METHODS -->
       <div class="space-y-4 mb-8">
 
-        <div class="flex items-center gap-3 p-4 border rounded-xl">
-          <input type="radio" checked class="accent-pink-500">
-          <span class="font-medium">Chuyển khoản ngân hàng</span>
-        </div>
-
-        <div class="flex items-center gap-3 p-4 border rounded-xl opacity-50">
-          <input type="radio" disabled>
-          <span class="font-medium">VNPay (sắp ra mắt)</span>
-        </div>
-
-        <div class="flex items-center gap-3 p-4 border rounded-xl opacity-50">
-          <input type="radio" disabled>
-          <span class="font-medium">Momo (sắp ra mắt)</span>
-        </div>
-
-      </div>
+      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
+        <%= radio_button_tag :payment_method, "bank", true, class: "accent-pink-500" %>
+        <span class="font-medium">Chuyển khoản ngân hàng</span>
+      </label>
+    
+      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
+        <%= radio_button_tag :payment_method, "vnpay", false, class: "accent-pink-500" %>
+        <span class="font-medium">VNPay</span>
+      </label>
+    
+      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
+        <%= radio_button_tag :payment_method, "momo", false, class: "accent-pink-500" %>
+        <span class="font-medium">MoMo</span>
+      </label>
+    
+    </div>
+    
 
       <!-- PAY BUTTON -->
       <%= button_to "Xác nhận thanh toán",

@@ -1,28 +1,97 @@
-<h1 class="text-3xl font-bold mb-2">
-  <%= params[:paid] == "true" ? "Khóa học của tôi" : "Tất cả khóa học" %>
-</h1>
+<section class="container mx-auto px-6 py-16 mt-10 mb-10">
 
-<% if params[:paid] == "true" %>
-  <% if @courses.any? %>
-    <p class="text-gray-600 mb-6">
-      Bạn đã mua
-      <span class="font-semibold text-gray-800">
-        <%= @courses.size %>
-      </span>
-      khóa học:
-    </p>
+  <!-- TITLE -->
+  <h1 class="text-3xl font-bold text-gray-900 mb-2">
+    <%= params[:paid] == "true" ? "Khóa học của tôi" : "Tất cả khóa học" %>
+  </h1>
 
-    <ul class="mb-8 space-y-2">
-      <% @courses.each do |course| %>
-        <li class="flex items-center gap-2 text-lg text-gray-800">
-          <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-          <%= link_to course.title, students_course_path(course), class: "hover:underline" %>
-        </li>
-      <% end %>
-    </ul>
-  <% else %>
-    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-      <p class="text-yellow-700">Bạn chưa mua khóa học nào.</p>
-    </div>
+  <% if params[:paid] == "true" %>
+    <% if @courses.any? %>
+      <p class="text-gray-600 mb-10">
+        Bạn đã mua
+        <span class="font-semibold text-gray-900">
+          <%= @courses.size %>
+        </span>
+        khóa học
+      </p>
+    <% end %>
   <% end %>
-<% end %>
+
+  <!-- EMPTY STATE -->
+  <% if @courses.empty? %>
+    <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-2xl">
+      <p class="text-yellow-700 font-medium">
+        Bạn chưa có khóa học nào.
+      </p>
+    </div>
+  <% else %>
+
+  <!-- GRID CARD -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+
+    <% @courses.each do |course| %>
+
+      <div class="bg-white border border-gray-200
+                  rounded-2xl overflow-hidden
+                  shadow-sm hover:shadow-xl
+                  hover:-translate-y-1
+                  transition-all duration-300">
+
+        <!-- IMAGE -->
+        <%= link_to students_course_path(course) do %>
+
+          <% if course.thumbnail.attached? %>
+            <%= image_tag course.thumbnail.variant(resize_to_fill: [400, 220]),
+                class: "w-full h-[220px] object-cover" %>
+          <% else %>
+            <div class="w-full h-[220px]
+                        bg-pink-50 flex items-center justify-center">
+              <span class="text-gray-400 text-sm">
+                No image
+              </span>
+            </div>
+          <% end %>
+
+        <% end %>
+
+        <!-- CONTENT -->
+        <div class="p-5">
+
+          <% if course.band_min.present? && course.band_max.present? %>
+            <p class="text-xs font-semibold text-blue-600 mb-1">
+              IELTS <%= course.band_min %> – <%= course.band_max %>
+            </p>
+          <% end %>
+
+          <h3 class="text-base font-semibold text-gray-900
+                     line-clamp-2 mb-4">
+            <%= course.title %>
+          </h3>
+
+          <div class="flex items-center justify-between">
+
+            <span class="text-lg font-bold text-gray-900">
+              <%= number_to_currency(course.price,
+                    unit: "₫", precision: 0) %>
+            </span>
+
+            <%= link_to "Xem",
+                students_course_path(course),
+                class: "px-4 py-2 text-sm font-semibold
+                        bg-gray-900 text-white
+                        rounded-xl hover:bg-black
+                        transition" %>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+  <% end %>
+
+</section>

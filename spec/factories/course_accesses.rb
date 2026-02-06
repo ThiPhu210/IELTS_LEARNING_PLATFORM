@@ -1,10 +1,10 @@
 FactoryBot.define do
   factory :course_access do
-    user
-    course
-    payment
-    start_date { Time.current }
-    end_date { 30.days.from_now }
+    association :user
+    association :course
+    association :payment
     status { :active }
+    start_date { Time.current }
+    end_date { 1.year.from_now }
   end
 end

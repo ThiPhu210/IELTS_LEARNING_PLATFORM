@@ -24,6 +24,10 @@ namespace :students do
     collection do
       get :vnpay_return
       match :vnpay_ipn, via: [:get, :post] 
+      post :momo_create
+      post :momo_notify
+      get  :momo_return
+
     end
   end
 
