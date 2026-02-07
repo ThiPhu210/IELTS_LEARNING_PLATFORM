@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_27_033254) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_05_103211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -132,17 +132,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_27_033254) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.bigint "course_access_id", null: false
     t.decimal "amount"
     t.string "payment_method"
     t.string "transaction_code"
     t.datetime "paid_at"
-    t.string "status"
+    t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "order_id", null: false
-    t.index ["course_access_id"], name: "index_payments_on_course_access_id"
+    t.string "gateway_order_id"
+    t.string "gateway_request_id"
+    t.string "gateway_name"
     t.index ["order_id"], name: "index_payments_on_order_id"
+    t.index ["transaction_code"], name: "index_payments_on_transaction_code", unique: true
   end
 
   create_table "speaking_attempts", force: :cascade do |t|
@@ -235,7 +237,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_27_033254) do
   add_foreign_key "lessons", "course_sections"
   add_foreign_key "orders", "courses"
   add_foreign_key "orders", "users"
-  add_foreign_key "payments", "course_accesses"
   add_foreign_key "payments", "orders"
   add_foreign_key "speaking_attempts", "courses"
   add_foreign_key "speaking_attempts", "speaking_topics"

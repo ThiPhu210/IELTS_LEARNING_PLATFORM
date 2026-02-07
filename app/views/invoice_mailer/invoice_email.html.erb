@@ -1,0 +1,26 @@
+<div class="mt-8">
+  <div style="background:#fff1f2;border:1px solid #ffe4e6;border-radius:16px;padding:24px">
+
+    <h3 style="font-size:18px;font-weight:600;color:#111827">
+      Hóa đơn thanh toán
+    </h3>
+
+    <p style="font-size:14px;color:#6b7280;margin-top:4px">
+      Vui lòng kiểm tra lại thông tin đơn hàng
+    </p>
+
+    <hr>
+
+    <p><strong>Học viên:</strong> <%= @user.full_name %></p>
+    <p><strong>Email:</strong> <%= @user.email %></p>
+    <p><strong>Khóa học:</strong> <%= @course.title %></p>
+    <p><strong>Giá tiền:</strong>
+      <%= number_to_currency(@order.total_price, unit: "₫", precision: 0) %>
+    </p>
+    <p><strong>Mã giao dịch:</strong> #<%= @order.id %></p>
+    <p><strong>Ngày tạo đơn:</strong>
+      <%= l(@order.created_at, format: :long) %>
+    </p>
+
+  </div>
+</div>

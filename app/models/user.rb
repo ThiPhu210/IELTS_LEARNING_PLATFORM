@@ -33,6 +33,12 @@ class User < ApplicationRecord
             format: { with: /\A0\d{9,10}\z/, message: "Phone number must have 10 digits" },
             allow_blank: true
   validate :thumbnail_type
+  after_initialize :set_default_role, if: :new_record?
+
+  def set_default_role
+    self.role ||= "student"
+  end
+
   def has_course_access?(course)
     course_accesses.exists?(
       course_id: course.id,

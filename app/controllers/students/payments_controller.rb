@@ -4,28 +4,36 @@ class Students::PaymentsController < ApplicationController
   require "openssl"
   require "uri"
   require "cgi"
+  require "net/http"
+  require "json"
+  require "securerandom"
 
-  # ❗ IPN + RETURN không cần login + không CSRF
-  # skip_before_action :authenticate_user!, only: [:vnpay_return, :vnpay_ipn]
-  # skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
-  # ❗ IPN + RETURN không cần login + không CSRF
-skip_before_action :authenticate_user!,
-                   only: [:vnpay_return, :vnpay_ipn],
-                   if: -> { respond_to?(:authenticate_user!) },
-                  raise: false
+  skip_before_action :authenticate_user!,
+                     only: [ :vnpay_return, :vnpay_ipn, :momo_notify, :momo_return ],
+                     if: -> { respond_to?(:authenticate_user!) },
+                     raise: false
 
-skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
-
-
+  skip_before_action :verify_authenticity_token,
+                     only: [ :vnpay_ipn, :momo_notify ]
 
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
   VNP_HASH_SECRET = "OV71K9S7ITDX3J2HF113O886GMZR72ZP"
   VNP_RETURN_URL  = "https://resigned-unincreased-agnus.ngrok-free.dev/students/payments/vnpay_return"
 
-  # ================= CREATE PAYMENT =================
+  # ================= VNPay CREATE =================
   def create
     order = current_user.orders.find(params[:order_id])
+
+    payment = order.payments.create!(
+      amount: order.total_price,
+      payment_method: "vnpay",
+      gateway_name: "vnpay",
+      status: "pending"
+    )
+
+    txn_ref = "VNP#{payment.id}_#{SecureRandom.hex(4)}"
+    payment.update!(gateway_order_id: txn_ref)
 
     vnp_params = {
       vnp_Version: "2.1.0",
@@ -33,93 +41,210 @@ skip_before_action :verify_authenticity_token, only: [:vnpay_ipn]
       vnp_TmnCode: VNP_TMNCODE,
       vnp_Amount: (order.total_price * 100).to_i,
       vnp_CurrCode: "VND",
-      vnp_TxnRef: order.id.to_s,
+      vnp_TxnRef: txn_ref,
       vnp_OrderInfo: "Order_#{order.id}",
       vnp_OrderType: "education",
       vnp_Locale: "vn",
       vnp_ReturnUrl: VNP_RETURN_URL,
-      vnp_IpAddr: request.headers["X-Forwarded-For"] || request.remote_ip,
+      vnp_IpAddr: request.remote_ip,
       vnp_CreateDate: Time.current.strftime("%Y%m%d%H%M%S")
     }
 
-    sorted = vnp_params.sort.to_h
-    query_string = URI.encode_www_form(sorted)
-    secure_hash  = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET, query_string)
+    query_string = URI.encode_www_form(vnp_params.sort.to_h)
+    secure_hash  = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET.to_s, query_string.to_s)
 
-    Rails.logger.info "VNPay HASH DATA: #{query_string}"
-    Rails.logger.info "VNPay HASH: #{secure_hash}"
-
-    redirect_to "#{VNP_URL}?#{query_string}&vnp_SecureHash=#{secure_hash}", allow_other_host: true
+    redirect_to "#{VNP_URL}?#{query_string}&vnp_SecureHash=#{secure_hash}",
+                allow_other_host: true
   end
 
-  # ================= RETURN URL (UI ONLY) =================
+  # ================= VNPay RETURN =================
   def vnpay_return
-    order = Order.find_by(id: params[:vnp_TxnRef])
-    return redirect_to root_path unless order
+    payment = Payment.find_by(gateway_order_id: params[:vnp_TxnRef])
+    return redirect_to root_path unless payment
 
     if params[:vnp_ResponseCode] == "00"
-      redirect_to students_course_path(order.course), notice: "Thanh toán thành công. Đang xác nhận..."
+      flash[:success] = "Bạn vừa thanh toán thành công 🎉"
+      redirect_to students_dashboard_path, notice: "Bạn đã thanh toán thành công 🎉"
+
     else
-      redirect_to students_course_path(order.course), alert: "Thanh toán thất bại"
+      redirect_to students_course_path(payment.order.course),
+                  alert: "Thanh toán thất bại"
     end
   end
 
+  # ================= VNPay IPN =================
+  def vnpay_ipn
+    vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
+    query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
 
-  
-  # ================= IPN (REAL CONFIRMATION) =================
- def vnpay_ipn
-  Rails.logger.info "🔥 VNPAY IPN CALLED"
-  vnp_params = params.to_unsafe_h.select { |k, _| k.start_with?("vnp_") && k != "vnp_SecureHash" }
-  secure_hash = params[:vnp_SecureHash]
+    check_hash = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET.to_s, query.to_s)
 
-  query = vnp_params.sort.map { |k, v| "#{k}=#{CGI.escape(v.to_s)}" }.join("&")
-  check_hash = OpenSSL::HMAC.hexdigest("SHA512", VNP_HASH_SECRET, query)
-  return render json: { RspCode: "97", Message: "Invalid Signature" } if secure_hash != check_hash
+    return render json: { RspCode: "97" } if params[:vnp_SecureHash] != check_hash
 
-  order = Order.find_by(id: params[:vnp_TxnRef])
-  return render json: { RspCode: "01", Message: "Order Not Found" } unless order
+    payment = Payment.find_by(gateway_order_id: params[:vnp_TxnRef])
+    return render json: { RspCode: "01" } unless payment
 
-  if order.payment&.status == "success"
-    return render json: { RspCode: "00", Message: "Already Processed" }
-  end
+    return render json: { RspCode: "00" } if payment.paid_status?
 
-  if params[:vnp_ResponseCode] == "00" && params[:vnp_TransactionStatus] == "00"
-    ActiveRecord::Base.transaction do
-      # 1️⃣ Create Payment
-      payment = Payment.create!(
-        order: order,
-        amount: params[:vnp_Amount].to_i / 100,
-        payment_method: "vnpay",
+    if params[:vnp_ResponseCode] == "00"
+      payment.update!(
         transaction_code: params[:vnp_TransactionNo],
         paid_at: Time.current,
         status: "paid"
       )
 
-      # 2️⃣ Create CourseAccess
       CourseAccess.create!(
-        user: order.user,
-        course: order.course,
+        user: payment.order.user,
+        course: payment.order.course,
         payment: payment,
         status: :active,
         start_date: Time.current,
         end_date: 1.year.from_now
       )
 
-      order.update!(status: :paid)
+      payment.order.update!(status: :paid)
+      Rails.logger.info "=== SEND INVOICE MAIL ==="
+      InvoiceMailer.invoice_email(payment.order).deliver_later
+    else
+      payment.update!(status: "failed")
     end
 
-    return render json: { RspCode: "00", Message: "Confirm Success" }
+    render json: { RspCode: "00" }
   end
 
-  Payment.create!(
-    order: order,
-    amount: params[:vnp_Amount].to_i / 100,
-    payment_method: "vnpay",
-    transaction_code: params[:vnp_TransactionNo],
-    status: "failed"
-  )
+  # ================= MOMO CREATE =================
+  def momo_create
+    order = current_user.orders.find(params[:order_id])
 
-  render json: { RspCode: "02", Message: "Payment Failed" }
-end
+    endpoint     = ENV["MOMO_ENDPOINT"]
+    partner_code = ENV["MOMO_PARTNER_CODE"]
+    access_key   = ENV["MOMO_ACCESS_KEY"]
+    secret_key   = ENV["MOMO_SECRET_KEY"]
 
+    payment = order.payments.create!(
+      amount: order.total_price,
+      payment_method: "momo",
+      gateway_name: "momo",
+      status: "pending"
+    )
+
+    order_id   = "ORD#{payment.id}_#{SecureRandom.hex(4)}"
+    payment.update!(gateway_order_id: order_id)
+
+    request_id = SecureRandom.uuid
+    amount     = order.total_price.to_i.to_s
+    order_info = "Pay order #{order.id}"
+
+    redirect_url = "https://1234.ngrok-free.app/students/payments/momo_return"
+    ipn_url      = "https://1234.ngrok-free.app/students/payments/momo_notify"
+
+    raw_signature = [
+      "accessKey=#{access_key}",
+      "amount=#{amount}",
+      "extraData=",
+      "ipnUrl=#{ipn_url}",
+      "orderId=#{order_id}",
+      "orderInfo=#{order_info}",
+      "partnerCode=#{partner_code}",
+      "redirectUrl=#{redirect_url}",
+      "requestId=#{request_id}",
+      "requestType=captureWallet"
+    ].join("&")
+
+    signature = OpenSSL::HMAC.hexdigest("SHA256", secret_key.to_s, raw_signature.to_s)
+
+    body = {
+      partnerCode: partner_code,
+      requestId: request_id,
+      amount: amount,
+      orderId: order_id,
+      orderInfo: order_info,
+      redirectUrl: redirect_url,
+      ipnUrl: ipn_url,
+      lang: "vi",
+      extraData: "",
+      requestType: "captureWallet",
+      signature: signature
+    }
+    Rails.logger.info "========== MOMO CREATE =========="
+    Rails.logger.info "ENDPOINT: #{endpoint}"
+    Rails.logger.info "PARTNER_CODE: #{partner_code}"
+    Rails.logger.info "ACCESS_KEY: #{access_key}"
+    Rails.logger.info "ORDER_ID: #{order_id}"
+    Rails.logger.info "REQUEST_ID: #{request_id}"
+    Rails.logger.info "AMOUNT: #{amount}"
+    Rails.logger.info "REDIRECT_URL: #{redirect_url}"
+    Rails.logger.info "IPN_URL: #{ipn_url}"
+    Rails.logger.info "RAW_SIGNATURE: #{raw_signature}"
+    Rails.logger.info "SIGNATURE: #{signature}"
+
+    uri = URI(endpoint)
+    res = Net::HTTP.post(uri, body.to_json, "Content-Type" => "application/json")
+    Rails.logger.info "========== MOMO RESPONSE =========="
+    Rails.logger.info "HTTP STATUS: #{res.code}"
+    Rails.logger.info "RAW BODY: #{res.body}"
+
+    json = JSON.parse(res.body)
+    Rails.logger.info "========== MOMO JSON =========="
+    Rails.logger.info "RESULT CODE: #{json["resultCode"]}"
+    Rails.logger.info "MESSAGE: #{json["message"]}"
+    Rails.logger.info "PAY URL: #{json["payUrl"]}"
+
+    if json["resultCode"] == 0
+      redirect_to json["payUrl"], allow_other_host: true
+    else
+      redirect_back fallback_location: root_path,
+                    alert: "MoMo lỗi: #{json["message"]}"
+    end
+  end
+
+  # ================= MOMO NOTIFY =================
+  def momo_notify
+    Rails.logger.info "========== MOMO NOTIFY =========="
+    Rails.logger.info "REQUEST BODY: #{request.body.read}"
+    Rails.logger.info "REQUEST HEADERS: #{request.headers}"
+    json = JSON.parse(request.body.read)
+
+    payment = Payment.find_by(gateway_order_id: json["orderId"])
+    return head :ok unless payment
+
+    return head :ok if payment.paid_status?
+
+    if json["resultCode"] == 0
+      payment.update!(
+        transaction_code: json["transId"],
+        paid_at: Time.current,
+        status: "paid"
+      )
+
+      CourseAccess.create!(
+        user: payment.order.user,
+        course: payment.order.course,
+        payment: payment,
+        status: :active,
+        start_date: Time.current,
+        end_date: 1.year.from_now
+      )
+
+      payment.order.update!(status: :paid)
+    else
+      payment.update!(status: "failed")
+    end
+
+    head :ok
+  end
+
+  # ================= MOMO RETURN =================
+  def momo_return
+    payment = Payment.find_by(gateway_order_id: params[:orderId])
+    return redirect_to root_path unless payment
+
+    if params[:resultCode] == "0"
+      redirect_to students_course_path(payment.order.course),
+                  notice: "Thanh toán thành công. Đang xác nhận..."
+    else
+      redirect_to students_course_path(payment.order.course),
+                  alert: "Thanh toán thất bại"
+    end
+  end
 end

@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :payment do
-    order
-    amount { 100 }
-    payment_method { "card" }
+    association :order
+    amount { 999000 }
+    payment_method { "vnpay" }
     transaction_code { SecureRandom.hex(8) }
     status { :paid }
   end
