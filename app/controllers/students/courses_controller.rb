@@ -17,7 +17,7 @@ class Students::CoursesController < ApplicationController
     @courses = courses
       .order(created_at: :desc)
       .page(params[:page])
-      .per(9)
+      .per(3)
   end
 
   def show
