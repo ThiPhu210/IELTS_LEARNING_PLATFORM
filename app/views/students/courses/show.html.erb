@@ -1,1 +1,38 @@
-<h1><%= @course.title %></h1>
+<h1 class="text-2xl font-bold mb-6">
+  <%= @course.title %>
+</h1>
+
+<% @sections.each do |section| %>
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-3">
+      <%= section.title %>
+    </h2>
+
+    <% section.lessons.each do |lesson| %>
+      <div class="p-4 border rounded-xl mb-3">
+
+        <p class="font-semibold">
+          <%= lesson.title %>
+        </p>
+
+        <% if lesson.video.attached? %>
+          <video controls class="mt-2 w-full rounded-lg">
+            <source src="<%= url_for(lesson.video) %>" type="video/mp4">
+          </video>
+        <% end %>
+
+        <% if lesson.pdfs.attached? %>
+          <div class="mt-2 space-y-1">
+            <% lesson.pdfs.each do |pdf| %>
+              <%= link_to pdf.filename,
+                    url_for(pdf),
+                    target: "_blank",
+                    class: "text-blue-600 underline" %>
+            <% end %>
+          </div>
+        <% end %>
+
+      </div>
+    <% end %>
+  </div>
+<% end %>
