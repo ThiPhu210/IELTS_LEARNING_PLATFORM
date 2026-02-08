@@ -20,9 +20,14 @@ class Students::CoursesController < ApplicationController
       .per(3)
   end
 
-  def show
-    @course = Course.find(params[:id])
-  end
+def show
+  @course = Course
+              .includes(course_sections: :lessons)
+              .find(params[:id])
+
+  @sections = @course.course_sections
+end
+
 
   private
 
