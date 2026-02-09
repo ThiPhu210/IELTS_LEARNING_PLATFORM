@@ -155,6 +155,77 @@
       </label>
     </div>
 
+<div class="mt-4 p-4 bg-yellow-50 rounded">
+
+  <h4 class="font-semibold mb-2">Speaking Exercises</h4>
+
+  <div class="topics space-y-3">
+
+    <%= lesson.fields_for :speaking_topics do |topic| %>
+
+      <div class="topic-box border p-3 rounded bg-white">
+        <%= topic.hidden_field :_destroy %>
+
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <%= topic.text_field :title,
+                placeholder:"Topic title",
+                class:"border px-3 py-2" %>
+
+          <%= topic.select :part,
+                ["part1","part2","part3"],
+                {},
+                class:"border px-3 py-2" %>
+        </div>
+
+        <div class="questions space-y-2">
+
+          <%= topic.fields_for :speaking_questions do |q| %>
+
+            <div class="question-item border p-3 rounded">
+              <%= q.hidden_field :_destroy %>
+
+              <%= q.text_area :question_text,
+                    placeholder:"Question",
+                    class:"border w-full mb-2 px-3 py-2" %>
+
+              <%= q.text_area :cue_card,
+                    placeholder:"Cue card",
+                    class:"border w-full mb-2 px-3 py-2" %>
+
+              <div class="grid grid-cols-2 gap-2">
+                <%= q.number_field :preparation_time,
+                      placeholder:"Prep time",
+                      class:"border px-3 py-2" %>
+
+                <%= q.number_field :speaking_time,
+                      placeholder:"Speaking time",
+                      class:"border px-3 py-2" %>
+              </div>
+
+              <button type="button"
+                class="remove-question text-red-500 text-sm mt-2">
+                Remove question
+              </button>
+            </div>
+
+          <% end %>
+
+        </div>
+
+        <button type="button"
+          class="add-question text-indigo-600 text-sm mt-2">
+          + Add question
+        </button>
+
+      </div>
+
+    <% end %>
+
+  </div>
+
+</div>
+
+
     <button type="button" class="remove-lesson mt-3 text-sm text-red-500">
       Remove lesson
     </button>
@@ -291,6 +362,42 @@ document.addEventListener("change", function (e) {
   if (e.target.classList.contains("pdf-input")) {
     handlePDFUpload(e.target)
   }
+})
+
+</script>
+
+<script>
+document.addEventListener("click", function(e){
+
+  if(e.target.classList.contains("add-question")){
+
+    const topic =
+      e.target.closest(".topic-box")
+
+    const questionBox =
+      topic.querySelector(".questions")
+
+    const topicIndex =
+      Array.from(document.querySelectorAll(".topic-box"))
+      .indexOf(topic)
+
+    const questionIndex = Date.now()
+
+    const html = `
+      <div class="question-item border p-3 rounded">
+        <textarea
+        name="course[course_sections_attributes][0]
+        [lessons_attributes][0]
+        [speaking_topics_attributes][${topicIndex}]
+        [speaking_questions_attributes][${questionIndex}]
+        [question_text]"
+        class="border w-full mb-2 px-3 py-2"></textarea>
+      </div>
+    `
+
+    questionBox.insertAdjacentHTML("beforeend", html)
+  }
+
 })
 
 </script>
