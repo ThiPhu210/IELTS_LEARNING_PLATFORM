@@ -1,124 +1,182 @@
 <%= render "students/shared/navbar" %>
-<h1 class="text-3xl font-bold text-slate-800 mb-10">
-  <%= @course.title %>
-</h1>
 
+<div class="pt-28 pb-20 bg-slate-100 min-h-screen">
+
+<div class="max-w-6xl mx-auto px-6">
+
+<!-- COURSE HEADER -->
+<div class="mb-12">
+  <h1 class="text-4xl font-bold text-slate-900 mb-3">
+    <%= @course.title %>
+  </h1>
+
+  <% if @course.description.present? %>
+    <p class="text-slate-600 max-w-3xl">
+      <%= @course.description %>
+    </p>
+  <% end %>
+</div>
+
+<!-- SECTIONS -->
 <% @sections.each do |section| %>
 
-  <div class="mb-12">
+<div class="mb-14">
 
-    <h2 class="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">
-      📚 <%= section.title %>
+  <div class="flex items-center gap-3 mb-6">
+    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white font-bold">
+      📚
+    </div>
+    <h2 class="text-2xl font-semibold text-slate-800">
+      <%= section.title %>
     </h2>
+  </div>
 
-    <% section.lessons.each do |lesson| %>
+  <!-- LESSONS -->
+  <div class="space-y-8">
 
-      <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-6 shadow-sm">
+  <% section.lessons.each do |lesson| %>
 
-        <!-- LESSON TITLE -->
-        <p class="font-semibold text-lg text-slate-800">
-          🎬 <%= lesson.title %>
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-7">
+
+    <!-- LESSON HEADER -->
+    <div class="flex justify-between items-center mb-5">
+      <h3 class="text-lg font-semibold text-slate-800">
+        🎬 <%= lesson.title %>
+      </h3>
+
+      <% if lesson.duration.present? %>
+        <span class="text-xs px-3 py-1 bg-slate-100 rounded-full text-slate-600">
+          ⏱ <%= lesson.duration %> mins
+        </span>
+      <% end %>
+    </div>
+
+    <!-- VIDEO -->
+    <% if lesson.video.attached? %>
+      <div class="overflow-hidden rounded-xl border mb-6">
+        <video controls class="w-full">
+          <source src="<%= url_for(lesson.video) %>" type="video/mp4">
+        </video>
+      </div>
+    <% end %>
+
+    <!-- PDF MATERIALS -->
+    <% if lesson.pdfs.attached? %>
+      <div class="mb-6">
+        <p class="font-semibold text-slate-700 mb-3">
+          📄 Lesson Materials
         </p>
 
-        <!-- VIDEO -->
-        <% if lesson.video.attached? %>
-          <video controls class="mt-4 w-full rounded-xl border">
-            <source src="<%= url_for(lesson.video) %>" type="video/mp4">
-          </video>
-        <% end %>
+        <div class="flex flex-wrap gap-3">
+          <% lesson.pdfs.each do |pdf| %>
+            <%= link_to pdf.filename,
+                  url_for(pdf),
+                  target: "_blank",
+                  class:"px-4 py-2 rounded-lg bg-indigo-50
+                         text-indigo-700 text-sm
+                         hover:bg-indigo-100 transition
+                         border border-indigo-200" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
-        <!-- PDF -->
-        <% if lesson.pdfs.attached? %>
-          <div class="mt-4 space-y-2">
-            <p class="font-medium text-slate-700">
-              📄 Lesson Materials
+    <!-- SPEAKING -->
+    <% if lesson.speaking_topics.any? %>
+
+    <div class="mt-6 bg-slate-50 border rounded-2xl p-6">
+
+      <h4 class="text-lg font-semibold text-slate-800 mb-6">
+        🎤 Speaking Practice
+      </h4>
+
+      <div class="space-y-6">
+
+      <% lesson.speaking_topics.each do |topic| %>
+
+      <div class="bg-white border rounded-xl p-5 shadow-sm">
+
+        <div class="flex justify-between items-center mb-4">
+
+          <p class="font-semibold text-slate-800">
+            <%= topic.title %>
+          </p>
+
+          <span class="px-3 py-1 text-xs rounded-full
+                       bg-indigo-100 text-indigo-700 font-medium">
+            <%= topic.part.upcase %>
+          </span>
+
+        </div>
+
+        <!-- QUESTIONS -->
+        <div class="space-y-5">
+
+        <% topic.speaking_questions.each do |q| %>
+
+        <div class="border-t pt-4">
+
+          <p class="font-medium text-slate-700 mb-2">
+            ❓ <%= q.question_text %>
+          </p>
+
+          <% if q.cue_card.present? %>
+          <div class="bg-yellow-50 border border-yellow-200
+                      rounded-xl p-4 text-sm text-slate-700 mb-3">
+            <p class="font-semibold text-yellow-700 mb-1">
+              📝 Cue Card
             </p>
-
-            <% lesson.pdfs.each do |pdf| %>
-              <%= link_to pdf.filename,
-                    url_for(pdf),
-                    target: "_blank",
-                    class: "block text-indigo-600 hover:underline text-sm" %>
-            <% end %>
+            <p class="whitespace-pre-line">
+              <%= q.cue_card %>
+            </p>
           </div>
-        <% end %>
+          <% end %>
 
-        <!-- SPEAKING EXERCISES -->
-        <% if lesson.speaking_topics.any? %>
+          <div class="flex flex-wrap gap-3 text-xs">
 
-          <div class="mt-6 bg-slate-50 border rounded-xl p-5">
+            <% if q.preparation_time.present? %>
+              <span class="px-3 py-1 rounded-full
+                           bg-blue-50 text-blue-700
+                           border border-blue-200">
+                ⏱ Preparation: <b><%= q.preparation_time %> sec</b>
+              </span>
+            <% end %>
 
-            <h3 class="font-semibold text-slate-700 mb-4">
-              🎤 Speaking Practice
-            </h3>
-
-            <% lesson.speaking_topics.each do |topic| %>
-
-              <div class="border rounded-lg p-4 mb-4 bg-white">
-
-                <div class="flex justify-between items-center mb-3">
-
-                  <p class="font-medium text-slate-800">
-                    <%= topic.title %>
-                  </p>
-
-                  <span class="text-xs px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full">
-                    <%= topic.part.upcase %>
-                  </span>
-
-                </div>
-
-                <% topic.speaking_questions.each do |q| %>
-
-                  <div class="border-t pt-3 mt-3 space-y-2">
-
-                    <p class="font-medium text-slate-700">
-                      ❓ <%= q.question_text %>
-                    </p>
-
-                    <% if q.cue_card.present? %>
-                      <div class="bg-yellow-50 border rounded p-3 text-sm text-slate-700">
-                        📝 Cue Card:
-                        <p class="mt-1 whitespace-pre-line">
-                          <%= q.cue_card %>
-                        </p>
-                      </div>
-                    <% end %>
-
-                    <div class="flex gap-6 text-xs text-slate-600">
-
-                      <% if q.preparation_time.present? %>
-                        <span>
-                          ⏱ Preparation:
-                          <b><%= q.preparation_time %> sec</b>
-                        </span>
-                      <% end %>
-
-                      <% if q.speaking_time.present? %>
-                        <span>
-                          🎙 Speaking:
-                          <b><%= q.speaking_time %> sec</b>
-                        </span>
-                      <% end %>
-
-                    </div>
-
-                  </div>
-
-                <% end %>
-
-              </div>
-
+            <% if q.speaking_time.present? %>
+              <span class="px-3 py-1 rounded-full
+                           bg-emerald-50 text-emerald-700
+                           border border-emerald-200">
+                🎙 Speaking: <b><%= q.speaking_time %> sec</b>
+              </span>
             <% end %>
 
           </div>
 
+        </div>
+
         <% end %>
+
+        </div>
 
       </div>
+
+      <% end %>
+
+      </div>
+
+    </div>
 
     <% end %>
 
   </div>
 
+  <% end %>
+
+  </div>
+
+</div>
+
 <% end %>
+
+</div>
+</div>
