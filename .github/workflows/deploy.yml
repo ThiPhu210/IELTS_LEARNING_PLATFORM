@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - VNPay
 
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
