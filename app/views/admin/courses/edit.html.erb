@@ -1,253 +1,111 @@
 <!-- NAVBAR -->
 <%= render "admin/shared/navbar" %>
-
 <div id="alert-container" class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3"></div>
 
 <div class="pt-24 p-6 bg-gray-100 min-h-screen">
-  <div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto">
 
-    <h1 class="text-2xl font-bold text-blueGray-700 mb-6">Edit Course</h1>
+<h1 class="text-2xl font-bold mb-6">Edit Course</h1>
 
-    <%= form_with model: [:admin, @course], local: true, multipart: true do |f| %>
+<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
 
-      <!-- COURSE INFO -->
-      <div class="bg-white rounded-xl shadow p-6 mb-10 space-y-6">
-        <div>
-          <%= f.label :title, class: "block font-semibold mb-2" %>
-          <%= f.text_field :title, class: "w-full rounded-lg border px-4 py-2" %>
-        </div>
+<!-- COURSE INFO -->
+<div class="bg-white rounded-xl shadow p-6 mb-10 space-y-6">
 
-        <div>
-          <%= f.label :description, class: "block font-semibold mb-2" %>
-          <%= f.text_area :description, rows: 4, class: "w-full rounded-lg border px-4 py-2" %>
-        </div>
+<%= f.text_field :title,class:"w-full border px-4 py-2",placeholder:"Title" %>
+<%= f.text_area :description,class:"w-full border px-4 py-2",rows:4 %>
+<%= f.number_field :price,class:"w-full border px-4 py-2" %>
+<%= f.file_field :thumbnail %>
 
-        <div class="grid grid-cols-2 gap-6">
-          <div>
-            <%= f.label :price, class: "block font-semibold mb-2" %>
-            <%= f.number_field :price, min: 0, step: 1000, class: "w-full rounded-lg border px-4 py-2" %>
-          </div>
+</div>
 
-          <div>
-            <%= f.label :thumbnail, class: "block font-semibold mb-2" %>
-            <% if @course.thumbnail.attached? %>
-              <%= image_tag @course.thumbnail.variant(resize_to_limit: [220,140]), class: "rounded mb-2" %>
-            <% end %>
-            <%= f.file_field :thumbnail %>
-          </div>
-        </div>
-      </div>
+<!-- COURSE CONTENT -->
+<div class="bg-white rounded-xl shadow p-6 mb-10">
 
-      <!-- COURSE CONTENT -->
-      <div class="bg-white rounded-xl shadow p-6 mb-10 mt-10">
-        <h2 class="text-xl font-bold mb-6">Course Content</h2>
+<div id="sections">
 
-        <div id="sections" class="space-y-6">
-          <%= f.fields_for :course_sections do |section| %>
-            <div class="border rounded-lg p-5 bg-gray-50">
-              <%= section.hidden_field :_destroy %>
+<%= f.fields_for :course_sections do |section| %>
 
-           
+<div class="border p-5 bg-gray-50">
 
-              <div class="lessons space-y-4 ml-4">
-                <%= section.fields_for :lessons do |lesson| %>
-                  <div class="lesson-item bg-white p-4 rounded shadow-sm">
-                    <%= lesson.hidden_field :_destroy %>
+<div class="lessons">
 
-                    <div class="grid grid-cols-2 gap-4 mb-3">
-                      <%= lesson.text_field :title, placeholder: "Lesson title", class: "border rounded px-3 py-2" %>
-                      <%= lesson.number_field :duration, placeholder: "Duration", class: "border rounded px-3 py-2" %>
-                    </div>
-<!-- UPLOADED FILE INFO (BACKEND) -->
+<%= section.fields_for :lessons do |lesson| %>
 
-<% if lesson.object.video.attached? %>
-  <div class="mb-3 text-sm text-gray-700">
-    🎬 <b>Video uploaded:</b>
-    <span class="text-indigo-600">
-      <%= lesson.object.video.filename.to_s %>
-    </span>
-  </div>
+<div class="lesson-item bg-white p-4 rounded shadow-sm">
 
-  <video controls class="w-full rounded border mb-3">
-    <source src="<%= rails_blob_url(lesson.object.video) %>" type="video/mp4">
-  </video>
-<% end %>
+<%= lesson.hidden_field :_destroy %>
 
-<% if lesson.object.pdfs.attached? %>
-  <div class="mb-2 text-sm text-gray-700">
-    📄 <b>PDF uploaded:</b>
-  </div>
+<%= lesson.text_field :title,class:"border px-3 py-2",placeholder:"Lesson title"%>
+<%= lesson.number_field :duration,class:"border px-3 py-2"%>
 
-  <ul class="ml-5 text-sm space-y-1">
-    <% lesson.object.pdfs.each do |pdf| %>
-      <li>
-        📄
-        <%= link_to pdf.filename.to_s,
-            rails_blob_url(pdf),
-            target: "_blank",
-            class: "text-indigo-600 hover:underline" %>
-      </li>
-    <% end %>
-  </ul>
-<% end %>
+<%= lesson.file_field :video %>
+<%= lesson.file_field :pdfs,multiple:true %>
 
-
-
-                    <div class="flex gap-4 mt-3">
-                      <label class="cursor-pointer bg-blue-100 px-3 py-1 rounded text-sm">
-                        🎬 Upload video
-                        <%= lesson.file_field :video,
-                              accept: "video/mp4",
-                              class: "hidden",
-                              onchange: "handleVideoUpload(this)" %>
-                      </label>
-
-                      <label class="cursor-pointer bg-emerald-100 px-3 py-1 rounded text-sm">
-                        📄 Upload PDF
-                    <%= lesson.file_field :pdfs,
-      multiple: true,
-      accept: "application/pdf",
-      class: "pdf-input hidden" %>
-
-                      </label>
-                    </div>
-
-                    <button type="button" class="remove-lesson mt-3 text-sm text-red-500">
-                      Remove lesson
-                    </button>
-                  </div>
-                <% end %>
-              </div>
-<template class="lesson-template">
-  <div class="lesson-item bg-white p-4 rounded shadow-sm">
-    <input type="hidden" name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][_destroy]" value="false">
-
-    <div class="grid grid-cols-2 gap-4 mb-3">
-      <input type="text"
-             name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][title]"
-             placeholder="Lesson title"
-             class="border rounded px-3 py-2">
-
-      <input type="number"
-             name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][duration]"
-             placeholder="Duration"
-             class="border rounded px-3 py-2">
-    </div>
-
-    <div class="flex gap-4 mt-3">
-      <label class="cursor-pointer bg-blue-100 px-3 py-1 rounded text-sm">
-        🎬 Upload video
-        <input type="file"
-               name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][video]"
-               accept="video/mp4"
-               class="hidden"
-               onchange="handleVideoUpload(this)">
-      </label>
-
-      <label class="cursor-pointer bg-emerald-100 px-3 py-1 rounded text-sm">
-        📄 Upload PDF
-      <input type="file"
-  name="course[course_sections_attributes][__SECTION__][lessons_attributes][__INDEX__][pdfs][]"
-  multiple
-  accept="application/pdf"
-  class="pdf-input hidden">
-
-      </label>
-    </div>
-
+<!-- SPEAKING -->
 <div class="mt-4 p-4 bg-yellow-50 rounded">
 
-  <h4 class="font-semibold mb-2">Speaking Exercises</h4>
+<h4 class="font-semibold mb-2">Speaking Exercises</h4>
 
-  <div class="topics space-y-3">
+<%= lesson.fields_for :speaking_topics do |topic| %>
 
-    <%= lesson.fields_for :speaking_topics do |topic| %>
+<div class="border p-3 bg-white rounded mb-3">
 
-      <div class="topic-box border p-3 rounded bg-white">
-        <%= topic.hidden_field :_destroy %>
+<%= topic.hidden_field :_destroy %>
 
-        <div class="grid grid-cols-2 gap-3 mb-3">
-          <%= topic.text_field :title,
-                placeholder:"Topic title",
-                class:"border px-3 py-2" %>
+<%= topic.text_field :title,class:"border px-3 py-2",placeholder:"Topic"%>
 
-          <%= topic.select :part,
-                ["part1","part2","part3"],
-                {},
-                class:"border px-3 py-2" %>
-        </div>
+<%= topic.select :part,["part1","part2","part3"],{},class:"border px-3 py-2"%>
 
-        <div class="questions space-y-2">
+<%= topic.fields_for :speaking_questions do |q| %>
 
-          <%= topic.fields_for :speaking_questions do |q| %>
+<div class="border p-2 mb-2">
 
-            <div class="question-item border p-3 rounded">
-              <%= q.hidden_field :_destroy %>
+<%= q.hidden_field :_destroy %>
 
-              <%= q.text_area :question_text,
-                    placeholder:"Question",
-                    class:"border w-full mb-2 px-3 py-2" %>
+<%= q.text_area :question_text,class:"border w-full mb-2"%>
+<%= q.text_area :cue_card,class:"border w-full mb-2"%>
 
-              <%= q.text_area :cue_card,
-                    placeholder:"Cue card",
-                    class:"border w-full mb-2 px-3 py-2" %>
-
-              <div class="grid grid-cols-2 gap-2">
-                <%= q.number_field :preparation_time,
-                      placeholder:"Prep time",
-                      class:"border px-3 py-2" %>
-
-                <%= q.number_field :speaking_time,
-                      placeholder:"Speaking time",
-                      class:"border px-3 py-2" %>
-              </div>
-
-              <button type="button"
-                class="remove-question text-red-500 text-sm mt-2">
-                Remove question
-              </button>
-            </div>
-
-          <% end %>
-
-        </div>
-
-        <button type="button"
-          class="add-question text-indigo-600 text-sm mt-2">
-          + Add question
-        </button>
-
-      </div>
-
-    <% end %>
-
-  </div>
+<%= q.number_field :preparation_time,class:"border"%>
+<%= q.number_field :speaking_time,class:"border"%>
 
 </div>
 
+<% end %>
 
-    <button type="button" class="remove-lesson mt-3 text-sm text-red-500">
-      Remove lesson
-    </button>
-  </div>
-</template>
-
-              <button type="button" class="add-lesson mt-4 text-indigo-600 text-sm">
-                + Add lesson
-              </button>
-            </div>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-3">
-        <%= link_to "Cancel", admin_courses_path, class: "px-5 py-2 border rounded" %>
-        <%= f.submit "Save Course", class: "px-6 py-2 bg-green-600 text-white rounded" %>
-      </div>
-
-    <% end %>
-  </div>
 </div>
+
+<% end %>
+
+</div>
+
+<button type="button" class="remove-lesson text-red-500 mt-2">
+Remove lesson
+</button>
+
+</div>
+
+<% end %>
+
+</div>
+
+</div>
+
+<% end %>
+
+</div>
+
+</div>
+
+<div class="flex justify-end gap-3">
+<%= f.submit "Save Course",class:"px-6 py-2 bg-green-600 text-white rounded"%>
+</div>
+
+<% end %>
+
+</div>
+</div>
+
 
 <!-- JS -->
 <script>
