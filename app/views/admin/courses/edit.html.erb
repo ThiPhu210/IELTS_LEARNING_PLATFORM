@@ -219,39 +219,133 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 
 </div>
 </div>
-
 <template id="section-template">
 
-<div class="bg-slate-50 border rounded-xl p-6 mt-6 section-item">
+<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
+
+<h3 class="font-bold text-lg mb-4 text-indigo-700">
+📂 Section
+</h3>
 
 <button type="button"
 onclick="removeSection(this)"
-class="mb-4 text-sm text-red-500">
+class="text-sm text-red-500 mb-4">
 🗑 Remove Section
 </button>
 
 <input type="text"
 name="course[course_sections_attributes][NEW_SECTION][title]"
 placeholder="Section Title"
-class="border px-3 py-2 w-full mb-4"/>
+class="border rounded px-3 py-2 w-full mb-6"/>
 
 <div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
+
+<h4 class="font-semibold mb-4">🎬 Lesson</h4>
+
+<div class="grid grid-cols-2 gap-4 mb-4">
 
 <input type="text"
 name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
 placeholder="Lesson Title"
-class="border px-3 py-2 w-full mb-3"/>
+class="border rounded px-3 py-2"/>
 
 <input type="number"
 name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
-placeholder="Duration"
-class="border px-3 py-2 w-full mb-3"/>
+placeholder="Duration (minutes)"
+class="border rounded px-3 py-2"/>
 
+</div>
+
+<label class="text-sm font-semibold">
+🎬 Admin Video Upload
+</label>
+
+<input type="file"
+accept="video/mp4"
+class="video-input mt-2"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
+onchange="handleVideoUpload(this)"/>
+
+<label class="text-sm font-semibold mt-4 block">
+📄 Admin PDF Materials
+</label>
+
+<input type="file"
+multiple
+accept="application/pdf"
+class="pdf-input mt-2"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
+onchange="handlePDFUpload(this)"/>
+
+<!-- SPEAKING -->
+<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
+
+<h5 class="font-bold text-yellow-700 mb-4">
+🎤 Speaking Exercises (Admin)
+</h5>
+
+<div class="topic-box bg-white border rounded-lg p-4 mb-4">
+
+<div class="grid grid-cols-2 gap-3 mb-3">
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
+placeholder="Topic Title"
+class="border px-3 py-2"/>
+
+<select
+class="border px-3 py-2 part-select"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
+onchange="toggleCueCard(this)">
+
+<option value="part1">PART1</option>
+<option value="part2">PART2</option>
+<option value="part3">PART3</option>
+
+</select>
+
+</div>
+
+<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+
+<label class="text-xs font-semibold">Question</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+<div class="cue-card-field">
+
+<label class="text-xs font-semibold">Cue Card</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+</div>
+
+<div class="grid grid-cols-2 gap-3">
+
+<input type="number"
+placeholder="Preparation Time"
+class="border px-3 py-2 w-full"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"/>
+
+<input type="number"
+placeholder="Speaking Time"
+class="border px-3 py-2 w-full"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"/>
+
+</div>
+
+</div>
+</div>
 </div>
 
 </div>
 
 </template>
+
 
 
 <!-- JS VALIDATION -->
@@ -313,6 +407,10 @@ showAlert("success",`📄 Upload ${files.length} file PDF`)
 <script>
 let sectionIndex = 1000
 
+function removeSection(btn){
+btn.closest(".section-item").remove()
+}
+
 function addSection(){
 
 const template = document
@@ -356,28 +454,3 @@ document.querySelectorAll(".part-select")
 
 </script>
 
-<script>
-let sectionIndex = 1000
-
-function addSection(){
-
-const template = document
-.getElementById("section-template")
-.innerHTML
-
-const html = template.replaceAll(
-"NEW_SECTION",
-sectionIndex++
-)
-
-document
-.getElementById("sections")
-.insertAdjacentHTML("beforeend",html)
-
-}
-
-function removeSection(btn){
-btn.closest(".section-item").remove()
-}
-
-</script>
