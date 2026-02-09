@@ -1,5 +1,5 @@
 class SpeakingTopic < ApplicationRecord
-  belongs_to :course
+  belongs_to :lesson
   has_many :speaking_questions, dependent: :destroy
   has_many :speaking_attempts
 
