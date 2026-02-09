@@ -59,6 +59,7 @@ class:"w-full border rounded-lg px-4 py-2" %>
 ➕ Add Section
 </button>
 
+
 <div id="sections" class="space-y-8">
 
 <%= f.fields_for :course_sections do |section| %>
@@ -218,22 +219,40 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 
 </div>
 </div>
+
 <template id="section-template">
 
-<div class="bg-slate-50 border rounded-xl p-6 mt-6">
+<div class="bg-slate-50 border rounded-xl p-6 mt-6 section-item">
 
-<h3 class="font-bold text-lg mb-4 text-indigo-700">
-📂 Section
-</h3>
+<button type="button"
+onclick="removeSection(this)"
+class="mb-4 text-sm text-red-500">
+🗑 Remove Section
+</button>
 
 <input type="text"
 name="course[course_sections_attributes][NEW_SECTION][title]"
 placeholder="Section Title"
 class="border px-3 py-2 w-full mb-4"/>
 
+<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
+placeholder="Lesson Title"
+class="border px-3 py-2 w-full mb-3"/>
+
+<input type="number"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
+placeholder="Duration"
+class="border px-3 py-2 w-full mb-3"/>
+
+</div>
+
 </div>
 
 </template>
+
 
 <!-- JS VALIDATION -->
 <script>
@@ -334,5 +353,31 @@ document.querySelectorAll(".part-select")
 .forEach(select=>toggleCueCard(select))
 
 })
+
+</script>
+
+<script>
+let sectionIndex = 1000
+
+function addSection(){
+
+const template = document
+.getElementById("section-template")
+.innerHTML
+
+const html = template.replaceAll(
+"NEW_SECTION",
+sectionIndex++
+)
+
+document
+.getElementById("sections")
+.insertAdjacentHTML("beforeend",html)
+
+}
+
+function removeSection(btn){
+btn.closest(".section-item").remove()
+}
 
 </script>
