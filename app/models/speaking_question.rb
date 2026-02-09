@@ -1,6 +1,6 @@
 class SpeakingQuestion < ApplicationRecord
   belongs_to :speaking_topic
-
+  accepts_nested_attributes_for :speaking_questions, allow_destroy: true
   validates :question_text, presence: true
   validates :cue_card, presence: true
   validates :preparation_time, presence: true
