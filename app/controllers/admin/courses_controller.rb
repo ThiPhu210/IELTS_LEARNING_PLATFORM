@@ -43,8 +43,8 @@ class Admin::CoursesController < Admin::BaseController
     redirect_to admin_courses_path, notice: "Đã xóa khóa học"
   end
 
-  private
-  def course_params
+ private
+def course_params
   params.require(:course).permit(
     :title,
     :description,
@@ -60,9 +60,27 @@ class Admin::CoursesController < Admin::BaseController
         :duration,
         :video,
         :_destroy,
-        { pdfs: [] }
+        { pdfs: [] },
+        speaking_topics_attributes: [
+          :id,
+          :title,
+          :part,
+          :_destroy,
+
+          speaking_questions_attributes: [
+            :id,
+            :question_text,
+            :cue_card,
+            :preparation_time,
+            :speaking_time,
+            :transcript,
+            :feedback,
+            :_destroy
+          ]
+        ]
       ]
     ]
   )
 end
+
 end
