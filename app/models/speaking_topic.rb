@@ -9,6 +9,4 @@ class SpeakingTopic < ApplicationRecord
     part3: "part3"
   }, suffix: true
 
-  validates :title, presence: true
-  validates :part, presence: true
 end
