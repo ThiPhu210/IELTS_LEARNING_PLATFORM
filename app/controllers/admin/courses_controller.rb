@@ -78,8 +78,6 @@ def course_params
             :cue_card,
             :preparation_time,
             :speaking_time,
-            :transcript,
-            :feedback,
             :_destroy
           ]
         ]
