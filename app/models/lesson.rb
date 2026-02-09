@@ -3,6 +3,8 @@ class Lesson < ApplicationRecord
 
   has_one_attached  :video
   has_many_attached :pdfs
+  has_many :speaking_topics, dependent: :destroy
+  accepts_nested_attributes_for :speaking_topics, allow_destroy: true
 
   validates :title,
             length: { maximum: 255 }
