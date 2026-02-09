@@ -8,20 +8,25 @@ class Admin::CoursesController < Admin::BaseController
               .per(5)
   end
 
-
   def edit
-    @course = Course.find(params[:id])
-
-    if @course.course_sections.empty?
-      section = @course.course_sections.build
-      section.lessons.build
-    else
-      @course.course_sections.each do |section|
-        section.lessons.build if section.lessons.empty?
+  @course = Course.find(params[:id])
+  if @course.course_sections.empty?
+    section = @course.course_sections.build
+    lesson  = section.lessons.build
+  else
+    @course.course_sections.each do |section|
+      section.lessons.build if section.lessons.empty?
+    end
+  end
+  @course.course_sections.each do |section|
+    section.lessons.each do |lesson|
+      lesson.speaking_topics.build if lesson.speaking_topics.empty?
+      lesson.speaking_topics.each do |topic|
+        topic.speaking_questions.build if topic.speaking_questions.empty?
       end
     end
   end
-
+end
 
   def update
     @course = Course.find(params[:id])
