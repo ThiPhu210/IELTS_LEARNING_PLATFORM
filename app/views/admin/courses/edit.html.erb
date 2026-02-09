@@ -53,6 +53,11 @@ class:"w-full border rounded-lg px-4 py-2" %>
 <h2 class="text-xl font-semibold mb-8 border-b pb-3">
 📚 Course Structure
 </h2>
+<button type="button"
+        onclick="addSection()"
+        class="mb-6 px-5 py-2 bg-indigo-600 text-white rounded-lg">
+➕ Add Section
+</button>
 
 <div id="sections" class="space-y-8">
 
@@ -144,7 +149,9 @@ class:"border px-3 py-2" %>
 <%= topic.select :part,
 SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
 {},
-class:"border px-3 py-2" %>
+class:"border px-3 py-2 part-select",
+onchange:"toggleCueCard(this)" %>
+
 
 </div>
 
@@ -158,9 +165,12 @@ class:"border px-3 py-2" %>
 <%= q.text_area :question_text,
 class:"border w-full px-3 py-2 mb-3" %>
 
+<div class="cue-card-field">
 <label class="text-xs font-semibold">Cue Card</label>
 <%= q.text_area :cue_card,
 class:"border w-full px-3 py-2 mb-3" %>
+</div>
+
 
 <div class="grid grid-cols-2 gap-3">
 
@@ -208,6 +218,22 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 
 </div>
 </div>
+<template id="section-template">
+
+<div class="bg-slate-50 border rounded-xl p-6 mt-6">
+
+<h3 class="font-bold text-lg mb-4 text-indigo-700">
+📂 Section
+</h3>
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][title]"
+placeholder="Section Title"
+class="border px-3 py-2 w-full mb-4"/>
+
+</div>
+
+</template>
 
 <!-- JS VALIDATION -->
 <script>
@@ -264,4 +290,49 @@ return
 
 showAlert("success",`📄 Upload ${files.length} file PDF`)
 }
+</script>
+<script>
+let sectionIndex = 1000
+
+function addSection(){
+
+const template = document
+.getElementById("section-template")
+.innerHTML
+
+const html = template.replaceAll(
+"NEW_SECTION",
+sectionIndex++
+)
+
+document
+.getElementById("sections")
+.insertAdjacentHTML("beforeend",html)
+
+}
+</script>
+
+<script>
+function toggleCueCard(select){
+
+const topicBox = select.closest(".topic-box")
+
+const cueCards = topicBox.querySelectorAll(".cue-card-field")
+
+cueCards.forEach(card=>{
+if(select.value === "part2"){
+card.style.display = "block"
+}else{
+card.style.display = "none"
+}
+})
+
+}
+document.addEventListener("DOMContentLoaded",()=>{
+
+document.querySelectorAll(".part-select")
+.forEach(select=>toggleCueCard(select))
+
+})
+
 </script>
