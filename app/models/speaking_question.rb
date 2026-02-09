@@ -8,4 +8,5 @@ class SpeakingQuestion < ApplicationRecord
   validates :cue_card, length: { maximum: 1000 }
   validates :transcript, length: { maximum: 1000 }
   validates :feedback, length: { maximum: 1000 }
+  def transcript=(val); end
 end
