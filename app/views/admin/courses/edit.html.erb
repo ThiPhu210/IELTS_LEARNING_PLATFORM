@@ -340,25 +340,29 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 </div>
 
 <script>
+
 function addSection(){
 
-  let template=document.getElementById("section-template").innerHTML
+  let template =
+    document.getElementById("section-template").innerHTML
 
-  let index=document.querySelectorAll(".section-item").length
+  let uniqueId = new Date().getTime()
 
-  template=template.replace(/NEW_SECTION/g,index)
+  template = template.replace(/NEW_SECTION/g, uniqueId)
 
-  let wrapper=document.createElement("div")
-  wrapper.innerHTML=template
+  let wrapper = document.createElement("div")
+  wrapper.innerHTML = template
 
-  let newSection=wrapper.firstElementChild
+  let newSection = wrapper.firstElementChild
 
-  document.getElementById("sections").appendChild(newSection)
+  document.getElementById("sections")
+          .appendChild(newSection)
 
   newSection
     .querySelectorAll(".part-select")
-    .forEach(select=>toggleCueCard(select))
+    .forEach(select => toggleCueCard(select))
 }
+
 
 
 function removeSection(btn){
