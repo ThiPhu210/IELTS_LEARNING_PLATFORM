@@ -12,7 +12,7 @@ class Course < ApplicationRecord
   validates :title, presence: true
   validates :band_min, :band_max, allow_blank: true
   validates :price, presence: true
-  validates :duration_days, presence: true
+  validates :duration_days, presence: true, , on: :create
   validates :status, presence: true
   accepts_nested_attributes_for :course_sections, allow_destroy: true
 end
