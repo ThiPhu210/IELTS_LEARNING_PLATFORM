@@ -76,12 +76,27 @@
                     unit: "₫", precision: 0) %>
             </span>
 
-            <%= link_to "Xem",
-                students_course_path(course),
-                class: "px-4 py-2 text-sm font-semibold
-                        bg-gray-900 text-white
-                        rounded-xl hover:bg-black
-                        transition" %>
+            <% if @paid_course_ids.include?(course.id) %>
+
+  <%= link_to "Xem",
+      students_course_path(course),
+      class: "px-4 py-2 text-sm font-semibold
+              bg-gray-900 text-white
+              rounded-xl hover:bg-black
+              transition" %>
+
+<% else %>
+
+  <%= button_to "Thanh toán",
+      students_course_orders_path(course),
+      method: :post,
+      class: "px-4 py-2 text-sm font-semibold
+              bg-green-600 text-white
+              rounded-xl hover:bg-green-700
+              transition" %>
+
+<% end %>
+
 
           </div>
 
