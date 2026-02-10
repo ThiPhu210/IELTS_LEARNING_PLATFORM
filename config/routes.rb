@@ -1,7 +1,4 @@
 Rails.application.routes.draw do
-  namespace :students do
-    get "speaking_attempts/create"
-  end
   get "home/index"
   # ================= AUTH =================
   devise_for :users, controllers: {
@@ -22,6 +19,8 @@ Rails.application.routes.draw do
 namespace :students do
   get "dashboard", to: "dashboard#index"
   resource :profile, only: [ :edit, :update ]
+  resources :speaking_attempts, only: [:create]
+
   # ================== PAYMENTS ==================
   resources :payments, only: [ :create ] do
     collection do
