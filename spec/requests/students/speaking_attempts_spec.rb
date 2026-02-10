@@ -24,10 +24,11 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
 
   it "creates speaking attempt successfully" do
 
-    file = fixture_file_upload(
-      "files/audio.webm",
-      "audio/webm"
-    )
+file = fixture_file_upload(
+  "audio.webm",
+  "audio/webm"
+)
+
 
     post "/students/speaking_attempts",
          params: {
