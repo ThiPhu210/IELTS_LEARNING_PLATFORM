@@ -84,11 +84,12 @@ class:"border rounded px-3 py-2 w-full mb-6"%>
 <label class="text-sm font-semibold">🎬 Video Upload</label>
 <%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
 onchange:"handleVideoUpload(this)" %>
-  <video
-    class="video-preview hidden mt-3 w-64 rounded border"
-    controls>
+<% if lesson.object.persisted? && lesson.object.video.attached? %>
+  <video controls class="mt-3 w-64 rounded">
+    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
   </video>
 <% end %>
+
 
 
 <label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
@@ -358,46 +359,6 @@ function toggleCueCard(select){
     cue.classList.add("hidden")
   }
 }
-
-
-function handleVideoUpload(input){
-
-  const file = input.files[0]
-  if(!file) return
-
-  // validate size
-  if(file.size > 5 * 1024 * 1024){
-    showAlert("danger","❌ Video phải nhỏ hơn 5MB")
-    input.value = ""
-    return
-  }
-
-  // validate type
-  if(file.type !== "video/mp4"){
-    showAlert("danger","❌ Chỉ chấp nhận file MP4")
-    input.value = ""
-    return
-  }
-
-  const lesson  = input.closest(".lesson")
-  const preview = lesson.querySelector(".video-preview")
-
-  // revoke URL cũ tránh leak RAM
-  if(preview.dataset.url){
-    URL.revokeObjectURL(preview.dataset.url)
-  }
-
-  const url = URL.createObjectURL(file)
-
-  preview.src = url
-  preview.dataset.url = url
-  preview.classList.remove("hidden")
-
-  showAlert("success",`🎬 Video: <b>${file.name}</b>`)
-
-}
-
-
 </script>
 
 <script>
@@ -506,4 +467,3 @@ document.addEventListener("DOMContentLoaded",()=>{
 })
 
 </script>
-
