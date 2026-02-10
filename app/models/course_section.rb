@@ -16,8 +16,17 @@ class CourseSection < ApplicationRecord
 
   private
 
-  def set_order_index
-    return if order_index.present?
-    self.order_index = course.course_sections.maximum(:order_index).to_i + 1
-  end
+def set_order_index
+  return if order_index.present?
+
+  max =
+    course.course_sections
+          .reject(&:marked_for_destruction?)
+          .map(&:order_index)
+          .compact
+          .max.to_i
+
+  self.order_index = max + 1
+end
+
 end
