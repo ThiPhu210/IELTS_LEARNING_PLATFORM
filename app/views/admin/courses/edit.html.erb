@@ -25,9 +25,15 @@
 <%= f.number_field :price,min:0,step:1000,class:"w-full border rounded-lg px-4 py-2"%>
 
 <div>
-<% if @course.persisted? && @course.thumbnail.attached? %>
-<%= image_tag @course.thumbnail.variant(resize_to_limit:[260,160]),class:"rounded-lg mb-3 border"%>
+<% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
+
+  <%= image_tag(
+        @course.thumbnail.variant(resize_to_limit:[260,160]),
+        class:"rounded-lg mb-3 border"
+      ) %>
+
 <% end %>
+
 <%= f.file_field :thumbnail %>
 </div>
 
@@ -327,11 +333,21 @@ section.remove()
 }
 
 function toggleCueCard(select){
-let box=select.closest(".topic-box")
-let cue=box.querySelector(".cue-card-field")
-if(select.value==="part2"){cue.style.display="block"}
-else{cue.style.display="none"}
+
+  const topicBox = select.closest(".topic-box")
+  if(!topicBox) return
+
+  const cue = topicBox.querySelector(".cue-card-field")
+  if(!cue) return
+
+  if(select.value === "part2"){
+    cue.style.display = "block"
+  }else{
+    cue.style.display = "none"
+  }
+
 }
+
 
 function handleVideoUpload(input){
 
@@ -365,29 +381,62 @@ input.parentNode.appendChild(preview)
 
 const MAX_VIDEO = 5 * 1024 * 1024
 const MAX_PDF   = 500 * 1024
+function showAlert(type, message){
 
-function showAlert(type,message){
+  const container = document.getElementById("alert-container")
+  if(!container) return
 
-const container=document.getElementById("alert-container")
+  const div = document.createElement("div")
 
-const div=document.createElement("div")
+  // ❌ DANGER
+  if(type === "danger"){
+    div.className = "flex items-start sm:items-center p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft border border-danger-subtle"
+    div.innerHTML = `
+      <svg class="w-4 h-4 me-2 shrink-0 mt-0.5 sm:mt-0"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <p>
+        <span class="font-medium me-1">Danger alert!</span>
+        ${message}
+      </p>
+    `
+  }
 
-if(type==="danger"){
-div.className="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft shadow"
-div.innerHTML=`<span class="font-medium">Danger alert!</span> ${message}`
+  // ✅ SUCCESS
+  if(type === "success"){
+    div.className = "flex items-start sm:items-center p-4 mb-4 text-sm text-fg-success-strong rounded-base bg-success-soft border border-success-subtle"
+    div.innerHTML = `
+      <svg class="w-4 h-4 me-2 shrink-0 mt-0.5 sm:mt-0"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor">
+        <path stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <p>
+        <span class="font-medium me-1">Success alert!</span>
+        ${message}
+      </p>
+    `
+  }
+
+  container.appendChild(div)
+
+  setTimeout(() => {
+    div.remove()
+  }, 4000)
 }
 
-if(type==="success"){
-div.className="p-4 mb-4 text-sm text-fg-success-strong rounded-base bg-success-soft shadow"
-div.innerHTML=`<span class="font-medium">Success alert!</span> ${message}`
-}
-
-container.appendChild(div)
-
-setTimeout(()=>{
-div.remove()
-},4000)
-}
 
 function handleVideoUpload(input){
 const file=input.files[0]
