@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_02_05_103211) do
+ActiveRecord::Schema[8.0].define(version: 2026_02_10_041024) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -160,7 +160,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_05_103211) do
     t.float "grammar_score"
     t.float "pronunciation_score"
     t.text "feedback"
-    t.string "graded_by"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -181,13 +180,13 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_05_103211) do
   end
 
   create_table "speaking_topics", force: :cascade do |t|
-    t.bigint "course_id", null: false
     t.string "title"
     t.string "part"
     t.string "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["course_id"], name: "index_speaking_topics_on_course_id"
+    t.bigint "lesson_id"
+    t.index ["lesson_id"], name: "index_speaking_topics_on_lesson_id"
   end
 
   create_table "teacher_profiles", force: :cascade do |t|
@@ -242,5 +241,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_02_05_103211) do
   add_foreign_key "speaking_attempts", "speaking_topics"
   add_foreign_key "speaking_attempts", "users"
   add_foreign_key "speaking_questions", "speaking_topics"
-  add_foreign_key "speaking_topics", "courses"
+  add_foreign_key "speaking_topics", "lessons"
 end
