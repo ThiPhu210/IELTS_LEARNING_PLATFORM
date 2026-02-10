@@ -33,7 +33,7 @@ class Lesson < ApplicationRecord
   end
 
   def video_size
-    errors.add(:video, "tối đa 5MB") if video.byte_size > 5.megabytes
+    errors.add(:video, "tối đa 5MB") if video.byte_size > 10.megabytes
   end
 
   def pdfs_type
@@ -44,7 +44,7 @@ class Lesson < ApplicationRecord
 
   def pdfs_size
     pdfs.each do |pdf|
-      errors.add(:pdfs, "mỗi file tối đa 500KB") if pdf.byte_size > 500.kilobytes
+      errors.add(:pdfs, "mỗi file tối đa 500KB") if pdf.byte_size > 800.kilobytes
     end
   end
 end
