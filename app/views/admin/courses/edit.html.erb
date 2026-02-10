@@ -1,11 +1,10 @@
 <!-- NAVBAR -->
 <%= render "admin/shared/navbar" %>
-
-<div id="alert-container" class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3"></div>
-
+<div id="alert-container"
+     class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3">
+</div>
 <div class="pt-24 px-8 pb-16 bg-slate-100 min-h-screen">
 <div class="max-w-6xl mx-auto">
-
 <h1 class="text-3xl font-bold text-slate-800 mb-10">
 🎓 Admin Course Editor
 </h1>
@@ -77,10 +76,17 @@ class:"border rounded px-3 py-2 w-full mb-6"%>
 </div>
 
 <label class="text-sm font-semibold">🎬 Video Upload</label>
-<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2"%>
+<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
+onchange:"handleVideoUpload(this)" %>
+<% if lesson.object.video.attached? %>
+  <video controls class="mt-3 w-64 rounded">
+    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
+  </video>
+<% end %>
+
 
 <label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
-<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2"%>
+<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
 
 <!-- SPEAKING -->
 <div class="bg-yellow-50 border rounded-xl p-5 mt-6">
@@ -161,14 +167,20 @@ class="text-red-500 mt-4">
 <!-- TEMPLATE -->
 <template id="section-template">
 
-<div class="bg-slate-50 border rounded-xl p-6 section-item">
+<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
 
-<input type="hidden"
-name="course[course_sections_attributes][NEW_RECORD][_destroy]"
-value="false"/>
+<h3 class="font-bold text-lg mb-4 text-indigo-700">
+📂 Section
+</h3>
+
+<button type="button"
+onclick="removeSection(this)"
+class="text-sm text-red-500 mb-4">
+🗑 Remove Section
+</button>
 
 <input type="text"
-name="course[course_sections_attributes][NEW_RECORD][title]"
+name="course[course_sections_attributes][NEW_SECTION][title]"
 placeholder="Section Title"
 class="border rounded px-3 py-2 w-full mb-6"/>
 
@@ -179,33 +191,106 @@ class="border rounded px-3 py-2 w-full mb-6"/>
 <div class="grid grid-cols-2 gap-4 mb-4">
 
 <input type="text"
-name="course[course_sections_attributes][NEW_RECORD][lessons_attributes][0][title]"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
+placeholder="Lesson Title"
 class="border rounded px-3 py-2"/>
 
 <input type="number"
-name="course[course_sections_attributes][NEW_RECORD][lessons_attributes][0][duration]"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
+placeholder="Duration"
 class="border rounded px-3 py-2"/>
 
 </div>
 
-<label class="text-sm font-semibold">🎬 Video Upload</label>
+<label class="text-sm font-semibold">
+🎬 Admin Video Upload
+</label>
 
 <input type="file"
 accept="video/mp4"
-name="course[course_sections_attributes][NEW_RECORD][lessons_attributes][0][video]"
-class="mt-2"/>
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
+class="video-input mt-2"
+onchange="handleVideoUpload(this)"
+/>
+
+<label class="text-sm font-semibold mt-4 block">
+📄 Admin PDF Materials
+</label>
+
+<input type="file"
+multiple
+accept="application/pdf"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
+class="pdf-input mt-2"
+onchange="handlePDFUpload(this)"
+/>
+
+<!-- SPEAKING -->
+<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
+
+<h5 class="font-bold text-yellow-700 mb-4">
+🎤 Speaking Exercises (Admin)
+</h5>
+
+<div class="topic-box bg-white border rounded-lg p-4 mb-4">
+
+<div class="grid grid-cols-2 gap-3 mb-3">
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
+placeholder="Topic Title"
+class="border px-3 py-2"/>
+
+<select
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
+class="border px-3 py-2">
+
+<option value="part1">PART1</option>
+<option value="part2">PART2</option>
+<option value="part3">PART3</option>
+
+</select>
 
 </div>
 
-<button type="button"
-onclick="removeSection(this)"
-class="text-red-500 mt-4">
-🗑 Remove Section
-</button>
+<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+
+<label class="text-xs font-semibold">Question</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+<label class="text-xs font-semibold">Cue Card</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+<div class="grid grid-cols-2 gap-3">
+
+<input type="number"
+placeholder="Preparation Time"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
+class="border px-3 py-2"/>
+
+<input type="number"
+placeholder="Speaking Time"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
+class="border px-3 py-2"/>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
 
 </div>
 
 </template>
+
 
 <div class="flex justify-end gap-4 mt-10">
 
@@ -226,7 +311,7 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 function addSection(){
 let template=document.getElementById("section-template").innerHTML
 let uniq=Date.now()
-template=template.replace(/NEW_RECORD/g,uniq)
+template=template.replace(/NEW_SECTION/g,uniq)
 document.getElementById("sections").insertAdjacentHTML("beforeend",template)
 }
 
@@ -248,20 +333,60 @@ if(select.value==="part2"){cue.style.display="block"}
 else{cue.style.display="none"}
 }
 
+function handleVideoUpload(input){
+
+const file = input.files[0]
+if(!file) return
+
+if(file.size > 5*1024*1024){
+alert("Video must be under 5MB")
+input.value=""
+return
+}
+
+if(file.type !== "video/mp4"){
+alert("Only MP4 allowed")
+input.value=""
+return
+}
+
+let preview = document.createElement("video")
+preview.controls = true
+preview.className = "mt-3 rounded border w-full"
+preview.src = URL.createObjectURL(file)
+
+input.parentNode.appendChild(preview)
+
+}
+
 </script>
 
-
-<!-- JS VALIDATION -->
 <script>
+
 const MAX_VIDEO = 5 * 1024 * 1024
 const MAX_PDF   = 500 * 1024
 
 function showAlert(type,message){
+
+const container=document.getElementById("alert-container")
+
 const div=document.createElement("div")
-div.className="p-3 rounded shadow bg-white border"
-div.innerHTML=message
-document.getElementById("alert-container").appendChild(div)
-setTimeout(()=>div.remove(),4000)
+
+if(type==="danger"){
+div.className="p-4 mb-4 text-sm text-fg-danger-strong rounded-base bg-danger-soft shadow"
+div.innerHTML=`<span class="font-medium">Danger alert!</span> ${message}`
+}
+
+if(type==="success"){
+div.className="p-4 mb-4 text-sm text-fg-success-strong rounded-base bg-success-soft shadow"
+div.innerHTML=`<span class="font-medium">Success alert!</span> ${message}`
+}
+
+container.appendChild(div)
+
+setTimeout(()=>{
+div.remove()
+},4000)
 }
 
 function handleVideoUpload(input){
@@ -306,54 +431,5 @@ return
 
 showAlert("success",`📄 Upload ${files.length} file PDF`)
 }
-</script>
-<script>
-let sectionIndex = 1000
-
-function removeSection(btn){
-btn.closest(".section-item").remove()
-}
-
-function addSection(){
-
-const template = document
-.getElementById("section-template")
-.innerHTML
-
-const html = template.replaceAll(
-"NEW_SECTION",
-sectionIndex++
-)
-
-document
-.getElementById("sections")
-.insertAdjacentHTML("beforeend",html)
-
-}
-</script>
-
-<script>
-function toggleCueCard(select){
-
-const topicBox = select.closest(".topic-box")
-
-const cueCards = topicBox.querySelectorAll(".cue-card-field")
-
-cueCards.forEach(card=>{
-if(select.value === "part2"){
-card.style.display = "block"
-}else{
-card.style.display = "none"
-}
-})
-
-}
-document.addEventListener("DOMContentLoaded",()=>{
-
-document.querySelectorAll(".part-select")
-.forEach(select=>toggleCueCard(select))
-
-})
-
 </script>
 
