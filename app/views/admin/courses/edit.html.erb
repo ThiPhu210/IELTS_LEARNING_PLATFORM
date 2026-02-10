@@ -94,18 +94,29 @@ onchange:"handleVideoUpload(this)" %>
 
 <label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
 <%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
-<% if lesson.object.pdfs.attached? %>
+
+<% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
+
   <ul class="mt-3 space-y-1 text-sm">
+
     <% lesson.object.pdfs.each do |pdf| %>
+
+      <% next unless pdf.persisted? %>
+
       <li>
         📄 <%= link_to pdf.filename,
-            url_for(pdf),
-            target:"_blank",
-            class:"text-indigo-600 underline" %>
+              rails_blob_url(pdf),
+              target:"_blank",
+              class:"text-indigo-600 underline" %>
       </li>
+
     <% end %>
+
   </ul>
+
 <% end %>
+
+
 
 <!-- SPEAKING -->
 <div class="bg-yellow-50 border rounded-xl p-5 mt-6">
@@ -282,12 +293,15 @@ onchange="toggleCueCard(this)">
 <textarea
 name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
 class="border w-full px-3 py-2 mb-3"></textarea>
+<div class="cue-card-field hidden">
 
 <label class="text-xs font-semibold">Cue Card</label>
 
 <textarea
 name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
 class="border w-full px-3 py-2 mb-3"></textarea>
+
+</div>
 
 <div class="grid grid-cols-2 gap-3">
 
@@ -335,6 +349,10 @@ let template=document.getElementById("section-template").innerHTML
 let uniq=Date.now()
 template=template.replace(/NEW_SECTION/g,uniq)
 document.getElementById("sections").insertAdjacentHTML("beforeend",template)
+
+document
+    .querySelectorAll(".part-select")
+    .forEach(select=>toggleCueCard(select))
 }
 
 function removeSection(btn){
