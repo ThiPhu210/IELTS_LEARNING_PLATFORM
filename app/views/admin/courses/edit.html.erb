@@ -108,7 +108,7 @@ Uploaded: <%= lesson.object.video.filename %>
 
 <!-- PDF -->
 <label class="text-sm font-semibold mt-4 block">
-📄 Admin PDF Materials (max 5MB)
+📄 Admin PDF Materials (PDF - max 500KB)
 </label>
 
 <%= lesson.file_field :pdfs,
@@ -204,21 +204,6 @@ class:"border px-3 py-2 w-full" %>
 
 <% end %>
 
-<div class="flex justify-end gap-4 mt-10">
-
-<%= link_to "Cancel",
-admin_courses_path,
-class:"px-6 py-2 border rounded-lg bg-white" %>
-
-<%= f.submit "💾 Save Course",
-class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700" %>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
 <template id="section-template">
 
 <div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
@@ -347,6 +332,21 @@ name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][spe
 </template>
 
 
+<div class="flex justify-end gap-4 mt-10">
+
+<%= link_to "Cancel",
+admin_courses_path,
+class:"px-6 py-2 border rounded-lg bg-white" %>
+
+<%= f.submit "💾 Save Course",
+class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700" %>
+
+</div>
+
+<% end %>
+
+</div>
+</div>
 
 <!-- JS VALIDATION -->
 <script>
