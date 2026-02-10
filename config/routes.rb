@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  namespace :students do
+    get "speaking_attempts/create"
+  end
   get "home/index"
   # ================= AUTH =================
   devise_for :users, controllers: {

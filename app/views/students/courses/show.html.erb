@@ -153,7 +153,23 @@
           </div>
 
         </div>
+        <div class="mt-4">
 
+        <button
+          class="start-speaking px-4 py-2 bg-indigo-600 text-white rounded-lg"
+          data-prep="<%= q.preparation_time %>"
+          data-speak="<%= q.speaking_time %>"
+          data-topic="<%= topic.id %>"
+          data-course="<%= @course.id %>"
+          data-part="<%= topic.part %>">
+      
+          🎤 Start Speaking
+        </button>
+      
+        <div class="timer-display mt-3 text-xl font-bold text-red-600"></div>
+      
+      </div>
+      
         <% end %>
 
         </div>
@@ -180,3 +196,88 @@
 
 </div>
 </div>
+
+<script>
+let mediaRecorder;
+let chunks = [];
+
+async function startRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+  mediaRecorder = new MediaRecorder(stream);
+
+  mediaRecorder.ondataavailable = e => {
+    chunks.push(e.data);
+  };
+
+  mediaRecorder.start();
+}
+
+function stopRecording() {
+  return new Promise(resolve => {
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(chunks, { type: "audio/webm" });
+      chunks = [];
+      resolve(blob);
+    };
+
+    mediaRecorder.stop();
+  });
+}
+
+function countdown(sec, el, label) {
+  return new Promise(resolve => {
+
+    let s = sec;
+
+    const i = setInterval(() => {
+      el.innerText = `${label}: ${s}s`;
+      s--;
+
+      if (s < 0) {
+        clearInterval(i);
+        resolve();
+      }
+
+    }, 1000);
+
+  });
+}
+
+document.addEventListener("click", async e => {
+
+  if (!e.target.classList.contains("start-speaking")) return;
+
+  const btn = e.target;
+  const timer = btn.parentElement.querySelector(".timer-display");
+
+  btn.disabled = true;
+
+  await countdown(btn.dataset.prep, timer, "🧠 Preparation");
+
+  timer.innerText = "🎙 Time to complete your speaking task";
+
+  await startRecording();
+
+  await countdown(btn.dataset.speak, timer, "🎤 Speaking");
+
+  const audioBlob = await stopRecording();
+
+  timer.innerText = "⬆ Uploading...";
+
+  const form = new FormData();
+
+  form.append("audio", audioBlob);
+  form.append("speaking_topic_id", btn.dataset.topic);
+  form.append("course_id", btn.dataset.course);
+  form.append("part", btn.dataset.part);
+
+  await fetch("/students/speaking_attempts", {
+    method: "POST",
+    body: form
+  });
+
+  timer.innerText = "🤖 AI is evaluating...";
+});
+</script>
