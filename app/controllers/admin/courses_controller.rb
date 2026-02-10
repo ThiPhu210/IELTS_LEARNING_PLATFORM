@@ -29,18 +29,49 @@ class Admin::CoursesController < Admin::BaseController
 end
 
   def update
-    @course = Course.find(params[:id])
+  @course = Course.find(params[:id])
 
-    if @course.update(course_params)
-      flash[:success] = "✅ Bạn vừa thay đổi thành công thông tin khóa học"
-      redirect_to admin_courses_path, notice: "Cập nhật khóa học thành công"
+  Rails.logger.debug "================ PARAMS COURSE ================"
+  Rails.logger.debug params[:course].deep_inspect
 
-    else
-      Rails.logger.debug @course.errors.full_messages
-      render :edit, status: :unprocessable_entity
+  if @course.update(course_params)
+    Rails.logger.debug "================ UPDATE SUCCESS ================"
+
+    redirect_to admin_courses_path,
+                notice: "Cập nhật khóa học thành công"
+
+  else
+    Rails.logger.debug "================ COURSE ERRORS ================"
+    Rails.logger.debug @course.errors.full_messages
+
+    @course.course_sections.each do |section|
+      if section.errors.any?
+        Rails.logger.debug "SECTION ERROR: #{section.errors.full_messages}"
+      end
+
+      section.lessons.each do |lesson|
+        if lesson.errors.any?
+          Rails.logger.debug "LESSON ERROR: #{lesson.errors.full_messages}"
+        end
+
+        lesson.speaking_topics.each do |topic|
+          if topic.errors.any?
+            Rails.logger.debug "TOPIC ERROR: #{topic.errors.full_messages}"
+          end
+
+          topic.speaking_questions.each do |q|
+            if q.errors.any?
+              Rails.logger.debug "QUESTION ERROR: #{q.errors.full_messages}"
+            end
+          end
+        end
+      end
     end
-    Rails.logger.debug params[:course]
+
+    render :edit, status: :unprocessable_entity
   end
+end
+
 
   def destroy
     course = Course.find(params[:id])
