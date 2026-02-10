@@ -18,6 +18,12 @@ class Students::CoursesController < ApplicationController
       .order(created_at: :desc)
       .page(params[:page])
       .per(3)
+
+    @paid_course_ids = current_user
+                       .course_accesses
+                       .active_status
+                       .pluck(:course_id)
+    
   end
 
 def show
