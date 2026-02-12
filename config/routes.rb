@@ -47,8 +47,6 @@ namespace :students do
   end
 end
 
-
-
   # ================= ADMIN =================
   namespace :admin do
     root to: "dashboard#index"
