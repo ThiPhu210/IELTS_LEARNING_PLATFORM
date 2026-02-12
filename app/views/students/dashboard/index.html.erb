@@ -170,7 +170,11 @@
                 </span>
 
            <% access = current_user.course_accesses.active_status.find_by(course: course) %>
-<% pending = current_user.orders.pending_status.find_by(course: course) %>
+<% pending = current_user.orders
+      .pending_status
+      .where("created_at > ?", 1.minutes.ago)
+      .find_by(course: course) %>
+
 
 <% if access %>
   <%= link_to "Vào học", students_course_path(course), class: "btn btn-primary" %>
