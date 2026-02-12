@@ -19,17 +19,19 @@ Rails.application.routes.draw do
 namespace :students do
   get "dashboard", to: "dashboard#index"
   resource :profile, only: [ :edit, :update ]
-  resources :speaking_attempts, only: [:create]
+  resources :speaking_attempts, only: [ :create ]
 
   # ================== PAYMENTS ==================
   resources :payments, only: [ :create ] do
     collection do
       get :vnpay_return
-      match :vnpay_ipn, via: [:get, :post] 
+      match :vnpay_ipn, via: [ :get, :post ]
       post :momo_create
       post :momo_notify
       get  :momo_return
-
+      post :stripe_create
+      get  :stripe_success
+      get  :stripe_cancel
     end
   end
 

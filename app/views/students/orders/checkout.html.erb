@@ -1,19 +1,21 @@
-<div class="mt-8">
+ <%= render "students/shared/navbar" %>
+<div class="pt-28 pb-16 flex justify-center">
 
-  <div class="bg-pink-50 border border-pink-100 rounded-2xl p-6 shadow-sm space-y-6">
 
-    <!-- TITLE -->
-    <div>
-      <h3 class="text-lg font-semibold text-gray-900">
-        Chọn phương thức thanh toán
-      </h3>
+  <div class="w-full max-w-xl bg-white border border-pink-100 rounded-2xl p-8 shadow-sm space-y-8">
+
+    <!-- HEADER -->
+    <div class="text-center">
+      <h2 class="text-xl font-semibold text-gray-900">
+        Xác nhận thanh toán
+      </h2>
       <p class="text-sm text-gray-500 mt-1">
-        Vui lòng kiểm tra lại thông tin trước khi thanh toán
+        Kiểm tra thông tin và chọn phương thức thanh toán
       </p>
     </div>
 
-    <!-- INFO GRID -->
-    <div class="grid grid-cols-2 gap-4 text-sm">
+    <!-- INFO -->
+    <div class="grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
 
       <div>
         <p class="text-gray-500">Học viên</p>
@@ -51,7 +53,7 @@
       </div>
 
       <div>
-        <p class="text-gray-500">Ngày tạo đơn</p>
+        <p class="text-gray-500">Ngày tạo</p>
         <p class="text-gray-900">
           <%= l(@order.created_at, format: :long) %>
         </p>
@@ -59,34 +61,89 @@
 
     </div>
 
-    <!-- VNPay -->
-    <%= button_to students_payments_path(order_id: @order.id),
-          method: :post,
-          class: "w-full flex items-center justify-center gap-3
-                  bg-pink-500 hover:bg-pink-600
-                  text-white text-lg font-semibold
-                  py-4 rounded-xl
-                  transition shadow-md" do %>
+    <!-- PAYMENT FORM -->
+    <form id="payment-form" method="post" class="space-y-4">
+
+      <%= hidden_field_tag :authenticity_token,
+          form_authenticity_token %>
+
+      <%= hidden_field_tag :order_id, @order.id %>
+
+      <!-- RADIO VNPay -->
+      <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50">
+        <input type="radio"
+               name="payment_method"
+               class="payment-radio"
+               data-url="<%= students_payments_path(order_id: @order.id) %>"
+               checked>
 
         <%= image_tag "vnpay-logo.jpg", class: "h-6 w-auto" %>
-        Thanh toán VNPay
 
-    <% end %>
+        <span class="font-medium text-gray-800">
+          Thanh toán VNPay
+        </span>
+      </label>
 
-    <!-- MOMO -->
-    <%= button_to momo_create_students_payments_path(order_id: @order.id),
-          method: :post,
-          class: "w-full flex items-center justify-center gap-3
-                  bg-red-500 hover:bg-red-600
-                  text-white text-lg font-semibold
-                  py-4 rounded-xl
-                  transition shadow-md" do %>
+      <!-- RADIO MOMO -->
+      <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50">
+        <input type="radio"
+               name="payment_method"
+               class="payment-radio"
+               data-url="<%= momo_create_students_payments_path(order_id: @order.id) %>">
 
         <%= image_tag "momo-logo.png", class: "h-6 w-auto" %>
-        Thanh toán MoMo
 
-    <% end %>
+        <span class="font-medium text-gray-800">
+          Thanh toán MoMo
+        </span>
+      </label>
+
+      <!-- RADIO STRIPE -->
+      <label class="flex items-center gap-4 p-4 border rounded-xl cursor-pointer hover:bg-gray-50">
+        <input type="radio"
+               name="payment_method"
+               class="payment-radio"
+               data-url="<%= stripe_create_students_payments_path(order_id: @order.id) %>">
+
+        <%= image_tag "stripe.png", class: "h-6 w-auto" %>
+
+        <span class="font-medium text-gray-800">
+          Thanh toán Stripe
+        </span>
+      </label>
+
+      <!-- MAIN BUTTON -->
+      <button type="submit"
+              class="w-full mt-4 bg-pink-500 hover:bg-pink-600
+                     text-white font-semibold py-4 rounded-xl
+                     transition shadow-md">
+        Thanh toán ngay
+      </button>
+
+    </form>
 
   </div>
 
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+  const form = document.getElementById("payment-form");
+
+  form.addEventListener("submit", function(e) {
+
+    const selected = document.querySelector(".payment-radio:checked");
+
+    if (!selected) {
+      e.preventDefault();
+      alert("Vui lòng chọn phương thức thanh toán");
+      return;
+    }
+
+    form.action = selected.dataset.url;
+
+  });
+
+});
+</script>

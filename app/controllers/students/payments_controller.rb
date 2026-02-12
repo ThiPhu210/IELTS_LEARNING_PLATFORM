@@ -7,14 +7,16 @@ class Students::PaymentsController < ApplicationController
   require "net/http"
   require "json"
   require "securerandom"
+  require "stripe"
 
   skip_before_action :authenticate_user!,
-                     only: [ :vnpay_return, :vnpay_ipn, :momo_notify, :momo_return ],
-                     if: -> { respond_to?(:authenticate_user!) },
-                     raise: false
+  only: [ :vnpay_return, :vnpay_ipn, :momo_notify, :momo_return, :stripe_webhook ],
+  if: -> { respond_to?(:authenticate_user!) },
+  raise: false
 
-  skip_before_action :verify_authenticity_token,
-                     only: [ :vnpay_ipn, :momo_notify ]
+skip_before_action :verify_authenticity_token,
+  only: [ :vnpay_ipn, :momo_notify, :stripe_webhook ]
+
 
   VNP_URL         = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
   VNP_TMNCODE     = "9APTANC1"
@@ -246,5 +248,41 @@ class Students::PaymentsController < ApplicationController
       redirect_to students_course_path(payment.order.course),
                   alert: "Thanh toán thất bại"
     end
+  end
+
+  def stripe_create
+    order = current_user.orders.find(params[:order_id])
+
+    payment = order.payments.create!(
+      amount: order.total_price,
+      payment_method: "stripe",
+      gateway_name: "stripe",
+      status: "pending"
+    )
+
+    session = Stripe::Checkout::Session.create(
+      payment_method_types: [ "card" ],
+      mode: "payment",
+      line_items: [ {
+        price_data: {
+          currency: "vnd",
+          product_data: {
+            name: "Order #{order.id}"
+          },
+          unit_amount: order.total_price.to_i
+        },
+        quantity: 1
+      } ],
+      metadata: {
+        payment_id: payment.id
+      },
+      success_url: stripe_success_students_payments_url +
+                   "?session_id={CHECKOUT_SESSION_ID}",
+      cancel_url: stripe_cancel_students_payments_url
+    )
+
+    payment.update!(gateway_order_id: session.id)
+
+    redirect_to session.url, allow_other_host: true
   end
 end
