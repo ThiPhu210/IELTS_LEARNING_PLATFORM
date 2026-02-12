@@ -32,6 +32,8 @@ namespace :students do
       post :stripe_create
       get  :stripe_success
       get  :stripe_cancel
+      post :stripe_webhook
+
     end
   end
 
