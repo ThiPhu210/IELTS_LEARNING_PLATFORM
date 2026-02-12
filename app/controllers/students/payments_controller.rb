@@ -285,4 +285,42 @@ skip_before_action :verify_authenticity_token,
 
     redirect_to session.url, allow_other_host: true
   end
+  def stripe_webhook
+  payload = request.body.read
+  sig_header = request.env["HTTP_STRIPE_SIGNATURE"]
+  endpoint_secret = ENV["STRIPE_WEBHOOK_SECRET"]
+
+  event = Stripe::Webhook.construct_event(
+    payload,
+    sig_header,
+    endpoint_secret
+  )
+
+  if event["type"] == "checkout.session.completed"
+    session = event["data"]["object"]
+
+    payment = Payment.find_by(gateway_order_id: session.id)
+    return head :ok unless payment
+    return head :ok if payment.paid_status?
+
+    payment.update!(
+      status: "paid",
+      paid_at: Time.current
+    )
+
+    CourseAccess.create!(
+      user: payment.order.user,
+      course: payment.order.course,
+      payment: payment,
+      status: :active,
+      start_date: Time.current,
+      end_date: 1.year.from_now
+    )
+
+    payment.order.update!(status: :paid)
+  end
+
+  head :ok
+end
+
 end
