@@ -86,6 +86,7 @@ jobs:
         env:
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
         run: |
           bundle exec rails db:drop db:create 
           bundle exec rails db:schema:load
@@ -93,6 +94,7 @@ jobs:
 
       - name: Run RSpec
         env:
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
           RAILS_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/app_test
           AWS_BUCKET: fake
