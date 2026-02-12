@@ -61,6 +61,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: app_test
+          RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
         ports:
           - 5432:5432
         options: >-
