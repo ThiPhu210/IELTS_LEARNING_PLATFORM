@@ -17,7 +17,10 @@ env:
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
   GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
-  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}   
+  STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+  STRIPE_PUBLIC_KEY: ${{ secrets.STRIPE_PUBLIC_KEY }}
+  STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
 
 jobs:
 
@@ -95,6 +98,9 @@ jobs:
           AWS_ACCESS_KEY_ID: fake
           AWS_SECRET_ACCESS_KEY: fake
           AWS_REGION: us-east-1
+          STRIPE_SECRET_KEY: sk_test_fake
+          STRIPE_PUBLIC_KEY: pk_test_fake
+          STRIPE_WEBHOOK_SECRET: whsec_fake
         run: bundle exec rspec
 
 
@@ -140,6 +146,9 @@ jobs:
             export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
             export GMAIL_USERNAME="${{ secrets.GMAIL_USERNAME }}"
             export GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}"
+            export STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
+            export STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_PUBLIC_KEY }}"
+            export STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}"
 
             echo "Deploying Docker container on EC2..."
 
@@ -163,6 +172,10 @@ jobs:
               -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
               -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0 \
               -e APP_HOST=https://resigned-unincreased-agnus.ngrok-free.dev \
+              -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
+              -e STRIPE_PUBLIC_KEY=$STRIPE_PUBLIC_KEY \
+              -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
+
               $DOCKER_USER/myapp:latest \
               sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:drop db:create db:migrate db:seed && bundle exec rails server -b 0.0.0.0 -p 3000"
               echo "Starting ngrok..."
