@@ -4,27 +4,32 @@ class Students::CoursesController < ApplicationController
   before_action :require_course_access!, only: [:show]
 
   def index
-    courses =
-      if params[:paid] == "true"
-        Course
-          .joins(:course_accesses)
-          .merge(current_user.course_accesses.active_status)
-          .distinct
-      else
-        Course.all
-      end
+  courses =
+    if params[:paid] == "true"
+      Course
+        .joins(:course_accesses)
+        .merge(current_user.course_accesses.active_status)
+        .distinct
+    else
+      Course.all
+    end
 
-    @courses = courses
-      .order(created_at: :desc)
-      .page(params[:page])
-      .per(3)
-
-    @paid_course_ids = current_user
-                       .course_accesses
-                       .active_status
-                       .pluck(:course_id)
-    
+  if params[:q].present?
+    courses = courses.where(
+      "title ILIKE ?", "%#{params[:q]}%"
+    )
   end
+
+  @courses = courses
+    .order(created_at: :desc)
+    .page(params[:page])
+    .per(3)
+
+  @paid_course_ids = current_user
+                     .course_accesses
+                     .active_status
+                     .pluck(:course_id)
+end
 
 def show
   @course = Course
