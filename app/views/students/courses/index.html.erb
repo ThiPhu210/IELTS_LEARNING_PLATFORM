@@ -1,4 +1,55 @@
  <%= render "students/shared/navbar" %>
+<!-- SEARCH BAR -->
+<div class="flex justify-center mb-10">
+
+<%= form_with url: students_courses_path,
+              method: :get,
+              local: true,
+              class: "flex items-center max-w-sm mx-auto space-x-2" do %>
+
+    <%= hidden_field_tag :paid, params[:paid] %>
+
+    <label for="simple-search" class="sr-only">Search</label>
+
+    <div class="relative w-full">
+
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-body" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8 8v8m0-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 0a4 4 0 0 1-4 4h-1a3 3 0 0 0-3 3"/>
+            </svg>
+        </div>
+
+        <%= text_field_tag :q,
+              params[:q],
+              id: "simple-search",
+              class: "px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium rounded-base ps-9 text-heading text-sm focus:ring-brand focus:border-brand block w-full placeholder:text-body",
+              placeholder: "Search branch name..." %>
+
+    </div>
+
+    <button type="submit"
+        class="inline-flex items-center justify-center shrink-0 text-white bg-brand hover:bg-brand-strong focus:ring-4 focus:ring-brand-medium shadow-xs rounded-base w-10 h-10 focus:outline-none">
+
+        <svg class="w-5 h-5"
+             xmlns="http://www.w3.org/2000/svg"
+             fill="none"
+             viewBox="0 0 24 24">
+          <path stroke="currentColor"
+                stroke-linecap="round"
+                stroke-width="2"
+                d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+        </svg>
+
+        <span class="sr-only">Icon description</span>
+
+    </button>
+
+<% end %>
+
+</div>
+
+
 <section class="container mx-auto px-6 py-16 mt-10 mb-10">
 
   <!-- TITLE -->
@@ -18,16 +69,16 @@
     <% end %>
   <% end %>
 
-  <!-- EMPTY STATE -->
   <% if @courses.empty? %>
+
     <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-2xl">
       <p class="text-yellow-700 font-medium">
-        Bạn chưa có khóa học nào.
+        Không tìm thấy khóa học phù hợp.
       </p>
     </div>
+
   <% else %>
 
-  <!-- GRID CARD -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
     <% @courses.each do |course| %>
@@ -38,7 +89,6 @@
                   hover:-translate-y-1
                   transition-all duration-300">
 
-        <!-- IMAGE -->
         <%= link_to students_course_path(course) do %>
 
           <% if course.thumbnail.attached? %>
@@ -55,7 +105,6 @@
 
         <% end %>
 
-        <!-- CONTENT -->
         <div class="p-5">
 
           <% if course.band_min.present? && course.band_max.present? %>
@@ -78,25 +127,24 @@
 
             <% if @paid_course_ids.include?(course.id) %>
 
-  <%= link_to "Xem",
-      students_course_path(course),
-      class: "px-4 py-2 text-sm font-semibold
-              bg-gray-900 text-white
-              rounded-xl hover:bg-black
-              transition" %>
+              <%= link_to "Xem",
+                  students_course_path(course),
+                  class: "px-4 py-2 text-sm font-semibold
+                          bg-gray-900 text-white
+                          rounded-xl hover:bg-black
+                          transition" %>
 
-<% else %>
+            <% else %>
 
-  <%= button_to "Thanh toán",
-      students_course_orders_path(course),
-      method: :post,
-      class: "px-4 py-2 text-sm font-semibold
-              bg-green-600 text-white
-              rounded-xl hover:bg-green-700
-              transition" %>
+              <%= button_to "Thanh toán",
+                  students_course_orders_path(course),
+                  method: :post,
+                  class: "px-4 py-2 text-sm font-semibold
+                          bg-green-600 text-white
+                          rounded-xl hover:bg-green-700
+                          transition" %>
 
-<% end %>
-
+            <% end %>
 
           </div>
 
@@ -109,8 +157,11 @@
   </div>
 
   <% end %>
-<div class="mt-12 flex justify-center">
-  <%= paginate @courses %>
-</div>
+
+  <div class="mt-12 flex justify-center">
+    <%= paginate @courses %>
+  </div>
+
 </section>
+
 <style> nav.pagination { display: flex; gap: 0.5rem; } nav.pagination a, nav.pagination span { padding: 0.5rem 0.75rem; border-radius: 0.375rem; } nav.pagination .current { background: #FF1C04; color: white; } </style>
