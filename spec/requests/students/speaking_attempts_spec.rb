@@ -28,7 +28,7 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
     })
 
     # Stub mailer
-    allow(SpeakingResultMailer).to receive_message_chain(:result_email, :deliver_later)
+    allow_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_later)
   end
 
   it "creates speaking attempt successfully" do
