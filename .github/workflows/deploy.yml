@@ -125,84 +125,90 @@ jobs:
           docker build -t $DOCKER_USER/myapp:latest .
           docker push $DOCKER_USER/myapp:latest
 
-
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to EC2
-        uses: appleboy/ssh-action@v1.2.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            export DATABASE_URL="${{ secrets.DATABASE_URL }}"
-            export DOCKER_USER="${{ secrets.DOCKER_USERNAME }}"
-            export RAILS_ENV=production
-            export RAILS_MASTER_KEY="${{ secrets.RAILS_MASTER_KEY }}"
-            export DB_HOST="${{ secrets.DB_HOST }}"
-            export DB_PORT="${{ secrets.DB_PORT }}"
-            export DB_USERNAME="${{ secrets.DB_USERNAME }}"
-            export DB_PASSWORD="${{ secrets.DB_PASSWORD }}"
-            export AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
-            export AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-            export GMAIL_USERNAME="${{ secrets.GMAIL_USERNAME }}"
-            export GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}"
-            export STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
-            export STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_PUBLIC_KEY }}"
-            export STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}"
-
-            echo "Deploying Docker container on EC2..."
-
-            docker system prune -a -f
-            docker pull $DOCKER_USER/myapp:latest
-
-            docker rm -f redis || true
-            docker rm -f myapp_container || true
-
-            docker run -d \
-              --name myapp_container \
-              -p 3000:3000 \
-              -e RAILS_ENV=$RAILS_ENV \
-              -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
-              -e DATABASE_URL="$DATABASE_URL" \
-              -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-              -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-              -e AWS_REGION=us-east-1 \
-              -e AWS_BUCKET=ielts-learning-platform-uploads \
-              -e GMAIL_USERNAME=$GMAIL_USERNAME \
-              -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
-              -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0 \
-              -e APP_HOST=https://resigned-unincreased-agnus.ngrok-free.dev \
-              -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
-              -e STRIPE_PUBLIC_KEY=$STRIPE_PUBLIC_KEY \
-              -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
-              $DOCKER_USER/myapp:latest \
-              $DOCKER_USER/myapp:latest \
-              sh -c "rm -rf tmp/cache/* && DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
-              echo "Starting ngrok..."
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy to EC2
+          uses: appleboy/ssh-action@v1.2.4
+          with:
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            script: |
+              set -e
+  
+              DOCKER_USER="${{ secrets.DOCKER_USERNAME }}"
+              RAILS_MASTER_KEY="${{ secrets.RAILS_MASTER_KEY }}"
+              DATABASE_URL="${{ secrets.DATABASE_URL }}"
+              AWS_ACCESS_KEY_ID="${{ secrets.AWS_ACCESS_KEY_ID }}"
+              AWS_SECRET_ACCESS_KEY="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
+              GMAIL_USERNAME="${{ secrets.GMAIL_USERNAME }}"
+              GMAIL_APP_PASSWORD="${{ secrets.GMAIL_APP_PASSWORD }}"
+              STRIPE_SECRET_KEY="${{ secrets.STRIPE_SECRET_KEY }}"
+              STRIPE_PUBLIC_KEY="${{ secrets.STRIPE_PUBLIC_KEY }}"
+              STRIPE_WEBHOOK_SECRET="${{ secrets.STRIPE_WEBHOOK_SECRET }}"
+  
+              echo "=== Pulling latest image ==="
+              docker pull $DOCKER_USER/myapp:latest
+  
+              echo "=== Stopping old containers ==="
+              docker rm -f myapp_container || true
+              docker rm -f sidekiq_worker || true
+  
+              echo "=== Removing unused images (keep latest) ==="
+              docker image prune -f || true
+  
+              echo "=== Starting Rails app ==="
+              docker run -d \
+                --name myapp_container \
+                -p 3000:3000 \
+                -e RAILS_ENV=production \
+                -e RAILS_MASTER_KEY="$RAILS_MASTER_KEY" \
+                -e DATABASE_URL="$DATABASE_URL" \
+                -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+                -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+                -e AWS_REGION=us-east-1 \
+                -e AWS_BUCKET=ielts-learning-platform-uploads \
+                -e GMAIL_USERNAME="$GMAIL_USERNAME" \
+                -e GMAIL_APP_PASSWORD="$GMAIL_APP_PASSWORD" \
+                -e REDIS_URL="redis://:Nguyenthiphu1243@172.31.18.246:6379/0" \
+                -e APP_HOST="https://resigned-unincreased-agnus.ngrok-free.dev" \
+                -e STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
+                -e STRIPE_PUBLIC_KEY="$STRIPE_PUBLIC_KEY" \
+                -e STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
+                $DOCKER_USER/myapp:latest \
+                sh -c "rm -rf tmp/cache/* && bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
+  
+              echo "=== Waiting for Rails to start ==="
+              sleep 10
+              docker logs myapp_container --tail 20
+  
+              echo "=== Starting Sidekiq ==="
+              docker run -d \
+                --name sidekiq_worker \
+                -e RAILS_ENV=production \
+                -e RAILS_MASTER_KEY="$RAILS_MASTER_KEY" \
+                -e DATABASE_URL="$DATABASE_URL" \
+                -e AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" \
+                -e AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" \
+                -e AWS_REGION=us-east-1 \
+                -e AWS_BUCKET=ielts-learning-platform-uploads \
+                -e GMAIL_USERNAME="$GMAIL_USERNAME" \
+                -e GMAIL_APP_PASSWORD="$GMAIL_APP_PASSWORD" \
+                -e REDIS_URL="redis://:Nguyenthiphu1243@172.31.18.246:6379/0" \
+                -e APP_HOST="https://resigned-unincreased-agnus.ngrok-free.dev" \
+                -e STRIPE_SECRET_KEY="$STRIPE_SECRET_KEY" \
+                -e STRIPE_PUBLIC_KEY="$STRIPE_PUBLIC_KEY" \
+                -e STRIPE_WEBHOOK_SECRET="$STRIPE_WEBHOOK_SECRET" \
+                $DOCKER_USER/myapp:latest \
+                bundle exec sidekiq
+  
+              echo "=== Starting ngrok ==="
               pkill ngrok || true
-              nohup ngrok http 3000 > ngrok.log 2>&1 &
-              sleep 3
-              curl http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url'
-              
-            docker rm -f sidekiq_worker || true
-            docker run -d \
-              --name sidekiq_worker \
-              -e RAILS_ENV=$RAILS_ENV \
-              -e RAILS_MASTER_KEY=$RAILS_MASTER_KEY \
-              -e DATABASE_URL="$DATABASE_URL" \
-              -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-              -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-              -e AWS_REGION=us-east-1 \
-              -e AWS_BUCKET=ielts-learning-platform-uploads \
-              -e GMAIL_USERNAME=$GMAIL_USERNAME \
-              -e GMAIL_APP_PASSWORD=$GMAIL_APP_PASSWORD \
-              -e STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY \
-              -e STRIPE_PUBLIC_KEY=$STRIPE_PUBLIC_KEY \
-              -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
-              -e REDIS_URL=redis://:Nguyenthiphu1243@172.31.18.246:6379/0 \
-              -e APP_HOST=https://resigned-unincreased-agnus.ngrok-free.dev \
-              $DOCKER_USER/myapp:latest \
-              bundle exec sidekiq
+              sleep 2
+              nohup ngrok http 3000 > /tmp/ngrok.log 2>&1 &
+              sleep 5
+              curl -s http://127.0.0.1:4040/api/tunnels | jq -r '.tunnels[0].public_url' || echo "ngrok URL not available yet"
+  
+              echo "=== Deploy completed ==="
