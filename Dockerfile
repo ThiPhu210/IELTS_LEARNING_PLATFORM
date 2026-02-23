@@ -11,11 +11,11 @@ RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
       build-essential \
       git \
-      curl && \
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-    apt-get install --no-install-recommends -y nodejs && \
-    npm install -g yarn && \
+      curl \
+      nodejs && \
+    npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
+
 
 ENV RAILS_ENV=production \
     BUNDLE_DEPLOYMENT=1 \
