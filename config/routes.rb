@@ -14,7 +14,7 @@ Rails.application.routes.draw do
     root "home#index"
   end
 
-
+post "/stripe/webhook", to: "students/payments#stripe_webhook"
 # ================= STUDENT =================
 namespace :students do
   get "dashboard", to: "dashboard#index"
