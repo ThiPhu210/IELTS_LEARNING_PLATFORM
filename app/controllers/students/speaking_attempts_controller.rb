@@ -23,9 +23,14 @@ attempt = SpeakingAttempt.create!(
   audio_url: audio_url,
   status: "processing"
 )
+  result = SpeakingEvaluateService.new(attempt).call
+  
+  # Gửi mail sau (background)
+  InvoiceMailer.speaking_result(attempt).deliver_later
 
-    SpeakingEvaluateJob.perform_later(attempt.id)
-
-    head :ok
-  end
+  render json: {
+    score: attempt.reload.score,
+    feedback: attempt.reload.feedback,
+    band: attempt.reload.band
+  }
 end
