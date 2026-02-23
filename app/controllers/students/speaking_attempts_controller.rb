@@ -1,7 +1,8 @@
 class Students::SpeakingAttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create]
-
+  before_action :authenticate_user!
   def create
+    Rails.logger.info "=== SPEAKING ATTEMPT CREATE ==="
     audio = params[:audio]
 
     key = "speaking/#{SecureRandom.uuid}.webm"
