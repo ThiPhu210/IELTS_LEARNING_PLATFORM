@@ -1,13 +1,12 @@
 class SpeakingResultMailer < ApplicationMailer
-  default from: "no-reply@yourapp.com"
-
-  def send_result(attempt)
+  def result_email(attempt)
     @attempt = attempt
     @user = attempt.user
+    @course = attempt.course
 
     mail(
       to: @user.email,
-      subject: "Your Speaking Evaluation Result"
+      subject: "🎤 Your IELTS Speaking Result - Band #{@attempt.overall_band}"
     )
   end
 end
