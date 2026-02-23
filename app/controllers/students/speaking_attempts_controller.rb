@@ -1,50 +1,52 @@
 class Students::SpeakingAttemptsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:create]
   before_action :authenticate_user!
-def create
-  audio = params[:audio]
-  key = "speaking/#{SecureRandom.uuid}.webm"
-  s3 = Aws::S3::Resource.new
-  obj = s3.bucket(ENV["AWS_BUCKET"]).object(key)
-  obj.put(body: audio.read)
 
-  attempt = SpeakingAttempt.create!(
-    user: current_user,
-    course_id: params[:course_id],
-    speaking_topic_id: params[:speaking_topic_id],
-    part: params[:part],
-    transcript: params[:transcript],
-    audio_url: obj.public_url,
-    status: "processing"
-  )
+  def create
+    audio = params[:audio]
+    key = "speaking/#{SecureRandom.uuid}.webm"
+    s3 = Aws::S3::Resource.new
+    obj = s3.bucket(ENV["AWS_BUCKET"]).object(key)
+    obj.put(body: audio.read)
 
-  # Gọi Bedrock AI ngay
-  result = BedrockService.evaluate_speaking(attempt.transcript)
+    attempt = SpeakingAttempt.create!(
+      user: current_user,
+      course_id: params[:course_id],
+      speaking_topic_id: params[:speaking_topic_id],
+      part: params[:part],
+      transcript: params[:transcript],
+      audio_url: obj.public_url,
+      status: "processing"
+    )
 
-  attempt.update!(
-    score: result["overall"],
-    fluency: result["fluency"],
-    lexical: result["lexical"],
-    grammar: result["grammar"],
-    pronunciation: result["pronunciation"],
-    feedback: result["feedback"],
-    status: "evaluated"
-  )
+    # Gọi Bedrock AI ngay
+    result = BedrockService.evaluate_speaking(attempt.transcript)
 
-  SpeakingResultMailer.result_email(attempt).deliver_later
+    attempt.update!(
+      overall_band: result["overall"],
+      fluency_score: result["fluency"],
+      lexical_score: result["lexical"],
+      grammar_score: result["grammar"],
+      pronunciation_score: result["pronunciation"],
+      feedback: result["feedback"],
+      status: "evaluated"
+    )
 
-  render json: {
-    overall: result["overall"],
-    fluency: result["fluency"],
-    lexical: result["lexical"],
-    grammar: result["grammar"],
-    pronunciation: result["pronunciation"],
-    feedback: result["feedback"]
-  }
+    SpeakingResultMailer.result_email(attempt).deliver_later
 
-rescue => e
-  Rails.logger.error "Bedrock error: #{e.message}"
-  attempt&.update!(status: "failed")
-  render json: { error: "AI evaluation failed" }, status: :unprocessable_entity
-end
+    render json: {
+      overall: attempt.overall_band,
+      fluency: attempt.fluency_score,
+      lexical: attempt.lexical_score,
+      grammar: attempt.grammar_score,
+      pronunciation: attempt.pronunciation_score,
+      feedback: attempt.feedback
+    }
+
+  rescue => e
+    Rails.logger.error "Bedrock error: #{e.message}"
+    Rails.logger.error e.backtrace.first(5).join("\n")
+    attempt&.update!(status: "failed")
+    render json: { error: "AI evaluation failed: #{e.message}" }, status: :unprocessable_entity
+  end
 end
