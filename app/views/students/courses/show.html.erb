@@ -886,13 +886,42 @@ startBtn.addEventListener('click', async () => {
     });
 
     if (res.ok) {
-      showStatus('success', '🤖 Recording submitted! AI is evaluating your response...');
-      startBtn.textContent = '🔄 Try Again';
-      startBtn.disabled = false;
-      startBtn.onclick = () => { resetModal(); };
-    } else {
-      throw new Error('Server error');
-    }
+  const result = await res.json();
+
+  document.getElementById('transcript-display').innerHTML = `
+    <div style="margin-top:8px">
+      <p style="color:var(--green);font-weight:800;font-size:1.2rem;margin-bottom:12px">
+        🏆 Overall Band: ${result.overall}
+      </p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">
+          🗣 Fluency: <b>${result.fluency}</b>
+        </span>
+        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">
+          📚 Lexical: <b>${result.lexical}</b>
+        </span>
+        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">
+          ✏️ Grammar: <b>${result.grammar}</b>
+        </span>
+        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">
+          🎵 Pronunciation: <b>${result.pronunciation}</b>
+        </span>
+      </div>
+      <p style="color:var(--muted);font-size:0.85rem;line-height:1.7;border-top:1px solid var(--border);padding-top:10px">
+        💬 ${result.feedback}
+      </p>
+    </div>
+  `;
+
+  showStatus('success', '✅ AI đã chấm xong!');
+  startBtn.textContent = '🔄 Try Again';
+  startBtn.disabled = false;
+  startBtn.onclick = () => resetModal();
+} else {
+  showStatus('error', '❌ AI evaluation failed. Please try again.');
+  startBtn.disabled = false;
+  startBtn.textContent = '🔄 Retry';
+}
   } catch(err) {
     showStatus('error', '❌ Upload failed. Please try again.');
     startBtn.disabled = false;
