@@ -322,5 +322,20 @@ skip_before_action :verify_authenticity_token,
 
   head :ok
 end
+def stripe_success
+  session_id = params[:session_id]
+  stripe_session = Stripe::Checkout::Session.retrieve(session_id)
+  payment = Payment.find_by(gateway_order_id: stripe_session.id)
 
+  if payment&.paid_status?
+    redirect_to students_dashboard_path, notice: "Thanh toán Stripe thành công 🎉"
+  else
+    # Webhook chưa kịp xử lý, vẫn redirect thành công
+    redirect_to students_dashboard_path, notice: "Đang xác nhận thanh toán..."
+  end
+end
+
+def stripe_cancel
+  redirect_to students_courses_path, alert: "Bạn đã hủy thanh toán Stripe"
+end
 end
