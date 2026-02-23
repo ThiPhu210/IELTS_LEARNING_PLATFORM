@@ -26,9 +26,6 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
       "pronunciation" => 6.5,
       "feedback" => "Good job!"
     })
-
-    # Stub mailer
-    allow_any_instance_of(ActionMailer::MessageDelivery).to receive(:deliver_later)
   end
 
   it "creates speaking attempt successfully" do
