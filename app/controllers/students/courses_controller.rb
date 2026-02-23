@@ -32,11 +32,8 @@ class Students::CoursesController < ApplicationController
 end
 
 def show
-  @course = Course
-              .includes(course_sections: :lessons)
-              .find(params[:id])
-
-  @sections = @course.course_sections
+  @course = Course.find(params[:id])
+  @sections = @course.course_sections.includes(lessons: [:speaking_topics => :speaking_questions])
 end
 
 
