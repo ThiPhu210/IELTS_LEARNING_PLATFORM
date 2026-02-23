@@ -14,14 +14,15 @@ class Students::SpeakingAttemptsController < ApplicationController
 
     audio_url = obj.public_url
 
-    attempt = SpeakingAttempt.create!(
-      user: current_user,
-      course_id: params[:course_id],
-      speaking_topic_id: params[:speaking_topic_id],
-      part: params[:part],
-      audio_url: audio_url,
-      status: "processing"
-    )
+attempt = SpeakingAttempt.create!(
+  user: current_user,
+  course_id: params[:course_id],
+  speaking_topic_id: params[:speaking_topic_id],
+  part: params[:part],
+  transcript: params[:transcript],
+  audio_url: audio_url,
+  status: "processing"
+)
 
     SpeakingEvaluateJob.perform_later(attempt.id)
 
