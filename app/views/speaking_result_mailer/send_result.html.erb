@@ -1,0 +1,15 @@
+<h2>Your Speaking Evaluation Result</h2>
+
+<p><strong>Overall Band:</strong> <%= @attempt.overall_band %></p>
+
+<ul>
+  <li>Fluency: <%= @attempt.fluency_score %></li>
+  <li>Lexical: <%= @attempt.lexical_score %></li>
+  <li>Grammar: <%= @attempt.grammar_score %></li>
+  <li>Pronunciation: <%= @attempt.pronunciation_score %></li>
+</ul>
+
+<h3>Feedback</h3>
+<p><%= @attempt.feedback %></p>
+
+<p>Keep practicing 💪</p>
