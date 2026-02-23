@@ -9,12 +9,12 @@ WORKDIR /rails
 
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
-      libpq-dev \
-      curl \
-      postgresql-client \
-      libjemalloc2 \
-      libvips \
-      imagemagick && \
+      build-essential \
+      git \
+      curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install --no-install-recommends -y nodejs && \
+    npm install -g yarn && \
     rm -rf /var/lib/apt/lists/*
 
 ENV RAILS_ENV=production \
