@@ -1,283 +1,905 @@
 <%= render "students/shared/navbar" %>
 
-<div class="pt-28 pb-20 bg-slate-100 min-h-screen">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
-<div class="max-w-6xl mx-auto px-6">
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #22263a;
+    --border: #2e3350;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --green: #22d3a5;
+    --yellow: #fbbf24;
+    --text: #e8eaf6;
+    --muted: #7b82a8;
+    --radius: 16px;
+  }
 
-<!-- COURSE HEADER -->
-<div class="mb-12">
-  <h1 class="text-4xl font-bold text-slate-900 mb-3">
-    <%= @course.title %>
-  </h1>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-  <% if @course.description.present? %>
-    <p class="text-slate-600 max-w-3xl">
-      <%= @course.description %>
-    </p>
-  <% end %>
-</div>
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+  }
 
-<!-- SECTIONS -->
-<% @sections.each do |section| %>
+  .page-wrapper {
+    padding-top: 100px;
+    padding-bottom: 80px;
+    min-height: 100vh;
+    background:
+      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(108,99,255,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 30% at 10% 80%, rgba(34,211,165,0.08) 0%, transparent 60%),
+      var(--bg);
+  }
 
-<div class="mb-14">
+  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
-  <div class="flex items-center gap-3 mb-6">
-    <div class="w-10 h-10 flex items-center justify-center rounded-xl bg-indigo-600 text-white font-bold">
-      📚
-    </div>
-    <h2 class="text-2xl font-semibold text-slate-800">
-      <%= section.title %>
-    </h2>
+  /* ── Course Header ── */
+  .course-header {
+    margin-bottom: 48px;
+    padding: 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .course-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--green));
+  }
+
+  .course-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+  }
+
+  .course-desc { color: var(--muted); font-size: 1rem; line-height: 1.6; }
+
+  /* ── Section ── */
+  .section-block { margin-bottom: 48px; }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-icon {
+    width: 40px; height: 40px;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  /* ── Lesson Card ── */
+  .lesson-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color 0.2s;
+  }
+
+  .lesson-card:hover { border-color: rgba(108,99,255,0.4); }
+
+  .lesson-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .lesson-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .duration-badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    flex-shrink: 0;
+  }
+
+  /* ── Video ── */
+  .video-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    background: #000;
+  }
+
+  .video-wrap video { width: 100%; display: block; max-height: 420px; }
+
+  /* ── PDF ── */
+  .pdf-section { margin-bottom: 20px; }
+  .pdf-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  .pdf-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .pdf-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: rgba(108,99,255,0.1);
+    border: 1px solid rgba(108,99,255,0.3);
+    border-radius: 8px;
+    color: #a5b4fc;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .pdf-link:hover { background: rgba(108,99,255,0.2); color: #c7d2fe; }
+
+  /* ── Speaking Block ── */
+  .speaking-block {
+    margin-top: 24px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+
+  .speaking-block-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── Topic Card ── */
+  .topic-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+
+  .topic-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+
+  .topic-title { font-weight: 600; color: var(--text); }
+
+  .part-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .part-badge.part1 { background: rgba(34,211,165,0.15); color: var(--green); border: 1px solid rgba(34,211,165,0.3); }
+  .part-badge.part2 { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+  .part-badge.part3 { background: rgba(108,99,255,0.15); color: #a5b4fc; border: 1px solid rgba(108,99,255,0.3); }
+
+  /* ── Question ── */
+  .question-block { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px; }
+
+  .question-text {
+    font-size: 0.95rem;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .cue-card {
+    background: rgba(251,191,36,0.08);
+    border: 1px solid rgba(251,191,36,0.2);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 12px;
+  }
+
+  .cue-card-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--yellow);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .cue-card-text {
+    font-size: 0.875rem;
+    color: #d1d5db;
+    white-space: pre-line;
+    line-height: 1.6;
+  }
+
+  .time-info { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+
+  .time-badge {
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .time-badge.prep { background: rgba(59,130,246,0.1); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
+  .time-badge.speak { background: rgba(34,211,165,0.1); color: var(--green); border: 1px solid rgba(34,211,165,0.2); }
+
+  /* ── Speaking Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 36px;
+    width: 100%;
+    max-width: 600px;
+    margin: 20px;
+    position: relative;
+    animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.9) translateY(20px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 32px; height: 32px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--border); color: var(--text); }
+
+  .modal-q {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 24px;
+    line-height: 1.5;
+    padding-right: 40px;
+  }
+
+  /* ── Phase Display ── */
+  .phase-display {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .phase-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .phase-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+
+  .timer-ring-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 120px; height: 120px;
+  }
+
+  .timer-ring svg {
+    transform: rotate(-90deg);
+    width: 120px; height: 120px;
+  }
+
+  .timer-ring circle.bg {
+    fill: none;
+    stroke: var(--surface2);
+    stroke-width: 8;
+  }
+
+  .timer-ring circle.progress {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 339.3;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+  }
+
+  .timer-ring circle.progress.speaking-phase { stroke: var(--accent2); }
+  .timer-ring circle.progress.done-phase { stroke: var(--green); }
+
+  .timer-number {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+  }
+
+  /* ── Waveform ── */
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 40px;
+    margin-bottom: 16px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .waveform.active { opacity: 1; }
+
+  .waveform-bar {
+    width: 4px;
+    background: var(--accent2);
+    border-radius: 2px;
+    animation: wave 0.8s ease-in-out infinite;
+    min-height: 4px;
+  }
+
+  @keyframes wave {
+    0%, 100% { height: 8px; }
+    50% { height: 32px; }
+  }
+
+  /* ── Transcript ── */
+  .transcript-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 80px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .transcript-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .transcript-text {
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--text);
+    min-height: 40px;
+  }
+
+  .transcript-interim { color: var(--muted); font-style: italic; }
+
+  .transcript-placeholder {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 0.85rem;
+  }
+
+  /* ── Btn ── */
+  .btn-speak {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: 'Outfit', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .btn-speak.primary {
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: #fff;
+  }
+
+  .btn-speak.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
+  .btn-speak:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  /* ── Start btn on card ── */
+  .btn-start {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-start:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.4); }
+
+  /* ── Status message ── */
+  .status-msg {
+    display: none;
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .status-msg.success { background: rgba(34,211,165,0.15); color: var(--green); border: 1px solid rgba(34,211,165,0.3); display: block; }
+  .status-msg.uploading { background: rgba(108,99,255,0.15); color: #a5b4fc; border: 1px solid rgba(108,99,255,0.3); display: block; }
+  .status-msg.error { background: rgba(255,101,132,0.15); color: var(--accent2); border: 1px solid rgba(255,101,132,0.3); display: block; }
+
+  /* ── Attempt history ── */
+  .attempt-result {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: rgba(34,211,165,0.08);
+    border: 1px solid rgba(34,211,165,0.2);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    color: var(--green);
+    display: none;
+  }
+</style>
+
+<div class="page-wrapper">
+<div class="container">
+
+  <!-- Course Header -->
+  <div class="course-header">
+    <h1 class="course-title">📘 <%= @course.title %></h1>
+    <% if @course.description.present? %>
+      <p class="course-desc"><%= @course.description %></p>
+    <% end %>
   </div>
 
-  <!-- LESSONS -->
-  <div class="space-y-8">
+  <!-- Sections -->
+  <% @sections.each_with_index do |section, si| %>
+  <div class="section-block">
 
-  <% section.lessons.each do |lesson| %>
-
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-7">
-
-    <!-- LESSON HEADER -->
-    <div class="flex justify-between items-center mb-5">
-      <h3 class="text-lg font-semibold text-slate-800">
-        🎬 <%= lesson.title %>
-      </h3>
-
-      <% if lesson.duration.present? %>
-        <span class="text-xs px-3 py-1 bg-slate-100 rounded-full text-slate-600">
-          ⏱ <%= lesson.duration %> mins
-        </span>
-      <% end %>
+    <div class="section-heading">
+      <div class="section-icon">📚</div>
+      <h2 class="section-title"><%= section.title %></h2>
     </div>
 
-    <!-- VIDEO -->
-    <% if lesson.video.attached? %>
-      <div class="overflow-hidden rounded-xl border mb-6">
-        <video controls class="w-full">
-          <source src="<%= url_for(lesson.video) %>" type="video/mp4">
-        </video>
-      </div>
-    <% end %>
+    <!-- Lessons -->
+    <% section.lessons.each do |lesson| %>
+    <div class="lesson-card">
 
-    <!-- PDF MATERIALS -->
-    <% if lesson.pdfs.attached? %>
-      <div class="mb-6">
-        <p class="font-semibold text-slate-700 mb-3">
-          📄 Lesson Materials
-        </p>
-
-        <div class="flex flex-wrap gap-3">
-          <% lesson.pdfs.each do |pdf| %>
-            <%= link_to pdf.filename,
-                  url_for(pdf),
-                  target: "_blank",
-                  class:"px-4 py-2 rounded-lg bg-indigo-50
-                         text-indigo-700 text-sm
-                         hover:bg-indigo-100 transition
-                         border border-indigo-200" %>
-          <% end %>
-        </div>
-      </div>
-    <% end %>
-
-    <!-- SPEAKING -->
-    <% if lesson.speaking_topics.any? %>
-
-    <div class="mt-6 bg-slate-50 border rounded-2xl p-6">
-
-      <h4 class="text-lg font-semibold text-slate-800 mb-6">
-        🎤 Speaking Practice
-      </h4>
-
-      <div class="space-y-6">
-
-      <% lesson.speaking_topics.each do |topic| %>
-
-      <div class="bg-white border rounded-xl p-5 shadow-sm">
-
-        <div class="flex justify-between items-center mb-4">
-
-          <p class="font-semibold text-slate-800">
-            <%= topic.title %>
-          </p>
-
-          <span class="px-3 py-1 text-xs rounded-full
-                       bg-indigo-100 text-indigo-700 font-medium">
-            <%= topic.part.upcase %>
-          </span>
-
-        </div>
-
-        <!-- QUESTIONS -->
-        <div class="space-y-5">
-
-        <% topic.speaking_questions.each do |q| %>
-
-        <div class="border-t pt-4">
-
-          <p class="font-medium text-slate-700 mb-2">
-            ❓ <%= q.question_text %>
-          </p>
-
-          <% if q.cue_card.present? %>
-          <div class="bg-yellow-50 border border-yellow-200
-                      rounded-xl p-4 text-sm text-slate-700 mb-3">
-            <p class="font-semibold text-yellow-700 mb-1">
-              📝 Cue Card
-            </p>
-            <p class="whitespace-pre-line">
-              <%= q.cue_card %>
-            </p>
-          </div>
-          <% end %>
-
-          <div class="flex flex-wrap gap-3 text-xs">
-
-            <% if q.preparation_time.present? %>
-              <span class="px-3 py-1 rounded-full
-                           bg-blue-50 text-blue-700
-                           border border-blue-200">
-                ⏱ Preparation: <b><%= q.preparation_time %> sec</b>
-              </span>
-            <% end %>
-
-            <% if q.speaking_time.present? %>
-              <span class="px-3 py-1 rounded-full
-                           bg-emerald-50 text-emerald-700
-                           border border-emerald-200">
-                🎙 Speaking: <b><%= q.speaking_time %> sec</b>
-              </span>
-            <% end %>
-
-          </div>
-
-        </div>
-        <div class="mt-4">
-
-        <button
-          class="start-speaking px-4 py-2 bg-indigo-600 text-white rounded-lg"
-          data-prep="<%= q.preparation_time %>"
-          data-speak="<%= q.speaking_time %>"
-          data-topic="<%= topic.id %>"
-          data-course="<%= @course.id %>"
-          data-part="<%= topic.part %>">
-      
-          🎤 Start Speaking
-        </button>
-      
-        <div class="timer-display mt-3 text-xl font-bold text-red-600"></div>
-      
-      </div>
-      
+      <div class="lesson-header">
+        <h3 class="lesson-title">🎬 <%= lesson.title %></h3>
+        <% if lesson.duration.present? %>
+          <span class="duration-badge">⏱ <%= lesson.duration %> min</span>
         <% end %>
-
-        </div>
-
       </div>
 
+      <!-- Video -->
+      <% if lesson.video.attached? %>
+        <div class="video-wrap">
+          <video controls>
+            <source src="<%= url_for(lesson.video) %>" type="video/mp4">
+          </video>
+        </div>
       <% end %>
 
-      </div>
+      <!-- PDFs -->
+      <% if lesson.pdfs.attached? %>
+        <div class="pdf-section">
+          <p class="pdf-label">📄 Materials</p>
+          <div class="pdf-list">
+            <% lesson.pdfs.each do |pdf| %>
+              <a href="<%= url_for(pdf) %>" target="_blank" class="pdf-link">
+                📎 <%= pdf.filename %>
+              </a>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Speaking -->
+      <% if lesson.speaking_topics.any? %>
+        <div class="speaking-block">
+          <p class="speaking-block-title">🎤 Speaking Practice</p>
+
+          <% lesson.speaking_topics.each do |topic| %>
+          <div class="topic-card">
+
+            <div class="topic-header">
+              <span class="topic-title"><%= topic.title %></span>
+              <span class="part-badge <%= topic.part %>"><%= topic.part.upcase %></span>
+            </div>
+
+            <% topic.speaking_questions.each do |q| %>
+            <div class="question-block">
+
+              <p class="question-text">❓ <%= q.question_text %></p>
+
+              <% if q.cue_card.present? %>
+                <div class="cue-card">
+                  <p class="cue-card-label">📝 Cue Card</p>
+                  <p class="cue-card-text"><%= q.cue_card %></p>
+                </div>
+              <% end %>
+
+              <div class="time-info">
+                <% if q.preparation_time.present? %>
+                  <span class="time-badge prep">🧠 Prep: <%= q.preparation_time %>s</span>
+                <% end %>
+                <% if q.speaking_time.present? %>
+                  <span class="time-badge speak">🎙 Speak: <%= q.speaking_time %>s</span>
+                <% end %>
+              </div>
+
+              <button class="btn-start"
+                data-modal="speaking-modal"
+                data-prep="<%= q.preparation_time || 60 %>"
+                data-speak="<%= q.speaking_time || 120 %>"
+                data-topic="<%= topic.id %>"
+                data-course="<%= @course.id %>"
+                data-part="<%= topic.part %>"
+                data-question="<%= q.question_text %>">
+                🎤 Start Speaking
+              </button>
+
+              <div class="attempt-result" id="result-<%= q.id %>"></div>
+
+            </div>
+            <% end %>
+
+          </div>
+          <% end %>
+        </div>
+      <% end %>
 
     </div>
-
     <% end %>
 
   </div>
-
   <% end %>
 
+</div>
+</div>
+
+<!-- Speaking Modal -->
+<div class="modal-overlay" id="speaking-modal">
+  <div class="modal">
+
+    <button class="modal-close" id="modal-close-btn">✕</button>
+
+    <p class="modal-q" id="modal-question"></p>
+
+    <div class="phase-display">
+      <p class="phase-label">Current Phase</p>
+      <p class="phase-name" id="phase-name">Ready</p>
+
+      <div class="timer-ring-wrap">
+        <div class="timer-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="bg" cx="60" cy="60" r="54"/>
+            <circle class="progress" id="ring-progress" cx="60" cy="60" r="54"/>
+          </svg>
+          <div class="timer-number" id="timer-number">—</div>
+        </div>
+      </div>
+
+      <div class="waveform" id="waveform">
+        <% 12.times do |i| %>
+          <div class="waveform-bar" style="animation-delay: <%= i * 0.07 %>s"></div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Live Transcript -->
+    <div class="transcript-wrap">
+      <p class="transcript-label">📝 Live Transcript</p>
+      <div class="transcript-text" id="transcript-display">
+        <span class="transcript-placeholder">Your words will appear here as you speak...</span>
+      </div>
+    </div>
+
+    <button class="btn-speak primary" id="modal-start-btn">
+      🎤 Begin Session
+    </button>
+
+    <div class="status-msg" id="status-msg"></div>
   </div>
-
-</div>
-
-<% end %>
-
-</div>
 </div>
 
 <script>
-let mediaRecorder;
-let chunks = [];
+// ── State ──
+let mediaRecorder, audioChunks = [];
+let recognition, finalTranscript = '', interimTranscript = '';
+let currentData = {};
+let timerInterval = null;
+let totalSeconds = 0;
+const CIRCUMFERENCE = 2 * Math.PI * 54; // 339.3
 
-async function startRecording() {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+const modal        = document.getElementById('speaking-modal');
+const modalQ       = document.getElementById('modal-question');
+const phaseName    = document.getElementById('phase-name');
+const timerNum     = document.getElementById('timer-number');
+const ringProgress = document.getElementById('ring-progress');
+const waveform     = document.getElementById('waveform');
+const transcriptEl = document.getElementById('transcript-display');
+const startBtn     = document.getElementById('modal-start-btn');
+const statusMsg    = document.getElementById('status-msg');
 
-  mediaRecorder = new MediaRecorder(stream);
+// ── Open modal ──
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-modal]');
+  if (!btn) return;
 
-  mediaRecorder.ondataavailable = e => {
-    chunks.push(e.data);
+  currentData = {
+    prep: parseInt(btn.dataset.prep),
+    speak: parseInt(btn.dataset.speak),
+    topic: btn.dataset.topic,
+    course: btn.dataset.course,
+    part: btn.dataset.part,
+    question: btn.dataset.question
   };
 
+  modalQ.textContent = '❓ ' + currentData.question;
+  resetModal();
+  modal.classList.add('active');
+});
+
+// ── Close modal ──
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+function closeModal() {
+  stopRecording();
+  stopRecognition();
+  clearInterval(timerInterval);
+  modal.classList.remove('active');
+}
+
+// ── Reset ──
+function resetModal() {
+  finalTranscript = '';
+  interimTranscript = '';
+  transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
+  phaseName.textContent = 'Ready';
+  timerNum.textContent = '—';
+  ringProgress.style.strokeDashoffset = 0;
+  ringProgress.className = 'progress';
+  waveform.classList.remove('active');
+  startBtn.disabled = false;
+  startBtn.textContent = '🎤 Begin Session';
+  statusMsg.className = 'status-msg';
+  statusMsg.textContent = '';
+  ringProgress.style.strokeDasharray = CIRCUMFERENCE;
+}
+
+// ── Countdown ring ──
+function runTimer(seconds, label, phaseClass) {
+  return new Promise(resolve => {
+    totalSeconds = seconds;
+    let remaining = seconds;
+
+    phaseName.textContent = label;
+    ringProgress.className = 'progress ' + phaseClass;
+    ringProgress.style.strokeDasharray = CIRCUMFERENCE;
+    ringProgress.style.strokeDashoffset = 0;
+    timerNum.textContent = remaining;
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      remaining--;
+      timerNum.textContent = remaining;
+      const offset = CIRCUMFERENCE * (1 - remaining / totalSeconds);
+      ringProgress.style.strokeDashoffset = offset;
+
+      if (remaining <= 0) {
+        clearInterval(timerInterval);
+        resolve();
+      }
+    }, 1000);
+  });
+}
+
+// ── Speech Recognition ──
+function startRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+
+  recognition = new SR();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalTranscript += t + ' ';
+      else interimTranscript += t;
+    }
+    updateTranscript();
+  };
+
+  recognition.onerror = (e) => console.warn('Recognition error:', e.error);
+  recognition.start();
+}
+
+function stopRecognition() {
+  try { if (recognition) recognition.stop(); } catch(e) {}
+}
+
+function updateTranscript() {
+  if (!finalTranscript && !interimTranscript) return;
+  transcriptEl.innerHTML =
+    '<span style="color:var(--text)">' + finalTranscript + '</span>' +
+    '<span class="transcript-interim">' + interimTranscript + '</span>';
+}
+
+// ── MediaRecorder ──
+async function startRecording() {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  audioChunks = [];
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
   mediaRecorder.start();
 }
 
 function stopRecording() {
   return new Promise(resolve => {
-
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') { resolve(null); return; }
     mediaRecorder.onstop = () => {
-      const blob = new Blob(chunks, { type: "audio/webm" });
-      chunks = [];
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      audioChunks = [];
       resolve(blob);
     };
-
     mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(t => t.stop());
   });
 }
 
-function countdown(sec, el, label) {
-  return new Promise(resolve => {
+// ── Main flow ──
+startBtn.addEventListener('click', async () => {
+  startBtn.disabled = true;
+  startBtn.textContent = '⏳ Starting...';
+  statusMsg.className = 'status-msg';
 
-    let s = sec;
+  // Phase 1: Preparation
+  await runTimer(currentData.prep, '🧠 Preparation Time', '');
 
-    const i = setInterval(() => {
-      el.innerText = `${label}: ${s}s`;
-      s--;
+  // Phase 2: Speaking
+  phaseName.textContent = '🎙 Speak Now!';
+  waveform.classList.add('active');
 
-      if (s < 0) {
-        clearInterval(i);
-        resolve();
-      }
+  try {
+    await startRecording();
+    startRecognition();
+  } catch(err) {
+    showStatus('error', '❌ Microphone access denied. Please allow mic and try again.');
+    startBtn.disabled = false;
+    startBtn.textContent = '🎤 Begin Session';
+    return;
+  }
 
-    }, 1000);
+  await runTimer(currentData.speak, '🎙 Speaking...', 'speaking-phase');
 
-  });
-}
+  // Done
+  waveform.classList.remove('active');
+  stopRecognition();
+  phaseName.textContent = '✅ Done!';
+  ringProgress.className = 'progress done-phase';
+  timerNum.textContent = '✓';
 
-document.addEventListener("click", async e => {
-
-  if (!e.target.classList.contains("start-speaking")) return;
-
-  const btn = e.target;
-  const timer = btn.parentElement.querySelector(".timer-display");
-
-  btn.disabled = true;
-
-  await countdown(btn.dataset.prep, timer, "🧠 Preparation");
-
-  timer.innerText = "🎙 Time to complete your speaking task";
-
-  await startRecording();
-
-  await countdown(btn.dataset.speak, timer, "🎤 Speaking");
+  showStatus('uploading', '⬆️ Uploading your recording...');
 
   const audioBlob = await stopRecording();
 
-  timer.innerText = "⬆ Uploading...";
+  try {
+    const form = new FormData();
+    form.append('audio', audioBlob, 'recording.webm');
+    form.append('transcript', finalTranscript.trim());
+    form.append('speaking_topic_id', currentData.topic);
+    form.append('course_id', currentData.course);
+    form.append('part', currentData.part);
 
-  const form = new FormData();
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-  form.append("audio", audioBlob);
-  form.append("speaking_topic_id", btn.dataset.topic);
-  form.append("course_id", btn.dataset.course);
-  form.append("part", btn.dataset.part);
+    const res = await fetch('/students/speaking_attempts', {
+      method: 'POST',
+      headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+      body: form
+    });
 
-  await fetch("/students/speaking_attempts", {
-    method: "POST",
-    body: form
-  });
-
-  timer.innerText = "🤖 AI is evaluating...";
+    if (res.ok) {
+      showStatus('success', '🤖 Recording submitted! AI is evaluating your response...');
+      startBtn.textContent = '🔄 Try Again';
+      startBtn.disabled = false;
+      startBtn.onclick = () => { resetModal(); };
+    } else {
+      throw new Error('Server error');
+    }
+  } catch(err) {
+    showStatus('error', '❌ Upload failed. Please try again.');
+    startBtn.disabled = false;
+    startBtn.textContent = '🔄 Retry';
+  }
 });
+
+function showStatus(type, msg) {
+  statusMsg.className = 'status-msg ' + type;
+  statusMsg.textContent = msg;
+}
 </script>
