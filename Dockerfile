@@ -6,14 +6,15 @@ ARG RUBY_VERSION=3.3.5
 FROM ruby:${RUBY_VERSION}-slim AS base
 WORKDIR /rails
 
-# Cài curl trước, sau đó mới dùng curl để setup NodeSource
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y curl && \
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install --no-install-recommends -y \
       build-essential \
       git \
-      nodejs && \
+      nodejs \
+      imagemagick \        
+      libvips-tools && \   
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
 
