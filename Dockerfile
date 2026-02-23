@@ -7,14 +7,14 @@ FROM ruby:${RUBY_VERSION}-slim AS base
 
 WORKDIR /rails
 
-RUN apt-get update -qq && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install --no-install-recommends -y \
       build-essential \
       git \
-      curl \
       nodejs && \
     npm install --global yarn && \
     rm -rf /var/lib/apt/lists/*
+
 
 
 ENV RAILS_ENV=production \
