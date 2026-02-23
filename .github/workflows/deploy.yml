@@ -179,7 +179,8 @@ jobs:
               -e STRIPE_PUBLIC_KEY=$STRIPE_PUBLIC_KEY \
               -e STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET \
               $DOCKER_USER/myapp:latest \
-              sh -c "DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:drop db:create db:migrate db:seed && bundle exec rails server -b 0.0.0.0 -p 3000"
+              $DOCKER_USER/myapp:latest \
+              sh -c "rm -rf tmp/cache/* && DISABLE_DATABASE_ENVIRONMENT_CHECK=1 bundle exec rails db:migrate && bundle exec rails server -b 0.0.0.0 -p 3000"
               echo "Starting ngrok..."
               pkill ngrok || true
               nohup ngrok http 3000 > ngrok.log 2>&1 &
