@@ -207,7 +207,133 @@ body {
     </div>
     <div class="card-body">
       <div class="order-hint">⠿ Drag to reorder sections and lessons</div>
-      <div id="sections"></div>
+      <div id="sections">
+  <% @course.course_sections.order(:position).each_with_index do |section, s_idx| %>
+    <div class="section-item" data-section-id="<%= s_idx %>">
+      <div class="section-header">
+        <div class="drag-handle section-drag"><span></span><span></span><span></span></div>
+        <div class="section-badge"><%= s_idx + 1 %></div>
+        <%= f.fields_for :course_sections_attributes, {s_idx => section} do |sf| %>
+          <%= sf.hidden_field :id %>
+          <%= sf.hidden_field :_destroy, value: 0 %>
+          <%= sf.text_field :title, class: "section-title-inline", placeholder: "Section title…" %>
+        <% end %>
+        <div class="section-actions">
+          <button type="button" class="btn-icon" onclick="toggleSection(this)"><span class="section-toggle">▾</span></button>
+          <button type="button" class="btn-icon danger" onclick="removeSection(this)">🗑</button>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="lessons-list">
+          <% section.lessons.order(:position).each_with_index do |lesson, l_idx| %>
+            <%
+              l_prefix = "course[course_sections_attributes][#{s_idx}][lessons_attributes][#{l_idx}]"
+            %>
+            <div class="lesson-item" data-lesson-id="<%= lesson.id %>">
+              <div class="lesson-header">
+                <div class="lesson-drag"><span></span><span></span></div>
+                <span class="lesson-type-badge badge-video">Video</span>
+                <input type="hidden" name="<%= l_prefix %>[id]" value="<%= lesson.id %>">
+                <input type="hidden" name="<%= l_prefix %>[_destroy]" value="0">
+                <input type="text" class="lesson-name-inline" name="<%= l_prefix %>[title]" value="<%= lesson.title %>" placeholder="Lesson title…">
+                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <input type="number" class="input" style="width:72px;padding:5px 8px;font-size:12px;" name="<%= l_prefix %>[duration]" value="<%= lesson.duration %>" placeholder="min">
+                  <span style="font-size:11px;color:var(--text-dim);">min</span>
+                  <button type="button" class="btn-icon danger" onclick="removeLesson(this)">🗑</button>
+                </div>
+              </div>
+              <div class="lesson-body">
+                <div class="tabs">
+                  <button type="button" class="tab active" onclick="switchTab(this,'video')">🎬 Video</button>
+                  <button type="button" class="tab" onclick="switchTab(this,'pdf')">📄 PDF</button>
+                  <button type="button" class="tab" onclick="switchTab(this,'speaking')">🎤 Speaking</button>
+                </div>
+                <div class="tab-panel active" data-tab="video">
+                  <div class="upload-zone">
+                    <input type="file" accept="video/mp4" name="<%= l_prefix %>[video]" onchange="handleVideoUpload(this)">
+                    <span class="upload-zone-icon">🎬</span>
+                    <div>
+                      <% if lesson.video.attached? %>
+                        <div class="upload-zone-text">✅ <%= lesson.video.filename %></div>
+                      <% else %>
+                        <div class="upload-zone-text">Upload video lesson</div>
+                      <% end %>
+                      <div class="upload-zone-hint">MP4 · Max 5MB</div>
+                    </div>
+                  </div>
+                  <div class="video-preview-wrap"></div>
+                </div>
+                <div class="tab-panel" data-tab="pdf">
+                  <div class="upload-zone">
+                    <input type="file" multiple accept="application/pdf" name="<%= l_prefix %>[pdfs][]" onchange="handlePDFUpload(this)">
+                    <span class="upload-zone-icon">📄</span>
+                    <div>
+                      <div class="upload-zone-text">Upload PDF materials</div>
+                      <div class="upload-zone-hint">PDF · Max 500KB each</div>
+                    </div>
+                  </div>
+                  <div class="pdf-list">
+                    <% lesson.pdfs.each do |pdf| %>
+                      <div class="pdf-item">📄 <%= pdf.filename %></div>
+                    <% end %>
+                  </div>
+                </div>
+                <div class="tab-panel" data-tab="speaking">
+                  <div class="speaking-section">
+                    <div class="speaking-label">🎤 Speaking Exercises</div>
+                    <div class="topics-container">
+                      <% lesson.speaking_topics.each_with_index do |topic, t_idx| %>
+                        <% t_prefix = "#{l_prefix}[speaking_topics_attributes][#{t_idx}]" %>
+                        <div class="topic-box">
+                          <div class="grid-2" style="margin-bottom:10px;">
+                            <input type="hidden" name="<%= t_prefix %>[id]" value="<%= topic.id %>">
+                            <input type="text" class="input" name="<%= t_prefix %>[title]" value="<%= topic.title %>" placeholder="Topic title…">
+                            <select class="select part-select" name="<%= t_prefix %>[part]" onchange="toggleCueCard(this)">
+                              <option value="part1" <%= 'selected' if topic.part == 'part1' %>>PART 1</option>
+                              <option value="part2" <%= 'selected' if topic.part == 'part2' %>>PART 2</option>
+                              <option value="part3" <%= 'selected' if topic.part == 'part3' %>>PART 3</option>
+                            </select>
+                          </div>
+                          <div class="questions-container">
+                            <% topic.speaking_questions.each_with_index do |q, q_idx| %>
+                              <% q_prefix = "#{t_prefix}[speaking_questions_attributes][#{q_idx}]" %>
+                              <div class="question-item">
+                                <input type="hidden" name="<%= q_prefix %>[id]" value="<%= q.id %>">
+                                <label>Question</label>
+                                <textarea class="textarea" style="font-size:13px;min-height:56px;" name="<%= q_prefix %>[question_text]"><%= q.question_text %></textarea>
+                                <div class="cue-card-field <%= 'hidden' unless topic.part == 'part2' %>" style="margin-top:8px;">
+                                  <label>Cue Card</label>
+                                  <textarea class="textarea" style="font-size:13px;min-height:56px;" name="<%= q_prefix %>[cue_card]"><%= q.cue_card %></textarea>
+                                </div>
+                                <div class="grid-2" style="margin-top:10px;">
+                                  <div>
+                                    <label>Prep Time (sec)</label>
+                                    <input type="number" class="input" name="<%= q_prefix %>[preparation_time]" value="<%= q.preparation_time %>">
+                                  </div>
+                                  <div>
+                                    <label>Speaking Time (sec)</label>
+                                    <input type="number" class="input" name="<%= q_prefix %>[speaking_time]" value="<%= q.speaking_time %>">
+                                  </div>
+                                </div>
+                              </div>
+                            <% end %>
+                          </div>
+                          <button type="button" class="btn btn-add" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
+                        </div>
+                      <% end %>
+                    </div>
+                    <button type="button" class="btn btn-add" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <button type="button" class="btn btn-add" onclick="addLesson(this)">＋ Add Lesson</button>
+      </div>
+    </div>
+  <% end %>
+</div>
       <button type="button" class="add-section-zone" onclick="addSection()">＋ Add Section</button>
     </div>
   </div>
@@ -502,14 +628,26 @@ function showAlert(type, message) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  const existingSections = document.querySelectorAll('.section-item')
+  // Init Sortable cho sections có sẵn từ DB
+  document.querySelectorAll('.section-item').forEach(section => {
+    Sortable.create(section.querySelector('.lessons-list'), {
+      animation: 140, handle: '.lesson-drag',
+      ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen'
+    })
+    // Set counter để tránh trùng index khi add lesson mới
+    const sid = section.dataset.sectionId
+    lessonCounters[sid] = section.querySelectorAll('.lesson-item').length
+  })
 
+  // Chỉ tạo mới nếu course chưa có section nào
+  const existingSections = document.querySelectorAll('.section-item')
   if (existingSections.length === 0) {
     addSection()
-
     const firstBtn = document.querySelector('.section-item .btn-add')
     if (firstBtn) addLesson(firstBtn)
   }
+
+  updateSectionBadges()
 })
 </script>
 <% end %>
