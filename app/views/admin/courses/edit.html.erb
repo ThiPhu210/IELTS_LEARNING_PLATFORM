@@ -1,456 +1,589 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course Editor</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-<style>
-:root {
-  --bg: #ffffff;
-  --surface: #ffffff;
-  --surface2: #f5f6f8;
-  --surface3: #eceef2;
-  --border: rgba(0,0,0,0.13);
-  --border-hover: rgba(0,0,0,0.24);
-  --text: #1a1a2e;
-  --text-muted: #5a5a7a;
-  --text-dim: #9a9ab0;
-  --accent: #5b4fe0;
-  --accent2: #7c6af7;
-  --accent-glow: rgba(91,79,224,0.12);
-  --green: #059669;
-  --green-dim: rgba(5,150,105,0.1);
-  --red: #dc2626;
-  --red-dim: rgba(220,38,38,0.08);
-  --radius: 12px;
-  --radius-sm: 8px;
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.5;
-}
-#alert-container {
-  position: fixed; top: 20px; right: 20px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 8px; max-width: 360px;
-}
-.alert {
-  display: flex; align-items: center; gap: 8px;
-  padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
-  border: 1px solid; box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-  animation: slideIn 0.25s ease; transition: opacity 0.3s, transform 0.3s;
-}
-.alert-danger  { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
-.alert-success { background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
-@keyframes slideIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
-.page { max-width: 900px; margin: 0 auto; padding: 36px 24px 60px; }
-.breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); margin-bottom:10px; }
-.breadcrumb a { color:var(--text-muted); text-decoration:none; }
-.breadcrumb a:hover { color:var(--text); }
-.page-title { font-size:26px; font-weight:700; color:var(--text); margin-bottom:4px; letter-spacing:-0.4px; }
-.page-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:28px; }
-.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:20px; overflow:hidden; }
-.card-header { display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface2); }
-.card-title { font-size:13px; font-weight:600; color:var(--text); }
-.card-body { padding:20px; }
-.field { margin-bottom:16px; }
-.field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:6px; }
-.input,.textarea,.select { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; font-family:inherit; font-size:14px; color:var(--text); outline:none; transition:border-color 0.15s, box-shadow 0.15s; }
-.input:focus,.textarea:focus,.select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); background:#fff; }
-.input::placeholder,.textarea::placeholder { color:var(--text-dim); }
-.textarea { resize:vertical; min-height:80px; }
-.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.upload-zone { position:relative; border:1.5px dashed var(--border); border-radius:var(--radius-sm); padding:16px; cursor:pointer; transition:border-color 0.15s,background 0.15s; background:var(--surface2); display:flex; align-items:center; gap:12px; }
-.upload-zone:hover { border-color:var(--accent); background:var(--accent-glow); }
-.upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
-.upload-zone-icon { font-size:20px; flex-shrink:0; }
-.upload-zone-text { font-size:13px; font-weight:500; color:var(--text-muted); }
-.upload-zone-hint { font-size:11px; color:var(--text-dim); margin-top:2px; }
-#sections { display:flex; flex-direction:column; gap:14px; }
-.section-item { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); transition:box-shadow 0.2s; }
-.section-item.sortable-ghost { opacity:0.35; border:1.5px dashed var(--accent2); }
-.section-item.sortable-chosen { box-shadow:0 8px 30px rgba(0,0,0,0.12); }
-.section-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border); }
-.drag-handle { display:flex; flex-direction:column; gap:3px; cursor:grab; padding:4px 2px; opacity:0.35; transition:opacity 0.15s; flex-shrink:0; }
-.drag-handle:hover { opacity:0.8; }
-.drag-handle:active { cursor:grabbing; }
-.drag-handle span { display:block; width:14px; height:2px; background:var(--text-muted); border-radius:2px; }
-.section-badge { width:24px; height:24px; border-radius:6px; background:rgba(91,79,224,0.1); border:1px solid rgba(91,79,224,0.18); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
-.section-title-inline { flex:1; background:transparent; border:none; border-bottom:1.5px solid transparent; outline:none; font-family:inherit; font-size:14px; font-weight:600; color:var(--text); padding:2px 0; transition:border-color 0.15s; }
-.section-title-inline:focus { border-bottom-color:var(--accent); }
-.section-title-inline::placeholder { color:var(--text-dim); font-weight:400; }
-.section-actions { display:flex; align-items:center; gap:4px; margin-left:auto; }
-.btn-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; font-size:13px; background:transparent; color:var(--text-muted); transition:background 0.15s,color 0.15s; }
-.btn-icon:hover { background:var(--surface3); color:var(--text); }
-.btn-icon.danger:hover { background:var(--red-dim); color:var(--red); }
-.section-toggle { font-size:10px; color:var(--text-dim); transition:transform 0.2s; }
-.section-item.collapsed .section-toggle { transform:rotate(-90deg); }
-.section-item.collapsed .section-body { display:none; }
-.section-body { padding:16px; }
-.lessons-list { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
-.lesson-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
-.lesson-item.sortable-ghost { opacity:0.3; border:1.5px dashed rgba(5,150,105,0.4); }
-.lesson-item.sortable-chosen { box-shadow:0 4px 16px rgba(0,0,0,0.1); }
-.lesson-header { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border); background:#fff; }
-.lesson-drag { cursor:grab; opacity:0.3; transition:opacity 0.15s; display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
-.lesson-drag:hover { opacity:0.7; }
-.lesson-drag:active { cursor:grabbing; }
-.lesson-drag span { width:12px; height:2px; background:var(--text-muted); border-radius:2px; display:block; }
-.lesson-type-badge { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; transition:all 0.2s; flex-shrink:0; }
-.badge-video    { background:var(--green-dim); color:var(--green); border:1px solid rgba(5,150,105,0.2); }
-.badge-pdf      { background:var(--red-dim); color:var(--red); border:1px solid rgba(220,38,38,0.2); }
-.badge-speaking { background:rgba(91,79,224,0.09); color:var(--accent); border:1px solid rgba(91,79,224,0.2); }
-.lesson-name-inline { flex:1; background:transparent; border:none; border-bottom:1.5px solid transparent; outline:none; font-family:inherit; font-size:13px; font-weight:500; color:var(--text); padding:1px 0; transition:border-color 0.15s; }
-.lesson-name-inline:focus { border-bottom-color:var(--green); }
-.lesson-name-inline::placeholder { color:var(--text-dim); font-weight:400; }
-.lesson-body { padding:14px; }
-.tabs { display:flex; gap:2px; background:var(--surface3); padding:3px; border-radius:8px; margin-bottom:14px; width:fit-content; }
-.tab { padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:var(--text-dim); transition:all 0.15s; border:none; background:transparent; font-family:inherit; }
-.tab:hover { color:var(--text-muted); }
-.tab.active { background:#fff; color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
-.tab-panel { display:none; }
-.tab-panel.active { display:block; }
-.video-preview { width:100%; max-width:300px; border-radius:var(--radius-sm); border:1px solid var(--border); margin-top:10px; }
-.pdf-list { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
-.pdf-item { display:flex; align-items:center; gap:8px; padding:7px 12px; background:#fff; border-radius:7px; border:1px solid var(--border); font-size:12px; color:var(--text-muted); }
-.speaking-section { background:#fffbeb; border:1px solid rgba(251,191,36,0.25); border-radius:var(--radius-sm); padding:14px; }
-.speaking-label { font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:5px; }
-.topic-box { background:#fff; border:1px solid rgba(251,191,36,0.2); border-radius:8px; padding:12px; margin-bottom:8px; }
-.question-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:12px; margin-top:8px; }
-.question-item label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:5px; display:block; }
-.cue-card-field { margin-top:8px; }
-.hidden { display:none !important; }
-.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:var(--radius-sm); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; text-decoration:none; }
-.btn-outline { background:transparent; color:var(--text-muted); border:1px solid var(--border); }
-.btn-outline:hover { background:var(--surface2); color:var(--text); border-color:var(--border-hover); }
-.btn-add { width:100%; justify-content:center; background:transparent; color:var(--text-dim); border:1.5px dashed var(--border); font-size:12px; padding:7px; border-radius:var(--radius-sm); }
-.btn-add:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
-.btn-save { background:var(--accent); color:#fff; padding:10px 28px; font-size:14px; border-radius:var(--radius-sm); box-shadow:0 2px 10px rgba(91,79,224,0.3); }
-.btn-save:hover { background:#4a3fcf; transform:translateY(-1px); }
-.add-section-zone { width:100%; border:1.5px dashed var(--border); border-radius:var(--radius); padding:20px; text-align:center; cursor:pointer; transition:all 0.15s; background:transparent; color:var(--text-dim); font-size:13px; font-weight:500; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; }
-.add-section-zone:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
-.order-hint { font-size:11px; color:var(--text-dim); margin-bottom:12px; }
-.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
-::-webkit-scrollbar { width:5px; }
-::-webkit-scrollbar-track { background:#f1f1f1; }
-::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
-</style>
-</head>
-<body>
+<%# app/views/admin/courses/edit.html.erb %>
+<%= render "admin/shared/navbar" %>
 
-<%= render "admin/shared/navbar" %> 
-<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+
+  :root {
+    --ink: #0f1117;
+    --ink-2: #3d4049;
+    --ink-3: #7a7f8e;
+    --ink-4: #b0b5c3;
+    --paper: #f7f8fc;
+    --white: #ffffff;
+    --border: #e4e6ed;
+    --border-focus: #4f63ff;
+    --indigo: #4f63ff;
+    --indigo-soft: #eef0ff;
+    --indigo-mid: #c7ccff;
+    --green: #0b9e6e;
+    --green-soft: #e6f8f3;
+    --amber: #c47d00;
+    --amber-soft: #fff8e6;
+    --amber-border: #ffd97a;
+    --red: #d63845;
+    --red-soft: #fff0f1;
+    --radius: 14px;
+    --radius-sm: 9px;
+    --shadow: 0 2px 12px rgba(15,17,23,0.07);
+    --shadow-lg: 0 8px 32px rgba(15,17,23,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ALERTS */
+  #alert-container {
+    position: fixed; top: 80px; right: 20px; z-index: 9999;
+    display: flex; flex-direction: column; gap: 8px; width: 340px;
+  }
+  .alert {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+    border: 1px solid; animation: slideIn 0.2s ease;
+    box-shadow: var(--shadow);
+  }
+  .alert-success { background: var(--green-soft); border-color: #a3e6d4; color: #065f46; }
+  .alert-danger  { background: var(--red-soft);   border-color: #ffc5c9; color: #9f1239; }
+  @keyframes slideIn { from { opacity:0; transform:translateX(10px) } to { opacity:1; transform:translateX(0) } }
+
+  /* PAGE */
+  .ce-page { max-width: 860px; margin: 0 auto; padding: 100px 24px 80px; }
+
+  .ce-breadcrumb { font-size: 12px; color: var(--ink-4); margin-bottom: 8px; }
+  .ce-breadcrumb a { color: var(--ink-3); text-decoration: none; }
+  .ce-breadcrumb a:hover { color: var(--indigo); }
+
+  .ce-heading { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); margin-bottom: 2px; }
+  .ce-subheading { font-size: 13px; color: var(--ink-3); margin-bottom: 32px; }
+
+  /* CARD */
+  .ce-card {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    margin-bottom: 20px; overflow: hidden;
+  }
+  .ce-card-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 16px 22px; border-bottom: 1px solid var(--border);
+    background: var(--paper);
+  }
+  .ce-card-icon { font-size: 17px; }
+  .ce-card-title { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: 0.1px; }
+  .ce-card-body { padding: 22px; }
+
+  /* FIELDS */
+  .ce-field { margin-bottom: 16px; }
+  .ce-label {
+    display: block; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.6px;
+    color: var(--ink-3); margin-bottom: 6px;
+  }
+  .ce-input, .ce-textarea, .ce-select {
+    width: 100%; background: var(--paper); border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm); padding: 9px 13px;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .ce-input:focus, .ce-textarea:focus, .ce-select:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(79,99,255,0.1);
+    background: var(--white);
+  }
+  .ce-input::placeholder, .ce-textarea::placeholder { color: var(--ink-4); }
+  .ce-textarea { resize: vertical; min-height: 84px; }
+  .ce-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  /* UPLOAD ZONE */
+  .ce-upload {
+    position: relative; border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px; cursor: pointer;
+    display: flex; align-items: center; gap: 12px;
+    background: var(--paper); transition: border-color 0.15s, background 0.15s;
+  }
+  .ce-upload:hover { border-color: var(--indigo); background: var(--indigo-soft); }
+  .ce-upload input[type="file"] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+  .ce-upload-icon { font-size: 20px; flex-shrink: 0; }
+  .ce-upload-text { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+  .ce-upload-hint { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
+
+  /* THUMBNAIL PREVIEW */
+  .ce-thumb-wrap { margin-bottom: 10px; }
+  .ce-thumb-wrap img { border-radius: var(--radius-sm); border: 1px solid var(--border); max-height: 120px; }
+
+  /* SECTION */
+  .ce-section {
+    border: 1.5px solid var(--border); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 16px;
+    transition: box-shadow 0.2s;
+  }
+  .ce-section:hover { box-shadow: var(--shadow); }
+
+  .ce-section-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 18px; background: var(--paper);
+    border-bottom: 1px solid var(--border);
+  }
+  .ce-section-num {
+    min-width: 26px; height: 26px; border-radius: 7px;
+    background: var(--indigo-soft); border: 1px solid var(--indigo-mid);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: var(--indigo); flex-shrink: 0;
+  }
+  .ce-section-title-input {
+    flex: 1; background: transparent; border: none;
+    border-bottom: 1.5px solid transparent; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    font-weight: 600; color: var(--ink); padding: 2px 0;
+    transition: border-color 0.15s;
+  }
+  .ce-section-title-input:focus { border-bottom-color: var(--indigo); }
+  .ce-section-title-input::placeholder { color: var(--ink-4); font-weight: 400; }
+
+  .ce-section-body { padding: 18px; }
+
+  /* BTN */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; text-decoration: none; }
+  .btn-primary { background: var(--indigo); color: #fff; box-shadow: 0 2px 8px rgba(79,99,255,0.3); }
+  .btn-primary:hover { background: #3d51f0; transform: translateY(-1px); }
+  .btn-outline { background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); }
+  .btn-outline:hover { background: var(--paper); border-color: var(--ink-4); }
+  .btn-ghost-danger { background: transparent; color: var(--ink-3); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
+  .btn-ghost-danger:hover { background: var(--red-soft); color: var(--red); }
+  .btn-dashed { width: 100%; justify-content: center; background: transparent; border: 1.5px dashed var(--border); color: var(--ink-4); font-size: 12px; padding: 8px; border-radius: var(--radius-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
+  .btn-dashed:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-soft); }
+
+  /* LESSON */
+  .ce-lesson {
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 10px;
+  }
+  .ce-lesson-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 16px; background: var(--paper);
+    border-bottom: 1px solid var(--border);
+  }
+  .ce-lesson-badge {
+    font-size: 10px; padding: 2px 8px; border-radius: 4px;
+    font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+    background: var(--green-soft); color: var(--green);
+    border: 1px solid #c3f0e0; flex-shrink: 0;
+  }
+  .ce-lesson-title-input {
+    flex: 1; background: transparent; border: none;
+    border-bottom: 1.5px solid transparent; outline: none;
+    font-family: 'DM Sans', sans-serif; font-size: 13px;
+    font-weight: 500; color: var(--ink); padding: 1px 0;
+    transition: border-color 0.15s;
+  }
+  .ce-lesson-title-input:focus { border-bottom-color: var(--green); }
+  .ce-lesson-title-input::placeholder { color: var(--ink-4); font-weight: 400; }
+  .ce-dur-input {
+    width: 68px; background: var(--paper); border: 1.5px solid var(--border);
+    border-radius: 6px; padding: 4px 8px; font-family: 'DM Mono', monospace;
+    font-size: 12px; color: var(--ink); outline: none;
+    transition: border-color 0.15s;
+  }
+  .ce-dur-input:focus { border-color: var(--border-focus); }
+  .ce-dur-label { font-size: 11px; color: var(--ink-4); }
+
+  .ce-lesson-body { padding: 16px; }
+
+  /* VIDEO PREVIEW */
+  .ce-video-preview { width: 100%; max-width: 320px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px; }
+
+  /* PDF LIST */
+  .ce-pdf-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+  .ce-pdf-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 12px; background: var(--paper);
+    border: 1px solid var(--border); border-radius: 7px;
+    font-size: 12px; color: var(--ink-2);
+  }
+  .ce-pdf-item a { color: var(--indigo); text-decoration: none; }
+  .ce-pdf-item a:hover { text-decoration: underline; }
+
+  /* SPEAKING */
+  .ce-speaking {
+    background: var(--amber-soft); border: 1.5px solid var(--amber-border);
+    border-radius: var(--radius-sm); padding: 16px;
+  }
+  .ce-speaking-title {
+    font-size: 11px; font-weight: 800; text-transform: uppercase;
+    letter-spacing: 0.6px; color: var(--amber); margin-bottom: 14px;
+  }
+  .ce-topic {
+    background: var(--white); border: 1px solid #ffe8a0;
+    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px;
+  }
+  .ce-question {
+    background: var(--paper); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px; margin-top: 8px;
+  }
+  .ce-question-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-4); margin-bottom: 5px; display: block; }
+  .ce-cue-wrap { margin-top: 8px; }
+  .hidden { display: none !important; }
+
+  /* SECTION NUMBER AUTO */
+  .ce-section:nth-child(1) .ce-section-num::after { content: '1'; }
+  .ce-section:nth-child(2) .ce-section-num::after { content: '2'; }
+  .ce-section:nth-child(3) .ce-section-num::after { content: '3'; }
+  .ce-section:nth-child(4) .ce-section-num::after { content: '4'; }
+  .ce-section:nth-child(5) .ce-section-num::after { content: '5'; }
+  /* fallback handled by JS */
+
+  /* DIVIDER */
+  .ce-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+  /* ACTIONS BAR */
+  .ce-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+
+  /* NEW SECTION zone */
+  .ce-add-section-zone {
+    width: 100%; border: 1.5px dashed var(--border); border-radius: var(--radius);
+    padding: 18px; text-align: center; cursor: pointer; display: flex;
+    align-items: center; justify-content: center; gap: 6px;
+    color: var(--ink-4); font-size: 13px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif; background: transparent;
+    transition: all 0.15s; margin-top: 14px;
+  }
+  .ce-add-section-zone:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-soft); }
+
+  /* Responsive */
+  @media (max-width: 600px) {
+    .ce-grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+
+<%= render "admin/shared/navbar" %>
+
 <div id="alert-container"></div>
-<div class="page">
-  <div class="breadcrumb">
+
+<div class="ce-page">
+  <div class="ce-breadcrumb">
     <a href="#">Admin</a> › <a href="#">Courses</a> › Edit
   </div>
-  <div class="page-title">🎓 Course Editor</div>
-  <div class="page-subtitle">Manage course content, lessons, and speaking exercises</div>
+  <div class="ce-heading">🎓 Course Editor</div>
+  <div class="ce-subheading">Manage course content, lessons, and speaking exercises</div>
 
-  <!-- COURSE INFO -->
-  <div class="card">
-    <div class="card-header">
-      <span>📘</span>
-      <span class="card-title">Course Information</span>
-    </div>
-    <div class="card-body">
-      <div class="field">
-        <label>Course Title</label>
-        <input type="text"
-       class="input"
-       name="course[title]"
-       value="<%= @course.title %>"
-       placeholder="e.g. IELTS Complete Preparation">
+  <%= form_with model: [:admin, @course], local: true, multipart: true do |f| %>
+
+    <%# ── COURSE INFO ── %>
+    <div class="ce-card">
+      <div class="ce-card-header">
+        <span class="ce-card-icon">📘</span>
+        <span class="ce-card-title">Course Information</span>
       </div>
-      <div class="field">
-        <label>Description</label>
-        <textarea class="textarea"
-          name="course[description]"
-          placeholder="Describe what students will learn..."><%= @course.description %></textarea>
-      </div>
-      <div class="grid-2">
-        <div class="field">
-          <label>Price (VND)</label>
-          <input type="number"
-       class="input"
-       name="course[price]"
-       value="<%= @course.price %>"
-       placeholder="0"
-       min="0"
-       step="1000">
+      <div class="ce-card-body">
+        <div class="ce-field">
+          <label class="ce-label">Course Title</label>
+          <%= f.text_field :title, class: "ce-input", placeholder: "e.g. IELTS Complete Preparation" %>
         </div>
-        <div class="field">
-          <label>Thumbnail</label>
-          <div class="upload-zone" id="thumbnail-zone">
-            <input type="file" accept="image/*" onchange="previewThumbnail(this)">
-            <span class="upload-zone-icon">🖼️</span>
-            <div>
-              <div class="upload-zone-text">Drop image or click to browse</div>
-              <div class="upload-zone-hint">JPG, PNG · Max 2MB</div>
+        <div class="ce-field">
+          <label class="ce-label">Description</label>
+          <%= f.text_area :description, class: "ce-textarea", placeholder: "Describe what students will learn…" %>
+        </div>
+        <div class="ce-grid-2">
+          <div class="ce-field">
+            <label class="ce-label">Price (VND)</label>
+            <%= f.number_field :price, min: 0, step: 1000, class: "ce-input", placeholder: "0" %>
+          </div>
+          <div class="ce-field">
+            <label class="ce-label">Thumbnail</label>
+            <% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
+              <div class="ce-thumb-wrap">
+                <%= image_tag @course.thumbnail.variant(resize_to_limit: [260, 120]), class: "rounded-lg border" %>
+              </div>
+            <% end %>
+            <div class="ce-upload">
+              <%= f.file_field :thumbnail, accept: "image/*", class: "" %>
+              <span class="ce-upload-icon">🖼️</span>
+              <div>
+                <div class="ce-upload-text">Drop image or click to browse</div>
+                <div class="ce-upload-hint">JPG, PNG · Max 2MB</div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- COURSE STRUCTURE -->
-  <div class="card">
-    <div class="card-header">
-      <span>📚</span>
-      <span class="card-title">Course Structure</span>
-    </div>
-    <div class="card-body">
-      <div class="order-hint">⠿ Drag to reorder sections and lessons</div>
-      <div id="sections">
-  <% @course.course_sections.order(:position).each_with_index do |section, s_idx| %>
-    <div class="section-item" data-section-id="<%= s_idx %>">
-      <div class="section-header">
-        <div class="drag-handle section-drag"><span></span><span></span><span></span></div>
-        <div class="section-badge"><%= s_idx + 1 %></div>
-        <%= f.fields_for :course_sections_attributes, {s_idx => section} do |sf| %>
-          <%= sf.hidden_field :id %>
-          <%= sf.hidden_field :_destroy, value: 0 %>
-          <%= sf.text_field :title, class: "section-title-inline", placeholder: "Section title…" %>
-        <% end %>
-        <div class="section-actions">
-          <button type="button" class="btn-icon" onclick="toggleSection(this)"><span class="section-toggle">▾</span></button>
-          <button type="button" class="btn-icon danger" onclick="removeSection(this)">🗑</button>
-        </div>
+    <%# ── COURSE STRUCTURE ── %>
+    <div class="ce-card">
+      <div class="ce-card-header">
+        <span class="ce-card-icon">📚</span>
+        <span class="ce-card-title">Course Structure</span>
       </div>
-      <div class="section-body">
-        <div class="lessons-list">
-          <% section.lessons.order(:position).each_with_index do |lesson, l_idx| %>
-            <%
-              l_prefix = "course[course_sections_attributes][#{s_idx}][lessons_attributes][#{l_idx}]"
-            %>
-            <div class="lesson-item" data-lesson-id="<%= lesson.id %>">
-              <div class="lesson-header">
-                <div class="lesson-drag"><span></span><span></span></div>
-                <span class="lesson-type-badge badge-video">Video</span>
-                <input type="hidden" name="<%= l_prefix %>[id]" value="<%= lesson.id %>">
-                <input type="hidden" name="<%= l_prefix %>[_destroy]" value="0">
-                <input type="text" class="lesson-name-inline" name="<%= l_prefix %>[title]" value="<%= lesson.title %>" placeholder="Lesson title…">
-                <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-                  <input type="number" class="input" style="width:72px;padding:5px 8px;font-size:12px;" name="<%= l_prefix %>[duration]" value="<%= lesson.duration %>" placeholder="min">
-                  <span style="font-size:11px;color:var(--text-dim);">min</span>
-                  <button type="button" class="btn-icon danger" onclick="removeLesson(this)">🗑</button>
-                </div>
+      <div class="ce-card-body">
+
+        <div id="sections">
+          <%= f.fields_for :course_sections do |sf| %>
+            <div class="ce-section" <% if sf.object.marked_for_destruction? %>style="display:none"<% end %>>
+              <%= sf.hidden_field :_destroy, class: "destroy-field" %>
+
+              <div class="ce-section-header">
+                <div class="ce-section-num"></div>
+                <%= sf.text_field :title,
+                      class: "ce-section-title-input",
+                      placeholder: "Section title…" %>
+                <button type="button" class="btn-ghost-danger" onclick="removeSection(this)">
+                  🗑 Remove
+                </button>
               </div>
-              <div class="lesson-body">
-                <div class="tabs">
-                  <button type="button" class="tab active" onclick="switchTab(this,'video')">🎬 Video</button>
-                  <button type="button" class="tab" onclick="switchTab(this,'pdf')">📄 PDF</button>
-                  <button type="button" class="tab" onclick="switchTab(this,'speaking')">🎤 Speaking</button>
-                </div>
-                <div class="tab-panel active" data-tab="video">
-                  <div class="upload-zone">
-                    <input type="file" accept="video/mp4" name="<%= l_prefix %>[video]" onchange="handleVideoUpload(this)">
-                    <span class="upload-zone-icon">🎬</span>
-                    <div>
-                      <% if lesson.video.attached? %>
-                        <div class="upload-zone-text">✅ <%= lesson.video.filename %></div>
-                      <% else %>
-                        <div class="upload-zone-text">Upload video lesson</div>
-                      <% end %>
-                      <div class="upload-zone-hint">MP4 · Max 5MB</div>
-                    </div>
-                  </div>
-                  <div class="video-preview-wrap"></div>
-                </div>
-                <div class="tab-panel" data-tab="pdf">
-                  <div class="upload-zone">
-                    <input type="file" multiple accept="application/pdf" name="<%= l_prefix %>[pdfs][]" onchange="handlePDFUpload(this)">
-                    <span class="upload-zone-icon">📄</span>
-                    <div>
-                      <div class="upload-zone-text">Upload PDF materials</div>
-                      <div class="upload-zone-hint">PDF · Max 500KB each</div>
-                    </div>
-                  </div>
-                  <div class="pdf-list">
-                    <% lesson.pdfs.each do |pdf| %>
-                      <div class="pdf-item">📄 <%= pdf.filename %></div>
-                    <% end %>
-                  </div>
-                </div>
-                <div class="tab-panel" data-tab="speaking">
-                  <div class="speaking-section">
-                    <div class="speaking-label">🎤 Speaking Exercises</div>
-                    <div class="topics-container">
-                      <% lesson.speaking_topics.each_with_index do |topic, t_idx| %>
-                        <% t_prefix = "#{l_prefix}[speaking_topics_attributes][#{t_idx}]" %>
-                        <div class="topic-box">
-                          <div class="grid-2" style="margin-bottom:10px;">
-                            <input type="hidden" name="<%= t_prefix %>[id]" value="<%= topic.id %>">
-                            <input type="text" class="input" name="<%= t_prefix %>[title]" value="<%= topic.title %>" placeholder="Topic title…">
-                            <select class="select part-select" name="<%= t_prefix %>[part]" onchange="toggleCueCard(this)">
-                              <option value="part1" <%= 'selected' if topic.part == 'part1' %>>PART 1</option>
-                              <option value="part2" <%= 'selected' if topic.part == 'part2' %>>PART 2</option>
-                              <option value="part3" <%= 'selected' if topic.part == 'part3' %>>PART 3</option>
-                            </select>
+
+              <div class="ce-section-body">
+                <div class="lessons">
+                  <%= sf.fields_for :lessons do |lf| %>
+                    <div class="ce-lesson" <% if lf.object.marked_for_destruction? %>style="display:none"<% end %>>
+                      <%= lf.hidden_field :_destroy, class: "destroy-field" %>
+
+                      <div class="ce-lesson-header">
+                        <span class="ce-lesson-badge">Lesson</span>
+                        <%= lf.text_field :title,
+                              class: "ce-lesson-title-input",
+                              placeholder: "Lesson title…" %>
+                        <%= lf.number_field :duration,
+                              class: "ce-dur-input",
+                              placeholder: "min" %>
+                        <span class="ce-dur-label">min</span>
+                        <button type="button" class="btn-ghost-danger" onclick="removeLesson(this)">🗑</button>
+                      </div>
+
+                      <div class="ce-lesson-body">
+
+                        <%# VIDEO %>
+                        <div class="ce-field">
+                          <label class="ce-label">🎬 Video</label>
+                          <div class="ce-upload">
+                            <%= lf.file_field :video, accept: "video/mp4", onchange: "handleVideoUpload(this)" %>
+                            <span class="ce-upload-icon">🎬</span>
+                            <div>
+                              <% if lf.object.persisted? && lf.object.video.attached? %>
+                                <div class="ce-upload-text">✅ <%= lf.object.video.filename %></div>
+                              <% else %>
+                                <div class="ce-upload-text">Upload video lesson</div>
+                              <% end %>
+                              <div class="ce-upload-hint">MP4 · Max 5MB</div>
+                            </div>
                           </div>
-                          <div class="questions-container">
-                            <% topic.speaking_questions.each_with_index do |q, q_idx| %>
-                              <% q_prefix = "#{t_prefix}[speaking_questions_attributes][#{q_idx}]" %>
-                              <div class="question-item">
-                                <input type="hidden" name="<%= q_prefix %>[id]" value="<%= q.id %>">
-                                <label>Question</label>
-                                <textarea class="textarea" style="font-size:13px;min-height:56px;" name="<%= q_prefix %>[question_text]"><%= q.question_text %></textarea>
-                                <div class="cue-card-field <%= 'hidden' unless topic.part == 'part2' %>" style="margin-top:8px;">
-                                  <label>Cue Card</label>
-                                  <textarea class="textarea" style="font-size:13px;min-height:56px;" name="<%= q_prefix %>[cue_card]"><%= q.cue_card %></textarea>
-                                </div>
-                                <div class="grid-2" style="margin-top:10px;">
-                                  <div>
-                                    <label>Prep Time (sec)</label>
-                                    <input type="number" class="input" name="<%= q_prefix %>[preparation_time]" value="<%= q.preparation_time %>">
-                                  </div>
-                                  <div>
-                                    <label>Speaking Time (sec)</label>
-                                    <input type="number" class="input" name="<%= q_prefix %>[speaking_time]" value="<%= q.speaking_time %>">
-                                  </div>
-                                </div>
-                              </div>
-                            <% end %>
-                          </div>
-                          <button type="button" class="btn btn-add" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
+                          <% if lf.object.persisted? && lf.object.video.attached? %>
+                            <video controls class="ce-video-preview">
+                              <source src="<%= url_for(lf.object.video) %>" type="video/mp4">
+                            </video>
+                          <% end %>
+                          <div class="video-preview-wrap"></div>
                         </div>
-                      <% end %>
-                    </div>
-                    <button type="button" class="btn btn-add" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+                        <div class="ce-divider"></div>
+
+                        <%# PDF %>
+                        <div class="ce-field">
+                          <label class="ce-label">📄 PDF Materials</label>
+                          <div class="ce-upload">
+                            <%= lf.file_field :pdfs, multiple: true, accept: "application/pdf", onchange: "handlePDFUpload(this)" %>
+                            <span class="ce-upload-icon">📄</span>
+                            <div>
+                              <div class="ce-upload-text">Upload PDF materials</div>
+                              <div class="ce-upload-hint">PDF · Max 500KB each · Multiple OK</div>
+                            </div>
+                          </div>
+                          <% if lf.object.persisted? && lf.object.pdfs.attached? %>
+                            <div class="ce-pdf-list">
+                              <% lf.object.pdfs.each do |pdf| %>
+                                <% next unless pdf.persisted? %>
+                                <div class="ce-pdf-item">
+                                  📄 <%= link_to pdf.filename, rails_blob_url(pdf), target: "_blank" %>
+                                </div>
+                              <% end %>
+                            </div>
+                          <% end %>
+                          <div class="pdf-list"></div>
+                        </div>
+
+                        <div class="ce-divider"></div>
+
+                        <%# SPEAKING %>
+                        <div class="ce-speaking">
+                          <div class="ce-speaking-title">🎤 Speaking Exercises</div>
+
+                          <%= lf.fields_for :speaking_topics do |tf| %>
+                            <div class="ce-topic">
+                              <div class="ce-grid-2" style="margin-bottom:10px;">
+                                <%= tf.text_field :title, class: "ce-input", placeholder: "Topic title…" %>
+                                <%= tf.select :part,
+                                      SpeakingTopic.parts.keys.map { |p| [p.upcase, p] },
+                                      {},
+                                      class: "ce-select part-select",
+                                      onchange: "toggleCueCard(this)" %>
+                              </div>
+
+                              <div class="questions">
+                                <%= tf.fields_for :speaking_questions do |qf| %>
+                                  <div class="ce-question">
+                                    <span class="ce-question-label">Question</span>
+                                    <%= qf.text_area :question_text,
+                                          class: "ce-input ce-textarea",
+                                          style: "min-height:52px;",
+                                          placeholder: "Enter your question…" %>
+
+                                    <div class="ce-cue-wrap cue-card-field <%= 'hidden' unless tf.object.part == 'part2' %>">
+                                      <span class="ce-question-label" style="margin-top:8px;">Cue Card</span>
+                                      <%= qf.text_area :cue_card,
+                                            class: "ce-input ce-textarea",
+                                            style: "min-height:52px;",
+                                            placeholder: "Cue card instructions…" %>
+                                    </div>
+
+                                    <div class="ce-grid-2" style="margin-top:10px;">
+                                      <div>
+                                        <span class="ce-question-label">Prep Time (sec)</span>
+                                        <%= qf.number_field :preparation_time, class: "ce-input" %>
+                                      </div>
+                                      <div>
+                                        <span class="ce-question-label">Speaking Time (sec)</span>
+                                        <%= qf.number_field :speaking_time, class: "ce-input" %>
+                                      </div>
+                                    </div>
+                                  </div>
+                                <% end %>
+                              </div>
+                            </div>
+                          <% end %>
+                        </div><%# /ce-speaking %>
+
+                      </div><%# /ce-lesson-body %>
+                    </div><%# /ce-lesson %>
+                  <% end %>
+                </div><%# /lessons %>
+
+                <button type="button" class="btn-dashed" style="margin-top:10px;" onclick="addLesson(this)">
+                  ＋ Add Lesson
+                </button>
+              </div><%# /ce-section-body %>
+            </div><%# /ce-section %>
           <% end %>
-        </div>
-        <button type="button" class="btn btn-add" onclick="addLesson(this)">＋ Add Lesson</button>
+        </div><%# /sections %>
+
+        <button type="button" class="ce-add-section-zone" onclick="addSection()">
+          ＋ Add Section
+        </button>
+
       </div>
     </div>
+
+    <%# ACTIONS %>
+    <div class="ce-actions">
+      <%= link_to "Cancel", admin_courses_path, class: "btn btn-outline" %>
+      <%= f.submit "💾 Save Course", class: "btn btn-primary" %>
+    </div>
+
   <% end %>
 </div>
-      <button type="button" class="add-section-zone" onclick="addSection()">＋ Add Section</button>
-    </div>
-  </div>
 
-  <!-- ACTIONS -->
-<div class="form-actions">
-  <%= link_to "Cancel",
-      admin_courses_path,
-      class: "btn btn-outline" %>
-
-  <%= submit_tag "💾 Save Course",
-      class: "btn btn-save" %>
-</div>
-</div>
-
+<%# ── TEMPLATES for JS-added sections/lessons ── %>
 <template id="section-tpl">
-  <div class="section-item" data-section-id="__SID__">
-    <div class="section-header">
-      <div class="drag-handle section-drag"><span></span><span></span><span></span></div>
-      <div class="section-badge">1</div>
-      <input type="hidden" name="course[course_sections_attributes][__SID__][_destroy]" value="0">
-      <input type="text" class="section-title-inline" name="course[course_sections_attributes][__SID__][title]" placeholder="Section title…">
-      <div class="section-actions">
-        <button type="button" class="btn-icon" onclick="toggleSection(this)"><span class="section-toggle">▾</span></button>
-        <button type="button" class="btn-icon danger" onclick="removeSection(this)">🗑</button>
-      </div>
+  <div class="ce-section">
+    <input type="hidden" name="course[course_sections_attributes][NEW_SID][_destroy]" value="0" class="destroy-field">
+    <div class="ce-section-header">
+      <div class="ce-section-num"></div>
+      <input type="text" class="ce-section-title-input"
+             name="course[course_sections_attributes][NEW_SID][title]"
+             placeholder="Section title…">
+      <button type="button" class="btn-ghost-danger" onclick="removeSection(this)">🗑 Remove</button>
     </div>
-    <div class="section-body">
-      <div class="lessons-list"></div>
-      <button type="button" class="btn btn-add" onclick="addLesson(this)">＋ Add Lesson</button>
+    <div class="ce-section-body">
+      <div class="lessons"></div>
+      <button type="button" class="btn-dashed" style="margin-top:10px;" onclick="addLesson(this)">＋ Add Lesson</button>
     </div>
   </div>
 </template>
 
 <template id="lesson-tpl">
-  <div class="lesson-item" data-lesson-id="__LID__">
-    <div class="lesson-header">
-      <div class="lesson-drag"><span></span><span></span></div>
-      <span class="lesson-type-badge badge-video">Video</span>
-      <input type="hidden" name="__LPREFIX__[_destroy]" value="0">
-      <input type="text" class="lesson-name-inline" name="__LPREFIX__[title]" placeholder="Lesson title…">
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-        <input type="number" class="input" style="width:72px;padding:5px 8px;font-size:12px;" name="__LPREFIX__[duration]" placeholder="min">
-        <span style="font-size:11px;color:var(--text-dim);">min</span>
-        <button type="button" class="btn-icon danger" onclick="removeLesson(this)">🗑</button>
-      </div>
+  <div class="ce-lesson">
+    <input type="hidden" name="LPREFIX[_destroy]" value="0" class="destroy-field">
+    <div class="ce-lesson-header">
+      <span class="ce-lesson-badge">Lesson</span>
+      <input type="text" class="ce-lesson-title-input" name="LPREFIX[title]" placeholder="Lesson title…">
+      <input type="number" class="ce-dur-input" name="LPREFIX[duration]" placeholder="min">
+      <span class="ce-dur-label">min</span>
+      <button type="button" class="btn-ghost-danger" onclick="removeLesson(this)">🗑</button>
     </div>
-    <div class="lesson-body">
-      <div class="tabs">
-     <button type="button" class="tab active" onclick="switchTab(this,'video')">🎬 Video</button>
-<button type="button" class="tab" onclick="switchTab(this,'pdf')">📄 PDF</button>
-<button type="button" class="tab" onclick="switchTab(this,'speaking')">🎤 Speaking</button>
-      </div>
-      <div class="tab-panel active" data-tab="video">
-        <div class="upload-zone">
-          <input type="file" accept="video/mp4" name="__LPREFIX__[video]" onchange="handleVideoUpload(this)">
-          <span class="upload-zone-icon">🎬</span>
+    <div class="ce-lesson-body">
+      <div class="ce-field">
+        <label class="ce-label">🎬 Video</label>
+        <div class="ce-upload">
+          <input type="file" accept="video/mp4" name="LPREFIX[video]" onchange="handleVideoUpload(this)">
+          <span class="ce-upload-icon">🎬</span>
           <div>
-            <div class="upload-zone-text">Upload video lesson</div>
-            <div class="upload-zone-hint">MP4 · Max 5MB</div>
+            <div class="ce-upload-text">Upload video lesson</div>
+            <div class="ce-upload-hint">MP4 · Max 5MB</div>
           </div>
         </div>
         <div class="video-preview-wrap"></div>
       </div>
-      <div class="tab-panel" data-tab="pdf">
-        <div class="upload-zone">
-          <input type="file" multiple accept="application/pdf" name="__LPREFIX__[pdfs][]" onchange="handlePDFUpload(this)">
-          <span class="upload-zone-icon">📄</span>
+      <div class="ce-divider"></div>
+      <div class="ce-field">
+        <label class="ce-label">📄 PDF Materials</label>
+        <div class="ce-upload">
+          <input type="file" multiple accept="application/pdf" name="LPREFIX[pdfs][]" onchange="handlePDFUpload(this)">
+          <span class="ce-upload-icon">📄</span>
           <div>
-            <div class="upload-zone-text">Upload PDF materials</div>
-            <div class="upload-zone-hint">PDF · Max 500KB each · Multiple OK</div>
+            <div class="ce-upload-text">Upload PDF materials</div>
+            <div class="ce-upload-hint">PDF · Max 500KB each · Multiple OK</div>
           </div>
         </div>
         <div class="pdf-list"></div>
       </div>
-      <div class="tab-panel" data-tab="speaking">
-        <div class="speaking-section">
-          <div class="speaking-label">🎤 Speaking Exercises</div>
-          <div class="topics-container"></div>
-          <button type="button" class="btn btn-add" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
-        </div>
+      <div class="ce-divider"></div>
+      <div class="ce-speaking">
+        <div class="ce-speaking-title">🎤 Speaking Exercises</div>
+        <div class="topics-container"></div>
+        <button type="button" class="btn-dashed" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
       </div>
     </div>
   </div>
 </template>
 
 <template id="topic-tpl">
-  <div class="topic-box">
-    <div class="grid-2" style="margin-bottom:10px;">
-      <input type="text" class="input" name="__TPREFIX__[title]" placeholder="Topic title…">
-      <select class="select part-select" name="__TPREFIX__[part]" onchange="toggleCueCard(this)">
+  <div class="ce-topic">
+    <div class="ce-grid-2" style="margin-bottom:10px;">
+      <input type="text" class="ce-input" name="TPREFIX[title]" placeholder="Topic title…">
+      <select class="ce-select part-select" name="TPREFIX[part]" onchange="toggleCueCard(this)">
         <option value="part1">PART 1</option>
         <option value="part2">PART 2</option>
         <option value="part3">PART 3</option>
       </select>
     </div>
     <div class="questions-container"></div>
-    <button type="button" class="btn btn-add" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
+    <button type="button" class="btn-dashed" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
   </div>
 </template>
 
 <template id="question-tpl">
-  <div class="question-item">
-    <label>Question</label>
-    <textarea class="textarea" style="font-size:13px;min-height:56px;" name="__QPREFIX__[question_text]" placeholder="Enter your question…"></textarea>
-    <div class="cue-card-field hidden" style="margin-top:8px;">
-      <label>Cue Card</label>
-      <textarea class="textarea" style="font-size:13px;min-height:56px;" name="__QPREFIX__[cue_card]" placeholder="Cue card instructions…"></textarea>
+  <div class="ce-question">
+    <span class="ce-question-label">Question</span>
+    <textarea class="ce-input ce-textarea" style="min-height:52px;" name="QPREFIX[question_text]" placeholder="Enter your question…"></textarea>
+    <div class="ce-cue-wrap cue-card-field hidden" style="margin-top:8px;">
+      <span class="ce-question-label">Cue Card</span>
+      <textarea class="ce-input ce-textarea" style="min-height:52px;" name="QPREFIX[cue_card]" placeholder="Cue card instructions…"></textarea>
     </div>
-    <div class="grid-2" style="margin-top:10px;">
+    <div class="ce-grid-2" style="margin-top:10px;">
       <div>
-        <label>Prep Time (sec)</label>
-        <input type="number" class="input" name="__QPREFIX__[preparation_time]" placeholder="30">
+        <span class="ce-question-label">Prep Time (sec)</span>
+        <input type="number" class="ce-input" name="QPREFIX[preparation_time]">
       </div>
       <div>
-        <label>Speaking Time (sec)</label>
-        <input type="number" class="input" name="__QPREFIX__[speaking_time]" placeholder="120">
+        <span class="ce-question-label">Speaking Time (sec)</span>
+        <input type="number" class="ce-input" name="QPREFIX[speaking_time]">
       </div>
     </div>
   </div>
@@ -459,197 +592,174 @@ body {
 <script>
 const MAX_VIDEO = 5 * 1024 * 1024
 const MAX_PDF   = 500 * 1024
-let lessonCounters = {}
 
-const sectionsEl = document.getElementById('sections')
-Sortable.create(sectionsEl, {
-  animation: 160, handle: '.section-drag',
-  ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-  easing: 'cubic-bezier(0.25,1,0.5,1)', onEnd: updateSectionBadges
-})
-
-function updateSectionBadges() {
-  let count = 0
-  document.querySelectorAll('.section-item').forEach(el => {
-    const d = el.querySelector("input[name*='_destroy']")
-    if (el.style.display !== 'none' && !(d && d.value === '1')) {
-      count++
-      const badge = el.querySelector('.section-badge')
-      if (badge) badge.textContent = count
-    }
+// ── Section numbering ──
+function updateSectionNumbers() {
+  let n = 0
+  document.querySelectorAll('#sections .ce-section').forEach(el => {
+    if (el.style.display === 'none') return
+    n++
+    const badge = el.querySelector('.ce-section-num')
+    if (badge) badge.textContent = n
   })
 }
 
+// ── Add Section (new, JS-only) ──
 function addSection() {
-  const sid = 'S' + Date.now()
+  const sid = 'new_' + Date.now()
+  let html = document.getElementById('section-tpl').innerHTML
+                      .replace(/NEW_SID/g, sid)
   const wrap = document.createElement('div')
-  wrap.innerHTML = document.getElementById('section-tpl').innerHTML.replace(/__SID__/g, sid)
+  wrap.innerHTML = html
   const el = wrap.firstElementChild
-  el.dataset.sectionId = sid
-  sectionsEl.appendChild(el)
-  updateSectionBadges()
-  Sortable.create(el.querySelector('.lessons-list'), {
-    animation: 140, handle: '.lesson-drag',
-    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
-    easing: 'cubic-bezier(0.25,1,0.5,1)'
-  })
-  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-  el.querySelector('.section-title-inline').focus()
+  document.getElementById('sections').appendChild(el)
+  updateSectionNumbers()
+  el.querySelector('.ce-section-title-input').focus()
 }
 
-function addLesson(btn) {
-  const section = btn.closest('.section-item')
-  const sid = section.dataset.sectionId
-  if (!lessonCounters[sid]) lessonCounters[sid] = 0
-  const idx = lessonCounters[sid]++
-  const prefix = `course[course_sections_attributes][${sid}][lessons_attributes][${idx}]`
-  const lid = Date.now()
-  const wrap = document.createElement('div')
-  wrap.innerHTML = document.getElementById('lesson-tpl').innerHTML
-    .replace(/__LID__/g, lid).replace(/__LPREFIX__/g, prefix)
-  const el = wrap.firstElementChild
-  el.dataset.lessonId = lid
-  section.querySelector('.lessons-list').appendChild(el)
-  el.querySelector('.lesson-name-inline').focus()
-}
-
+// ── Remove Section ──
 function removeSection(btn) {
-  const section = btn.closest('.section-item')
-  const destroy = section.querySelector("input[name*='_destroy']")
-  section.style.transition = 'opacity 0.2s, transform 0.2s'
+  const section = btn.closest('.ce-section')
+  const destroy = section.querySelector('.destroy-field')
+  section.style.transition = 'opacity 0.2s'
   section.style.opacity = '0'
-  section.style.transform = 'scale(0.98)'
   setTimeout(() => {
-    if (destroy) { destroy.value = '1'; section.style.display = 'none' }
-    else section.remove()
-    updateSectionBadges()
+    if (destroy && destroy.name.includes('_destroy')) {
+      destroy.value = '1'
+      section.style.display = 'none'
+    } else {
+      section.remove()
+    }
+    updateSectionNumbers()
   }, 200)
 }
 
+// ── Add Lesson ──
+let lessonCounters = {}
+function addLesson(btn) {
+  const section = btn.closest('.ce-section')
+  // figure out the section key from the hidden _destroy field name
+  // name = "course[course_sections_attributes][KEY][_destroy]"
+  const destroyField = section.querySelector('.destroy-field')
+  let skey = 'new_' + Date.now()
+  if (destroyField) {
+    const m = destroyField.name.match(/\[course_sections_attributes\]\[([^\]]+)\]/)
+    if (m) skey = m[1]
+  }
+  if (!lessonCounters[skey]) lessonCounters[skey] = Date.now()
+  const lid = lessonCounters[skey]++
+  const prefix = `course[course_sections_attributes][${skey}][lessons_attributes][${lid}]`
+  let html = document.getElementById('lesson-tpl').innerHTML
+                      .replace(/LPREFIX/g, prefix)
+  const wrap = document.createElement('div')
+  wrap.innerHTML = html
+  const el = wrap.firstElementChild
+  const container = section.querySelector('.lessons')
+  container.appendChild(el)
+  el.querySelector('.ce-lesson-title-input').focus()
+}
+
+// ── Remove Lesson ──
 function removeLesson(btn) {
-  const lesson = btn.closest('.lesson-item')
-  const destroy = lesson.querySelector("input[name*='_destroy']")
+  const lesson = btn.closest('.ce-lesson')
+  const destroy = lesson.querySelector('.destroy-field')
   lesson.style.transition = 'opacity 0.2s'
   lesson.style.opacity = '0'
   setTimeout(() => {
-    if (destroy) { destroy.value = '1'; lesson.style.display = 'none' }
-    else lesson.remove()
+    if (destroy && destroy.name.includes('_destroy')) {
+      destroy.value = '1'
+      lesson.style.display = 'none'
+    } else {
+      lesson.remove()
+    }
   }, 200)
 }
 
-function toggleSection(btn) {
-  btn.closest('.section-item').classList.toggle('collapsed')
-}
-
-function switchTab(btn, tab) {
-  const lesson = btn.closest('.lesson-item')
-  lesson.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
-  lesson.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
-  btn.classList.add('active')
-  lesson.querySelector('[data-tab="' + tab + '"]').classList.add('active')
-  const badge = lesson.querySelector('.lesson-type-badge')
-  if (badge) {
-    badge.className = 'lesson-type-badge badge-' + tab
-    badge.textContent = {video:'Video', pdf:'PDF', speaking:'Speaking'}[tab]
-  }
-}
-
+// ── Add Topic ──
 function addTopic(btn) {
-  const lesson = btn.closest('.lesson-item')
-  const container = btn.previousElementSibling
+  const lesson = btn.closest('.ce-lesson')
+  const container = lesson.querySelector('.topics-container')
+  const destroyField = lesson.querySelector('.destroy-field')
+  let lprefix = 'course[course_sections_attributes][x][lessons_attributes][x]'
+  if (destroyField) lprefix = destroyField.name.replace('[_destroy]', '')
   const idx = container.children.length
-  const base = lesson.querySelector("input[name*='_destroy']").name
-    .replace('[_destroy]', '[speaking_topics_attributes][' + idx + ']')
+  const tprefix = `${lprefix}[speaking_topics_attributes][${idx}]`
+  let html = document.getElementById('topic-tpl').innerHTML
+                      .replace(/TPREFIX/g, tprefix)
   const wrap = document.createElement('div')
-  wrap.innerHTML = document.getElementById('topic-tpl').innerHTML.replace(/__TPREFIX__/g, base)
+  wrap.innerHTML = html
   container.appendChild(wrap.firstElementChild)
 }
 
+// ── Add Question ──
 function addQuestion(btn) {
-  const topic = btn.closest('.topic-box')
+  const topic = btn.closest('.ce-topic')
   const container = topic.querySelector('.questions-container')
+  const partSelect = topic.querySelector('.part-select')
+  const tprefix = partSelect.name.replace('[part]', '')
   const idx = container.children.length
-  const base = topic.querySelector('select').name
-    .replace('[part]', '[speaking_questions_attributes][' + idx + ']')
+  const qprefix = `${tprefix}[speaking_questions_attributes][${idx}]`
+  let html = document.getElementById('question-tpl').innerHTML
+                      .replace(/QPREFIX/g, qprefix)
   const wrap = document.createElement('div')
-  wrap.innerHTML = document.getElementById('question-tpl').innerHTML.replace(/__QPREFIX__/g, base)
+  wrap.innerHTML = html
   container.appendChild(wrap.firstElementChild)
 }
 
+// ── Toggle Cue Card ──
 function toggleCueCard(select) {
-  const cue = select.closest('.topic-box').querySelector('.cue-card-field')
+  const topic = select.closest('.ce-topic') || select.closest('.topic-box')
+  const cue = topic.querySelector('.cue-card-field')
+  if (!cue) return
   select.value === 'part2' ? cue.classList.remove('hidden') : cue.classList.add('hidden')
 }
 
+// ── Video Upload ──
 function handleVideoUpload(input) {
   const file = input.files[0]
   if (!file) return
-  if (!file.type.includes('mp4')) { showAlert('danger','Video must be MP4'); input.value=''; return }
-  if (file.size > MAX_VIDEO) { showAlert('danger','Video exceeds 5MB limit'); input.value=''; return }
-  const wrap = input.closest('.lesson-item').querySelector('.video-preview-wrap')
-  wrap.innerHTML = '<video controls class="video-preview"><source src="' + URL.createObjectURL(file) + '" type="video/mp4"></video>'
-  showAlert('success', 'Video ready: ' + file.name)
+  if (!file.type.includes('mp4')) { showAlert('danger', 'Video phải là MP4'); input.value = ''; return }
+  if (file.size > MAX_VIDEO) { showAlert('danger', 'Video vượt quá 5MB'); input.value = ''; return }
+  const wrap = input.closest('.ce-lesson') ? input.closest('.ce-lesson').querySelector('.video-preview-wrap') : null
+  if (wrap) wrap.innerHTML = `<video controls class="ce-video-preview"><source src="${URL.createObjectURL(file)}" type="video/mp4"></video>`
+  showAlert('success', '🎬 Video: ' + file.name)
 }
 
+// ── PDF Upload ──
 function handlePDFUpload(input) {
   const files = Array.from(input.files)
   if (!files.length) return
   for (const f of files) {
-    if (f.type !== 'application/pdf') { showAlert('danger', f.name + ' is not PDF'); input.value=''; return }
-    if (f.size > MAX_PDF) { showAlert('danger', f.name + ' exceeds 500KB'); input.value=''; return }
+    if (f.type !== 'application/pdf') { showAlert('danger', f.name + ' không phải PDF'); input.value = ''; return }
+    if (f.size > MAX_PDF) { showAlert('danger', f.name + ' vượt quá 500KB'); input.value = ''; return }
   }
-  const list = input.closest('.lesson-item').querySelector('.pdf-list')
-  list.innerHTML = ''
-  files.forEach(f => {
-    const item = document.createElement('div')
-    item.className = 'pdf-item'
-    item.innerHTML = '📄 ' + f.name + '<span style="margin-left:auto;font-size:10px;color:var(--text-dim)">' + (f.size/1024).toFixed(0) + ' KB</span>'
-    list.appendChild(item)
-  })
-  showAlert('success', files.length + ' PDF file' + (files.length>1?'s':'') + ' selected')
+  const list = input.closest('.ce-field').querySelector('.pdf-list')
+  if (list) {
+    list.innerHTML = ''
+    files.forEach(f => {
+      const div = document.createElement('div')
+      div.className = 'ce-pdf-item'
+      div.innerHTML = `📄 ${f.name} <span style="margin-left:auto;font-size:10px;color:var(--ink-4)">${(f.size/1024).toFixed(0)} KB</span>`
+      list.appendChild(div)
+    })
+  }
+  showAlert('success', `📄 ${files.length} PDF file đã chọn`)
 }
 
-function previewThumbnail(input) {
-  const file = input.files[0]
-  if (!file) return
-  const zone = input.closest('.upload-zone')
-  zone.innerHTML = '<img src="' + URL.createObjectURL(file) + '" style="width:100%;height:100px;object-fit:cover;border-radius:6px;">'
-}
-
-function saveCourse() { showAlert('success', 'Course saved successfully!') }
-
+// ── Alert ──
 function showAlert(type, message) {
   const c = document.getElementById('alert-container')
   const div = document.createElement('div')
   div.className = 'alert alert-' + (type === 'danger' ? 'danger' : 'success')
-  div.innerHTML = '<span>' + (type==='danger'?'⚠️':'✓') + '</span><span>' + message + '</span>'
+  div.innerHTML = `<span>${type === 'danger' ? '⚠️' : '✅'}</span><span>${message}</span>`
   c.appendChild(div)
-  setTimeout(() => { div.style.opacity='0'; div.style.transform='translateX(10px)'; setTimeout(()=>div.remove(),300) }, 3000)
+  setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300) }, 3500)
 }
 
+// ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
-  // Init Sortable cho sections có sẵn từ DB
-  document.querySelectorAll('.section-item').forEach(section => {
-    Sortable.create(section.querySelector('.lessons-list'), {
-      animation: 140, handle: '.lesson-drag',
-      ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen'
-    })
-    // Set counter để tránh trùng index khi add lesson mới
-    const sid = section.dataset.sectionId
-    lessonCounters[sid] = section.querySelectorAll('.lesson-item').length
-  })
-
-  // Chỉ tạo mới nếu course chưa có section nào
-  const existingSections = document.querySelectorAll('.section-item')
-  if (existingSections.length === 0) {
-    addSection()
-    const firstBtn = document.querySelector('.section-item .btn-add')
-    if (firstBtn) addLesson(firstBtn)
-  }
-
-  updateSectionBadges()
+  // Init cue cards for existing ERB-rendered topics
+  document.querySelectorAll('.part-select').forEach(select => toggleCueCard(select))
+  updateSectionNumbers()
 })
 </script>
-<% end %>
-</body>
-</html>
