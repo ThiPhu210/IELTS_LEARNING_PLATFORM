@@ -1,765 +1,502 @@
-<%# app/views/admin/courses/edit.html.erb %>
+<!-- NAVBAR -->
 <%= render "admin/shared/navbar" %>
+<div id="alert-container"
+     class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3">
+</div>
+<div class="pt-24 px-8 pb-16 bg-slate-100 min-h-screen">
+<div class="max-w-6xl mx-auto">
+<h1 class="text-3xl font-bold text-slate-800 mb-10">
+🎓 Admin Course Editor
+</h1>
 
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
 
-  :root {
-    --ink: #0f1117;
-    --ink-2: #3d4049;
-    --ink-3: #7a7f8e;
-    --ink-4: #b0b5c3;
-    --paper: #f7f8fc;
-    --white: #ffffff;
-    --border: #e4e6ed;
-    --border-focus: #4f63ff;
-    --indigo: #4f63ff;
-    --indigo-soft: #eef0ff;
-    --indigo-mid: #c7ccff;
-    --green: #0b9e6e;
-    --green-soft: #e6f8f3;
-    --amber: #c47d00;
-    --amber-soft: #fff8e6;
-    --amber-border: #ffd97a;
-    --red: #d63845;
-    --red-soft: #fff0f1;
-    --radius: 14px;
-    --radius-sm: 9px;
-    --shadow: 0 2px 12px rgba(15,17,23,0.07);
-    --shadow-lg: 0 8px 32px rgba(15,17,23,0.12);
-  }
+<!-- COURSE INFO -->
+<div class="bg-white rounded-2xl shadow-lg p-8 mb-10 space-y-6">
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<h2 class="text-xl font-semibold border-b pb-3">📘 Course Information</h2>
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--paper);
-    color: var(--ink);
-    font-size: 14px;
-    line-height: 1.6;
-  }
+<%= f.text_field :title,class:"w-full border rounded-lg px-4 py-2",placeholder:"Course Title"%>
 
-  /* ALERTS */
-  #alert-container {
-    position: fixed; top: 80px; right: 20px; z-index: 9999;
-    display: flex; flex-direction: column; gap: 8px; width: 340px;
-  }
-  .alert {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
-    border: 1px solid; animation: slideIn 0.2s ease;
-    box-shadow: var(--shadow);
-  }
-  .alert-success { background: var(--green-soft); border-color: #a3e6d4; color: #065f46; }
-  .alert-danger  { background: var(--red-soft);   border-color: #ffc5c9; color: #9f1239; }
-  @keyframes slideIn { from { opacity:0; transform:translateX(10px) } to { opacity:1; transform:translateX(0) } }
+<%= f.text_area :description,rows:4,class:"w-full border rounded-lg px-4 py-2",placeholder:"Description"%>
 
-  /* PAGE */
-  .ce-page { max-width: 860px; margin: 0 auto; padding: 100px 24px 80px; }
+<div class="grid grid-cols-2 gap-6">
 
-  .ce-breadcrumb { font-size: 12px; color: var(--ink-4); margin-bottom: 8px; }
-  .ce-breadcrumb a { color: var(--ink-3); text-decoration: none; }
-  .ce-breadcrumb a:hover { color: var(--indigo); }
+<%= f.number_field :price,min:0,step:1000,class:"w-full border rounded-lg px-4 py-2"%>
 
-  .ce-heading { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; color: var(--ink); margin-bottom: 2px; }
-  .ce-subheading { font-size: 13px; color: var(--ink-3); margin-bottom: 32px; }
+<div>
+<% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
 
-  /* CARD */
-  .ce-card {
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow);
-    margin-bottom: 20px; overflow: hidden;
-  }
-  .ce-card-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 16px 22px; border-bottom: 1px solid var(--border);
-    background: var(--paper);
-  }
-  .ce-card-icon { font-size: 17px; }
-  .ce-card-title { font-size: 13px; font-weight: 700; color: var(--ink); letter-spacing: 0.1px; }
-  .ce-card-body { padding: 22px; }
+  <%= image_tag(
+        @course.thumbnail.variant(resize_to_limit:[260,160]),
+        class:"rounded-lg mb-3 border"
+      ) %>
 
-  /* FIELDS */
-  .ce-field { margin-bottom: 16px; }
-  .ce-label {
-    display: block; font-size: 11px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: 0.6px;
-    color: var(--ink-3); margin-bottom: 6px;
-  }
-  .ce-input, .ce-textarea, .ce-select {
-    width: 100%; background: var(--paper); border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm); padding: 9px 13px;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
-    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .ce-input:focus, .ce-textarea:focus, .ce-select:focus {
-    border-color: var(--border-focus);
-    box-shadow: 0 0 0 3px rgba(79,99,255,0.1);
-    background: var(--white);
-  }
-  .ce-input::placeholder, .ce-textarea::placeholder { color: var(--ink-4); }
-  .ce-textarea { resize: vertical; min-height: 84px; }
-  .ce-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+<% end %>
 
-  /* UPLOAD ZONE */
-  .ce-upload {
-    position: relative; border: 1.5px dashed var(--border);
-    border-radius: var(--radius-sm); padding: 14px 16px; cursor: pointer;
-    display: flex; align-items: center; gap: 12px;
-    background: var(--paper); transition: border-color 0.15s, background 0.15s;
-  }
-  .ce-upload:hover { border-color: var(--indigo); background: var(--indigo-soft); }
-  .ce-upload input[type="file"] {
-    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
-  }
-  .ce-upload-icon { font-size: 20px; flex-shrink: 0; }
-  .ce-upload-text { font-size: 13px; font-weight: 600; color: var(--ink-2); }
-  .ce-upload-hint { font-size: 11px; color: var(--ink-4); margin-top: 2px; }
-
-  /* THUMBNAIL PREVIEW */
-  .ce-thumb-wrap { margin-bottom: 10px; }
-  .ce-thumb-wrap img { border-radius: var(--radius-sm); border: 1px solid var(--border); max-height: 120px; }
-
-  /* SECTION */
-  .ce-section {
-    border: 1.5px solid var(--border); border-radius: var(--radius);
-    overflow: hidden; margin-bottom: 16px;
-    transition: box-shadow 0.2s;
-  }
-  .ce-section:hover { box-shadow: var(--shadow); }
-
-  .ce-section-header {
-    display: flex; align-items: center; gap: 10px;
-    padding: 12px 18px; background: var(--paper);
-    border-bottom: 1px solid var(--border);
-  }
-  .ce-section-num {
-    min-width: 26px; height: 26px; border-radius: 7px;
-    background: var(--indigo-soft); border: 1px solid var(--indigo-mid);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 11px; font-weight: 800; color: var(--indigo); flex-shrink: 0;
-  }
-  .ce-section-title-input {
-    flex: 1; background: transparent; border: none;
-    border-bottom: 1.5px solid transparent; outline: none;
-    font-family: 'DM Sans', sans-serif; font-size: 14px;
-    font-weight: 600; color: var(--ink); padding: 2px 0;
-    transition: border-color 0.15s;
-  }
-  .ce-section-title-input:focus { border-bottom-color: var(--indigo); }
-  .ce-section-title-input::placeholder { color: var(--ink-4); font-weight: 400; }
-
-  .ce-section-body { padding: 18px; }
-
-  /* BTN */
-  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all 0.15s; text-decoration: none; }
-  .btn-primary { background: var(--indigo); color: #fff; box-shadow: 0 2px 8px rgba(79,99,255,0.3); }
-  .btn-primary:hover { background: #3d51f0; transform: translateY(-1px); }
-  .btn-outline { background: transparent; color: var(--ink-2); border: 1.5px solid var(--border); }
-  .btn-outline:hover { background: var(--paper); border-color: var(--ink-4); }
-  .btn-ghost-danger { background: transparent; color: var(--ink-3); border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; padding: 4px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s; }
-  .btn-ghost-danger:hover { background: var(--red-soft); color: var(--red); }
-  .btn-dashed { width: 100%; justify-content: center; background: transparent; border: 1.5px dashed var(--border); color: var(--ink-4); font-size: 12px; padding: 8px; border-radius: var(--radius-sm); cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; display: flex; align-items: center; gap: 4px; transition: all 0.15s; }
-  .btn-dashed:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-soft); }
-
-  /* LESSON */
-  .ce-lesson {
-    background: var(--white); border: 1px solid var(--border);
-    border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 10px;
-  }
-  .ce-lesson-header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 16px; background: var(--paper);
-    border-bottom: 1px solid var(--border);
-  }
-  .ce-lesson-badge {
-    font-size: 10px; padding: 2px 8px; border-radius: 4px;
-    font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
-    background: var(--green-soft); color: var(--green);
-    border: 1px solid #c3f0e0; flex-shrink: 0;
-  }
-  .ce-lesson-title-input {
-    flex: 1; background: transparent; border: none;
-    border-bottom: 1.5px solid transparent; outline: none;
-    font-family: 'DM Sans', sans-serif; font-size: 13px;
-    font-weight: 500; color: var(--ink); padding: 1px 0;
-    transition: border-color 0.15s;
-  }
-  .ce-lesson-title-input:focus { border-bottom-color: var(--green); }
-  .ce-lesson-title-input::placeholder { color: var(--ink-4); font-weight: 400; }
-  .ce-dur-input {
-    width: 68px; background: var(--paper); border: 1.5px solid var(--border);
-    border-radius: 6px; padding: 4px 8px; font-family: 'DM Mono', monospace;
-    font-size: 12px; color: var(--ink); outline: none;
-    transition: border-color 0.15s;
-  }
-  .ce-dur-input:focus { border-color: var(--border-focus); }
-  .ce-dur-label { font-size: 11px; color: var(--ink-4); }
-
-  .ce-lesson-body { padding: 16px; }
-
-  /* VIDEO PREVIEW */
-  .ce-video-preview { width: 100%; max-width: 320px; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-top: 10px; }
-
-  /* PDF LIST */
-  .ce-pdf-list { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
-  .ce-pdf-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 12px; background: var(--paper);
-    border: 1px solid var(--border); border-radius: 7px;
-    font-size: 12px; color: var(--ink-2);
-  }
-  .ce-pdf-item a { color: var(--indigo); text-decoration: none; }
-  .ce-pdf-item a:hover { text-decoration: underline; }
-
-  /* SPEAKING */
-  .ce-speaking {
-    background: var(--amber-soft); border: 1.5px solid var(--amber-border);
-    border-radius: var(--radius-sm); padding: 16px;
-  }
-  .ce-speaking-title {
-    font-size: 11px; font-weight: 800; text-transform: uppercase;
-    letter-spacing: 0.6px; color: var(--amber); margin-bottom: 14px;
-  }
-  .ce-topic {
-    background: var(--white); border: 1px solid #ffe8a0;
-    border-radius: var(--radius-sm); padding: 14px; margin-bottom: 10px;
-  }
-  .ce-question {
-    background: var(--paper); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px; margin-top: 8px;
-  }
-  .ce-question-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--ink-4); margin-bottom: 5px; display: block; }
-  .ce-cue-wrap { margin-top: 8px; }
-  .hidden { display: none !important; }
-
-  /* SECTION NUMBER AUTO */
-  .ce-section:nth-child(1) .ce-section-num::after { content: '1'; }
-  .ce-section:nth-child(2) .ce-section-num::after { content: '2'; }
-  .ce-section:nth-child(3) .ce-section-num::after { content: '3'; }
-  .ce-section:nth-child(4) .ce-section-num::after { content: '4'; }
-  .ce-section:nth-child(5) .ce-section-num::after { content: '5'; }
-  /* fallback handled by JS */
-
-  /* DIVIDER */
-  .ce-divider { height: 1px; background: var(--border); margin: 14px 0; }
-
-  /* ACTIONS BAR */
-  .ce-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
-
-  /* NEW SECTION zone */
-  .ce-add-section-zone {
-    width: 100%; border: 1.5px dashed var(--border); border-radius: var(--radius);
-    padding: 18px; text-align: center; cursor: pointer; display: flex;
-    align-items: center; justify-content: center; gap: 6px;
-    color: var(--ink-4); font-size: 13px; font-weight: 600;
-    font-family: 'DM Sans', sans-serif; background: transparent;
-    transition: all 0.15s; margin-top: 14px;
-  }
-  .ce-add-section-zone:hover { border-color: var(--indigo); color: var(--indigo); background: var(--indigo-soft); }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .ce-grid-2 { grid-template-columns: 1fr; }
-  }
-</style>
-
-<%= render "admin/shared/navbar" %>
-
-<div id="alert-container"></div>
-
-<div class="ce-page">
-  <div class="ce-breadcrumb">
-    <a href="#">Admin</a> › <a href="#">Courses</a> › Edit
-  </div>
-  <div class="ce-heading">🎓 Course Editor</div>
-  <div class="ce-subheading">Manage course content, lessons, and speaking exercises</div>
-
-  <%= form_with model: [:admin, @course], local: true, multipart: true do |f| %>
-
-    <%# ── COURSE INFO ── %>
-    <div class="ce-card">
-      <div class="ce-card-header">
-        <span class="ce-card-icon">📘</span>
-        <span class="ce-card-title">Course Information</span>
-      </div>
-      <div class="ce-card-body">
-        <div class="ce-field">
-          <label class="ce-label">Course Title</label>
-          <%= f.text_field :title, class: "ce-input", placeholder: "e.g. IELTS Complete Preparation" %>
-        </div>
-        <div class="ce-field">
-          <label class="ce-label">Description</label>
-          <%= f.text_area :description, class: "ce-textarea", placeholder: "Describe what students will learn…" %>
-        </div>
-        <div class="ce-grid-2">
-          <div class="ce-field">
-            <label class="ce-label">Price (VND)</label>
-            <%= f.number_field :price, min: 0, step: 1000, class: "ce-input", placeholder: "0" %>
-          </div>
-          <div class="ce-field">
-            <label class="ce-label">Thumbnail</label>
-            <% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
-              <div class="ce-thumb-wrap">
-                <%= image_tag @course.thumbnail.variant(resize_to_limit: [260, 120]), class: "rounded-lg border" %>
-              </div>
-            <% end %>
-            <div class="ce-upload">
-              <%= f.file_field :thumbnail, accept: "image/*", class: "" %>
-              <span class="ce-upload-icon">🖼️</span>
-              <div>
-                <div class="ce-upload-text">Drop image or click to browse</div>
-                <div class="ce-upload-hint">JPG, PNG · Max 2MB</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <%# ── COURSE STRUCTURE ── %>
-    <div class="ce-card">
-      <div class="ce-card-header">
-        <span class="ce-card-icon">📚</span>
-        <span class="ce-card-title">Course Structure</span>
-      </div>
-      <div class="ce-card-body">
-
-        <div id="sections">
-          <%= f.fields_for :course_sections do |sf| %>
-            <div class="ce-section" <% if sf.object.marked_for_destruction? %>style="display:none"<% end %>>
-              <%= sf.hidden_field :_destroy, class: "destroy-field" %>
-
-              <div class="ce-section-header">
-                <div class="ce-section-num"></div>
-                <%= sf.text_field :title,
-                      class: "ce-section-title-input",
-                      placeholder: "Section title…" %>
-                <button type="button" class="btn-ghost-danger" onclick="removeSection(this)">
-                  🗑 Remove
-                </button>
-              </div>
-
-              <div class="ce-section-body">
-                <div class="lessons">
-                  <%= sf.fields_for :lessons do |lf| %>
-                    <div class="ce-lesson" <% if lf.object.marked_for_destruction? %>style="display:none"<% end %>>
-                      <%= lf.hidden_field :_destroy, class: "destroy-field" %>
-
-                      <div class="ce-lesson-header">
-                        <span class="ce-lesson-badge">Lesson</span>
-                        <%= lf.text_field :title,
-                              class: "ce-lesson-title-input",
-                              placeholder: "Lesson title…" %>
-                        <%= lf.number_field :duration,
-                              class: "ce-dur-input",
-                              placeholder: "min" %>
-                        <span class="ce-dur-label">min</span>
-                        <button type="button" class="btn-ghost-danger" onclick="removeLesson(this)">🗑</button>
-                      </div>
-
-                      <div class="ce-lesson-body">
-
-                        <%# VIDEO %>
-                        <div class="ce-field">
-                          <label class="ce-label">🎬 Video</label>
-                          <div class="ce-upload">
-                            <%= lf.file_field :video, accept: "video/mp4", onchange: "handleVideoUpload(this)" %>
-                            <span class="ce-upload-icon">🎬</span>
-                            <div>
-                              <% if lf.object.persisted? && lf.object.video.attached? %>
-                                <div class="ce-upload-text">✅ <%= lf.object.video.filename %></div>
-                              <% else %>
-                                <div class="ce-upload-text">Upload video lesson</div>
-                              <% end %>
-                              <div class="ce-upload-hint">MP4 · Max 5MB</div>
-                            </div>
-                          </div>
-                          <% if lf.object.persisted? && lf.object.video.attached? %>
-                            <video controls class="ce-video-preview">
-                              <source src="<%= url_for(lf.object.video) %>" type="video/mp4">
-                            </video>
-                          <% end %>
-                          <div class="video-preview-wrap"></div>
-                        </div>
-
-                        <div class="ce-divider"></div>
-
-                        <%# PDF %>
-                        <div class="ce-field">
-                          <label class="ce-label">📄 PDF Materials</label>
-                          <div class="ce-upload">
-                            <%= lf.file_field :pdfs, multiple: true, accept: "application/pdf", onchange: "handlePDFUpload(this)" %>
-                            <span class="ce-upload-icon">📄</span>
-                            <div>
-                              <div class="ce-upload-text">Upload PDF materials</div>
-                              <div class="ce-upload-hint">PDF · Max 500KB each · Multiple OK</div>
-                            </div>
-                          </div>
-                          <% if lf.object.persisted? && lf.object.pdfs.attached? %>
-                            <div class="ce-pdf-list">
-                              <% lf.object.pdfs.each do |pdf| %>
-                                <% next unless pdf.persisted? %>
-                                <div class="ce-pdf-item">
-                                  📄 <%= link_to pdf.filename, rails_blob_url(pdf), target: "_blank" %>
-                                </div>
-                              <% end %>
-                            </div>
-                          <% end %>
-                          <div class="pdf-list"></div>
-                        </div>
-
-                        <div class="ce-divider"></div>
-
-                        <%# SPEAKING %>
-                        <div class="ce-speaking">
-                          <div class="ce-speaking-title">🎤 Speaking Exercises</div>
-
-                          <%= lf.fields_for :speaking_topics do |tf| %>
-                            <div class="ce-topic">
-                              <div class="ce-grid-2" style="margin-bottom:10px;">
-                                <%= tf.text_field :title, class: "ce-input", placeholder: "Topic title…" %>
-                                <%= tf.select :part,
-                                      SpeakingTopic.parts.keys.map { |p| [p.upcase, p] },
-                                      {},
-                                      class: "ce-select part-select",
-                                      onchange: "toggleCueCard(this)" %>
-                              </div>
-
-                              <div class="questions">
-                                <%= tf.fields_for :speaking_questions do |qf| %>
-                                  <div class="ce-question">
-                                    <span class="ce-question-label">Question</span>
-                                    <%= qf.text_area :question_text,
-                                          class: "ce-input ce-textarea",
-                                          style: "min-height:52px;",
-                                          placeholder: "Enter your question…" %>
-
-                                    <div class="ce-cue-wrap cue-card-field <%= 'hidden' unless tf.object.part == 'part2' %>">
-                                      <span class="ce-question-label" style="margin-top:8px;">Cue Card</span>
-                                      <%= qf.text_area :cue_card,
-                                            class: "ce-input ce-textarea",
-                                            style: "min-height:52px;",
-                                            placeholder: "Cue card instructions…" %>
-                                    </div>
-
-                                    <div class="ce-grid-2" style="margin-top:10px;">
-                                      <div>
-                                        <span class="ce-question-label">Prep Time (sec)</span>
-                                        <%= qf.number_field :preparation_time, class: "ce-input" %>
-                                      </div>
-                                      <div>
-                                        <span class="ce-question-label">Speaking Time (sec)</span>
-                                        <%= qf.number_field :speaking_time, class: "ce-input" %>
-                                      </div>
-                                    </div>
-                                  </div>
-                                <% end %>
-                              </div>
-                            </div>
-                          <% end %>
-                        </div><%# /ce-speaking %>
-
-                      </div><%# /ce-lesson-body %>
-                    </div><%# /ce-lesson %>
-                  <% end %>
-                </div><%# /lessons %>
-
-                <button type="button" class="btn-dashed" style="margin-top:10px;" onclick="addLesson(this)">
-                  ＋ Add Lesson
-                </button>
-              </div><%# /ce-section-body %>
-            </div><%# /ce-section %>
-          <% end %>
-        </div><%# /sections %>
-
-        <button type="button" class="ce-add-section-zone" onclick="addSection()">
-          ＋ Add Section
-        </button>
-
-      </div>
-    </div>
-
-    <%# ACTIONS %>
-    <div class="ce-actions">
-      <%= link_to "Cancel", admin_courses_path, class: "btn btn-outline" %>
-      <%= f.submit "💾 Save Course", class: "btn btn-primary" %>
-    </div>
-
-  <% end %>
+<%= f.file_field :thumbnail %>
 </div>
 
-<%# ── TEMPLATES for JS-added sections/lessons ── %>
-<template id="section-tpl">
-  <div class="ce-section">
-    <input type="hidden" name="course[course_sections_attributes][NEW_SID][_destroy]" value="0" class="destroy-field">
-    <div class="ce-section-header">
-      <div class="ce-section-num"></div>
-      <input type="text" class="ce-section-title-input"
-             name="course[course_sections_attributes][NEW_SID][title]"
-             placeholder="Section title…">
-      <button type="button" class="btn-ghost-danger" onclick="removeSection(this)">🗑 Remove</button>
-    </div>
-    <div class="ce-section-body">
-      <div class="lessons"></div>
-      <button type="button" class="btn-dashed" style="margin-top:10px;" onclick="addLesson(this)">＋ Add Lesson</button>
-    </div>
-  </div>
+</div>
+</div>
+
+<!-- COURSE STRUCTURE -->
+<div class="bg-white rounded-2xl shadow-lg p-8">
+
+<h2 class="text-xl font-semibold mb-8 border-b pb-3">
+📚 Course Structure
+</h2>
+
+<button type="button"
+onclick="addSection()"
+class="mb-6 px-5 py-2 bg-indigo-600 text-white rounded-lg">
+➕ Add Section
+</button>
+
+<div id="sections" class="space-y-8">
+
+<%= f.fields_for :course_sections do |section| %>
+
+<div class="bg-slate-50 border rounded-xl p-6 section-item">
+
+<%= section.hidden_field :_destroy %>
+
+<%= section.text_field :title,
+placeholder:"Section Title",
+class:"border rounded px-3 py-2 w-full mb-6"%>
+
+<div class="lessons space-y-6">
+
+<%= section.fields_for :lessons do |lesson| %>
+
+<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
+
+<h4 class="font-semibold mb-4">🎬 Lesson</h4>
+
+<div class="grid grid-cols-2 gap-4 mb-4">
+
+<%= lesson.text_field :title,class:"border rounded px-3 py-2"%>
+
+<%= lesson.number_field :duration,class:"border rounded px-3 py-2"%>
+
+</div>
+
+<label class="text-sm font-semibold">🎬 Video Upload</label>
+<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
+onchange:"handleVideoUpload(this)" %>
+<% if lesson.object.persisted? && lesson.object.video.attached? %>
+  <video controls class="mt-3 w-64 rounded">
+    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
+  </video>
+<% end %>
+
+
+
+<label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
+<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
+
+<% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
+
+  <ul class="mt-3 space-y-1 text-sm">
+
+    <% lesson.object.pdfs.each do |pdf| %>
+
+      <% next unless pdf.persisted? %>
+
+      <li>
+        📄 <%= link_to pdf.filename,
+              rails_blob_url(pdf),
+              target:"_blank",
+              class:"text-indigo-600 underline" %>
+      </li>
+
+    <% end %>
+
+  </ul>
+
+<% end %>
+
+
+
+<!-- SPEAKING -->
+<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
+
+<h5 class="font-bold text-yellow-700 mb-4">
+🎤 Speaking Exercises
+</h5>
+
+<%= lesson.fields_for :speaking_topics do |topic| %>
+
+<div class="topic-box bg-white border rounded-lg p-4 mb-4">
+
+<div class="grid grid-cols-2 gap-3 mb-3">
+
+<%= topic.text_field :title,class:"border px-3 py-2"%>
+
+<%= topic.select :part,
+SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
+{},
+class:"border px-3 py-2 part-select",
+onchange:"toggleCueCard(this)"%>
+
+</div>
+
+<div class="questions">
+
+<%= topic.fields_for :speaking_questions do |q| %>
+
+<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+
+<label class="text-xs font-semibold">Question</label>
+
+<%= q.text_area :question_text,class:"border w-full px-3 py-2 mb-3"%>
+
+<div class="cue-card-field hidden">
+
+<label class="text-xs font-semibold">Cue Card</label>
+<%= q.text_area :cue_card,class:"border w-full px-3 py-2 mb-3"%>
+</div>
+
+<div class="grid grid-cols-2 gap-3">
+
+<%= q.number_field :preparation_time,class:"border px-3 py-2 w-full"%>
+
+<%= q.number_field :speaking_time,class:"border px-3 py-2 w-full"%>
+
+</div>
+
+</div>
+
+<% end %>
+
+</div>
+</div>
+
+<% end %>
+
+</div>
+
+</div>
+
+<% end %>
+
+</div>
+
+<button type="button"
+onclick="removeSection(this)"
+class="text-red-500 mt-4">
+🗑 Remove Section
+</button>
+
+</div>
+
+<% end %>
+
+</div>
+</div>
+
+<!-- TEMPLATE -->
+<template id="section-template">
+
+<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
+
+<input type="hidden"
+name="course[course_sections_attributes][NEW_SECTION][_destroy]"
+value="0">
+
+<h3 class="font-bold text-lg mb-4 text-indigo-700">
+📂 Section
+</h3>
+
+<button type="button"
+onclick="removeSection(this)"
+class="text-sm text-red-500 mb-4">
+🗑 Remove Section
+</button>
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][title]"
+placeholder="Section Title"
+class="border rounded px-3 py-2 w-full mb-6"/>
+
+<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
+
+<h4 class="font-semibold mb-4">🎬 Lesson</h4>
+
+<div class="grid grid-cols-2 gap-4 mb-4">
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
+placeholder="Lesson Title"
+class="border rounded px-3 py-2"/>
+
+<input type="number"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
+placeholder="Duration"
+class="border rounded px-3 py-2"/>
+
+</div>
+
+<label class="text-sm font-semibold">🎬 Admin Video Upload</label>
+
+<input type="file"
+accept="video/mp4"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
+class="video-input mt-2"
+onchange="handleVideoUpload(this)"/>
+
+<label class="text-sm font-semibold mt-4 block">📄 Admin PDF Materials</label>
+
+<input type="file"
+multiple
+accept="application/pdf"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
+class="pdf-input mt-2"
+onchange="handlePDFUpload(this)"/>
+
+<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
+
+<h5 class="font-bold text-yellow-700 mb-4">
+🎤 Speaking Exercises (Admin)
+</h5>
+
+<div class="topic-box bg-white border rounded-lg p-4 mb-4">
+
+<div class="grid grid-cols-2 gap-3 mb-3">
+
+<input type="text"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
+placeholder="Topic Title"
+class="border px-3 py-2"/>
+
+<select
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
+class="border px-3 py-2 part-select"
+onchange="toggleCueCard(this)">
+
+<option value="part1">PART1</option>
+<option value="part2">PART2</option>
+<option value="part3">PART3</option>
+
+</select>
+
+</div>
+
+<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+
+<label class="text-xs font-semibold">Question</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+<div class="cue-card-field hidden">
+
+<label class="text-xs font-semibold">Cue Card</label>
+
+<textarea
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
+class="border w-full px-3 py-2 mb-3"></textarea>
+
+</div>
+
+<div class="grid grid-cols-2 gap-3">
+
+<input type="number"
+placeholder="Preparation Time"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
+class="border px-3 py-2"/>
+
+<input type="number"
+placeholder="Speaking Time"
+name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
+class="border px-3 py-2"/>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
 </template>
 
-<template id="lesson-tpl">
-  <div class="ce-lesson">
-    <input type="hidden" name="LPREFIX[_destroy]" value="0" class="destroy-field">
-    <div class="ce-lesson-header">
-      <span class="ce-lesson-badge">Lesson</span>
-      <input type="text" class="ce-lesson-title-input" name="LPREFIX[title]" placeholder="Lesson title…">
-      <input type="number" class="ce-dur-input" name="LPREFIX[duration]" placeholder="min">
-      <span class="ce-dur-label">min</span>
-      <button type="button" class="btn-ghost-danger" onclick="removeLesson(this)">🗑</button>
-    </div>
-    <div class="ce-lesson-body">
-      <div class="ce-field">
-        <label class="ce-label">🎬 Video</label>
-        <div class="ce-upload">
-          <input type="file" accept="video/mp4" name="LPREFIX[video]" onchange="handleVideoUpload(this)">
-          <span class="ce-upload-icon">🎬</span>
-          <div>
-            <div class="ce-upload-text">Upload video lesson</div>
-            <div class="ce-upload-hint">MP4 · Max 5MB</div>
-          </div>
-        </div>
-        <div class="video-preview-wrap"></div>
-      </div>
-      <div class="ce-divider"></div>
-      <div class="ce-field">
-        <label class="ce-label">📄 PDF Materials</label>
-        <div class="ce-upload">
-          <input type="file" multiple accept="application/pdf" name="LPREFIX[pdfs][]" onchange="handlePDFUpload(this)">
-          <span class="ce-upload-icon">📄</span>
-          <div>
-            <div class="ce-upload-text">Upload PDF materials</div>
-            <div class="ce-upload-hint">PDF · Max 500KB each · Multiple OK</div>
-          </div>
-        </div>
-        <div class="pdf-list"></div>
-      </div>
-      <div class="ce-divider"></div>
-      <div class="ce-speaking">
-        <div class="ce-speaking-title">🎤 Speaking Exercises</div>
-        <div class="topics-container"></div>
-        <button type="button" class="btn-dashed" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
-      </div>
-    </div>
-  </div>
-</template>
 
-<template id="topic-tpl">
-  <div class="ce-topic">
-    <div class="ce-grid-2" style="margin-bottom:10px;">
-      <input type="text" class="ce-input" name="TPREFIX[title]" placeholder="Topic title…">
-      <select class="ce-select part-select" name="TPREFIX[part]" onchange="toggleCueCard(this)">
-        <option value="part1">PART 1</option>
-        <option value="part2">PART 2</option>
-        <option value="part3">PART 3</option>
-      </select>
-    </div>
-    <div class="questions-container"></div>
-    <button type="button" class="btn-dashed" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
-  </div>
-</template>
+<div class="flex justify-end gap-4 mt-10">
 
-<template id="question-tpl">
-  <div class="ce-question">
-    <span class="ce-question-label">Question</span>
-    <textarea class="ce-input ce-textarea" style="min-height:52px;" name="QPREFIX[question_text]" placeholder="Enter your question…"></textarea>
-    <div class="ce-cue-wrap cue-card-field hidden" style="margin-top:8px;">
-      <span class="ce-question-label">Cue Card</span>
-      <textarea class="ce-input ce-textarea" style="min-height:52px;" name="QPREFIX[cue_card]" placeholder="Cue card instructions…"></textarea>
-    </div>
-    <div class="ce-grid-2" style="margin-top:10px;">
-      <div>
-        <span class="ce-question-label">Prep Time (sec)</span>
-        <input type="number" class="ce-input" name="QPREFIX[preparation_time]">
-      </div>
-      <div>
-        <span class="ce-question-label">Speaking Time (sec)</span>
-        <input type="number" class="ce-input" name="QPREFIX[speaking_time]">
-      </div>
-    </div>
-  </div>
-</template>
+<%= link_to "Cancel",admin_courses_path,class:"px-6 py-2 border rounded-lg bg-white"%>
+
+<%= f.submit "💾 Save Course",
+class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"%>
+
+</div>
+
+<% end %>
+
+</div>
+</div>
 
 <script>
+
+function addSection(){
+
+  let template =
+    document.getElementById("section-template").innerHTML
+
+  let uniqueId = new Date().getTime()
+
+  template = template.replace(/NEW_SECTION/g, uniqueId)
+
+  let wrapper = document.createElement("div")
+  wrapper.innerHTML = template
+
+  let newSection = wrapper.firstElementChild
+
+  document.getElementById("sections")
+          .appendChild(newSection)
+
+  newSection
+    .querySelectorAll(".part-select")
+    .forEach(select => toggleCueCard(select))
+}
+
+
+
+function removeSection(btn){
+
+let section=btn.closest(".section-item")
+
+let destroyInput=section.querySelector("input[name*='_destroy']")
+
+if(destroyInput){
+destroyInput.value="1"
+section.style.display="none"
+}else{
+section.remove()
+}
+
+}
+
+
+function toggleCueCard(select){
+
+  const box = select.closest(".topic-box")
+  const cue = box.querySelector(".cue-card-field")
+
+  if(select.value==="part2"){
+    cue.classList.remove("hidden")
+  }else{
+    cue.classList.add("hidden")
+  }
+}
+</script>
+
+<script>
+
 const MAX_VIDEO = 5 * 1024 * 1024
 const MAX_PDF   = 500 * 1024
+function showAlert(type, message){
 
-// ── Section numbering ──
-function updateSectionNumbers() {
-  let n = 0
-  document.querySelectorAll('#sections .ce-section').forEach(el => {
-    if (el.style.display === 'none') return
-    n++
-    const badge = el.querySelector('.ce-section-num')
-    if (badge) badge.textContent = n
+  const container = document.getElementById("alert-container")
+  if(!container) return
+
+  const div = document.createElement("div")
+
+  if(type==="danger"){
+    div.className="flex items-start sm:items-center p-4 text-sm text-pink-800 rounded-xl bg-pink-100 border border-pink-200 shadow"
+    div.innerHTML=`
+      <svg class="w-4 h-4 me-2 shrink-0"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+      </svg>
+      <p><span class="font-semibold me-1">Error:</span>${message}</p>
+    `
+  }
+
+  if(type==="success"){
+    div.className="flex items-start sm:items-center p-4 text-sm text-emerald-800 rounded-xl bg-emerald-100 border border-emerald-200 shadow"
+    div.innerHTML=`
+      <svg class="w-4 h-4 me-2 shrink-0"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor">
+      <path stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M5 13l4 4L19 7"/>
+      </svg>
+      <p><span class="font-semibold me-1">Success:</span>${message}</p>
+    `
+  }
+
+  container.appendChild(div)
+
+  setTimeout(()=>{
+    div.remove()
+  },4000)
+}
+
+
+function handleVideoUpload(input){
+const file=input.files[0]
+if(!file)return
+
+if(!file.type.includes("mp4")){
+showAlert("danger","❌ Video phải là MP4")
+input.value=""
+return
+}
+
+if(file.size>MAX_VIDEO){
+showAlert("danger","❌ Video vượt quá 5MB")
+input.value=""
+return
+}
+
+showAlert("success",`🎬 Upload video: <b>${file.name}</b>`)
+}
+
+function handlePDFUpload(input){
+
+const files=Array.from(input.files)
+if(files.length===0)return
+
+for(const file of files){
+
+if(file.type!=="application/pdf"){
+showAlert("danger",`❌ ${file.name} không phải PDF`)
+input.value=""
+return
+}
+
+if(file.size>MAX_PDF){
+showAlert("danger",`❌ ${file.name} vượt quá 500KB`)
+input.value=""
+return
+}
+
+}
+
+showAlert("success",`📄 Upload ${files.length} file PDF`)
+}
+</script>
+<script>
+document.addEventListener("DOMContentLoaded",()=>{
+
+  document.querySelectorAll(".part-select").forEach(select=>{
+    toggleCueCard(select)
   })
-}
 
-// ── Add Section (new, JS-only) ──
-function addSection() {
-  const sid = 'new_' + Date.now()
-  let html = document.getElementById('section-tpl').innerHTML
-                      .replace(/NEW_SID/g, sid)
-  const wrap = document.createElement('div')
-  wrap.innerHTML = html
-  const el = wrap.firstElementChild
-  document.getElementById('sections').appendChild(el)
-  updateSectionNumbers()
-  el.querySelector('.ce-section-title-input').focus()
-}
-
-// ── Remove Section ──
-function removeSection(btn) {
-  const section = btn.closest('.ce-section')
-  const destroy = section.querySelector('.destroy-field')
-  section.style.transition = 'opacity 0.2s'
-  section.style.opacity = '0'
-  setTimeout(() => {
-    if (destroy && destroy.name.includes('_destroy')) {
-      destroy.value = '1'
-      section.style.display = 'none'
-    } else {
-      section.remove()
-    }
-    updateSectionNumbers()
-  }, 200)
-}
-
-// ── Add Lesson ──
-let lessonCounters = {}
-function addLesson(btn) {
-  const section = btn.closest('.ce-section')
-  // figure out the section key from the hidden _destroy field name
-  // name = "course[course_sections_attributes][KEY][_destroy]"
-  const destroyField = section.querySelector('.destroy-field')
-  let skey = 'new_' + Date.now()
-  if (destroyField) {
-    const m = destroyField.name.match(/\[course_sections_attributes\]\[([^\]]+)\]/)
-    if (m) skey = m[1]
-  }
-  if (!lessonCounters[skey]) lessonCounters[skey] = Date.now()
-  const lid = lessonCounters[skey]++
-  const prefix = `course[course_sections_attributes][${skey}][lessons_attributes][${lid}]`
-  let html = document.getElementById('lesson-tpl').innerHTML
-                      .replace(/LPREFIX/g, prefix)
-  const wrap = document.createElement('div')
-  wrap.innerHTML = html
-  const el = wrap.firstElementChild
-  const container = section.querySelector('.lessons')
-  container.appendChild(el)
-  el.querySelector('.ce-lesson-title-input').focus()
-}
-
-// ── Remove Lesson ──
-function removeLesson(btn) {
-  const lesson = btn.closest('.ce-lesson')
-  const destroy = lesson.querySelector('.destroy-field')
-  lesson.style.transition = 'opacity 0.2s'
-  lesson.style.opacity = '0'
-  setTimeout(() => {
-    if (destroy && destroy.name.includes('_destroy')) {
-      destroy.value = '1'
-      lesson.style.display = 'none'
-    } else {
-      lesson.remove()
-    }
-  }, 200)
-}
-
-// ── Add Topic ──
-function addTopic(btn) {
-  const lesson = btn.closest('.ce-lesson')
-  const container = lesson.querySelector('.topics-container')
-  const destroyField = lesson.querySelector('.destroy-field')
-  let lprefix = 'course[course_sections_attributes][x][lessons_attributes][x]'
-  if (destroyField) lprefix = destroyField.name.replace('[_destroy]', '')
-  const idx = container.children.length
-  const tprefix = `${lprefix}[speaking_topics_attributes][${idx}]`
-  let html = document.getElementById('topic-tpl').innerHTML
-                      .replace(/TPREFIX/g, tprefix)
-  const wrap = document.createElement('div')
-  wrap.innerHTML = html
-  container.appendChild(wrap.firstElementChild)
-}
-
-// ── Add Question ──
-function addQuestion(btn) {
-  const topic = btn.closest('.ce-topic')
-  const container = topic.querySelector('.questions-container')
-  const partSelect = topic.querySelector('.part-select')
-  const tprefix = partSelect.name.replace('[part]', '')
-  const idx = container.children.length
-  const qprefix = `${tprefix}[speaking_questions_attributes][${idx}]`
-  let html = document.getElementById('question-tpl').innerHTML
-                      .replace(/QPREFIX/g, qprefix)
-  const wrap = document.createElement('div')
-  wrap.innerHTML = html
-  container.appendChild(wrap.firstElementChild)
-}
-
-// ── Toggle Cue Card ──
-function toggleCueCard(select) {
-  const topic = select.closest('.ce-topic') || select.closest('.topic-box')
-  const cue = topic.querySelector('.cue-card-field')
-  if (!cue) return
-  select.value === 'part2' ? cue.classList.remove('hidden') : cue.classList.add('hidden')
-}
-
-// ── Video Upload ──
-function handleVideoUpload(input) {
-  const file = input.files[0]
-  if (!file) return
-  if (!file.type.includes('mp4')) { showAlert('danger', 'Video phải là MP4'); input.value = ''; return }
-  if (file.size > MAX_VIDEO) { showAlert('danger', 'Video vượt quá 5MB'); input.value = ''; return }
-  const wrap = input.closest('.ce-lesson') ? input.closest('.ce-lesson').querySelector('.video-preview-wrap') : null
-  if (wrap) wrap.innerHTML = `<video controls class="ce-video-preview"><source src="${URL.createObjectURL(file)}" type="video/mp4"></video>`
-  showAlert('success', '🎬 Video: ' + file.name)
-}
-
-// ── PDF Upload ──
-function handlePDFUpload(input) {
-  const files = Array.from(input.files)
-  if (!files.length) return
-  for (const f of files) {
-    if (f.type !== 'application/pdf') { showAlert('danger', f.name + ' không phải PDF'); input.value = ''; return }
-    if (f.size > MAX_PDF) { showAlert('danger', f.name + ' vượt quá 500KB'); input.value = ''; return }
-  }
-  const list = input.closest('.ce-field').querySelector('.pdf-list')
-  if (list) {
-    list.innerHTML = ''
-    files.forEach(f => {
-      const div = document.createElement('div')
-      div.className = 'ce-pdf-item'
-      div.innerHTML = `📄 ${f.name} <span style="margin-left:auto;font-size:10px;color:var(--ink-4)">${(f.size/1024).toFixed(0)} KB</span>`
-      list.appendChild(div)
-    })
-  }
-  showAlert('success', `📄 ${files.length} PDF file đã chọn`)
-}
-
-// ── Alert ──
-function showAlert(type, message) {
-  const c = document.getElementById('alert-container')
-  const div = document.createElement('div')
-  div.className = 'alert alert-' + (type === 'danger' ? 'danger' : 'success')
-  div.innerHTML = `<span>${type === 'danger' ? '⚠️' : '✅'}</span><span>${message}</span>`
-  c.appendChild(div)
-  setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300) }, 3500)
-}
-
-// ── Init ──
-document.addEventListener('DOMContentLoaded', () => {
-  // Init cue cards for existing ERB-rendered topics
-  document.querySelectorAll('.part-select').forEach(select => toggleCueCard(select))
-  updateSectionNumbers()
 })
+
 </script>
