@@ -1,227 +1,723 @@
 <%= render "students/shared/navbar" %>
 
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
 
   :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #22263a;
-    --border: #2e3350;
-    --accent: #6c63ff;
-    --accent2: #ff6584;
-    --green: #22d3a5;
-    --yellow: #fbbf24;
-    --text: #e8eaf6;
-    --muted: #7b82a8;
-    --radius: 16px;
+    --bg:        #f7f8fa;
+    --white:     #ffffff;
+    --border:    #e5e7eb;
+    --border2:   #d1d5db;
+    --primary:   #2563eb;
+    --primary-h: #1d4ed8;
+    --primary-s: #eff6ff;
+    --success:   #16a34a;
+    --success-s: #f0fdf4;
+    --warn:      #d97706;
+    --warn-s:    #fffbeb;
+    --danger:    #dc2626;
+    --danger-s:  #fef2f2;
+    --text:      #111827;
+    --text2:     #374151;
+    --muted:     #6b7280;
+    --muted2:    #9ca3af;
+    --radius:    10px;
+    --shadow:    0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Outfit', sans-serif; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .page-wrapper {
-    padding-top: 100px; padding-bottom: 80px; min-height: 100vh;
-    background:
-      radial-gradient(ellipse 60% 40% at 80% 10%, rgba(108,99,255,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 30% at 10% 80%, rgba(34,211,165,0.08) 0%, transparent 60%),
-      var(--bg);
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
   }
-  .container { max-width: 900px; margin: 0 auto; padding: 0 24px; }
 
+  /* ── Layout ── */
+  .lms-wrapper { padding-top: 72px; min-height: 100vh; }
+
+  .lms-container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 36px 24px 80px;
+  }
+
+  /* ── Course Header ── */
   .course-header {
-    margin-bottom: 48px; padding: 36px; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 24px; position: relative; overflow: hidden;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow);
   }
-  .course-header::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--green));
+
+  .course-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--primary);
+    margin-bottom: 10px;
   }
-  .course-title { font-size: 2rem; font-weight: 800; color: var(--text); margin-bottom: 10px; letter-spacing: -0.5px; }
-  .course-desc { color: var(--muted); font-size: 1rem; line-height: 1.6; }
 
-  .section-block { margin-bottom: 48px; }
-  .section-heading { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
-  .section-icon { width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), #8b5cf6); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
-  .section-title { font-size: 1.3rem; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+  .course-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1.3;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
+  }
 
-  .lesson-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; margin-bottom: 20px; transition: border-color 0.2s; }
-  .lesson-card:hover { border-color: rgba(108,99,255,0.4); }
-  .lesson-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .lesson-title { font-size: 1.05rem; font-weight: 600; color: var(--text); }
-  .duration-badge { font-size: 0.75rem; padding: 4px 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-family: 'JetBrains Mono', monospace; flex-shrink: 0; }
+  .course-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
 
-  .video-wrap { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); margin-bottom: 20px; background: #000; }
-  .video-wrap video { width: 100%; display: block; max-height: 420px; }
+  /* ── Section ── */
+  .section-block { margin-bottom: 24px; }
 
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 10px;
+    padding-left: 2px;
+  }
+
+  /* ── Lesson Card ── */
+  .lesson-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .lesson-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid var(--border);
+    background: #fafafa;
+  }
+
+  .lesson-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lesson-icon {
+    width: 32px; height: 32px;
+    background: var(--primary-s);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--primary);
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .lesson-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .lesson-body { padding: 24px; }
+
+  .duration-tag {
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  /* ── Video ── */
+  .video-wrap {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    background: #000;
+  }
+  .video-wrap video { width: 100%; display: block; max-height: 400px; }
+
+  /* ── PDF ── */
   .pdf-section { margin-bottom: 20px; }
-  .pdf-label { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .block-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
   .pdf-list { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pdf-link { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; background: rgba(108,99,255,0.1); border: 1px solid rgba(108,99,255,0.3); border-radius: 8px; color: #a5b4fc; font-size: 0.85rem; text-decoration: none; transition: all 0.2s; }
-  .pdf-link:hover { background: rgba(108,99,255,0.2); color: #c7d2fe; }
+  .pdf-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text2);
+    font-size: 0.82rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  .pdf-link:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-s); }
 
-  .speaking-block { margin-top: 24px; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
-  .speaking-block-title { font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+  /* ── Speaking Section ── */
+  .speaking-section {
+    border-top: 1px solid var(--border);
+    padding-top: 20px;
+    margin-top: 4px;
+  }
 
-  .topic-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
-  .topic-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .topic-title { font-weight: 600; color: var(--text); }
-  .part-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.08em; font-family: 'JetBrains Mono', monospace; }
-  .part-badge.part1 { background: rgba(34,211,165,0.15); color: var(--green); border: 1px solid rgba(34,211,165,0.3); }
-  .part-badge.part2 { background: rgba(251,191,36,0.15); color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
-  .part-badge.part3 { background: rgba(108,99,255,0.15); color: #a5b4fc; border: 1px solid rgba(108,99,255,0.3); }
+  .speaking-section-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
 
-  .question-block { border-top: 1px solid var(--border); padding-top: 16px; margin-top: 8px; }
-  .question-text { font-size: 0.95rem; color: var(--text); font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
-  .cue-card { background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.2); border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-  .cue-card-label { font-size: 0.75rem; font-weight: 700; color: var(--yellow); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
-  .cue-card-text { font-size: 0.875rem; color: #d1d5db; white-space: pre-line; line-height: 1.6; }
-  .time-info { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .time-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; }
-  .time-badge.prep { background: rgba(59,130,246,0.1); color: #93c5fd; border: 1px solid rgba(59,130,246,0.2); }
-  .time-badge.speak { background: rgba(34,211,165,0.1); color: var(--green); border: 1px solid rgba(34,211,165,0.2); }
+  .topic-block {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
 
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center; }
+  .topic-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #fafafa;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topic-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .part-tag {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .part-tag.part1 { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+  .part-tag.part2 { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
+  .part-tag.part3 { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+
+  /* ── Question Row ── */
+  .question-row {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .question-row:last-child { border-bottom: none; }
+
+  .question-text {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.55;
+  }
+
+  .cue-card {
+    background: var(--warn-s);
+    border: 1px solid #fde68a;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin-bottom: 12px;
+  }
+  .cue-card-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--warn);
+    margin-bottom: 5px;
+  }
+  .cue-card-text {
+    font-size: 0.82rem;
+    color: var(--text2);
+    white-space: pre-line;
+    line-height: 1.6;
+  }
+
+  .question-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .meta-tag {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 3px 9px;
+    border-radius: 5px;
+    font-weight: 500;
+  }
+  .meta-tag.prep  { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
+  .meta-tag.speak { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+
+  .question-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Previous result chip */
+  .prev-result {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--success);
+    background: var(--success-s);
+    border: 1px solid #bbf7d0;
+    padding: 4px 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .prev-result:hover { background: #dcfce7; }
+  .prev-result.visible { display: inline-flex; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: none;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:hover { background: var(--primary-h); }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--border2); color: var(--text2); background: var(--bg); }
+  .btn-danger { background: var(--danger-s); color: var(--danger); border: 1px solid #fecaca; }
+  .btn-danger:hover { background: #fee2e2; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn.hidden { display: none; }
+
+  /* ── Modal ── */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
   .modal-overlay.active { display: flex; }
-  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 24px; padding: 36px; width: 100%; max-width: 600px; margin: 20px; position: relative; animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); max-height: 90vh; overflow-y: auto; }
-  @keyframes modalIn { from { opacity: 0; transform: scale(0.9) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-  .modal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 1rem; transition: all 0.2s; }
-  .modal-close:hover { background: var(--border); color: var(--text); }
-  .modal-q { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 24px; line-height: 1.5; padding-right: 40px; }
 
-  .phase-display { text-align: center; margin-bottom: 24px; }
-  .phase-label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
-  .phase-name { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
-  .timer-ring-wrap { display: flex; justify-content: center; margin-bottom: 16px; }
-  .timer-ring { position: relative; width: 120px; height: 120px; }
-  .timer-ring svg { transform: rotate(-90deg); width: 120px; height: 120px; }
-  .timer-ring circle.bg { fill: none; stroke: var(--surface2); stroke-width: 8; }
-  .timer-ring circle.progress { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; stroke-dasharray: 339.3; stroke-dashoffset: 0; transition: stroke-dashoffset 1s linear, stroke 0.3s; }
-  .timer-ring circle.progress.speaking-phase { stroke: var(--accent2); }
-  .timer-ring circle.progress.done-phase { stroke: var(--green); }
-  .timer-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text); }
+  .modal {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    animation: slideUp 0.25s ease;
+  }
 
-  .waveform { display: flex; align-items: center; justify-content: center; gap: 3px; height: 40px; margin-bottom: 16px; opacity: 0; transition: opacity 0.3s; }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .modal-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.4;
+    padding-right: 12px;
+  }
+
+  .modal-close-btn {
+    width: 28px; height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--muted);
+    font-size: 14px;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .modal-close-btn:hover { background: var(--border); color: var(--text); }
+
+  .modal-body { padding: 20px 24px; }
+
+  /* ── Phase / Timer ── */
+  .phase-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .phase-badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    background: var(--bg);
+  }
+  .phase-badge.active-prep  { background: #eff6ff; color: var(--primary); border-color: #bfdbfe; }
+  .phase-badge.active-speak { background: #fff1f2; color: var(--danger); border-color: #fecaca; }
+  .phase-badge.active-done  { background: var(--success-s); color: var(--success); border-color: #bbf7d0; }
+  .phase-badge.active-eval  { background: #fffbeb; color: var(--warn); border-color: #fde68a; }
+
+  .timer-display {
+    font-size: 1.5rem;
+    font-weight: 800;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+
+  /* Progress bar */
+  .timer-bar-wrap {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .timer-bar {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 2px;
+    width: 100%;
+    transition: width 1s linear, background 0.3s;
+  }
+  .timer-bar.speaking { background: var(--danger); }
+
+  /* Waveform */
+  .waveform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 32px;
+    margin-bottom: 14px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
   .waveform.active { opacity: 1; }
-  .waveform-bar { width: 4px; background: var(--accent2); border-radius: 2px; animation: wave 0.8s ease-in-out infinite; min-height: 4px; }
-  @keyframes wave { 0%, 100% { height: 8px; } 50% { height: 32px; } }
+  .waveform-bar {
+    width: 3px;
+    background: var(--danger);
+    border-radius: 2px;
+    animation: wave 0.7s ease-in-out infinite;
+  }
+  @keyframes wave { 0%,100%{height:4px} 50%{height:24px} }
 
-  .transcript-wrap { background: var(--surface2); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-height: 80px; margin-bottom: 16px; }
-  .transcript-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 8px; }
-  .transcript-text { font-size: 0.9rem; line-height: 1.7; color: var(--text); min-height: 40px; }
+  /* ── Transcript Box ── */
+  .transcript-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .transcript-box-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--muted2);
+    margin-bottom: 8px;
+  }
+  .transcript-content {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: var(--text2);
+    max-height: 140px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+  .transcript-content::-webkit-scrollbar { width: 4px; }
+  .transcript-content::-webkit-scrollbar-track { background: transparent; }
+  .transcript-content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+  .transcript-placeholder { color: var(--muted2); font-style: italic; }
   .transcript-interim { color: var(--muted); font-style: italic; }
-  .transcript-placeholder { color: var(--muted); font-style: italic; font-size: 0.85rem; }
 
-  .btn-group { display: flex; gap: 10px; margin-bottom: 12px; }
-  .btn-speak { flex: 1; padding: 14px; border-radius: 12px; border: none; font-size: 0.9rem; font-weight: 700; font-family: 'Outfit', sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .btn-speak.primary { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; }
-  .btn-speak.primary:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(108,99,255,0.4); }
-  .btn-speak.danger { background: rgba(255,101,132,0.15); color: var(--accent2); border: 1px solid rgba(255,101,132,0.3); }
-  .btn-speak.danger:hover { background: rgba(255,101,132,0.25); }
-  .btn-speak.secondary { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
-  .btn-speak.secondary:hover { background: var(--border); color: var(--text); }
-  .btn-speak:disabled { opacity: 0.4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
-  .btn-speak.hidden { display: none; }
+  /* ── Result Panel ── */
+  .result-panel { display: none; }
+  .result-panel.visible { display: block; }
 
-  .btn-start { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; border: none; border-radius: 10px; font-family: 'Outfit', sans-serif; font-size: 0.875rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .btn-start:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(108,99,255,0.4); }
+  .result-band {
+    text-align: center;
+    padding: 16px;
+    background: var(--success-s);
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .result-band-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--success);
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .result-band-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--success);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
 
-  .status-msg { display: none; margin-top: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; text-align: center; }
-  .status-msg.success  { background: rgba(34,211,165,0.15);  color: var(--green);   border: 1px solid rgba(34,211,165,0.3);  display: block; }
-  .status-msg.uploading{ background: rgba(108,99,255,0.15);  color: #a5b4fc;        border: 1px solid rgba(108,99,255,0.3);  display: block; }
-  .status-msg.error    { background: rgba(255,101,132,0.15); color: var(--accent2); border: 1px solid rgba(255,101,132,0.3); display: block; }
-  .status-msg.info     { background: rgba(251,191,36,0.1);   color: var(--yellow);  border: 1px solid rgba(251,191,36,0.3);  display: block; }
+  .result-scores {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .score-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 10px 12px;
+  }
+  .score-item-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    margin-bottom: 3px;
+  }
+  .score-item-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .result-feedback {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 7px 7px 0;
+    padding: 12px 14px;
+    font-size: 0.85rem;
+    line-height: 1.65;
+    color: var(--text2);
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    display: none;
+    padding: 8px 12px;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  .status-bar.info    { background: #eff6ff; color: var(--primary); border: 1px solid #bfdbfe; display: block; }
+  .status-bar.success { background: var(--success-s); color: var(--success); border: 1px solid #bbf7d0; display: block; }
+  .status-bar.warn    { background: var(--warn-s); color: var(--warn); border: 1px solid #fde68a; display: block; }
+  .status-bar.error   { background: var(--danger-s); color: var(--danger); border: 1px solid #fecaca; display: block; }
+
+  .modal-footer {
+    display: flex;
+    gap: 8px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: #fafafa;
+    border-radius: 0 0 14px 14px;
+  }
 </style>
 
-<div class="page-wrapper">
-<div class="container">
+<div class="lms-wrapper">
+<div class="lms-container">
 
+  <!-- Course Header -->
   <div class="course-header">
-    <h1 class="course-title">📘 <%= @course.title %></h1>
+    <div class="course-meta">
+      <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.357l4-2.286a.75.75 0 01.788 1.283L7.25 8.705 8 9.032V13.5a1 1 0 001 1h2a1 1 0 001-1V9.032l.606-.273 3.143-1.419A1 1 0 0017 6.42V6a1 1 0 00-.606-.92l-6-2.58z"/></svg>
+      Course
+    </div>
+    <h1 class="course-title"><%= @course.title %></h1>
     <% if @course.description.present? %>
       <p class="course-desc"><%= @course.description %></p>
     <% end %>
   </div>
 
-  <% @sections.each do |section| %>
+  <!-- Sections -->
+  <% @sections.each_with_index do |section, si| %>
   <div class="section-block">
-    <div class="section-heading">
-      <div class="section-icon">📚</div>
-      <h2 class="section-title"><%= section.title %></h2>
-    </div>
+    <p class="section-label">Section <%= si + 1 %> — <%= section.title %></p>
 
-    <% section.lessons.each do |lesson| %>
+    <% section.lessons.each_with_index do |lesson, li| %>
     <div class="lesson-card">
-      <div class="lesson-header">
-        <h3 class="lesson-title">🎬 <%= lesson.title %></h3>
+
+      <div class="lesson-head">
+        <div class="lesson-title-row">
+          <div class="lesson-icon">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          </div>
+          <span class="lesson-title"><%= lesson.title %></span>
+        </div>
         <% if lesson.duration.present? %>
-          <span class="duration-badge">⏱ <%= lesson.duration %> min</span>
+          <span class="duration-tag">⏱ <%= lesson.duration %> min</span>
         <% end %>
       </div>
 
-      <% if lesson.video.attached? %>
-        <div class="video-wrap">
-          <video controls>
-            <source src="<%= url_for(lesson.video) %>" type="video/mp4">
-          </video>
-        </div>
-      <% end %>
+      <div class="lesson-body">
 
-      <% if lesson.pdfs.attached? %>
-        <div class="pdf-section">
-          <p class="pdf-label">📄 Materials</p>
-          <div class="pdf-list">
-            <% lesson.pdfs.each do |pdf| %>
-              <a href="<%= url_for(pdf) %>" target="_blank" class="pdf-link">📎 <%= pdf.filename %></a>
-            <% end %>
+        <!-- Video -->
+        <% if lesson.video.attached? %>
+          <div class="video-wrap">
+            <video controls>
+              <source src="<%= url_for(lesson.video) %>" type="video/mp4">
+            </video>
           </div>
-        </div>
-      <% end %>
+        <% end %>
 
-      <% if lesson.speaking_topics.any? %>
-        <div class="speaking-block">
-          <p class="speaking-block-title">🎤 Speaking Practice</p>
-          <% lesson.speaking_topics.each do |topic| %>
-          <div class="topic-card">
-            <div class="topic-header">
-              <span class="topic-title"><%= topic.title %></span>
-              <span class="part-badge <%= topic.part %>"><%= topic.part.upcase %></span>
-            </div>
-            <% topic.speaking_questions.each do |q| %>
-            <div class="question-block">
-              <p class="question-text">❓ <%= q.question_text %></p>
-              <% if q.cue_card.present? %>
-                <div class="cue-card">
-                  <p class="cue-card-label">📝 Cue Card</p>
-                  <p class="cue-card-text"><%= q.cue_card %></p>
-                </div>
+        <!-- PDFs -->
+        <% if lesson.pdfs.attached? %>
+          <div class="pdf-section">
+            <p class="block-label">Lesson Materials</p>
+            <div class="pdf-list">
+              <% lesson.pdfs.each do |pdf| %>
+                <a href="<%= url_for(pdf) %>" target="_blank" class="pdf-link">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <%= pdf.filename %>
+                </a>
               <% end %>
-              <div class="time-info">
-                <% if q.preparation_time.present? %>
-                  <span class="time-badge prep">🧠 Prep: <%= q.preparation_time %>s</span>
-                <% end %>
-                <% if q.speaking_time.present? %>
-                  <span class="time-badge speak">🎙 Speak: <%= q.speaking_time %>s</span>
-                <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Speaking -->
+        <% if lesson.speaking_topics.any? %>
+          <div class="speaking-section">
+            <p class="speaking-section-title">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg>
+              Speaking Practice
+            </p>
+
+            <% lesson.speaking_topics.each do |topic| %>
+            <div class="topic-block">
+              <div class="topic-head">
+                <span class="topic-name"><%= topic.title %></span>
+                <span class="part-tag <%= topic.part %>"><%= topic.part.upcase %></span>
               </div>
-              <button class="btn-start"
-                data-modal="speaking-modal"
-                data-prep="<%= q.preparation_time || 60 %>"
-                data-speak="<%= q.speaking_time || 120 %>"
-                data-topic="<%= topic.id %>"
-                data-course="<%= @course.id %>"
-                data-part="<%= topic.part %>"
-                data-question="<%= q.question_text %>">
-                🎤 Start Speaking
-              </button>
+
+              <% topic.speaking_questions.each do |q| %>
+              <div class="question-row" id="qrow-<%= q.id %>">
+                <p class="question-text"><%= q.question_text %></p>
+
+                <% if q.cue_card.present? %>
+                  <div class="cue-card">
+                    <p class="cue-card-label">Cue Card</p>
+                    <p class="cue-card-text"><%= q.cue_card %></p>
+                  </div>
+                <% end %>
+
+                <div class="question-meta">
+                  <% if q.preparation_time.present? %>
+                    <span class="meta-tag prep">Prep <%= q.preparation_time %>s</span>
+                  <% end %>
+                  <% if q.speaking_time.present? %>
+                    <span class="meta-tag speak">Speaking <%= q.speaking_time %>s</span>
+                  <% end %>
+                </div>
+
+                <div class="question-footer">
+                  <button class="btn btn-primary open-modal-btn"
+                    data-prep="<%= q.preparation_time || 60 %>"
+                    data-speak="<%= q.speaking_time || 120 %>"
+                    data-topic="<%= topic.id %>"
+                    data-course="<%= @course.id %>"
+                    data-part="<%= topic.part %>"
+                    data-question="<%= q.question_text %>"
+                    data-qid="<%= q.id %>">
+                    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+                    Start Speaking
+                  </button>
+
+                  <!-- Chip hiện kết quả cũ nếu có -->
+                  <span class="prev-result" id="chip-<%= q.id %>" onclick="showPrevResult('<%= q.id %>')">
+                    <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+                    View last result
+                  </span>
+                </div>
+              </div>
+              <% end %>
+
             </div>
             <% end %>
           </div>
-          <% end %>
-        </div>
-      <% end %>
+        <% end %>
 
+      </div>
     </div>
     <% end %>
   </div>
@@ -233,146 +729,176 @@
 <!-- Speaking Modal -->
 <div class="modal-overlay" id="speaking-modal">
   <div class="modal">
-    <button class="modal-close" id="modal-close-btn">✕</button>
-    <p class="modal-q" id="modal-question"></p>
 
-    <div class="phase-display">
-      <p class="phase-label">Current Phase</p>
-      <p class="phase-name" id="phase-name">Ready</p>
-      <div class="timer-ring-wrap">
-        <div class="timer-ring">
-          <svg viewBox="0 0 120 120">
-            <circle class="bg" cx="60" cy="60" r="54"/>
-            <circle class="progress" id="ring-progress" cx="60" cy="60" r="54"/>
-          </svg>
-          <div class="timer-number" id="timer-number">—</div>
-        </div>
+    <div class="modal-header">
+      <p class="modal-title" id="modal-question-text">Question</p>
+      <button class="modal-close-btn" id="modal-close-btn">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- Phase + Timer -->
+      <div class="phase-row">
+        <span class="phase-badge" id="phase-badge">Ready</span>
+        <span class="timer-display" id="timer-display">—</span>
       </div>
+      <div class="timer-bar-wrap">
+        <div class="timer-bar" id="timer-bar" style="width:100%"></div>
+      </div>
+
+      <!-- Waveform -->
       <div class="waveform" id="waveform">
-        <% 12.times do |i| %>
-          <div class="waveform-bar" style="animation-delay: <%= i * 0.07 %>s"></div>
+        <% 16.times do |i| %>
+          <div class="waveform-bar" style="animation-delay:<%= i*0.05 %>s"></div>
         <% end %>
       </div>
-    </div>
 
-    <div class="transcript-wrap">
-      <p class="transcript-label">📝 Live Transcript</p>
-      <div class="transcript-text" id="transcript-display">
-        <span class="transcript-placeholder">Your words will appear here as you speak...</span>
+      <!-- Transcript -->
+      <div class="transcript-box" id="transcript-box">
+        <p class="transcript-box-label">Live Transcript</p>
+        <div class="transcript-content" id="transcript-content">
+          <span class="transcript-placeholder">Your words will appear here as you speak...</span>
+        </div>
       </div>
+
+      <!-- Result Panel (ẩn, hiện khi có kết quả) -->
+      <div class="result-panel" id="result-panel">
+        <div class="result-band">
+          <div class="result-band-num" id="res-overall">—</div>
+          <div class="result-band-label">Overall Band Score</div>
+        </div>
+        <div class="result-scores">
+          <div class="score-item"><div class="score-item-label">Fluency</div><div class="score-item-value" id="res-fluency">—</div></div>
+          <div class="score-item"><div class="score-item-label">Lexical Resource</div><div class="score-item-value" id="res-lexical">—</div></div>
+          <div class="score-item"><div class="score-item-label">Grammar</div><div class="score-item-value" id="res-grammar">—</div></div>
+          <div class="score-item"><div class="score-item-label">Pronunciation</div><div class="score-item-value" id="res-pronunciation">—</div></div>
+        </div>
+        <div class="result-feedback" id="res-feedback"></div>
+      </div>
+
+      <!-- Status -->
+      <div class="status-bar" id="status-bar"></div>
+
     </div>
 
-    <div class="btn-group">
-      <button class="btn-speak primary" id="btn-start">🎤 Begin Session</button>
-      <button class="btn-speak danger hidden" id="btn-done">✅ Finish Early</button>
-      <button class="btn-speak secondary hidden" id="btn-retry">🔄 Try Again</button>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="btn-start">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+        Begin Session
+      </button>
+      <button class="btn btn-danger hidden" id="btn-done">Stop & Submit</button>
+      <button class="btn btn-ghost hidden" id="btn-retry">Try Again</button>
     </div>
 
-    <div class="status-msg" id="status-msg"></div>
   </div>
 </div>
 
 <script>
 // ── Logger ──
 const LOG = '[Speaking]';
-function log(msg, data)      { data !== undefined ? console.log(LOG, msg, data) : console.log(LOG, msg); }
-function logError(msg, err)  { console.error(LOG, '❌', msg, err || ''); }
+const log  = (m, d) => d !== undefined ? console.log(LOG, m, d) : console.log(LOG, m);
+const logE = (m, e) => console.error(LOG, '❌', m, e || '');
 
 // ── State ──
 let mediaRecorder, audioChunks = [];
 let recognition, finalTranscript = '', interimTranscript = '';
-let currentData = {};
-let timerInterval = null;
-let totalSeconds  = 0;
-let currentPhase  = 'idle'; // idle | prep | speaking | uploading | done
-let resolveTimer  = null;
+let currentData = {}, currentQid = null;
+let timerInterval = null, totalSeconds = 0;
+let currentPhase = 'idle';
+let resolveTimer = null;
 
-const CIRCUMFERENCE = 2 * Math.PI * 54;
+// Lưu kết quả theo question id để xem lại
+const resultCache = {};
 
 const modal        = document.getElementById('speaking-modal');
-const modalQ       = document.getElementById('modal-question');
-const phaseName    = document.getElementById('phase-name');
-const timerNum     = document.getElementById('timer-number');
-const ringProgress = document.getElementById('ring-progress');
+const modalQText   = document.getElementById('modal-question-text');
+const phaseBadge   = document.getElementById('phase-badge');
+const timerDisp    = document.getElementById('timer-display');
+const timerBar     = document.getElementById('timer-bar');
 const waveform     = document.getElementById('waveform');
-const transcriptEl = document.getElementById('transcript-display');
+const transcriptEl = document.getElementById('transcript-content');
+const resultPanel  = document.getElementById('result-panel');
+const statusBar    = document.getElementById('status-bar');
 const btnStart     = document.getElementById('btn-start');
 const btnDone      = document.getElementById('btn-done');
 const btnRetry     = document.getElementById('btn-retry');
-const statusMsg    = document.getElementById('status-msg');
 
 // ── Open modal ──
-document.addEventListener('click', e => {
-  const btn = e.target.closest('[data-modal]');
-  if (!btn) return;
-  currentData = {
-    prep: parseInt(btn.dataset.prep), speak: parseInt(btn.dataset.speak),
-    topic: btn.dataset.topic, course: btn.dataset.course,
-    part: btn.dataset.part, question: btn.dataset.question
-  };
-  log('Modal opened', currentData);
-  modalQ.textContent = '❓ ' + currentData.question;
-  resetModal();
-  modal.classList.add('active');
+document.querySelectorAll('.open-modal-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    currentData = {
+      prep: parseInt(btn.dataset.prep), speak: parseInt(btn.dataset.speak),
+      topic: btn.dataset.topic, course: btn.dataset.course,
+      part: btn.dataset.part, question: btn.dataset.question
+    };
+    currentQid = btn.dataset.qid;
+    log('Open modal', currentData);
+    modalQText.textContent = btn.dataset.question;
+    resetModal();
+
+    // Nếu có kết quả cũ, hiện luôn
+    if (resultCache[currentQid]) {
+      showResult(resultCache[currentQid], false);
+    }
+    modal.classList.add('active');
+  });
 });
 
-// ── Close modal ──
+// ── Close ──
 document.getElementById('modal-close-btn').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
 function closeModal() {
-  log('Modal closed, phase:', currentPhase);
-  stopRecording();
-  stopRecognition();
-  clearInterval(timerInterval);
-  if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+  log('Close modal, phase:', currentPhase);
+  // Nếu đang upload/evaluate — vẫn cho đóng, background tự chạy
+  if (currentPhase === 'speaking') {
+    stopRecording(); stopRecognition();
+    clearInterval(timerInterval);
+    if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+  }
   currentPhase = 'idle';
   modal.classList.remove('active');
 }
 
 // ── Reset ──
 function resetModal() {
-  log('Reset modal');
   finalTranscript = ''; interimTranscript = '';
   currentPhase = 'idle'; resolveTimer = null;
   transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
-  phaseName.textContent = 'Ready';
-  timerNum.textContent = '—';
-  ringProgress.style.strokeDashoffset = 0;
-  ringProgress.className = 'progress';
-  ringProgress.style.strokeDasharray = CIRCUMFERENCE;
+  resultPanel.classList.remove('visible');
+  statusBar.className = 'status-bar'; statusBar.textContent = '';
+  setPhaseBadge('Ready', '');
+  timerDisp.textContent = '—';
+  timerBar.style.width = '100%';
+  timerBar.className = 'timer-bar';
   waveform.classList.remove('active');
-  statusMsg.className = 'status-msg'; statusMsg.textContent = '';
-  btnStart.classList.remove('hidden'); btnStart.disabled = false; btnStart.textContent = '🎤 Begin Session';
-  btnDone.classList.add('hidden');  btnDone.disabled = false;
+  btnStart.classList.remove('hidden'); btnStart.disabled = false; btnStart.textContent = 'Begin Session';
+  btnDone.classList.add('hidden');
   btnRetry.classList.add('hidden');
 }
 
+function setPhaseBadge(text, cls) {
+  phaseBadge.textContent = text;
+  phaseBadge.className = 'phase-badge' + (cls ? ' ' + cls : '');
+}
+
 // ── Timer ──
-function runTimer(seconds, label, phaseClass) {
+function runTimer(seconds, label, badgeCls, barCls) {
   return new Promise(resolve => {
-    totalSeconds = seconds;
-    let remaining = seconds;
-    log(`Timer start: "${label}" (${seconds}s)`);
-    phaseName.textContent = label;
-    ringProgress.className = 'progress ' + phaseClass;
-    ringProgress.style.strokeDasharray = CIRCUMFERENCE;
-    ringProgress.style.strokeDashoffset = 0;
-    timerNum.textContent = remaining;
+    totalSeconds = seconds; let remaining = seconds;
+    log(`Timer: "${label}" (${seconds}s)`);
+    setPhaseBadge(label, badgeCls);
+    timerBar.className = 'timer-bar ' + (barCls || '');
+    timerDisp.textContent = remaining;
+    timerBar.style.width = '100%';
 
     resolveTimer = () => { clearInterval(timerInterval); log('Timer resolved early'); resolve(); };
-
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
       remaining--;
-      timerNum.textContent = remaining;
-      ringProgress.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / totalSeconds);
-      if (remaining <= 0) {
-        clearInterval(timerInterval);
-        resolveTimer = null;
-        log(`Timer finished: "${label}"`);
-        resolve();
-      }
+      timerDisp.textContent = remaining;
+      timerBar.style.width = (remaining / totalSeconds * 100) + '%';
+      if (remaining <= 0) { clearInterval(timerInterval); resolveTimer = null; resolve(); }
     }, 1000);
   });
 }
@@ -380,47 +906,46 @@ function runTimer(seconds, label, phaseClass) {
 // ── Speech Recognition ──
 function startRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { log('⚠️ SpeechRecognition not supported'); return; }
+  if (!SR) { log('SpeechRecognition not supported'); return; }
   recognition = new SR();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-  recognition.onstart  = () => log('Recognition started');
-  recognition.onend    = () => log('Recognition ended');
-  recognition.onerror  = (e) => logError('Recognition error', e.error);
-  recognition.onresult = (event) => {
+  recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
+  recognition.onstart = () => log('Recognition started');
+  recognition.onend   = () => log('Recognition ended');
+  recognition.onerror = e => logE('Recognition error', e.error);
+  recognition.onresult = event => {
     interimTranscript = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) { finalTranscript += t + ' '; log('Final chunk:', t); }
+      if (event.results[i].isFinal) { finalTranscript += t + ' '; }
       else interimTranscript += t;
     }
     transcriptEl.innerHTML =
-      '<span style="color:var(--text)">' + finalTranscript + '</span>' +
+      '<span>' + finalTranscript + '</span>' +
       '<span class="transcript-interim">' + interimTranscript + '</span>';
+    // Auto scroll xuống cuối
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
   };
   recognition.start();
 }
 
 function stopRecognition() {
-  try { if (recognition) { recognition.stop(); log('Recognition stopped'); } } catch(e) { logError('stopRecognition', e); }
+  try { if (recognition) recognition.stop(); } catch(e) {}
 }
 
 // ── MediaRecorder ──
 async function startRecording() {
-  log('Requesting microphone...');
+  log('Requesting mic...');
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  log('Mic granted');
   audioChunks = [];
   mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.ondataavailable = e => { audioChunks.push(e.data); log('Chunk size:', e.data.size); };
+  mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
   mediaRecorder.start();
-  log('MediaRecorder started');
+  log('Recording started');
 }
 
 function stopRecording() {
   return new Promise(resolve => {
-    if (!mediaRecorder || mediaRecorder.state === 'inactive') { log('Recorder inactive'); resolve(null); return; }
+    if (!mediaRecorder || mediaRecorder.state === 'inactive') { resolve(null); return; }
     mediaRecorder.onstop = () => {
       const blob = new Blob(audioChunks, { type: 'audio/webm' });
       audioChunks = [];
@@ -434,10 +959,10 @@ function stopRecording() {
 
 // ── Upload ──
 async function uploadAttempt(audioBlob) {
-  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  if (!csrfToken) logError('CSRF token missing!');
+  const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+  if (!csrf) logE('CSRF token missing');
 
-  log('Uploading... transcript length:', finalTranscript.length);
+  log('Uploading, transcript chars:', finalTranscript.length);
   const form = new FormData();
   form.append('audio', audioBlob, 'recording.webm');
   form.append('transcript', finalTranscript.trim());
@@ -447,75 +972,67 @@ async function uploadAttempt(audioBlob) {
 
   const res = await fetch('/students/speaking_attempts', {
     method: 'POST',
-    headers: csrfToken ? { 'X-CSRF-Token': csrfToken } : {},
+    headers: csrf ? { 'X-CSRF-Token': csrf } : {},
     body: form
   });
 
   const text = await res.text();
   log('Response status:', res.status);
   log('Response body:', text);
-
   if (!res.ok) throw new Error(`Server ${res.status}: ${text}`);
   return JSON.parse(text);
 }
 
-// ── Finish speaking (manual or auto) ──
+// ── Finish Speaking ──
 async function finishSpeaking() {
-  if (currentPhase !== 'speaking') { log('finishSpeaking called but phase is:', currentPhase); return; }
+  if (currentPhase !== 'speaking') return;
   currentPhase = 'uploading';
   log('Finishing speaking...');
 
   btnDone.classList.add('hidden');
   waveform.classList.remove('active');
   stopRecognition();
-
-  phaseName.textContent = '✅ Done!';
-  ringProgress.className = 'progress done-phase';
-  timerNum.textContent = '✓';
-
   if (resolveTimer) { resolveTimer(); resolveTimer = null; }
 
-  showStatus('uploading', '⬆️ Uploading & AI evaluating... Please wait.');
+  setPhaseBadge('Evaluating...', 'active-eval');
+  timerDisp.textContent = '—';
+  showStatus('warn', 'AI is evaluating your response. You can close this window and come back later.');
 
   const audioBlob = await stopRecording();
 
   if (!audioBlob || audioBlob.size === 0) {
-    logError('Blob is empty!');
-    showStatus('error', '❌ Recording is empty. Please try again.');
+    logE('Blob empty');
+    showStatus('error', 'Recording is empty. Please try again.');
     showRetry(); return;
   }
 
   try {
     const result = await uploadAttempt(audioBlob);
-    log('Result:', result);
-    showResult(result);
+    resultCache[currentQid] = result;
+    showResult(result, true);
+    // Hiện chip "View last result" trên card
+    const chip = document.getElementById('chip-' + currentQid);
+    if (chip) chip.classList.add('visible');
   } catch(err) {
-    logError('Upload failed', err);
-    showStatus('error', `❌ ${err.message}`);
+    logE('Upload failed', err);
+    showStatus('error', 'Upload failed: ' + err.message);
     showRetry();
   }
 }
 
-// ── Show result ──
-function showResult(result) {
+// ── Show Result ──
+function showResult(result, animate) {
   currentPhase = 'done';
-  transcriptEl.innerHTML = `
-    <div style="margin-top:8px">
-      <p style="color:var(--green);font-weight:800;font-size:1.2rem;margin-bottom:12px">
-        🏆 Overall Band: ${result.overall ?? 'N/A'}
-      </p>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">🗣 Fluency: <b>${result.fluency ?? 'N/A'}</b></span>
-        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">📚 Lexical: <b>${result.lexical ?? 'N/A'}</b></span>
-        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">✏️ Grammar: <b>${result.grammar ?? 'N/A'}</b></span>
-        <span style="background:rgba(108,99,255,0.1);border:1px solid rgba(108,99,255,0.3);border-radius:8px;padding:8px;font-size:0.8rem">🎵 Pronunciation: <b>${result.pronunciation ?? 'N/A'}</b></span>
-      </div>
-      <p style="color:var(--muted);font-size:0.85rem;line-height:1.7;border-top:1px solid var(--border);padding-top:10px">
-        💬 ${result.feedback ?? ''}
-      </p>
-    </div>
-  `;
-  showStatus('success', '✅ AI đã chấm xong! Email kết quả sẽ được gửi cho bạn.');
+  document.getElementById('res-overall').textContent      = result.overall ?? '—';
+  document.getElementById('res-fluency').textContent      = result.fluency ?? '—';
+  document.getElementById('res-lexical').textContent      = result.lexical ?? '—';
+  document.getElementById('res-grammar').textContent      = result.grammar ?? '—';
+  document.getElementById('res-pronunciation').textContent= result.pronunciation ?? '—';
+  document.getElementById('res-feedback').textContent     = result.feedback ?? '';
+
+  resultPanel.classList.add('visible');
+  setPhaseBadge('Completed', 'active-done');
+  showStatus('success', 'Evaluation complete. A result email will be sent to you.');
   showRetry();
 }
 
@@ -525,35 +1042,41 @@ function showRetry() {
   btnRetry.classList.remove('hidden');
 }
 
+// ── View previous result ──
+function showPrevResult(qid) {
+  const btn = document.querySelector(`[data-qid="${qid}"]`);
+  if (btn) btn.click();
+}
+
 // ── Button events ──
 btnStart.addEventListener('click', async () => {
-  log('Begin Session clicked');
+  log('Begin Session');
   btnStart.disabled = true;
-  btnStart.textContent = '⏳ Starting...';
+  btnStart.textContent = 'Starting...';
   currentPhase = 'prep';
-  showStatus('info', '🧠 Prepare your answer...');
+  showStatus('info', 'Preparation phase. Read the question carefully.');
 
-  await runTimer(currentData.prep, '🧠 Preparation Time', '');
+  await runTimer(currentData.prep, 'Preparation', 'active-prep', '');
   if (currentPhase !== 'prep') return;
 
   try {
     await startRecording();
     startRecognition();
   } catch(err) {
-    logError('Mic denied', err);
-    showStatus('error', '❌ Microphone access denied. Please allow and retry.');
-    btnStart.disabled = false; btnStart.textContent = '🎤 Begin Session';
+    logE('Mic error', err);
+    showStatus('error', 'Microphone access denied. Please allow mic access and retry.');
+    btnStart.disabled = false; btnStart.textContent = 'Begin Session';
     currentPhase = 'idle'; return;
   }
 
   currentPhase = 'speaking';
-  phaseName.textContent = '🎙 Speak Now!';
+  setPhaseBadge('Speaking', 'active-speak');
   waveform.classList.add('active');
   btnStart.classList.add('hidden');
   btnDone.classList.remove('hidden');
-  showStatus('info', '🎙 Recording... Bấm "Finish Early" nếu xong trước giờ.');
+  showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
 
-  await runTimer(currentData.speak, '🎙 Speaking...', 'speaking-phase');
+  await runTimer(currentData.speak, 'Speaking', 'active-speak', 'speaking');
 
   if (currentPhase === 'speaking') {
     log('Timer ended naturally');
@@ -562,21 +1085,20 @@ btnStart.addEventListener('click', async () => {
 });
 
 btnDone.addEventListener('click', async () => {
-  log('Finish Early clicked');
+  log('Stop & Submit clicked');
   await finishSpeaking();
 });
 
 btnRetry.addEventListener('click', () => {
-  log('Retry clicked');
-  stopRecording();
-  stopRecognition();
+  log('Try Again clicked');
+  stopRecording(); stopRecognition();
   clearInterval(timerInterval);
   resetModal();
 });
 
 function showStatus(type, msg) {
-  statusMsg.className = 'status-msg ' + type;
-  statusMsg.textContent = msg;
+  statusBar.className = 'status-bar ' + type;
+  statusBar.textContent = msg;
   log(`[${type}] ${msg}`);
 }
 </script>
