@@ -3,949 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Course Editor — EduForge Admin</title>
+<title>Course Editor</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 <style>
 :root {
   --bg: #ffffff;
   --surface: #ffffff;
-  --surface2: #f0f1f6;
-  --surface3: #e8eaf2;
-  --border: rgba(0,0,0,0.14);
-  --border-hover: rgba(0,0,0,0.26);
+  --surface2: #f5f6f8;
+  --surface3: #eceef2;
+  --border: rgba(0,0,0,0.13);
+  --border-hover: rgba(0,0,0,0.24);
   --text: #1a1a2e;
   --text-muted: #5a5a7a;
   --text-dim: #9a9ab0;
-  --accent: #6355e0;
+  --accent: #5b4fe0;
   --accent2: #7c6af7;
-  --accent-glow: rgba(99,85,224,0.15);
-  --gold: #d97706;
-  --gold-dim: rgba(217,119,6,0.1);
+  --accent-glow: rgba(91,79,224,0.12);
   --green: #059669;
   --green-dim: rgba(5,150,105,0.1);
   --red: #dc2626;
   --red-dim: rgba(220,38,38,0.08);
-  --yellow: #b45309;
-  --yellow-dim: rgba(180,83,9,0.08);
-  --radius: 14px;
+  --radius: 12px;
   --radius-sm: 8px;
-  --shadow: 0 4px 16px rgba(0,0,0,0.08);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+  font-size: 14px;
+  line-height: 1.5;
 }
-
-/* ─── NOISE TEXTURE ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 1000;
-}
-
-
-/* ─── ALERT ─── */
 #alert-container {
-  position: fixed;
-  top: 80px;
-  right: 24px;
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 380px;
-  width: 100%;
+  position: fixed; top: 20px; right: 20px; z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px; max-width: 360px;
 }
-
 .alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  padding: 14px 16px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  backdrop-filter: blur(12px);
-  border: 1px solid;
-  animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
-  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
-}
-
-.alert-danger {
-  background: rgba(248,113,113,0.1);
-  border-color: rgba(248,113,113,0.25);
-  color: #fca5a5;
-}
-
-.alert-success {
-  background: rgba(52,211,153,0.1);
-  border-color: rgba(52,211,153,0.25);
-  color: #6ee7b7;
-}
-
-@keyframes slideIn {
-  from { opacity: 0; transform: translateX(20px) scale(0.95); }
-  to   { opacity: 1; transform: translateX(0) scale(1); }
-}
-
-/* ─── LAYOUT ─── */
-.page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 40px 24px 60px;
-}
-
-/* ─── PAGE HEADER ─── */
-.page-header {
-  margin-bottom: 36px;
-}
-
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-bottom: 12px;
-}
-
-.breadcrumb span { color: var(--text-muted); cursor: pointer; }
-.breadcrumb span:hover { color: var(--text); }
-.breadcrumb .sep { color: var(--text-dim); }
-
-.page-title {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 36px;
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: -0.5px;
-  color: var(--text);
-  margin-bottom: 6px;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-/* ─── CARD ─── */
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  margin-bottom: 20px;
-  overflow: hidden;
-  transition: border-color 0.2s;
-}
-
-.card:hover { border-color: var(--border-hover); }
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-}
-
-.card-title {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: 0.3px;
-  text-transform: uppercase;
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.card-title .icon {
-  width: 28px; height: 28px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  background: var(--surface2);
-}
-
-.card-body { padding: 24px; }
-
-/* ─── INPUTS ─── */
-.field {
-  margin-bottom: 20px;
-}
-
-.field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
-}
-
-.input, .textarea, .select {
-  width: 100%;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: 11px 14px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  transition: all 0.2s;
-}
-
-.input:hover, .textarea:hover, .select:hover {
-  border-color: var(--border-hover);
-}
-
-.input:focus, .textarea:focus, .select:focus {
-  border-color: var(--accent);
-  background: var(--surface3);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-
-.textarea { resize: vertical; min-height: 90px; }
-
-.input::placeholder, .textarea::placeholder {
-  color: var(--text-dim);
-}
-
-.select option {
-  background: var(--surface2);
-}
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-/* ─── FILE UPLOAD ─── */
-.upload-zone {
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius-sm);
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: var(--surface2);
-  position: relative;
-}
-
-.upload-zone:hover {
-  border-color: var(--accent);
-  background: var(--surface3);
-}
-
-.upload-zone input[type="file"] {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  cursor: pointer;
-  width: 100%;
-  height: 100%;
-}
-
-.upload-zone .upload-icon {
-  font-size: 24px;
-  margin-bottom: 6px;
-}
-
-.upload-zone .upload-text {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.upload-zone .upload-hint {
-  font-size: 11px;
-  color: var(--text-dim);
-  margin-top: 3px;
-}
-
-/* ─── THUMBNAIL PREVIEW ─── */
-.thumbnail-preview {
-  width: 100%;
-  max-width: 260px;
-  height: 160px;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  margin-bottom: 12px;
-}
-
-/* ─── SECTIONS ─── */
-#sections {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.section-item {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-  transition: all 0.25s;
-}
-
-.section-item.sortable-ghost {
-  opacity: 0.4;
-  border: 1.5px dashed var(--accent);
-  background: rgba(124,106,247,0.05);
-}
-
-.section-item.sortable-chosen {
-  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1.5px var(--accent);
-  transform: rotate(-0.5deg) scale(1.01);
-}
-
-.section-item.sortable-drag {
-  opacity: 1;
-}
-
-/* ─── SECTION HEADER ─── */
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 20px;
-  background: var(--surface2);
-  border-bottom: 1px solid var(--border);
-  cursor: default;
-}
-
-.drag-handle {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  cursor: grab;
-  padding: 4px 2px;
-  opacity: 0.4;
-  transition: opacity 0.2s;
-  flex-shrink: 0;
-}
-
-.drag-handle:active { cursor: grabbing; }
-
-.drag-handle:hover { opacity: 1; }
-
-.drag-handle span {
-  display: block;
-  width: 16px;
-  height: 2px;
-  background: var(--text-muted);
-  border-radius: 2px;
-}
-
-.section-badge {
-  width: 26px; height: 26px;
-  border-radius: 7px;
-  background: rgba(124,106,247,0.15);
-  border: 1px solid rgba(124,106,247,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--accent2);
-  flex-shrink: 0;
-}
-
-.section-title-inline {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-  cursor: text;
-  padding: 2px 0;
-}
-
-.section-title-inline:focus {
-  border-bottom: 1.5px solid var(--accent);
-}
-
-.section-title-inline::placeholder { color: var(--text-dim); }
-
-.section-actions {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-left: auto;
-}
-
-.btn-icon {
-  width: 30px; height: 30px;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: none;
-  font-size: 14px;
-  transition: all 0.2s;
-  background: transparent;
-  color: var(--text-muted);
-}
-
-.btn-icon:hover { background: var(--surface3); color: var(--text); }
-.btn-icon.danger:hover { background: var(--red-dim); color: var(--red); }
-
-.section-toggle {
-  font-size: 11px;
-  color: var(--text-dim);
-  transition: transform 0.2s;
-}
-
-.section-item.collapsed .section-toggle {
-  transform: rotate(-90deg);
-}
-
-.section-body {
-  padding: 20px;
-  display: block;
-}
-
-.section-item.collapsed .section-body {
-  display: none;
-}
-
-/* ─── LESSONS ─── */
-.lessons-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.lesson-item {
-  background: #f8f9fc;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  overflow: hidden;
-  transition: all 0.2s;
-}
-
-.lesson-item.sortable-ghost {
-  opacity: 0.3;
-  border: 1.5px dashed rgba(52,211,153,0.4);
-}
-
-.lesson-item.sortable-chosen {
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  transform: scale(1.01);
-}
-
-.lesson-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(255,255,255,0.02);
-  border-bottom: 1px solid var(--border);
-}
-
-.lesson-drag {
-  cursor: grab;
-  opacity: 0.35;
-  transition: opacity 0.2s;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.lesson-drag span {
-  width: 12px; height: 2px;
-  background: var(--text-muted);
-  border-radius: 2px;
-  display: block;
-}
-
-.lesson-drag:hover { opacity: 1; }
-.lesson-drag:active { cursor: grabbing; }
-
-.lesson-type-badge {
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  background: var(--green-dim);
-  color: var(--green);
-  border: 1px solid rgba(5,150,105,0.2);
-  transition: all 0.2s;
-}
-
-.lesson-type-badge.badge-video {
-  background: var(--green-dim);
-  color: var(--green);
-  border-color: rgba(5,150,105,0.2);
-}
-
-.lesson-type-badge.badge-pdf {
-  background: rgba(220,38,38,0.08);
-  color: #dc2626;
-  border-color: rgba(220,38,38,0.2);
-}
-
-.lesson-type-badge.badge-speaking {
-  background: rgba(99,85,224,0.1);
-  color: var(--accent);
-  border-color: rgba(99,85,224,0.2);
-}
-
-.lesson-name-inline {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text);
-}
-
-.lesson-name-inline::placeholder { color: var(--text-dim); }
-
-.lesson-name-inline:focus {
-  border-bottom: 1px solid var(--green);
-}
-
-.lesson-body {
-  padding: 16px;
-}
-
-/* ─── TABS ─── */
-.tabs {
-  display: flex;
-  gap: 4px;
-  background: var(--surface2);
-  padding: 4px;
-  border-radius: 10px;
-  margin-bottom: 16px;
-  width: fit-content;
-}
-
-.tab {
-  padding: 6px 14px;
-  border-radius: 7px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--text-dim);
-  transition: all 0.2s;
-  border: none;
-  background: transparent;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.tab:hover { color: var(--text-muted); }
-
-.tab.active {
-  background: var(--surface3);
-  color: var(--text);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.tab-panel { display: none; }
-.tab-panel.active { display: block; }
-
-/* ─── VIDEO PLAYER ─── */
-.video-preview {
-  width: 100%;
-  max-width: 320px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
-  margin-top: 10px;
-}
-
-/* ─── PDF LIST ─── */
-.pdf-list {
-  margin-top: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.pdf-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background: var(--surface2);
-  border-radius: 7px;
-  border: 1px solid var(--border);
-  font-size: 12px;
-  color: var(--text-muted);
-  text-decoration: none;
-  transition: all 0.2s;
-}
-
-.pdf-item:hover {
-  background: var(--surface3);
-  color: var(--text);
-  border-color: var(--border-hover);
-}
-
-/* ─── SPEAKING TOPICS ─── */
-.speaking-section {
-  background: var(--yellow-dim);
-  border: 1px solid rgba(251,191,36,0.12);
-  border-radius: var(--radius-sm);
-  padding: 16px;
-}
-
-.speaking-label {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--yellow);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 14px;
-}
-
-.topic-box {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(251,191,36,0.1);
-  border-radius: 8px;
-  padding: 14px;
-  margin-bottom: 10px;
-}
-
-.question-item {
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 7px;
-  padding: 12px;
-  margin-top: 10px;
-}
-
-.question-item label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-dim);
-  margin-bottom: 6px;
-  display: block;
-}
-
-.cue-card-field {
-  margin-top: 8px;
-}
-
-/* ─── BUTTONS ─── */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 9px 18px;
-  border-radius: var(--radius-sm);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: all 0.2s;
-  text-decoration: none;
-}
-
-.btn-primary {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 16px rgba(124,106,247,0.3);
-}
-
-.btn-primary:hover {
-  background: #8b7af9;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 24px rgba(124,106,247,0.4);
-}
-
-.btn-primary:active { transform: translateY(0); }
-
-.btn-outline {
-  background: transparent;
-  color: var(--text-muted);
-  border: 1px solid var(--border);
-}
-
-.btn-outline:hover {
-  background: var(--surface2);
-  color: var(--text);
-  border-color: var(--border-hover);
-}
-
-.btn-ghost {
-  background: transparent;
-  color: var(--text-muted);
-}
-
-.btn-ghost:hover { color: var(--text); background: var(--surface2); }
-
-.btn-danger-ghost {
-  background: transparent;
-  color: var(--text-dim);
-  font-size: 12px;
-}
-
-.btn-danger-ghost:hover { color: var(--red); background: var(--red-dim); }
-
-.btn-add {
-  background: var(--surface2);
-  color: var(--text-muted);
-  border: 1px dashed var(--border);
-  width: 100%;
-  justify-content: center;
-  font-size: 12px;
-  padding: 8px;
-  border-radius: var(--radius-sm);
-}
-
-.btn-add:hover {
-  border-color: var(--border-hover);
-  color: var(--text);
-  background: var(--surface3);
-}
-
-.btn-save {
-  background: linear-gradient(135deg, #7c6af7, #a78bfa);
-  color: white;
-  padding: 12px 32px;
-  font-size: 14px;
-  border-radius: 10px;
-  box-shadow: 0 6px 24px rgba(124,106,247,0.4);
-}
-
-.btn-save:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 32px rgba(124,106,247,0.5);
-}
-
-/* ─── ADD SECTION ─── */
-.add-section-zone {
-  border: 1.5px dashed var(--border);
-  border-radius: var(--radius);
-  padding: 28px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.25s;
-  background: transparent;
-  color: var(--text-dim);
-  font-size: 13px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-}
-
-.add-section-zone:hover {
-  border-color: var(--accent);
-  color: var(--accent2);
-  background: rgba(124,106,247,0.05);
-}
-
-/* ─── PROGRESS STEPS ─── */
-.progress-steps {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  margin-bottom: 32px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 20px;
-}
-
-.step {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-}
-
-.step-dot {
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px;
-  font-weight: 700;
-  flex-shrink: 0;
-  transition: all 0.2s;
-}
-
-.step-dot.done {
-  background: var(--green-dim);
-  border: 1.5px solid rgba(52,211,153,0.3);
-  color: var(--green);
-}
-
-.step-dot.active {
-  background: var(--accent-glow);
-  border: 1.5px solid rgba(124,106,247,0.4);
-  color: var(--accent2);
-  box-shadow: 0 0 12px var(--accent-glow);
-}
-
-.step-dot.pending {
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
-  color: var(--text-dim);
-}
-
-.step-text {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-dim);
-}
-
-.step-text.active { color: var(--text); }
-
-.step-sep {
-  flex: 0 0 24px;
-  height: 1px;
-  background: var(--border);
-  margin: 0 4px;
-}
-
-/* ─── HIDDEN ─── */
-.hidden { display: none !important; }
-
-/* ─── SCROLLBAR ─── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
-
-/* ─── DURATION BADGE ─── */
-.duration-input-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.duration-input-wrap .input {
-  width: 80px;
-}
-
-.duration-label {
-  font-size: 12px;
-  color: var(--text-dim);
-}
-
-/* ─── SECTION ORDER ─── */
-.order-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  color: var(--text-dim);
-  padding: 8px 0 16px;
-}
-
-/* ─── FOOTER ─── */
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+  border: 1px solid; box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  animation: slideIn 0.25s ease; transition: opacity 0.3s, transform 0.3s;
+}
+.alert-danger  { background:#fef2f2; border-color:#fecaca; color:#991b1b; }
+.alert-success { background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+@keyframes slideIn { from{opacity:0;transform:translateX(12px)} to{opacity:1;transform:translateX(0)} }
+.page { max-width: 900px; margin: 0 auto; padding: 36px 24px 60px; }
+.breadcrumb { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); margin-bottom:10px; }
+.breadcrumb a { color:var(--text-muted); text-decoration:none; }
+.breadcrumb a:hover { color:var(--text); }
+.page-title { font-size:26px; font-weight:700; color:var(--text); margin-bottom:4px; letter-spacing:-0.4px; }
+.page-subtitle { font-size:13px; color:var(--text-muted); margin-bottom:28px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:20px; overflow:hidden; }
+.card-header { display:flex; align-items:center; gap:10px; padding:16px 20px; border-bottom:1px solid var(--border); background:var(--surface2); }
+.card-title { font-size:13px; font-weight:600; color:var(--text); }
+.card-body { padding:20px; }
+.field { margin-bottom:16px; }
+.field label { display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-muted); margin-bottom:6px; }
+.input,.textarea,.select { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:9px 12px; font-family:inherit; font-size:14px; color:var(--text); outline:none; transition:border-color 0.15s, box-shadow 0.15s; }
+.input:focus,.textarea:focus,.select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-glow); background:#fff; }
+.input::placeholder,.textarea::placeholder { color:var(--text-dim); }
+.textarea { resize:vertical; min-height:80px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.upload-zone { position:relative; border:1.5px dashed var(--border); border-radius:var(--radius-sm); padding:16px; cursor:pointer; transition:border-color 0.15s,background 0.15s; background:var(--surface2); display:flex; align-items:center; gap:12px; }
+.upload-zone:hover { border-color:var(--accent); background:var(--accent-glow); }
+.upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+.upload-zone-icon { font-size:20px; flex-shrink:0; }
+.upload-zone-text { font-size:13px; font-weight:500; color:var(--text-muted); }
+.upload-zone-hint { font-size:11px; color:var(--text-dim); margin-top:2px; }
+#sections { display:flex; flex-direction:column; gap:14px; }
+.section-item { border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--surface); transition:box-shadow 0.2s; }
+.section-item.sortable-ghost { opacity:0.35; border:1.5px dashed var(--accent2); }
+.section-item.sortable-chosen { box-shadow:0 8px 30px rgba(0,0,0,0.12); }
+.section-header { display:flex; align-items:center; gap:10px; padding:12px 16px; background:var(--surface2); border-bottom:1px solid var(--border); }
+.drag-handle { display:flex; flex-direction:column; gap:3px; cursor:grab; padding:4px 2px; opacity:0.35; transition:opacity 0.15s; flex-shrink:0; }
+.drag-handle:hover { opacity:0.8; }
+.drag-handle:active { cursor:grabbing; }
+.drag-handle span { display:block; width:14px; height:2px; background:var(--text-muted); border-radius:2px; }
+.section-badge { width:24px; height:24px; border-radius:6px; background:rgba(91,79,224,0.1); border:1px solid rgba(91,79,224,0.18); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--accent); flex-shrink:0; }
+.section-title-inline { flex:1; background:transparent; border:none; border-bottom:1.5px solid transparent; outline:none; font-family:inherit; font-size:14px; font-weight:600; color:var(--text); padding:2px 0; transition:border-color 0.15s; }
+.section-title-inline:focus { border-bottom-color:var(--accent); }
+.section-title-inline::placeholder { color:var(--text-dim); font-weight:400; }
+.section-actions { display:flex; align-items:center; gap:4px; margin-left:auto; }
+.btn-icon { width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:none; font-size:13px; background:transparent; color:var(--text-muted); transition:background 0.15s,color 0.15s; }
+.btn-icon:hover { background:var(--surface3); color:var(--text); }
+.btn-icon.danger:hover { background:var(--red-dim); color:var(--red); }
+.section-toggle { font-size:10px; color:var(--text-dim); transition:transform 0.2s; }
+.section-item.collapsed .section-toggle { transform:rotate(-90deg); }
+.section-item.collapsed .section-body { display:none; }
+.section-body { padding:16px; }
+.lessons-list { display:flex; flex-direction:column; gap:10px; margin-bottom:10px; }
+.lesson-item { background:var(--surface2); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+.lesson-item.sortable-ghost { opacity:0.3; border:1.5px dashed rgba(5,150,105,0.4); }
+.lesson-item.sortable-chosen { box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+.lesson-header { display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid var(--border); background:#fff; }
+.lesson-drag { cursor:grab; opacity:0.3; transition:opacity 0.15s; display:flex; flex-direction:column; gap:2px; flex-shrink:0; }
+.lesson-drag:hover { opacity:0.7; }
+.lesson-drag:active { cursor:grabbing; }
+.lesson-drag span { width:12px; height:2px; background:var(--text-muted); border-radius:2px; display:block; }
+.lesson-type-badge { font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; transition:all 0.2s; flex-shrink:0; }
+.badge-video    { background:var(--green-dim); color:var(--green); border:1px solid rgba(5,150,105,0.2); }
+.badge-pdf      { background:var(--red-dim); color:var(--red); border:1px solid rgba(220,38,38,0.2); }
+.badge-speaking { background:rgba(91,79,224,0.09); color:var(--accent); border:1px solid rgba(91,79,224,0.2); }
+.lesson-name-inline { flex:1; background:transparent; border:none; border-bottom:1.5px solid transparent; outline:none; font-family:inherit; font-size:13px; font-weight:500; color:var(--text); padding:1px 0; transition:border-color 0.15s; }
+.lesson-name-inline:focus { border-bottom-color:var(--green); }
+.lesson-name-inline::placeholder { color:var(--text-dim); font-weight:400; }
+.lesson-body { padding:14px; }
+.tabs { display:flex; gap:2px; background:var(--surface3); padding:3px; border-radius:8px; margin-bottom:14px; width:fit-content; }
+.tab { padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600; cursor:pointer; color:var(--text-dim); transition:all 0.15s; border:none; background:transparent; font-family:inherit; }
+.tab:hover { color:var(--text-muted); }
+.tab.active { background:#fff; color:var(--text); box-shadow:0 1px 4px rgba(0,0,0,0.1); }
+.tab-panel { display:none; }
+.tab-panel.active { display:block; }
+.video-preview { width:100%; max-width:300px; border-radius:var(--radius-sm); border:1px solid var(--border); margin-top:10px; }
+.pdf-list { margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+.pdf-item { display:flex; align-items:center; gap:8px; padding:7px 12px; background:#fff; border-radius:7px; border:1px solid var(--border); font-size:12px; color:var(--text-muted); }
+.speaking-section { background:#fffbeb; border:1px solid rgba(251,191,36,0.25); border-radius:var(--radius-sm); padding:14px; }
+.speaking-label { font-size:11px; font-weight:700; color:#92400e; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:5px; }
+.topic-box { background:#fff; border:1px solid rgba(251,191,36,0.2); border-radius:8px; padding:12px; margin-bottom:8px; }
+.question-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:12px; margin-top:8px; }
+.question-item label { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim); margin-bottom:5px; display:block; }
+.cue-card-field { margin-top:8px; }
+.hidden { display:none !important; }
+.btn { display:inline-flex; align-items:center; gap:6px; padding:8px 16px; border-radius:var(--radius-sm); font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; border:none; transition:all 0.15s; text-decoration:none; }
+.btn-outline { background:transparent; color:var(--text-muted); border:1px solid var(--border); }
+.btn-outline:hover { background:var(--surface2); color:var(--text); border-color:var(--border-hover); }
+.btn-add { width:100%; justify-content:center; background:transparent; color:var(--text-dim); border:1.5px dashed var(--border); font-size:12px; padding:7px; border-radius:var(--radius-sm); }
+.btn-add:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
+.btn-save { background:var(--accent); color:#fff; padding:10px 28px; font-size:14px; border-radius:var(--radius-sm); box-shadow:0 2px 10px rgba(91,79,224,0.3); }
+.btn-save:hover { background:#4a3fcf; transform:translateY(-1px); }
+.add-section-zone { width:100%; border:1.5px dashed var(--border); border-radius:var(--radius); padding:20px; text-align:center; cursor:pointer; transition:all 0.15s; background:transparent; color:var(--text-dim); font-size:13px; font-weight:500; font-family:inherit; display:flex; align-items:center; justify-content:center; gap:6px; margin-top:14px; }
+.add-section-zone:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-glow); }
+.order-hint { font-size:11px; color:var(--text-dim); margin-bottom:12px; }
+.form-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+::-webkit-scrollbar { width:5px; }
+::-webkit-scrollbar-track { background:#f1f1f1; }
+::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
+</style>
 </head>
 <body>
 
-<!-- <%= render "admin/shared/navbar" %> -->
-
-<!-- ALERTS -->
+<%= render "admin/shared/navbar" %> 
+<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
 <div id="alert-container"></div>
-
-<!-- PAGE -->
 <div class="page">
-
-  <!-- HEADER -->
-  <div class="page-header">
-    <div class="breadcrumb">
-      <span>Admin</span>
-      <span class="sep">›</span>
-      <span>Courses</span>
-      <span class="sep">›</span>
-      <span style="color:var(--text-muted)">IELTS Complete Course</span>
-    </div>
-    <h1 class="page-title">Course Editor</h1>
-    <p class="page-subtitle">Manage course content, lessons, and speaking exercises</p>
+  <div class="breadcrumb">
+    <a href="#">Admin</a> › <a href="#">Courses</a> › Edit
   </div>
-
-  <!-- PROGRESS -->
-  <div class="progress-steps">
-    <div class="step">
-      <div class="step-dot done">✓</div>
-      <span class="step-text">Info</span>
-    </div>
-    <div class="step-sep"></div>
-    <div class="step">
-      <div class="step-dot active">2</div>
-      <span class="step-text active">Structure</span>
-    </div>
-    <div class="step-sep"></div>
-    <div class="step">
-      <div class="step-dot pending">3</div>
-      <span class="step-text">Media</span>
-    </div>
-    <div class="step-sep"></div>
-    <div class="step">
-      <div class="step-dot pending">4</div>
-      <span class="step-text">Publish</span>
-    </div>
-  </div>
+  <div class="page-title">🎓 Course Editor</div>
+  <div class="page-subtitle">Manage course content, lessons, and speaking exercises</div>
 
   <!-- COURSE INFO -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">
-        <div class="icon">📘</div>
-        Course Information
-      </div>
+      <span>📘</span>
+      <span class="card-title">Course Information</span>
     </div>
     <div class="card-body">
       <div class="field">
         <label>Course Title</label>
-        <input type="text" class="input" placeholder="e.g. IELTS Complete Preparation" value="IELTS Complete Course" name="course[title]">
+        <input type="text" class="input" name="course[title]" placeholder="e.g. IELTS Complete Preparation">
       </div>
       <div class="field">
         <label>Description</label>
-        <textarea class="textarea" placeholder="Describe what students will learn..." name="course[description]">Master all four IELTS skills with expert guidance, practice tests, and speaking exercises tailored for band 7+.</textarea>
+        <textarea class="textarea" name="course[description]" placeholder="Describe what students will learn..."></textarea>
       </div>
       <div class="grid-2">
         <div class="field">
           <label>Price (VND)</label>
-          <input type="number" class="input" placeholder="0" value="2500000" name="course[price]">
+          <input type="number" class="input" name="course[price]" placeholder="0" min="0" step="1000">
         </div>
         <div class="field">
           <label>Thumbnail</label>
-          <div class="upload-zone">
+          <div class="upload-zone" id="thumbnail-zone">
             <input type="file" accept="image/*" onchange="previewThumbnail(this)">
-            <div class="upload-icon">🖼️</div>
-            <div class="upload-text">Drop image or click to browse</div>
-            <div class="upload-hint">JPG, PNG · Max 2MB</div>
+            <span class="upload-zone-icon">🖼️</span>
+            <div>
+              <div class="upload-zone-text">Drop image or click to browse</div>
+              <div class="upload-zone-hint">JPG, PNG · Max 2MB</div>
+            </div>
           </div>
         </div>
       </div>
@@ -955,54 +190,37 @@ body::before {
   <!-- COURSE STRUCTURE -->
   <div class="card">
     <div class="card-header">
-      <div class="card-title">
-        <div class="icon">📚</div>
-        Course Structure
-      </div>
+      <span>📚</span>
+      <span class="card-title">Course Structure</span>
     </div>
-    <div class="card-body" style="padding-bottom:12px;">
-
-      <div class="order-hint">
-        <span>⠿</span> Drag sections and lessons to reorder
-      </div>
-
+    <div class="card-body">
+      <div class="order-hint">⠿ Drag to reorder sections and lessons</div>
       <div id="sections"></div>
-
-      <button type="button" class="add-section-zone" onclick="addSection()">
-        ＋ Add Section
-      </button>
-
+      <button type="button" class="add-section-zone" onclick="addSection()">＋ Add Section</button>
     </div>
   </div>
 
   <!-- ACTIONS -->
-  <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:24px;">
-    <button class="btn btn-outline">Cancel</button>
-    <button class="btn btn-save" onclick="saveCourse()">💾 Save Course</button>
-  </div>
+<div class="form-actions">
+  <%= link_to "Cancel",
+      admin_courses_path,
+      class: "btn btn-outline" %>
 
+  <%= submit_tag "💾 Save Course",
+      class: "btn btn-save" %>
+</div>
 </div>
 
-<!-- SECTION TEMPLATE -->
 <template id="section-tpl">
   <div class="section-item" data-section-id="__SID__">
     <div class="section-header">
-      <div class="drag-handle section-drag">
-        <span></span><span></span><span></span>
-      </div>
-      <div class="section-badge section-num">1</div>
+      <div class="drag-handle section-drag"><span></span><span></span><span></span></div>
+      <div class="section-badge">1</div>
       <input type="hidden" name="course[course_sections_attributes][__SID__][_destroy]" value="0">
-      <input
-        type="text"
-        class="section-title-inline"
-        name="course[course_sections_attributes][__SID__][title]"
-        placeholder="Section title…"
-      >
+      <input type="text" class="section-title-inline" name="course[course_sections_attributes][__SID__][title]" placeholder="Section title…">
       <div class="section-actions">
-        <button type="button" class="btn-icon" onclick="toggleSection(this)" title="Collapse">
-          <span class="section-toggle">▾</span>
-        </button>
-        <button type="button" class="btn-icon danger" onclick="removeSection(this)" title="Delete section">🗑</button>
+        <button type="button" class="btn-icon" onclick="toggleSection(this)"><span class="section-toggle">▾</span></button>
+        <button type="button" class="btn-icon danger" onclick="removeSection(this)">🗑</button>
       </div>
     </div>
     <div class="section-body">
@@ -1012,75 +230,58 @@ body::before {
   </div>
 </template>
 
-<!-- LESSON TEMPLATE -->
 <template id="lesson-tpl">
   <div class="lesson-item" data-lesson-id="__LID__">
     <div class="lesson-header">
-      <div class="lesson-drag">
-        <span></span><span></span>
-      </div>
+      <div class="lesson-drag"><span></span><span></span></div>
       <span class="lesson-type-badge badge-video">Video</span>
       <input type="hidden" name="__LPREFIX__[_destroy]" value="0">
-      <input
-        type="text"
-        class="lesson-name-inline"
-        name="__LPREFIX__[title]"
-        placeholder="Lesson title…"
-      >
-      <div style="display:flex;align-items:center;gap:8px;">
-        <input type="number" class="input" style="width:80px;padding:5px 10px;font-size:12px;" name="__LPREFIX__[duration]" placeholder="min">
-        <span style="font-size:11px;color:var(--text-dim)">min</span>
+      <input type="text" class="lesson-name-inline" name="__LPREFIX__[title]" placeholder="Lesson title…">
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+        <input type="number" class="input" style="width:72px;padding:5px 8px;font-size:12px;" name="__LPREFIX__[duration]" placeholder="min">
+        <span style="font-size:11px;color:var(--text-dim);">min</span>
         <button type="button" class="btn-icon danger" onclick="removeLesson(this)">🗑</button>
       </div>
     </div>
     <div class="lesson-body">
-      <!-- TABS -->
       <div class="tabs">
         <button class="tab active" onclick="switchTab(this,'video')">🎬 Video</button>
         <button class="tab" onclick="switchTab(this,'pdf')">📄 PDF</button>
         <button class="tab" onclick="switchTab(this,'speaking')">🎤 Speaking</button>
       </div>
-
       <div class="tab-panel active" data-tab="video">
-        <div class="upload-zone" style="text-align:left;padding:14px 16px;">
+        <div class="upload-zone">
           <input type="file" accept="video/mp4" name="__LPREFIX__[video]" onchange="handleVideoUpload(this)">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:20px;">🎬</span>
-            <div>
-              <div style="font-size:13px;color:var(--text-muted);font-weight:500;">Upload video lesson</div>
-              <div style="font-size:11px;color:var(--text-dim);">MP4 · Max 5MB</div>
-            </div>
+          <span class="upload-zone-icon">🎬</span>
+          <div>
+            <div class="upload-zone-text">Upload video lesson</div>
+            <div class="upload-zone-hint">MP4 · Max 5MB</div>
           </div>
         </div>
-        <div class="video-preview-wrap" style="display:none;"></div>
+        <div class="video-preview-wrap"></div>
       </div>
-
       <div class="tab-panel" data-tab="pdf">
-        <div class="upload-zone" style="text-align:left;padding:14px 16px;">
+        <div class="upload-zone">
           <input type="file" multiple accept="application/pdf" name="__LPREFIX__[pdfs][]" onchange="handlePDFUpload(this)">
-          <div style="display:flex;align-items:center;gap:10px;">
-            <span style="font-size:20px;">📄</span>
-            <div>
-              <div style="font-size:13px;color:var(--text-muted);font-weight:500;">Upload PDF materials</div>
-              <div style="font-size:11px;color:var(--text-dim);">PDF · Max 500KB each · Multiple files OK</div>
-            </div>
+          <span class="upload-zone-icon">📄</span>
+          <div>
+            <div class="upload-zone-text">Upload PDF materials</div>
+            <div class="upload-zone-hint">PDF · Max 500KB each · Multiple OK</div>
           </div>
         </div>
         <div class="pdf-list"></div>
       </div>
-
       <div class="tab-panel" data-tab="speaking">
         <div class="speaking-section">
           <div class="speaking-label">🎤 Speaking Exercises</div>
           <div class="topics-container"></div>
-          <button type="button" class="btn btn-add" onclick="addTopic(this)" style="margin-top:8px;">＋ Add Topic</button>
+          <button type="button" class="btn btn-add" style="margin-top:8px;" onclick="addTopic(this)">＋ Add Topic</button>
         </div>
       </div>
     </div>
   </div>
 </template>
 
-<!-- TOPIC TEMPLATE -->
 <template id="topic-tpl">
   <div class="topic-box">
     <div class="grid-2" style="margin-bottom:10px;">
@@ -1092,26 +293,25 @@ body::before {
       </select>
     </div>
     <div class="questions-container"></div>
-    <button type="button" class="btn btn-add" onclick="addQuestion(this)" style="margin-top:6px;font-size:11px;">＋ Question</button>
+    <button type="button" class="btn btn-add" style="margin-top:6px;font-size:11px;" onclick="addQuestion(this)">＋ Add Question</button>
   </div>
 </template>
 
-<!-- QUESTION TEMPLATE -->
 <template id="question-tpl">
   <div class="question-item">
     <label>Question</label>
-    <textarea class="textarea" style="font-size:13px;min-height:60px;" name="__QPREFIX__[question_text]" placeholder="Enter your question…"></textarea>
+    <textarea class="textarea" style="font-size:13px;min-height:56px;" name="__QPREFIX__[question_text]" placeholder="Enter your question…"></textarea>
     <div class="cue-card-field hidden" style="margin-top:8px;">
       <label>Cue Card</label>
-      <textarea class="textarea" style="font-size:13px;min-height:60px;" name="__QPREFIX__[cue_card]" placeholder="Cue card instructions…"></textarea>
+      <textarea class="textarea" style="font-size:13px;min-height:56px;" name="__QPREFIX__[cue_card]" placeholder="Cue card instructions…"></textarea>
     </div>
     <div class="grid-2" style="margin-top:10px;">
       <div>
-        <label style="font-size:10px;color:var(--text-dim);margin-bottom:4px;display:block;">PREP TIME (sec)</label>
+        <label>Prep Time (sec)</label>
         <input type="number" class="input" name="__QPREFIX__[preparation_time]" placeholder="30">
       </div>
       <div>
-        <label style="font-size:10px;color:var(--text-dim);margin-bottom:4px;display:block;">SPEAKING TIME (sec)</label>
+        <label>Speaking Time (sec)</label>
         <input type="number" class="input" name="__QPREFIX__[speaking_time]" placeholder="120">
       </div>
     </div>
@@ -1119,29 +319,22 @@ body::before {
 </template>
 
 <script>
-// ─── COUNTERS ───
-let sectionCount = 0
+const MAX_VIDEO = 5 * 1024 * 1024
+const MAX_PDF   = 500 * 1024
 let lessonCounters = {}
 
-// ─── SORTABLE SECTIONS ───
-let sectionsListEl = document.getElementById('sections')
-
-let sectionSortable = Sortable.create(sectionsListEl, {
-  animation: 180,
-  handle: '.section-drag',
-  ghostClass: 'sortable-ghost',
-  chosenClass: 'sortable-chosen',
-  dragClass: 'sortable-drag',
-  easing: 'cubic-bezier(0.34,1.56,0.64,1)',
-  onEnd() { updateSectionBadges() }
+const sectionsEl = document.getElementById('sections')
+Sortable.create(sectionsEl, {
+  animation: 160, handle: '.section-drag',
+  ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+  easing: 'cubic-bezier(0.25,1,0.5,1)', onEnd: updateSectionBadges
 })
 
 function updateSectionBadges() {
   let count = 0
-  document.querySelectorAll('.section-item').forEach((el) => {
-    const destroyInput = el.querySelector("input[name*='_destroy']")
-    const isDestroyed = destroyInput && destroyInput.value === '1'
-    if (!isDestroyed && el.style.display !== 'none') {
+  document.querySelectorAll('.section-item').forEach(el => {
+    const d = el.querySelector("input[name*='_destroy']")
+    if (el.style.display !== 'none' && !(d && d.value === '1')) {
       count++
       const badge = el.querySelector('.section-badge')
       if (badge) badge.textContent = count
@@ -1149,288 +342,159 @@ function updateSectionBadges() {
   })
 }
 
-// ─── ADD SECTION ───
 function addSection() {
   const sid = 'S' + Date.now()
-  sectionCount++
-
-  let tpl = document.getElementById('section-tpl').innerHTML
-  tpl = tpl.replace(/__SID__/g, sid)
-
   const wrap = document.createElement('div')
-  wrap.innerHTML = tpl
+  wrap.innerHTML = document.getElementById('section-tpl').innerHTML.replace(/__SID__/g, sid)
   const el = wrap.firstElementChild
-  el.querySelector('.section-badge').textContent = document.querySelectorAll('.section-item').length + 1
-
-  sectionsListEl.appendChild(el)
-
-  // Make lessons inside sortable
-  initLessonSortable(el.querySelector('.lessons-list'))
-
-  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.dataset.sectionId = sid
+  sectionsEl.appendChild(el)
+  updateSectionBadges()
+  Sortable.create(el.querySelector('.lessons-list'), {
+    animation: 140, handle: '.lesson-drag',
+    ghostClass: 'sortable-ghost', chosenClass: 'sortable-chosen',
+    easing: 'cubic-bezier(0.25,1,0.5,1)'
+  })
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
   el.querySelector('.section-title-inline').focus()
 }
 
-// ─── INIT LESSON SORTABLE ───
-function initLessonSortable(el) {
-  Sortable.create(el, {
-    animation: 150,
-    handle: '.lesson-drag',
-    ghostClass: 'sortable-ghost',
-    chosenClass: 'sortable-chosen',
-    easing: 'cubic-bezier(0.34,1.56,0.64,1)',
-  })
-}
-
-// ─── ADD LESSON ───
 function addLesson(btn) {
   const section = btn.closest('.section-item')
   const sid = section.dataset.sectionId
-  const lid = Date.now()
-
   if (!lessonCounters[sid]) lessonCounters[sid] = 0
-  const lessonIdx = lessonCounters[sid]++
-
-  const prefix = `course[course_sections_attributes][${sid}][lessons_attributes][${lessonIdx}]`
-
-  let tpl = document.getElementById('lesson-tpl').innerHTML
-  tpl = tpl.replace(/__LID__/g, lid)
-  tpl = tpl.replace(/__LPREFIX__/g, prefix)
-
+  const idx = lessonCounters[sid]++
+  const prefix = `course[course_sections_attributes][${sid}][lessons_attributes][${idx}]`
+  const lid = Date.now()
   const wrap = document.createElement('div')
-  wrap.innerHTML = tpl
-  const lessonEl = wrap.firstElementChild
-
-  // init topic sortable later
-  const lessonsList = section.querySelector('.lessons-list')
-  lessonsList.appendChild(lessonEl)
-  lessonEl.querySelector('.lesson-name-inline').focus()
+  wrap.innerHTML = document.getElementById('lesson-tpl').innerHTML
+    .replace(/__LID__/g, lid).replace(/__LPREFIX__/g, prefix)
+  const el = wrap.firstElementChild
+  el.dataset.lessonId = lid
+  section.querySelector('.lessons-list').appendChild(el)
+  el.querySelector('.lesson-name-inline').focus()
 }
 
-// ─── REMOVE SECTION ───
 function removeSection(btn) {
   const section = btn.closest('.section-item')
-  const destroyInput = section.querySelector("input[name*='_destroy']")
-  if (destroyInput) {
-    destroyInput.value = '1'
-    section.style.opacity = '0'
-    section.style.transform = 'scale(0.97)'
-    section.style.transition = 'all 0.2s'
-    setTimeout(() => {
-      section.style.display = 'none'
-      updateSectionBadges()
-    }, 200)
-  } else {
-    section.style.opacity = '0'
-    section.style.transform = 'scale(0.97)'
-    section.style.transition = 'all 0.2s'
-    setTimeout(() => {
-      section.remove()
-      updateSectionBadges()
-    }, 200)
-  }
+  const destroy = section.querySelector("input[name*='_destroy']")
+  section.style.transition = 'opacity 0.2s, transform 0.2s'
+  section.style.opacity = '0'
+  section.style.transform = 'scale(0.98)'
+  setTimeout(() => {
+    if (destroy) { destroy.value = '1'; section.style.display = 'none' }
+    else section.remove()
+    updateSectionBadges()
+  }, 200)
 }
 
-// ─── REMOVE LESSON ───
 function removeLesson(btn) {
   const lesson = btn.closest('.lesson-item')
-  const destroyInput = lesson.querySelector("input[name*='_destroy']")
-  if (destroyInput) {
-    destroyInput.value = '1'
-    lesson.style.opacity = '0'
-    lesson.style.transition = 'opacity 0.2s'
-    setTimeout(() => lesson.style.display = 'none', 200)
-  } else {
-    lesson.style.opacity = '0'
-    lesson.style.transition = 'opacity 0.2s'
-    setTimeout(() => lesson.remove(), 200)
-  }
+  const destroy = lesson.querySelector("input[name*='_destroy']")
+  lesson.style.transition = 'opacity 0.2s'
+  lesson.style.opacity = '0'
+  setTimeout(() => {
+    if (destroy) { destroy.value = '1'; lesson.style.display = 'none' }
+    else lesson.remove()
+  }, 200)
 }
 
-// ─── TOGGLE SECTION ───
 function toggleSection(btn) {
-  const section = btn.closest('.section-item')
-  section.classList.toggle('collapsed')
+  btn.closest('.section-item').classList.toggle('collapsed')
 }
 
-// ─── TABS ───
 function switchTab(btn, tab) {
   const lesson = btn.closest('.lesson-item')
   lesson.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
   lesson.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
   btn.classList.add('active')
-  lesson.querySelector(`[data-tab="${tab}"]`).classList.add('active')
-
+  lesson.querySelector('[data-tab="' + tab + '"]').classList.add('active')
   const badge = lesson.querySelector('.lesson-type-badge')
   if (badge) {
-    badge.classList.remove('badge-video', 'badge-pdf', 'badge-speaking')
-    badge.classList.add(`badge-${tab}`)
-    const labels = { video: 'Video', pdf: 'PDF', speaking: 'Speaking' }
-    badge.textContent = labels[tab]
+    badge.className = 'lesson-type-badge badge-' + tab
+    badge.textContent = {video:'Video', pdf:'PDF', speaking:'Speaking'}[tab]
   }
 }
 
-// ─── ADD TOPIC ───
 function addTopic(btn) {
   const lesson = btn.closest('.lesson-item')
-  const sid = lesson.closest('.section-item').dataset.sectionId
-  const lessonId = lesson.dataset.lessonId
-  const tContainer = btn.previousElementSibling
-  const tIdx = tContainer.children.length
-
-  const prefix = /* we grab the lesson prefix from the hidden input */
-    lesson.querySelector("input[name*='_destroy']").name
-      .replace('[_destroy]', `[speaking_topics_attributes][${tIdx}]`)
-
-  let tpl = document.getElementById('topic-tpl').innerHTML
-  tpl = tpl.replace(/__TPREFIX__/g, prefix)
-
+  const container = btn.previousElementSibling
+  const idx = container.children.length
+  const base = lesson.querySelector("input[name*='_destroy']").name
+    .replace('[_destroy]', '[speaking_topics_attributes][' + idx + ']')
   const wrap = document.createElement('div')
-  wrap.innerHTML = tpl
-  const el = wrap.firstElementChild
-  tContainer.appendChild(el)
+  wrap.innerHTML = document.getElementById('topic-tpl').innerHTML.replace(/__TPREFIX__/g, base)
+  container.appendChild(wrap.firstElementChild)
 }
 
-// ─── ADD QUESTION ───
 function addQuestion(btn) {
   const topic = btn.closest('.topic-box')
-  const qContainer = topic.querySelector('.questions-container')
-  const qIdx = qContainer.children.length
-
-  const topicPrefix = topic.querySelector("input.input[name]")?.name
-    .replace('[title]', '')
-    .replace(/\[+$/, '')
-
-  const topicSelectName = topic.querySelector('select').name
-  const basePrefix = topicSelectName.replace('[part]', `[speaking_questions_attributes][${qIdx}]`)
-
-  let tpl = document.getElementById('question-tpl').innerHTML
-  tpl = tpl.replace(/__QPREFIX__/g, basePrefix)
-
+  const container = topic.querySelector('.questions-container')
+  const idx = container.children.length
+  const base = topic.querySelector('select').name
+    .replace('[part]', '[speaking_questions_attributes][' + idx + ']')
   const wrap = document.createElement('div')
-  wrap.innerHTML = tpl
-  const el = wrap.firstElementChild
-  qContainer.appendChild(el)
+  wrap.innerHTML = document.getElementById('question-tpl').innerHTML.replace(/__QPREFIX__/g, base)
+  container.appendChild(wrap.firstElementChild)
 }
 
-// ─── CUE CARD ───
 function toggleCueCard(select) {
-  const box = select.closest('.topic-box')
-  const cue = box.querySelector('.cue-card-field')
-  if (select.value === 'part2') {
-    cue.classList.remove('hidden')
-  } else {
-    cue.classList.add('hidden')
-  }
+  const cue = select.closest('.topic-box').querySelector('.cue-card-field')
+  select.value === 'part2' ? cue.classList.remove('hidden') : cue.classList.add('hidden')
 }
-
-// ─── FILE VALIDATION ───
-const MAX_VIDEO = 5 * 1024 * 1024
-const MAX_PDF   = 500 * 1024
 
 function handleVideoUpload(input) {
   const file = input.files[0]
   if (!file) return
-  if (!file.type.includes('mp4')) {
-    showAlert('danger', 'Video must be MP4 format')
-    input.value = ''
-    return
-  }
-  if (file.size > MAX_VIDEO) {
-    showAlert('danger', 'Video exceeds 5MB limit')
-    input.value = ''
-    return
-  }
-  const lesson = input.closest('.lesson-item')
-  const previewWrap = lesson.querySelector('.video-preview-wrap')
-  if (previewWrap) {
-    const url = URL.createObjectURL(file)
-    previewWrap.innerHTML = `<video controls class="video-preview"><source src="${url}" type="video/mp4"></video>`
-    previewWrap.style.display = 'block'
-  }
-  showAlert('success', `Video ready: <b>${file.name}</b>`)
+  if (!file.type.includes('mp4')) { showAlert('danger','Video must be MP4'); input.value=''; return }
+  if (file.size > MAX_VIDEO) { showAlert('danger','Video exceeds 5MB limit'); input.value=''; return }
+  const wrap = input.closest('.lesson-item').querySelector('.video-preview-wrap')
+  wrap.innerHTML = '<video controls class="video-preview"><source src="' + URL.createObjectURL(file) + '" type="video/mp4"></video>'
+  showAlert('success', 'Video ready: ' + file.name)
 }
 
 function handlePDFUpload(input) {
   const files = Array.from(input.files)
   if (!files.length) return
-
-  for (const file of files) {
-    if (file.type !== 'application/pdf') {
-      showAlert('danger', `${file.name} is not a PDF`)
-      input.value = ''
-      return
-    }
-    if (file.size > MAX_PDF) {
-      showAlert('danger', `${file.name} exceeds 500KB`)
-      input.value = ''
-      return
-    }
+  for (const f of files) {
+    if (f.type !== 'application/pdf') { showAlert('danger', f.name + ' is not PDF'); input.value=''; return }
+    if (f.size > MAX_PDF) { showAlert('danger', f.name + ' exceeds 500KB'); input.value=''; return }
   }
-
-  const lesson = input.closest('.lesson-item')
-  const pdfList = lesson.querySelector('.pdf-list')
-  if (pdfList) {
-    pdfList.innerHTML = ''
-    files.forEach(f => {
-      const item = document.createElement('div')
-      item.className = 'pdf-item'
-      item.innerHTML = `📄 ${f.name} <span style="margin-left:auto;font-size:10px;color:var(--text-dim)">${(f.size/1024).toFixed(0)} KB</span>`
-      pdfList.appendChild(item)
-    })
-  }
-  showAlert('success', `${files.length} PDF file${files.length > 1 ? 's' : ''} selected`)
+  const list = input.closest('.lesson-item').querySelector('.pdf-list')
+  list.innerHTML = ''
+  files.forEach(f => {
+    const item = document.createElement('div')
+    item.className = 'pdf-item'
+    item.innerHTML = '📄 ' + f.name + '<span style="margin-left:auto;font-size:10px;color:var(--text-dim)">' + (f.size/1024).toFixed(0) + ' KB</span>'
+    list.appendChild(item)
+  })
+  showAlert('success', files.length + ' PDF file' + (files.length>1?'s':'') + ' selected')
 }
 
-// ─── THUMBNAIL PREVIEW ───
 function previewThumbnail(input) {
   const file = input.files[0]
   if (!file) return
   const zone = input.closest('.upload-zone')
-  const url = URL.createObjectURL(file)
-  zone.innerHTML = `<img src="${url}" style="width:100%;height:120px;object-fit:cover;border-radius:6px;">`
+  zone.innerHTML = '<img src="' + URL.createObjectURL(file) + '" style="width:100%;height:100px;object-fit:cover;border-radius:6px;">'
 }
 
-// ─── SAVE ───
-function saveCourse() {
-  showAlert('success', 'Course saved successfully!')
-}
+function saveCourse() { showAlert('success', 'Course saved successfully!') }
 
-// ─── ALERTS ───
 function showAlert(type, message) {
-  const container = document.getElementById('alert-container')
-  if (!container) return
-
+  const c = document.getElementById('alert-container')
   const div = document.createElement('div')
-  div.className = `alert alert-${type === 'danger' ? 'danger' : 'success'}`
-
-  const icon = type === 'danger' ? '⚠️' : '✓'
-  div.innerHTML = `
-    <span style="flex-shrink:0;">${icon}</span>
-    <span>${message}</span>
-  `
-
-  container.appendChild(div)
-  setTimeout(() => {
-    div.style.opacity = '0'
-    div.style.transform = 'translateX(10px)'
-    div.style.transition = 'all 0.3s'
-    setTimeout(() => div.remove(), 300)
-  }, 3500)
+  div.className = 'alert alert-' + (type === 'danger' ? 'danger' : 'success')
+  div.innerHTML = '<span>' + (type==='danger'?'⚠️':'✓') + '</span><span>' + message + '</span>'
+  c.appendChild(div)
+  setTimeout(() => { div.style.opacity='0'; div.style.transform='translateX(10px)'; setTimeout(()=>div.remove(),300) }, 3000)
 }
 
-// ─── INIT ───
 document.addEventListener('DOMContentLoaded', () => {
-  // Add a default section to start
   addSection()
-  // Add a default lesson to first section
-  const firstSection = document.querySelector('.section-item')
-  if (firstSection) {
-    const addBtn = firstSection.querySelector('.btn-add')
-    if (addBtn) addLesson(addBtn)
-  }
+  const firstBtn = document.querySelector('.section-item .btn-add')
+  if (firstBtn) addLesson(firstBtn)
 })
 </script>
-
+<% end %>
 </body>
 </html>
