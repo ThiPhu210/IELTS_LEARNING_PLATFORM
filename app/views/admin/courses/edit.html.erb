@@ -161,16 +161,28 @@ body {
     <div class="card-body">
       <div class="field">
         <label>Course Title</label>
-        <input type="text" class="input" name="course[title]" placeholder="e.g. IELTS Complete Preparation">
+        <input type="text"
+       class="input"
+       name="course[title]"
+       value="<%= @course.title %>"
+       placeholder="e.g. IELTS Complete Preparation">
       </div>
       <div class="field">
         <label>Description</label>
-        <textarea class="textarea" name="course[description]" placeholder="Describe what students will learn..."></textarea>
+        <textarea class="textarea"
+          name="course[description]"
+          placeholder="Describe what students will learn..."><%= @course.description %></textarea>
       </div>
       <div class="grid-2">
         <div class="field">
           <label>Price (VND)</label>
-          <input type="number" class="input" name="course[price]" placeholder="0" min="0" step="1000">
+          <input type="number"
+       class="input"
+       name="course[price]"
+       value="<%= @course.price %>"
+       placeholder="0"
+       min="0"
+       step="1000">
         </div>
         <div class="field">
           <label>Thumbnail</label>
@@ -490,9 +502,14 @@ function showAlert(type, message) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  addSection()
-  const firstBtn = document.querySelector('.section-item .btn-add')
-  if (firstBtn) addLesson(firstBtn)
+  const existingSections = document.querySelectorAll('.section-item')
+
+  if (existingSections.length === 0) {
+    addSection()
+
+    const firstBtn = document.querySelector('.section-item .btn-add')
+    if (firstBtn) addLesson(firstBtn)
+  }
 })
 </script>
 <% end %>
