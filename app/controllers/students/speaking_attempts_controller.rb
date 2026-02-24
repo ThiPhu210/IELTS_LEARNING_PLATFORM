@@ -6,7 +6,7 @@ class Students::SpeakingAttemptsController < ApplicationController
     audio = params[:audio]
     key = "speaking/#{SecureRandom.uuid}.webm"
     s3 = Aws::S3::Resource.new
-    obj = s3.bucket(ENV["AWS_BUCKET"]).object(key)
+    obj = s3.bucket("ielts-learning-platform-uploads").object(key)
     obj.put(body: audio.read)
 
     attempt = SpeakingAttempt.create!(
