@@ -1,502 +1,1534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Editor — EduForge Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+<style>
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface2: #f0f1f6;
+  --surface3: #e8eaf2;
+  --border: rgba(0,0,0,0.14);
+  --border-hover: rgba(0,0,0,0.26);
+  --text: #1a1a2e;
+  --text-muted: #5a5a7a;
+  --text-dim: #9a9ab0;
+  --accent: #6355e0;
+  --accent2: #7c6af7;
+  --accent-glow: rgba(99,85,224,0.15);
+  --gold: #d97706;
+  --gold-dim: rgba(217,119,6,0.1);
+  --green: #059669;
+  --green-dim: rgba(5,150,105,0.1);
+  --red: #dc2626;
+  --red-dim: rgba(220,38,38,0.08);
+  --yellow: #b45309;
+  --yellow-dim: rgba(180,83,9,0.08);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+}
+
+/* ─── TOPBAR ─── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.topbar-brand .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.topbar-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-item {
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.nav-item:hover { color: var(--text); background: var(--surface2); }
+.nav-item.active { color: var(--accent2); background: rgba(124,106,247,0.1); }
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ─── ALERT ─── */
+#alert-container {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 380px;
+  width: 100%;
+}
+
+.alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+  border: 1px solid;
+  animation: slideIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+}
+
+.alert-danger {
+  background: rgba(248,113,113,0.1);
+  border-color: rgba(248,113,113,0.25);
+  color: #fca5a5;
+}
+
+.alert-success {
+  background: rgba(52,211,153,0.1);
+  border-color: rgba(52,211,153,0.25);
+  color: #6ee7b7;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px) scale(0.95); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+/* ─── LAYOUT ─── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 100px;
+}
+
+/* ─── PAGE HEADER ─── */
+.page-header {
+  margin-bottom: 36px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+
+.breadcrumb span { color: var(--text-muted); cursor: pointer; }
+.breadcrumb span:hover { color: var(--text); }
+.breadcrumb .sep { color: var(--text-dim); }
+
+.page-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ─── CARD ─── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.card:hover { border-color: var(--border-hover); }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.card-title .icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  background: var(--surface2);
+}
+
+.card-body { padding: 24px; }
+
+/* ─── INPUTS ─── */
+.field {
+  margin-bottom: 20px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.input, .textarea, .select {
+  width: 100%;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input:hover, .textarea:hover, .select:hover {
+  border-color: var(--border-hover);
+}
+
+.input:focus, .textarea:focus, .select:focus {
+  border-color: var(--accent);
+  background: var(--surface3);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.textarea { resize: vertical; min-height: 90px; }
+
+.input::placeholder, .textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.select option {
+  background: var(--surface2);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ─── FILE UPLOAD ─── */
+.upload-zone {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--surface2);
+  position: relative;
+}
+
+.upload-zone:hover {
+  border-color: var(--accent);
+  background: var(--surface3);
+}
+
+.upload-zone input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+  height: 100%;
+}
+
+.upload-zone .upload-icon {
+  font-size: 24px;
+  margin-bottom: 6px;
+}
+
+.upload-zone .upload-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.upload-zone .upload-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 3px;
+}
+
+/* ─── THUMBNAIL PREVIEW ─── */
+.thumbnail-preview {
+  width: 100%;
+  max-width: 260px;
+  height: 160px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+/* ─── SECTIONS ─── */
+#sections {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all 0.25s;
+}
+
+.section-item.sortable-ghost {
+  opacity: 0.4;
+  border: 1.5px dashed var(--accent);
+  background: rgba(124,106,247,0.05);
+}
+
+.section-item.sortable-chosen {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 0 1.5px var(--accent);
+  transform: rotate(-0.5deg) scale(1.01);
+}
+
+.section-item.sortable-drag {
+  opacity: 1;
+}
+
+/* ─── SECTION HEADER ─── */
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  cursor: default;
+}
+
+.drag-handle {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: grab;
+  padding: 4px 2px;
+  opacity: 0.4;
+  transition: opacity 0.2s;
+  flex-shrink: 0;
+}
+
+.drag-handle:active { cursor: grabbing; }
+
+.drag-handle:hover { opacity: 1; }
+
+.drag-handle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+}
+
+.section-badge {
+  width: 26px; height: 26px;
+  border-radius: 7px;
+  background: rgba(124,106,247,0.15);
+  border: 1px solid rgba(124,106,247,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent2);
+  flex-shrink: 0;
+}
+
+.section-title-inline {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: text;
+  padding: 2px 0;
+}
+
+.section-title-inline:focus {
+  border-bottom: 1.5px solid var(--accent);
+}
+
+.section-title-inline::placeholder { color: var(--text-dim); }
+
+.section-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.btn-icon {
+  width: 30px; height: 30px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  transition: all 0.2s;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.btn-icon:hover { background: var(--surface3); color: var(--text); }
+.btn-icon.danger:hover { background: var(--red-dim); color: var(--red); }
+
+.section-toggle {
+  font-size: 11px;
+  color: var(--text-dim);
+  transition: transform 0.2s;
+}
+
+.section-item.collapsed .section-toggle {
+  transform: rotate(-90deg);
+}
+
+.section-body {
+  padding: 20px;
+  display: block;
+}
+
+.section-item.collapsed .section-body {
+  display: none;
+}
+
+/* ─── LESSONS ─── */
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.lesson-item {
+  background: #f8f9fc;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+
+.lesson-item.sortable-ghost {
+  opacity: 0.3;
+  border: 1.5px dashed rgba(52,211,153,0.4);
+}
+
+.lesson-item.sortable-chosen {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  transform: scale(1.01);
+}
+
+.lesson-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-bottom: 1px solid var(--border);
+}
+
+.lesson-drag {
+  cursor: grab;
+  opacity: 0.35;
+  transition: opacity 0.2s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lesson-drag span {
+  width: 12px; height: 2px;
+  background: var(--text-muted);
+  border-radius: 2px;
+  display: block;
+}
+
+.lesson-drag:hover { opacity: 1; }
+.lesson-drag:active { cursor: grabbing; }
+
+.lesson-type-badge {
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(5,150,105,0.2);
+  transition: all 0.2s;
+}
+
+.lesson-type-badge.badge-video {
+  background: var(--green-dim);
+  color: var(--green);
+  border-color: rgba(5,150,105,0.2);
+}
+
+.lesson-type-badge.badge-pdf {
+  background: rgba(220,38,38,0.08);
+  color: #dc2626;
+  border-color: rgba(220,38,38,0.2);
+}
+
+.lesson-type-badge.badge-speaking {
+  background: rgba(99,85,224,0.1);
+  color: var(--accent);
+  border-color: rgba(99,85,224,0.2);
+}
+
+.lesson-name-inline {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.lesson-name-inline::placeholder { color: var(--text-dim); }
+
+.lesson-name-inline:focus {
+  border-bottom: 1px solid var(--green);
+}
+
+.lesson-body {
+  padding: 16px;
+}
+
+/* ─── TABS ─── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--surface2);
+  padding: 4px;
+  border-radius: 10px;
+  margin-bottom: 16px;
+  width: fit-content;
+}
+
+.tab {
+  padding: 6px 14px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-dim);
+  transition: all 0.2s;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.tab:hover { color: var(--text-muted); }
+
+.tab.active {
+  background: var(--surface3);
+  color: var(--text);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── VIDEO PLAYER ─── */
+.video-preview {
+  width: 100%;
+  max-width: 320px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-top: 10px;
+}
+
+/* ─── PDF LIST ─── */
+.pdf-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pdf-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.pdf-item:hover {
+  background: var(--surface3);
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+/* ─── SPEAKING TOPICS ─── */
+.speaking-section {
+  background: var(--yellow-dim);
+  border: 1px solid rgba(251,191,36,0.12);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+}
+
+.speaking-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--yellow);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+.topic-box {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(251,191,36,0.1);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 10px;
+}
+
+.question-item {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+.question-item label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.cue-card-field {
+  margin-top: 8px;
+}
+
+/* ─── BUTTONS ─── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 18px;
+  border-radius: var(--radius-sm);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 4px 16px rgba(124,106,247,0.3);
+}
+
+.btn-primary:hover {
+  background: #8b7af9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(124,106,247,0.4);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--surface2);
+  color: var(--text);
+  border-color: var(--border-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.btn-ghost:hover { color: var(--text); background: var(--surface2); }
+
+.btn-danger-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.btn-danger-ghost:hover { color: var(--red); background: var(--red-dim); }
+
+.btn-add {
+  background: var(--surface2);
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  width: 100%;
+  justify-content: center;
+  font-size: 12px;
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-add:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+  background: var(--surface3);
+}
+
+.btn-save {
+  background: linear-gradient(135deg, #7c6af7, #a78bfa);
+  color: white;
+  padding: 12px 32px;
+  font-size: 14px;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(124,106,247,0.4);
+}
+
+.btn-save:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 32px rgba(124,106,247,0.5);
+}
+
+/* ─── ADD SECTION ─── */
+.add-section-zone {
+  border: 1.5px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.add-section-zone:hover {
+  border-color: var(--accent);
+  color: var(--accent2);
+  background: rgba(124,106,247,0.05);
+}
+
+/* ─── PROGRESS STEPS ─── */
+.progress-steps {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.step-dot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.step-dot.done {
+  background: var(--green-dim);
+  border: 1.5px solid rgba(52,211,153,0.3);
+  color: var(--green);
+}
+
+.step-dot.active {
+  background: var(--accent-glow);
+  border: 1.5px solid rgba(124,106,247,0.4);
+  color: var(--accent2);
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+
+.step-dot.pending {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  color: var(--text-dim);
+}
+
+.step-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-dim);
+}
+
+.step-text.active { color: var(--text); }
+
+.step-sep {
+  flex: 0 0 24px;
+  height: 1px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+/* ─── HIDDEN ─── */
+.hidden { display: none !important; }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ─── DURATION BADGE ─── */
+.duration-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.duration-input-wrap .input {
+  width: 80px;
+}
+
+.duration-label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* ─── SECTION ORDER ─── */
+.order-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 8px 0 16px;
+}
+
+/* ─── FOOTER ─── */
+.form-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background: rgba(255,255,255,0.95);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
+}
+
+.footer-status {
+  font-size: 12px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--yellow);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+</style>
+</head>
+<body>
+
 <!-- NAVBAR -->
-<%= render "admin/shared/navbar" %>
-<div id="alert-container"
-     class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3">
-</div>
-<div class="pt-24 px-8 pb-16 bg-slate-100 min-h-screen">
-<div class="max-w-6xl mx-auto">
-<h1 class="text-3xl font-bold text-slate-800 mb-10">
-🎓 Admin Course Editor
-</h1>
-
-<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
-
-<!-- COURSE INFO -->
-<div class="bg-white rounded-2xl shadow-lg p-8 mb-10 space-y-6">
-
-<h2 class="text-xl font-semibold border-b pb-3">📘 Course Information</h2>
-
-<%= f.text_field :title,class:"w-full border rounded-lg px-4 py-2",placeholder:"Course Title"%>
-
-<%= f.text_area :description,rows:4,class:"w-full border rounded-lg px-4 py-2",placeholder:"Description"%>
-
-<div class="grid grid-cols-2 gap-6">
-
-<%= f.number_field :price,min:0,step:1000,class:"w-full border rounded-lg px-4 py-2"%>
-
-<div>
-<% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
-
-  <%= image_tag(
-        @course.thumbnail.variant(resize_to_limit:[260,160]),
-        class:"rounded-lg mb-3 border"
-      ) %>
-
-<% end %>
-
-<%= f.file_field :thumbnail %>
+<%# render "admin/shared/navbar" %>
+<div class="topbar">
+  <div class="topbar-actions">
+    <button class="btn btn-outline" style="font-size:12px;padding:7px 14px;">Preview</button>
+  </div>
 </div>
 
-</div>
-</div>
+<!-- ALERTS -->
+<div id="alert-container"></div>
 
-<!-- COURSE STRUCTURE -->
-<div class="bg-white rounded-2xl shadow-lg p-8">
+<!-- PAGE -->
+<div class="page">
 
-<h2 class="text-xl font-semibold mb-8 border-b pb-3">
-📚 Course Structure
-</h2>
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="breadcrumb">
+      <span>Admin</span>
+      <span class="sep">›</span>
+      <span>Courses</span>
+      <span class="sep">›</span>
+      <span style="color:var(--text-muted)">IELTS Complete Course</span>
+    </div>
+    <h1 class="page-title">Course Editor</h1>
+    <p class="page-subtitle">Manage course content, lessons, and speaking exercises</p>
+  </div>
 
-<button type="button"
-onclick="addSection()"
-class="mb-6 px-5 py-2 bg-indigo-600 text-white rounded-lg">
-➕ Add Section
-</button>
+  <!-- PROGRESS -->
+  <div class="progress-steps">
+    <div class="step">
+      <div class="step-dot done">✓</div>
+      <span class="step-text">Info</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step">
+      <div class="step-dot active">2</div>
+      <span class="step-text active">Structure</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step">
+      <div class="step-dot pending">3</div>
+      <span class="step-text">Media</span>
+    </div>
+    <div class="step-sep"></div>
+    <div class="step">
+      <div class="step-dot pending">4</div>
+      <span class="step-text">Publish</span>
+    </div>
+  </div>
 
-<div id="sections" class="space-y-8">
+  <!-- COURSE INFO -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon">📘</div>
+        Course Information
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="field">
+        <label>Course Title</label>
+        <input type="text" class="input" placeholder="e.g. IELTS Complete Preparation" value="IELTS Complete Course" name="course[title]">
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <textarea class="textarea" placeholder="Describe what students will learn..." name="course[description]">Master all four IELTS skills with expert guidance, practice tests, and speaking exercises tailored for band 7+.</textarea>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label>Price (VND)</label>
+          <input type="number" class="input" placeholder="0" value="2500000" name="course[price]">
+        </div>
+        <div class="field">
+          <label>Thumbnail</label>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="previewThumbnail(this)">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-text">Drop image or click to browse</div>
+            <div class="upload-hint">JPG, PNG · Max 2MB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
-<%= f.fields_for :course_sections do |section| %>
+  <!-- COURSE STRUCTURE -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="icon">📚</div>
+        Course Structure
+      </div>
+    </div>
+    <div class="card-body" style="padding-bottom:12px;">
 
-<div class="bg-slate-50 border rounded-xl p-6 section-item">
+      <div class="order-hint">
+        <span>⠿</span> Drag sections and lessons to reorder
+      </div>
 
-<%= section.hidden_field :_destroy %>
+      <div id="sections"></div>
 
-<%= section.text_field :title,
-placeholder:"Section Title",
-class:"border rounded px-3 py-2 w-full mb-6"%>
+      <button type="button" class="add-section-zone" onclick="addSection()">
+        ＋ Add Section
+      </button>
 
-<div class="lessons space-y-6">
+    </div>
+  </div>
 
-<%= section.fields_for :lessons do |lesson| %>
-
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
-
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<%= lesson.text_field :title,class:"border rounded px-3 py-2"%>
-
-<%= lesson.number_field :duration,class:"border rounded px-3 py-2"%>
-
-</div>
-
-<label class="text-sm font-semibold">🎬 Video Upload</label>
-<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
-onchange:"handleVideoUpload(this)" %>
-<% if lesson.object.persisted? && lesson.object.video.attached? %>
-  <video controls class="mt-3 w-64 rounded">
-    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
-  </video>
-<% end %>
-
-
-
-<label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
-<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
-
-<% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
-
-  <ul class="mt-3 space-y-1 text-sm">
-
-    <% lesson.object.pdfs.each do |pdf| %>
-
-      <% next unless pdf.persisted? %>
-
-      <li>
-        📄 <%= link_to pdf.filename,
-              rails_blob_url(pdf),
-              target:"_blank",
-              class:"text-indigo-600 underline" %>
-      </li>
-
-    <% end %>
-
-  </ul>
-
-<% end %>
-
-
-
-<!-- SPEAKING -->
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises
-</h5>
-
-<%= lesson.fields_for :speaking_topics do |topic| %>
-
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
-
-<div class="grid grid-cols-2 gap-3 mb-3">
-
-<%= topic.text_field :title,class:"border px-3 py-2"%>
-
-<%= topic.select :part,
-SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
-{},
-class:"border px-3 py-2 part-select",
-onchange:"toggleCueCard(this)"%>
+  <!-- FOOTER -->
+  <div class="form-footer">
+    <div class="footer-status">
+      <div class="status-dot"></div>
+      Unsaved changes
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <button class="btn btn-outline">Cancel</button>
+      <button class="btn btn-save" onclick="saveCourse()">💾 Save Course</button>
+    </div>
+  </div>
 
 </div>
 
-<div class="questions">
-
-<%= topic.fields_for :speaking_questions do |q| %>
-
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
-
-<label class="text-xs font-semibold">Question</label>
-
-<%= q.text_area :question_text,class:"border w-full px-3 py-2 mb-3"%>
-
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-<%= q.text_area :cue_card,class:"border w-full px-3 py-2 mb-3"%>
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<%= q.number_field :preparation_time,class:"border px-3 py-2 w-full"%>
-
-<%= q.number_field :speaking_time,class:"border px-3 py-2 w-full"%>
-
-</div>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
-<% end %>
-
-</div>
-
-</div>
-
-<% end %>
-
-</div>
-
-<button type="button"
-onclick="removeSection(this)"
-class="text-red-500 mt-4">
-🗑 Remove Section
-</button>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
-<!-- TEMPLATE -->
-<template id="section-template">
-
-<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
-
-<input type="hidden"
-name="course[course_sections_attributes][NEW_SECTION][_destroy]"
-value="0">
-
-<h3 class="font-bold text-lg mb-4 text-indigo-700">
-📂 Section
-</h3>
-
-<button type="button"
-onclick="removeSection(this)"
-class="text-sm text-red-500 mb-4">
-🗑 Remove Section
-</button>
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][title]"
-placeholder="Section Title"
-class="border rounded px-3 py-2 w-full mb-6"/>
-
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
-
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
-placeholder="Lesson Title"
-class="border rounded px-3 py-2"/>
-
-<input type="number"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
-placeholder="Duration"
-class="border rounded px-3 py-2"/>
-
-</div>
-
-<label class="text-sm font-semibold">🎬 Admin Video Upload</label>
-
-<input type="file"
-accept="video/mp4"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
-class="video-input mt-2"
-onchange="handleVideoUpload(this)"/>
-
-<label class="text-sm font-semibold mt-4 block">📄 Admin PDF Materials</label>
-
-<input type="file"
-multiple
-accept="application/pdf"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
-class="pdf-input mt-2"
-onchange="handlePDFUpload(this)"/>
-
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises (Admin)
-</h5>
-
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
-
-<div class="grid grid-cols-2 gap-3 mb-3">
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
-placeholder="Topic Title"
-class="border px-3 py-2"/>
-
-<select
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
-class="border px-3 py-2 part-select"
-onchange="toggleCueCard(this)">
-
-<option value="part1">PART1</option>
-<option value="part2">PART2</option>
-<option value="part3">PART3</option>
-
-</select>
-
-</div>
-
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
-
-<label class="text-xs font-semibold">Question</label>
-
-<textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
-class="border w-full px-3 py-2 mb-3"></textarea>
-
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-
-<textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
-class="border w-full px-3 py-2 mb-3"></textarea>
-
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<input type="number"
-placeholder="Preparation Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
-class="border px-3 py-2"/>
-
-<input type="number"
-placeholder="Speaking Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
-class="border px-3 py-2"/>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+<!-- SECTION TEMPLATE -->
+<template id="section-tpl">
+  <div class="section-item" data-section-id="__SID__">
+    <div class="section-header">
+      <div class="drag-handle section-drag">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="section-badge section-num">1</div>
+      <input type="hidden" name="course[course_sections_attributes][__SID__][_destroy]" value="0">
+      <input
+        type="text"
+        class="section-title-inline"
+        name="course[course_sections_attributes][__SID__][title]"
+        placeholder="Section title…"
+      >
+      <div class="section-actions">
+        <button type="button" class="btn-icon" onclick="toggleSection(this)" title="Collapse">
+          <span class="section-toggle">▾</span>
+        </button>
+        <button type="button" class="btn-icon danger" onclick="removeSection(this)" title="Delete section">🗑</button>
+      </div>
+    </div>
+    <div class="section-body">
+      <div class="lessons-list"></div>
+      <button type="button" class="btn btn-add" onclick="addLesson(this)">＋ Add Lesson</button>
+    </div>
+  </div>
 </template>
 
+<!-- LESSON TEMPLATE -->
+<template id="lesson-tpl">
+  <div class="lesson-item" data-lesson-id="__LID__">
+    <div class="lesson-header">
+      <div class="lesson-drag">
+        <span></span><span></span>
+      </div>
+      <span class="lesson-type-badge badge-video">Video</span>
+      <input type="hidden" name="__LPREFIX__[_destroy]" value="0">
+      <input
+        type="text"
+        class="lesson-name-inline"
+        name="__LPREFIX__[title]"
+        placeholder="Lesson title…"
+      >
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input type="number" class="input" style="width:80px;padding:5px 10px;font-size:12px;" name="__LPREFIX__[duration]" placeholder="min">
+        <span style="font-size:11px;color:var(--text-dim)">min</span>
+        <button type="button" class="btn-icon danger" onclick="removeLesson(this)">🗑</button>
+      </div>
+    </div>
+    <div class="lesson-body">
+      <!-- TABS -->
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this,'video')">🎬 Video</button>
+        <button class="tab" onclick="switchTab(this,'pdf')">📄 PDF</button>
+        <button class="tab" onclick="switchTab(this,'speaking')">🎤 Speaking</button>
+      </div>
 
-<div class="flex justify-end gap-4 mt-10">
+      <div class="tab-panel active" data-tab="video">
+        <div class="upload-zone" style="text-align:left;padding:14px 16px;">
+          <input type="file" accept="video/mp4" name="__LPREFIX__[video]" onchange="handleVideoUpload(this)">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🎬</span>
+            <div>
+              <div style="font-size:13px;color:var(--text-muted);font-weight:500;">Upload video lesson</div>
+              <div style="font-size:11px;color:var(--text-dim);">MP4 · Max 5MB</div>
+            </div>
+          </div>
+        </div>
+        <div class="video-preview-wrap" style="display:none;"></div>
+      </div>
 
-<%= link_to "Cancel",admin_courses_path,class:"px-6 py-2 border rounded-lg bg-white"%>
+      <div class="tab-panel" data-tab="pdf">
+        <div class="upload-zone" style="text-align:left;padding:14px 16px;">
+          <input type="file" multiple accept="application/pdf" name="__LPREFIX__[pdfs][]" onchange="handlePDFUpload(this)">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">📄</span>
+            <div>
+              <div style="font-size:13px;color:var(--text-muted);font-weight:500;">Upload PDF materials</div>
+              <div style="font-size:11px;color:var(--text-dim);">PDF · Max 500KB each · Multiple files OK</div>
+            </div>
+          </div>
+        </div>
+        <div class="pdf-list"></div>
+      </div>
 
-<%= f.submit "💾 Save Course",
-class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"%>
+      <div class="tab-panel" data-tab="speaking">
+        <div class="speaking-section">
+          <div class="speaking-label">🎤 Speaking Exercises</div>
+          <div class="topics-container"></div>
+          <button type="button" class="btn btn-add" onclick="addTopic(this)" style="margin-top:8px;">＋ Add Topic</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
-</div>
+<!-- TOPIC TEMPLATE -->
+<template id="topic-tpl">
+  <div class="topic-box">
+    <div class="grid-2" style="margin-bottom:10px;">
+      <input type="text" class="input" name="__TPREFIX__[title]" placeholder="Topic title…">
+      <select class="select part-select" name="__TPREFIX__[part]" onchange="toggleCueCard(this)">
+        <option value="part1">PART 1</option>
+        <option value="part2">PART 2</option>
+        <option value="part3">PART 3</option>
+      </select>
+    </div>
+    <div class="questions-container"></div>
+    <button type="button" class="btn btn-add" onclick="addQuestion(this)" style="margin-top:6px;font-size:11px;">＋ Question</button>
+  </div>
+</template>
 
-<% end %>
-
-</div>
-</div>
+<!-- QUESTION TEMPLATE -->
+<template id="question-tpl">
+  <div class="question-item">
+    <label>Question</label>
+    <textarea class="textarea" style="font-size:13px;min-height:60px;" name="__QPREFIX__[question_text]" placeholder="Enter your question…"></textarea>
+    <div class="cue-card-field hidden" style="margin-top:8px;">
+      <label>Cue Card</label>
+      <textarea class="textarea" style="font-size:13px;min-height:60px;" name="__QPREFIX__[cue_card]" placeholder="Cue card instructions…"></textarea>
+    </div>
+    <div class="grid-2" style="margin-top:10px;">
+      <div>
+        <label style="font-size:10px;color:var(--text-dim);margin-bottom:4px;display:block;">PREP TIME (sec)</label>
+        <input type="number" class="input" name="__QPREFIX__[preparation_time]" placeholder="30">
+      </div>
+      <div>
+        <label style="font-size:10px;color:var(--text-dim);margin-bottom:4px;display:block;">SPEAKING TIME (sec)</label>
+        <input type="number" class="input" name="__QPREFIX__[speaking_time]" placeholder="120">
+      </div>
+    </div>
+  </div>
+</template>
 
 <script>
+// ─── COUNTERS ───
+let sectionCount = 0
+let lessonCounters = {}
 
-function addSection(){
+// ─── SORTABLE SECTIONS ───
+let sectionsListEl = document.getElementById('sections')
 
-  let template =
-    document.getElementById("section-template").innerHTML
-
-  let uniqueId = new Date().getTime()
-
-  template = template.replace(/NEW_SECTION/g, uniqueId)
-
-  let wrapper = document.createElement("div")
-  wrapper.innerHTML = template
-
-  let newSection = wrapper.firstElementChild
-
-  document.getElementById("sections")
-          .appendChild(newSection)
-
-  newSection
-    .querySelectorAll(".part-select")
-    .forEach(select => toggleCueCard(select))
-}
-
-
-
-function removeSection(btn){
-
-let section=btn.closest(".section-item")
-
-let destroyInput=section.querySelector("input[name*='_destroy']")
-
-if(destroyInput){
-destroyInput.value="1"
-section.style.display="none"
-}else{
-section.remove()
-}
-
-}
-
-
-function toggleCueCard(select){
-
-  const box = select.closest(".topic-box")
-  const cue = box.querySelector(".cue-card-field")
-
-  if(select.value==="part2"){
-    cue.classList.remove("hidden")
-  }else{
-    cue.classList.add("hidden")
-  }
-}
-</script>
-
-<script>
-
-const MAX_VIDEO = 5 * 1024 * 1024
-const MAX_PDF   = 500 * 1024
-function showAlert(type, message){
-
-  const container = document.getElementById("alert-container")
-  if(!container) return
-
-  const div = document.createElement("div")
-
-  if(type==="danger"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-pink-800 rounded-xl bg-pink-100 border border-pink-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-      </svg>
-      <p><span class="font-semibold me-1">Error:</span>${message}</p>
-    `
-  }
-
-  if(type==="success"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-emerald-800 rounded-xl bg-emerald-100 border border-emerald-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M5 13l4 4L19 7"/>
-      </svg>
-      <p><span class="font-semibold me-1">Success:</span>${message}</p>
-    `
-  }
-
-  container.appendChild(div)
-
-  setTimeout(()=>{
-    div.remove()
-  },4000)
-}
-
-
-function handleVideoUpload(input){
-const file=input.files[0]
-if(!file)return
-
-if(!file.type.includes("mp4")){
-showAlert("danger","❌ Video phải là MP4")
-input.value=""
-return
-}
-
-if(file.size>MAX_VIDEO){
-showAlert("danger","❌ Video vượt quá 5MB")
-input.value=""
-return
-}
-
-showAlert("success",`🎬 Upload video: <b>${file.name}</b>`)
-}
-
-function handlePDFUpload(input){
-
-const files=Array.from(input.files)
-if(files.length===0)return
-
-for(const file of files){
-
-if(file.type!=="application/pdf"){
-showAlert("danger",`❌ ${file.name} không phải PDF`)
-input.value=""
-return
-}
-
-if(file.size>MAX_PDF){
-showAlert("danger",`❌ ${file.name} vượt quá 500KB`)
-input.value=""
-return
-}
-
-}
-
-showAlert("success",`📄 Upload ${files.length} file PDF`)
-}
-</script>
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-
-  document.querySelectorAll(".part-select").forEach(select=>{
-    toggleCueCard(select)
-  })
-
+let sectionSortable = Sortable.create(sectionsListEl, {
+  animation: 180,
+  handle: '.section-drag',
+  ghostClass: 'sortable-ghost',
+  chosenClass: 'sortable-chosen',
+  dragClass: 'sortable-drag',
+  easing: 'cubic-bezier(0.34,1.56,0.64,1)',
+  onEnd() { updateSectionBadges() }
 })
 
+function updateSectionBadges() {
+  document.querySelectorAll('.section-item').forEach((el, i) => {
+    const badge = el.querySelector('.section-badge')
+    if (badge) badge.textContent = i + 1
+  })
+}
+
+// ─── ADD SECTION ───
+function addSection() {
+  const sid = 'S' + Date.now()
+  sectionCount++
+
+  let tpl = document.getElementById('section-tpl').innerHTML
+  tpl = tpl.replace(/__SID__/g, sid)
+
+  const wrap = document.createElement('div')
+  wrap.innerHTML = tpl
+  const el = wrap.firstElementChild
+  el.querySelector('.section-badge').textContent = document.querySelectorAll('.section-item').length + 1
+
+  sectionsListEl.appendChild(el)
+
+  // Make lessons inside sortable
+  initLessonSortable(el.querySelector('.lessons-list'))
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  el.querySelector('.section-title-inline').focus()
+}
+
+// ─── INIT LESSON SORTABLE ───
+function initLessonSortable(el) {
+  Sortable.create(el, {
+    animation: 150,
+    handle: '.lesson-drag',
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    easing: 'cubic-bezier(0.34,1.56,0.64,1)',
+  })
+}
+
+// ─── ADD LESSON ───
+function addLesson(btn) {
+  const section = btn.closest('.section-item')
+  const sid = section.dataset.sectionId
+  const lid = Date.now()
+
+  if (!lessonCounters[sid]) lessonCounters[sid] = 0
+  const lessonIdx = lessonCounters[sid]++
+
+  const prefix = `course[course_sections_attributes][${sid}][lessons_attributes][${lessonIdx}]`
+
+  let tpl = document.getElementById('lesson-tpl').innerHTML
+  tpl = tpl.replace(/__LID__/g, lid)
+  tpl = tpl.replace(/__LPREFIX__/g, prefix)
+
+  const wrap = document.createElement('div')
+  wrap.innerHTML = tpl
+  const lessonEl = wrap.firstElementChild
+
+  // init topic sortable later
+  const lessonsList = section.querySelector('.lessons-list')
+  lessonsList.appendChild(lessonEl)
+  lessonEl.querySelector('.lesson-name-inline').focus()
+}
+
+// ─── REMOVE SECTION ───
+function removeSection(btn) {
+  const section = btn.closest('.section-item')
+  const destroyInput = section.querySelector("input[name*='_destroy']")
+  if (destroyInput) {
+    destroyInput.value = '1'
+    section.style.opacity = '0'
+    section.style.transform = 'scale(0.97)'
+    section.style.transition = 'all 0.2s'
+    setTimeout(() => section.style.display = 'none', 200)
+  } else {
+    section.style.opacity = '0'
+    section.style.transform = 'scale(0.97)'
+    section.style.transition = 'all 0.2s'
+    setTimeout(() => section.remove(), 200)
+  }
+  setTimeout(updateSectionBadges, 250)
+}
+
+// ─── REMOVE LESSON ───
+function removeLesson(btn) {
+  const lesson = btn.closest('.lesson-item')
+  const destroyInput = lesson.querySelector("input[name*='_destroy']")
+  if (destroyInput) {
+    destroyInput.value = '1'
+    lesson.style.opacity = '0'
+    lesson.style.transition = 'opacity 0.2s'
+    setTimeout(() => lesson.style.display = 'none', 200)
+  } else {
+    lesson.style.opacity = '0'
+    lesson.style.transition = 'opacity 0.2s'
+    setTimeout(() => lesson.remove(), 200)
+  }
+}
+
+// ─── TOGGLE SECTION ───
+function toggleSection(btn) {
+  const section = btn.closest('.section-item')
+  section.classList.toggle('collapsed')
+}
+
+// ─── TABS ───
+function switchTab(btn, tab) {
+  const lesson = btn.closest('.lesson-item')
+  lesson.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+  lesson.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'))
+  btn.classList.add('active')
+  lesson.querySelector(`[data-tab="${tab}"]`).classList.add('active')
+
+  const badge = lesson.querySelector('.lesson-type-badge')
+  if (badge) {
+    badge.classList.remove('badge-video', 'badge-pdf', 'badge-speaking')
+    badge.classList.add(`badge-${tab}`)
+    const labels = { video: 'Video', pdf: 'PDF', speaking: 'Speaking' }
+    badge.textContent = labels[tab]
+  }
+}
+
+// ─── ADD TOPIC ───
+function addTopic(btn) {
+  const lesson = btn.closest('.lesson-item')
+  const sid = lesson.closest('.section-item').dataset.sectionId
+  const lessonId = lesson.dataset.lessonId
+  const tContainer = btn.previousElementSibling
+  const tIdx = tContainer.children.length
+
+  const prefix = /* we grab the lesson prefix from the hidden input */
+    lesson.querySelector("input[name*='_destroy']").name
+      .replace('[_destroy]', `[speaking_topics_attributes][${tIdx}]`)
+
+  let tpl = document.getElementById('topic-tpl').innerHTML
+  tpl = tpl.replace(/__TPREFIX__/g, prefix)
+
+  const wrap = document.createElement('div')
+  wrap.innerHTML = tpl
+  const el = wrap.firstElementChild
+  tContainer.appendChild(el)
+}
+
+// ─── ADD QUESTION ───
+function addQuestion(btn) {
+  const topic = btn.closest('.topic-box')
+  const qContainer = topic.querySelector('.questions-container')
+  const qIdx = qContainer.children.length
+
+  const topicPrefix = topic.querySelector("input.input[name]")?.name
+    .replace('[title]', '')
+    .replace(/\[+$/, '')
+
+  const topicSelectName = topic.querySelector('select').name
+  const basePrefix = topicSelectName.replace('[part]', `[speaking_questions_attributes][${qIdx}]`)
+
+  let tpl = document.getElementById('question-tpl').innerHTML
+  tpl = tpl.replace(/__QPREFIX__/g, basePrefix)
+
+  const wrap = document.createElement('div')
+  wrap.innerHTML = tpl
+  const el = wrap.firstElementChild
+  qContainer.appendChild(el)
+}
+
+// ─── CUE CARD ───
+function toggleCueCard(select) {
+  const box = select.closest('.topic-box')
+  const cue = box.querySelector('.cue-card-field')
+  if (select.value === 'part2') {
+    cue.classList.remove('hidden')
+  } else {
+    cue.classList.add('hidden')
+  }
+}
+
+// ─── FILE VALIDATION ───
+const MAX_VIDEO = 5 * 1024 * 1024
+const MAX_PDF   = 500 * 1024
+
+function handleVideoUpload(input) {
+  const file = input.files[0]
+  if (!file) return
+  if (!file.type.includes('mp4')) {
+    showAlert('danger', 'Video must be MP4 format')
+    input.value = ''
+    return
+  }
+  if (file.size > MAX_VIDEO) {
+    showAlert('danger', 'Video exceeds 5MB limit')
+    input.value = ''
+    return
+  }
+  const lesson = input.closest('.lesson-item')
+  const previewWrap = lesson.querySelector('.video-preview-wrap')
+  if (previewWrap) {
+    const url = URL.createObjectURL(file)
+    previewWrap.innerHTML = `<video controls class="video-preview"><source src="${url}" type="video/mp4"></video>`
+    previewWrap.style.display = 'block'
+  }
+  showAlert('success', `Video ready: <b>${file.name}</b>`)
+}
+
+function handlePDFUpload(input) {
+  const files = Array.from(input.files)
+  if (!files.length) return
+
+  for (const file of files) {
+    if (file.type !== 'application/pdf') {
+      showAlert('danger', `${file.name} is not a PDF`)
+      input.value = ''
+      return
+    }
+    if (file.size > MAX_PDF) {
+      showAlert('danger', `${file.name} exceeds 500KB`)
+      input.value = ''
+      return
+    }
+  }
+
+  const lesson = input.closest('.lesson-item')
+  const pdfList = lesson.querySelector('.pdf-list')
+  if (pdfList) {
+    pdfList.innerHTML = ''
+    files.forEach(f => {
+      const item = document.createElement('div')
+      item.className = 'pdf-item'
+      item.innerHTML = `📄 ${f.name} <span style="margin-left:auto;font-size:10px;color:var(--text-dim)">${(f.size/1024).toFixed(0)} KB</span>`
+      pdfList.appendChild(item)
+    })
+  }
+  showAlert('success', `${files.length} PDF file${files.length > 1 ? 's' : ''} selected`)
+}
+
+// ─── THUMBNAIL PREVIEW ───
+function previewThumbnail(input) {
+  const file = input.files[0]
+  if (!file) return
+  const zone = input.closest('.upload-zone')
+  const url = URL.createObjectURL(file)
+  zone.innerHTML = `<img src="${url}" style="width:100%;height:120px;object-fit:cover;border-radius:6px;">`
+}
+
+// ─── SAVE ───
+function saveCourse() {
+  showAlert('success', 'Course saved successfully!')
+  document.querySelector('.footer-status .status-dot').style.background = 'var(--green)'
+  document.querySelector('.footer-status').innerHTML = `<div class="status-dot" style="background:var(--green)"></div> All changes saved`
+}
+
+// ─── ALERTS ───
+function showAlert(type, message) {
+  const container = document.getElementById('alert-container')
+  if (!container) return
+
+  const div = document.createElement('div')
+  div.className = `alert alert-${type === 'danger' ? 'danger' : 'success'}`
+
+  const icon = type === 'danger' ? '⚠️' : '✓'
+  div.innerHTML = `
+    <span style="flex-shrink:0;">${icon}</span>
+    <span>${message}</span>
+  `
+
+  container.appendChild(div)
+  setTimeout(() => {
+    div.style.opacity = '0'
+    div.style.transform = 'translateX(10px)'
+    div.style.transition = 'all 0.3s'
+    setTimeout(() => div.remove(), 300)
+  }, 3500)
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', () => {
+  // Add a default section to start
+  addSection()
+  // Add a default lesson to first section
+  const firstSection = document.querySelector('.section-item')
+  if (firstSection) {
+    const addBtn = firstSection.querySelector('.btn-add')
+    if (addBtn) addLesson(addBtn)
+  }
+})
 </script>
+
+</body>
+</html>
