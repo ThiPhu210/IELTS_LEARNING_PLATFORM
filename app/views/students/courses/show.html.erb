@@ -789,6 +789,10 @@
         Begin Session
       </button>
       <button class="btn btn-danger hidden" id="btn-done">Stop & Submit</button>
+      <button class="btn btn-ghost hidden" id="btn-retry-recording">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 010-18 9 9 0 010 18zm0-2a7 7 0 100-14 7 7 0 000 14z"/><path d="M12 7v5l3.88 1.94"/></svg>
+        Re-record
+      </button>
       <button class="btn btn-ghost hidden" id="btn-retry">Try Again</button>
     </div>
 
@@ -824,6 +828,7 @@ const resultPanel  = document.getElementById('result-panel');
 const statusBar    = document.getElementById('status-bar');
 const btnStart     = document.getElementById('btn-start');
 const btnDone      = document.getElementById('btn-done');
+const btnRetryRecording = document.getElementById('btn-retry-recording');
 const btnRetry     = document.getElementById('btn-retry');
 
 // ── Open modal ──
@@ -883,6 +888,7 @@ function resetModal() {
   btnStart.disabled = false; 
   btnStart.textContent = 'Begin Session';
   btnDone.classList.add('hidden');
+  btnRetryRecording.classList.add('hidden');
   btnRetry.classList.add('hidden');
 }
 
@@ -1131,6 +1137,7 @@ async function finishSpeaking() {
   log('Finishing speaking...');
 
   btnDone.classList.add('hidden');
+  btnRetryRecording.classList.add('hidden');
   waveform.classList.remove('active');
   stopRecognition();
   if (resolveTimer) { resolveTimer(); resolveTimer = null; }
@@ -1179,6 +1186,7 @@ function showResult(result, animate) {
 function showRetry() {
   btnStart.classList.add('hidden');
   btnDone.classList.add('hidden');
+  btnRetryRecording.classList.add('hidden');
   btnRetry.classList.remove('hidden');
 }
 
@@ -1213,6 +1221,7 @@ btnStart.addEventListener('click', async () => {
   setPhaseBadge('Speaking', 'active-speak');
   btnStart.classList.add('hidden');
   btnDone.classList.remove('hidden');
+  btnRetryRecording.classList.remove('hidden');  // 🔥 Show Re-record button
   showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
 
   await runTimer(currentData.speak, 'Speaking', 'active-speak', 'speaking');
@@ -1226,6 +1235,40 @@ btnStart.addEventListener('click', async () => {
 btnDone.addEventListener('click', async () => {
   log('Stop & Submit clicked');
   await finishSpeaking();
+});
+
+btnRetryRecording.addEventListener('click', () => {
+  log('Re-record clicked');
+  stopRecording(); 
+  stopRecognition();
+  clearInterval(timerInterval);
+  clearInterval(monitorAudioInterval);
+  if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+  
+  // Reset and restart from speaking phase
+  finalTranscript = ''; 
+  interimTranscript = '';
+  transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
+  currentPhase = 'speaking';
+  setPhaseBadge('Speaking', 'active-speak');
+  waveform.classList.remove('active');
+  
+  showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
+  
+  // Restart recording and recognition
+  startRecording().then(success => {
+    if (success) {
+      startRecognition();
+      runTimer(currentData.speak, 'Speaking', 'active-speak', 'speaking').then(() => {
+        if (currentPhase === 'speaking') {
+          log('Timer ended naturally after re-record');
+          finishSpeaking();
+        }
+      });
+    } else {
+      showStatus('error', 'Failed to start recording');
+    }
+  });
 });
 
 btnRetry.addEventListener('click', () => {
