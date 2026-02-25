@@ -494,9 +494,11 @@
     font-size: 0.875rem;
     line-height: 1.7;
     color: var(--text2);
-    max-height: 140px;
+    max-height: 200px;
     overflow-y: auto;
     scroll-behavior: smooth;
+    word-wrap: break-word;
+    white-space: pre-wrap;
   }
   .transcript-content::-webkit-scrollbar { width: 4px; }
   .transcript-content::-webkit-scrollbar-track { background: transparent; }
@@ -806,8 +808,9 @@ let currentData = {}, currentQid = null;
 let timerInterval = null, totalSeconds = 0;
 let currentPhase = 'idle';
 let resolveTimer = null;
+let userManuallyScrolled = false;
+let audioContext = null, analyser = null, monitorAudioInterval = null;
 
-// Lưu kết quả theo question id để xem lại
 const resultCache = {};
 
 const modal        = document.getElementById('speaking-modal');
@@ -836,7 +839,6 @@ document.querySelectorAll('.open-modal-btn').forEach(btn => {
     modalQText.textContent = btn.dataset.question;
     resetModal();
 
-    // Nếu có kết quả cũ, hiện luôn
     if (resultCache[currentQid]) {
       showResult(resultCache[currentQid], false);
     }
@@ -850,10 +852,11 @@ modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
 function closeModal() {
   log('Close modal, phase:', currentPhase);
-  // Nếu đang upload/evaluate — vẫn cho đóng, background tự chạy
   if (currentPhase === 'speaking') {
-    stopRecording(); stopRecognition();
+    stopRecording(); 
+    stopRecognition();
     clearInterval(timerInterval);
+    clearInterval(monitorAudioInterval);
     if (resolveTimer) { resolveTimer(); resolveTimer = null; }
   }
   currentPhase = 'idle';
@@ -862,17 +865,23 @@ function closeModal() {
 
 // ── Reset ──
 function resetModal() {
-  finalTranscript = ''; interimTranscript = '';
-  currentPhase = 'idle'; resolveTimer = null;
+  finalTranscript = ''; 
+  interimTranscript = '';
+  currentPhase = 'idle'; 
+  resolveTimer = null;
+  userManuallyScrolled = false;
   transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
   resultPanel.classList.remove('visible');
-  statusBar.className = 'status-bar'; statusBar.textContent = '';
+  statusBar.className = 'status-bar'; 
+  statusBar.textContent = '';
   setPhaseBadge('Ready', '');
   timerDisp.textContent = '—';
   timerBar.style.width = '100%';
   timerBar.className = 'timer-bar';
   waveform.classList.remove('active');
-  btnStart.classList.remove('hidden'); btnStart.disabled = false; btnStart.textContent = 'Begin Session';
+  btnStart.classList.remove('hidden'); 
+  btnStart.disabled = false; 
+  btnStart.textContent = 'Begin Session';
   btnDone.classList.add('hidden');
   btnRetry.classList.add('hidden');
 }
@@ -885,7 +894,8 @@ function setPhaseBadge(text, cls) {
 // ── Timer ──
 function runTimer(seconds, label, badgeCls, barCls) {
   return new Promise(resolve => {
-    totalSeconds = seconds; let remaining = seconds;
+    totalSeconds = seconds; 
+    let remaining = seconds;
     log(`Timer: "${label}" (${seconds}s)`);
     setPhaseBadge(label, badgeCls);
     timerBar.className = 'timer-bar ' + (barCls || '');
@@ -903,63 +913,175 @@ function runTimer(seconds, label, badgeCls, barCls) {
   });
 }
 
-// ── Speech Recognition ──
+// ── Speech Recognition with Enhanced Logging ──
 function startRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) { log('SpeechRecognition not supported'); return; }
+  
+  if (!SR) {
+    logE('SpeechRecognition not supported in this browser');
+    showStatus('error', '🎙️ Browser không hỗ trợ Speech Recognition');
+    return;
+  }
+  
   recognition = new SR();
-  recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
-  recognition.onstart = () => log('Recognition started');
-  recognition.onend   = () => log('Recognition ended');
-  recognition.onerror = e => logE('Recognition error', e.error);
-// ✅ NEW - Smart auto-scroll
-let userManuallyScrolled = false;
-
-// Detect user scroll
-transcriptEl.addEventListener('scroll', () => {
-  // Check if user scrolled away from bottom
-  const isAtBottom = 
-    transcriptEl.scrollTop + transcriptEl.clientHeight >= 
-    transcriptEl.scrollHeight - 10;  // 10px tolerance
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
   
-  userManuallyScrolled = !isAtBottom;
-  console.log('User scrolled away from bottom:', userManuallyScrolled);
-});
-
-recognition.onresult = event => {
-  interimTranscript = '';
-  for (let i = event.resultIndex; i < event.results.length; i++) {
-    const t = event.results[i][0].transcript;
-    if (event.results[i].isFinal) { finalTranscript += t + ' '; }
-    else interimTranscript += t;
-  }
-  transcriptEl.innerHTML =
-    '<span>' + finalTranscript + '</span>' +
-    '<span class="transcript-interim">' + interimTranscript + '</span>';
+  recognition.onstart = () => {
+    log('✅ Recognition started');
+    showStatus('info', '🎤 Listening... Speak now!');
+  };
   
-  // 🔥 Smart auto-scroll
-  if (!userManuallyScrolled) {
-    // User ở cuối → auto-scroll xuống
-    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  recognition.onend = () => {
+    log('⚠️ Recognition ended');
+  };
+  
+  recognition.onerror = e => {
+    logE('Recognition error:', e.error);
+    showStatus('error', `❌ Microphone error: ${e.error}`);
+  };
+  
+  recognition.onresult = event => {
+    console.log('🎤 Result event:', event.results.length);
+    
+    interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const t = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += t + ' ';
+        log('✅ Final:', t);
+      } else {
+        interimTranscript += t;
+        log('⏳ Interim:', t);
+      }
+    }
+    
+    transcriptEl.innerHTML =
+      '<span>' + finalTranscript + '</span>' +
+      '<span class="transcript-interim">' + interimTranscript + '</span>';
+    
+    if (!userManuallyScrolled) {
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    }
+  };
+  
+  transcriptEl.addEventListener('scroll', () => {
+    const isAtBottom = 
+      transcriptEl.scrollTop + transcriptEl.clientHeight >= 
+      transcriptEl.scrollHeight - 10;
+    
+    userManuallyScrolled = !isAtBottom;
+    console.log('User scrolled away from bottom:', userManuallyScrolled);
+  });
+  
+  try {
+    recognition.start();
+  } catch(err) {
+    logE('Failed to start recognition:', err);
+    showStatus('error', '❌ Cannot start microphone');
   }
-  // Nếu user đã scroll lên → không auto-scroll
-};
-  recognition.start();
 }
 
 function stopRecognition() {
   try { if (recognition) recognition.stop(); } catch(e) {}
 }
 
-// ── MediaRecorder ──
+// ── Audio Quality Detector ──
+async function checkAudioQuality(audioStream) {
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioContext.createAnalyser();
+  const source = audioContext.createMediaStreamSource(audioStream);
+  source.connect(analyser);
+  
+  analyser.fftSize = 2048;
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+  
+  let maxVolume = 0;
+  let checkCount = 0;
+  
+  return new Promise(resolve => {
+    const checkInterval = setInterval(() => {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      maxVolume = Math.max(maxVolume, average);
+      
+      console.log(`📊 Audio level: ${average.toFixed(2)}`);
+      
+      checkCount++;
+      if (checkCount > 10) {
+        clearInterval(checkInterval);
+        
+        if (maxVolume < 5) {
+          resolve({ quality: 'MUTED', message: '🔇 Microphone quá yếu hoặc bị mute' });
+        } else if (maxVolume < 20) {
+          resolve({ quality: 'LOW', message: '🔉 Âm thanh quá yếu, hãy nói to hơn' });
+        } else {
+          resolve({ quality: 'GOOD', message: '✅ Âm thanh tốt' });
+        }
+      }
+    }, 50);
+  });
+}
+
+// ── MediaRecorder with Enhanced Audio Monitoring ──
 async function startRecording() {
-  log('Requesting mic...');
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  audioChunks = [];
-  mediaRecorder = new MediaRecorder(stream);
-  mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-  mediaRecorder.start();
-  log('Recording started');
+  log('🎤 Requesting microphone...');
+  
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    
+    const audioQuality = await checkAudioQuality(stream);
+    log('Audio quality:', audioQuality);
+    showStatus('info', audioQuality.message);
+    
+    if (audioQuality.quality === 'MUTED') {
+      stream.getTracks().forEach(t => t.stop());
+      showStatus('error', '❌ ' + audioQuality.message);
+      return false;
+    }
+    
+    analyser.fftSize = 256;
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    
+    monitorAudioInterval = setInterval(() => {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+      
+      if (average > 10) {
+        waveform.classList.add('active');
+        log(`🔊 Audio detected: ${average.toFixed(2)}`);
+      } else {
+        waveform.classList.remove('active');
+      }
+    }, 100);
+    
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.start();
+    
+    log('✅ Recording started, monitoring audio...');
+    
+    mediaRecorder.onstop = () => {
+      clearInterval(monitorAudioInterval);
+      if (audioContext) audioContext.close();
+    };
+    
+    return true;
+    
+  } catch(err) {
+    logE('Microphone error:', err.name);
+    
+    if (err.name === 'NotAllowedError') {
+      showStatus('error', '❌ Microphone permission denied');
+    } else if (err.name === 'NotFoundError') {
+      showStatus('error', '❌ Microphone not found');
+    } else {
+      showStatus('error', '❌ Microphone error: ' + err.message);
+    }
+    return false;
+  }
 }
 
 function stopRecording() {
@@ -1029,7 +1151,6 @@ async function finishSpeaking() {
     const result = await uploadAttempt(audioBlob);
     resultCache[currentQid] = result;
     showResult(result, true);
-    // Hiện chip "View last result" trên card
     const chip = document.getElementById('chip-' + currentQid);
     if (chip) chip.classList.add('visible');
   } catch(err) {
@@ -1078,19 +1199,18 @@ btnStart.addEventListener('click', async () => {
   await runTimer(currentData.prep, 'Preparation', 'active-prep', '');
   if (currentPhase !== 'prep') return;
 
-  try {
-    await startRecording();
-    startRecognition();
-  } catch(err) {
-    logE('Mic error', err);
-    showStatus('error', 'Microphone access denied. Please allow mic access and retry.');
-    btnStart.disabled = false; btnStart.textContent = 'Begin Session';
-    currentPhase = 'idle'; return;
+  const recordingStarted = await startRecording();
+  if (!recordingStarted) {
+    btnStart.disabled = false; 
+    btnStart.textContent = 'Begin Session';
+    currentPhase = 'idle'; 
+    return;
   }
+
+  startRecognition();
 
   currentPhase = 'speaking';
   setPhaseBadge('Speaking', 'active-speak');
-  waveform.classList.add('active');
   btnStart.classList.add('hidden');
   btnDone.classList.remove('hidden');
   showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
@@ -1110,8 +1230,10 @@ btnDone.addEventListener('click', async () => {
 
 btnRetry.addEventListener('click', () => {
   log('Try Again clicked');
-  stopRecording(); stopRecognition();
+  stopRecording(); 
+  stopRecognition();
   clearInterval(timerInterval);
+  clearInterval(monitorAudioInterval);
   resetModal();
 });
 
