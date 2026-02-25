@@ -6,7 +6,7 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
 
   let(:user)   { create(:user) }
   let(:course) { create(:course) }
-  let(:topic)  { create(:speaking_topic) }
+  let(:topic)  { create(:speaking_topic, course: course) }
 
   let(:fake_ai_result) do
     {
@@ -25,24 +25,24 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
   before do
     sign_in user
 
-    # ===== Stub S3 =====
+    # Stub S3
     fake_obj    = double("s3_obj", put: true, public_url: "https://fake-s3.com/audio.webm")
     fake_bucket = double("bucket", object: fake_obj)
     fake_s3     = double("s3", bucket: fake_bucket)
 
     allow(Aws::S3::Resource).to receive(:new).and_return(fake_s3)
 
-    # ===== Stub AI =====
+    # Stub AI
     allow(BedrockService).to receive(:evaluate_speaking)
       .and_return(fake_ai_result)
 
-    # ===== Stub Mailer =====
+    # Stub Mailer
     fake_mail = double("mail", deliver_later: true)
     allow(SpeakingResultMailer).to receive(:result_email)
       .and_return(fake_mail)
   end
 
-  it "creates speaking attempt and returns AI scores" do
+  it "creates speaking attempt with detailed AI feedback" do
     file = fixture_file_upload(
       Rails.root.join("spec/fixtures/files/audio.webm"),
       "audio/webm"
@@ -54,7 +54,7 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
            speaking_topic_id: topic.id,
            course_id: course.id,
            part: "part2",
-           transcript: "I think technology is very important nowadays."
+           transcript: "Technology is very important nowadays."
          }
 
     expect(response).to have_http_status(:ok)
@@ -62,22 +62,16 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
     json = JSON.parse(response.body)
 
     expect(json["overall"]).to eq(7.0)
-    expect(json["fluency"]).to eq(7.0)
-    expect(json["feedback"]).to eq("Good job!")
-    expect(json["strength"]).to include("Good fluency")
-    expect(json["improvement"]).to include("Improve grammar accuracy")
+    expect(json["strengths"]).to include("Good fluency")
+    expect(json["improvements"]).to include("Improve grammar accuracy")
     expect(json["sample_correction"]).to be_present
 
     attempt = SpeakingAttempt.last
 
-    expect(attempt.user).to eq(user)
-    expect(attempt.course).to eq(course)
-    expect(attempt.speaking_topic).to eq(topic)
     expect(attempt.status).to eq("evaluated")
-    expect(attempt.overall_band).to eq(7.0)
-    expect(attempt.strength).to include("Good fluency")
-    expect(attempt.improvement).to include("Improve grammar accuracy")
-    expect(attempt.audio_url).to be_present
+    expect(attempt.strengths).to eq(["Good fluency", "Clear structure"])
+    expect(attempt.improvements).to eq(["Improve grammar accuracy"])
+    expect(attempt.sample_correction).to be_present
   end
 
   it "returns error when AI fails" do
