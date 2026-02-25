@@ -252,13 +252,15 @@ Chỉnh sửa Khóa học
 <div>
 <label class="block text-xs font-semibold text-slate-600 mb-1">Thời gian chuẩn bị (s)</label>
 <%= q.number_field :preparation_time,
-    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition",
+    value: (q.object.preparation_time.present? ? q.object.preparation_time : 60)
 %>
 </div>
 <div>
 <label class="block text-xs font-semibold text-slate-600 mb-1">Thời gian nói (s)</label>
 <%= q.number_field :speaking_time,
-    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition",
+    value: (q.object.speaking_time.present? ? q.object.speaking_time : 120)
 %>
 </div>
 </div>
@@ -407,12 +409,14 @@ value="0">
 <input type="number"
        placeholder="Thời gian chuẩn bị"
        name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
-       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"/>
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+       value="60"/>
 
 <input type="number"
        placeholder="Thời gian nói"
        name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
-       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"/>
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+       value="120"/>
 </div>
 
 </div>
