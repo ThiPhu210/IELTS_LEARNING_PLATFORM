@@ -37,7 +37,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── Layout ── */
   .lms-wrapper { padding-top: 72px; min-height: 100vh; }
 
   .lms-container {
@@ -46,7 +45,6 @@
     padding: 36px 24px 80px;
   }
 
-  /* ── Course Header ── */
   .course-header {
     background: var(--white);
     border: 1px solid var(--border);
@@ -83,7 +81,6 @@
     line-height: 1.65;
   }
 
-  /* ── Section ── */
   .section-block { margin-bottom: 24px; }
 
   .section-label {
@@ -96,7 +93,6 @@
     padding-left: 2px;
   }
 
-  /* ── Lesson Card ── */
   .lesson-card {
     background: var(--white);
     border: 1px solid var(--border);
@@ -151,7 +147,6 @@
     white-space: nowrap;
   }
 
-  /* ── Video ── */
   .video-wrap {
     border-radius: 8px;
     overflow: hidden;
@@ -161,7 +156,6 @@
   }
   .video-wrap video { width: 100%; display: block; max-height: 400px; }
 
-  /* ── PDF ── */
   .pdf-section { margin-bottom: 20px; }
   .block-label {
     font-size: 11px;
@@ -188,7 +182,6 @@
   }
   .pdf-link:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-s); }
 
-  /* ── Speaking Section ── */
   .speaking-section {
     border-top: 1px solid var(--border);
     padding-top: 20px;
@@ -240,7 +233,6 @@
   .part-tag.part2 { background: #fffbeb; color: #d97706; border: 1px solid #fde68a; }
   .part-tag.part3 { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; }
 
-  /* ── Question Row ── */
   .question-row {
     padding: 16px;
     border-bottom: 1px solid var(--border);
@@ -303,7 +295,6 @@
     gap: 8px;
   }
 
-  /* Previous result chip */
   .prev-result {
     display: none;
     align-items: center;
@@ -321,7 +312,6 @@
   .prev-result:hover { background: #dcfce7; }
   .prev-result.visible { display: inline-flex; }
 
-  /* ── Buttons ── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -345,7 +335,6 @@
   .btn:disabled { opacity: 0.45; cursor: not-allowed; }
   .btn.hidden { display: none; }
 
-  /* ── Modal ── */
   .modal-overlay {
     display: none;
     position: fixed; inset: 0;
@@ -407,7 +396,6 @@
 
   .modal-body { padding: 20px 24px; }
 
-  /* ── Phase / Timer ── */
   .phase-row {
     display: flex;
     align-items: center;
@@ -437,7 +425,6 @@
     letter-spacing: -0.5px;
   }
 
-  /* Progress bar */
   .timer-bar-wrap {
     height: 4px;
     background: var(--border);
@@ -454,7 +441,6 @@
   }
   .timer-bar.speaking { background: var(--danger); }
 
-  /* Waveform */
   .waveform {
     display: flex;
     align-items: center;
@@ -474,7 +460,6 @@
   }
   @keyframes wave { 0%,100%{height:4px} 50%{height:24px} }
 
-  /* ── Transcript Box ── */
   .transcript-box {
     background: var(--bg);
     border: 1px solid var(--border);
@@ -506,7 +491,6 @@
   .transcript-placeholder { color: var(--muted2); font-style: italic; }
   .transcript-interim { color: var(--muted); font-style: italic; }
 
-  /* ── Result Panel ── */
   .result-panel { display: none; }
   .result-panel.visible { display: block; }
 
@@ -572,7 +556,6 @@
     color: var(--text2);
   }
 
-  /* ── Status bar ── */
   .status-bar {
     display: none;
     padding: 8px 12px;
@@ -593,13 +576,13 @@
     border-top: 1px solid var(--border);
     background: #fafafa;
     border-radius: 0 0 14px 14px;
+    flex-wrap: wrap;
   }
 </style>
 
 <div class="lms-wrapper">
 <div class="lms-container">
 
-  <!-- Course Header -->
   <div class="course-header">
     <div class="course-meta">
       <svg width="12" height="12" fill="currentColor" viewBox="0 0 20 20"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.357l4-2.286a.75.75 0 01.788 1.283L7.25 8.705 8 9.032V13.5a1 1 0 001 1h2a1 1 0 001-1V9.032l.606-.273 3.143-1.419A1 1 0 0017 6.42V6a1 1 0 00-.606-.92l-6-2.58z"/></svg>
@@ -611,7 +594,6 @@
     <% end %>
   </div>
 
-  <!-- Sections -->
   <% @sections.each_with_index do |section, si| %>
   <div class="section-block">
     <p class="section-label">Section <%= si + 1 %> — <%= section.title %></p>
@@ -633,7 +615,6 @@
 
       <div class="lesson-body">
 
-        <!-- Video -->
         <% if lesson.video.attached? %>
           <div class="video-wrap">
             <video controls>
@@ -642,7 +623,6 @@
           </div>
         <% end %>
 
-        <!-- PDFs -->
         <% if lesson.pdfs.attached? %>
           <div class="pdf-section">
             <p class="block-label">Lesson Materials</p>
@@ -657,7 +637,6 @@
           </div>
         <% end %>
 
-        <!-- Speaking -->
         <% if lesson.speaking_topics.any? %>
           <div class="speaking-section">
             <p class="speaking-section-title">
@@ -705,7 +684,6 @@
                     Start Speaking
                   </button>
 
-                  <!-- Chip hiện kết quả cũ nếu có -->
                   <span class="prev-result" id="chip-<%= q.id %>" onclick="showPrevResult('<%= q.id %>')">
                     <svg width="10" height="10" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
                     View last result
@@ -728,7 +706,6 @@
 </div>
 </div>
 
-<!-- Speaking Modal -->
 <div class="modal-overlay" id="speaking-modal">
   <div class="modal">
 
@@ -739,7 +716,6 @@
 
     <div class="modal-body">
 
-      <!-- Phase + Timer -->
       <div class="phase-row">
         <span class="phase-badge" id="phase-badge">Ready</span>
         <span class="timer-display" id="timer-display">—</span>
@@ -748,14 +724,12 @@
         <div class="timer-bar" id="timer-bar" style="width:100%"></div>
       </div>
 
-      <!-- Waveform -->
       <div class="waveform" id="waveform">
         <% 16.times do |i| %>
           <div class="waveform-bar" style="animation-delay:<%= i*0.05 %>s"></div>
         <% end %>
       </div>
 
-      <!-- Transcript -->
       <div class="transcript-box" id="transcript-box">
         <p class="transcript-box-label">Live Transcript</p>
         <div class="transcript-content" id="transcript-content">
@@ -763,7 +737,6 @@
         </div>
       </div>
 
-      <!-- Result Panel (ẩn, hiện khi có kết quả) -->
       <div class="result-panel" id="result-panel">
         <div class="result-band">
           <div class="result-band-num" id="res-overall">—</div>
@@ -778,7 +751,6 @@
         <div class="result-feedback" id="res-feedback"></div>
       </div>
 
-      <!-- Status -->
       <div class="status-bar" id="status-bar"></div>
 
     </div>
@@ -789,9 +761,10 @@
         Begin Session
       </button>
       <button class="btn btn-danger hidden" id="btn-done">Stop & Submit</button>
-      <button class="btn btn-ghost hidden" id="btn-retry-recording">
-        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 010-18 9 9 0 010 18zm0-2a7 7 0 100-14 7 7 0 000 14z"/><path d="M12 7v5l3.88 1.94"/></svg>
-        Re-record
+      <button class="btn btn-ghost hidden" id="btn-rerecord">🔄 Re-record</button>
+      <button class="btn btn-primary hidden" id="btn-submit">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+        Submit
       </button>
       <button class="btn btn-ghost hidden" id="btn-retry">Try Again</button>
     </div>
@@ -800,12 +773,10 @@
 </div>
 
 <script>
-// ── Logger ──
 const LOG = '[Speaking]';
 const log  = (m, d) => d !== undefined ? console.log(LOG, m, d) : console.log(LOG, m);
 const logE = (m, e) => console.error(LOG, '❌', m, e || '');
 
-// ── State ──
 let mediaRecorder, audioChunks = [];
 let recognition, finalTranscript = '', interimTranscript = '';
 let currentData = {}, currentQid = null;
@@ -814,6 +785,7 @@ let currentPhase = 'idle';
 let resolveTimer = null;
 let userManuallyScrolled = false;
 let audioContext = null, analyser = null, monitorAudioInterval = null;
+let timerEnded = false;
 
 const resultCache = {};
 
@@ -828,10 +800,10 @@ const resultPanel  = document.getElementById('result-panel');
 const statusBar    = document.getElementById('status-bar');
 const btnStart     = document.getElementById('btn-start');
 const btnDone      = document.getElementById('btn-done');
-const btnRetryRecording = document.getElementById('btn-retry-recording');
+const btnRerecord  = document.getElementById('btn-rerecord');
+const btnSubmit    = document.getElementById('btn-submit');
 const btnRetry     = document.getElementById('btn-retry');
 
-// ── Open modal ──
 document.querySelectorAll('.open-modal-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     currentData = {
@@ -851,7 +823,6 @@ document.querySelectorAll('.open-modal-btn').forEach(btn => {
   });
 });
 
-// ── Close ──
 document.getElementById('modal-close-btn').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 
@@ -868,13 +839,13 @@ function closeModal() {
   modal.classList.remove('active');
 }
 
-// ── Reset ──
 function resetModal() {
   finalTranscript = ''; 
   interimTranscript = '';
   currentPhase = 'idle'; 
   resolveTimer = null;
   userManuallyScrolled = false;
+  timerEnded = false;
   transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
   resultPanel.classList.remove('visible');
   statusBar.className = 'status-bar'; 
@@ -888,7 +859,8 @@ function resetModal() {
   btnStart.disabled = false; 
   btnStart.textContent = 'Begin Session';
   btnDone.classList.add('hidden');
-  btnRetryRecording.classList.add('hidden');
+  btnRerecord.classList.add('hidden');
+  btnSubmit.classList.add('hidden');
   btnRetry.classList.add('hidden');
 }
 
@@ -897,7 +869,6 @@ function setPhaseBadge(text, cls) {
   phaseBadge.className = 'phase-badge' + (cls ? ' ' + cls : '');
 }
 
-// ── Timer ──
 function runTimer(seconds, label, badgeCls, barCls) {
   return new Promise(resolve => {
     totalSeconds = seconds; 
@@ -914,17 +885,21 @@ function runTimer(seconds, label, badgeCls, barCls) {
       remaining--;
       timerDisp.textContent = remaining;
       timerBar.style.width = (remaining / totalSeconds * 100) + '%';
-      if (remaining <= 0) { clearInterval(timerInterval); resolveTimer = null; resolve(); }
+      if (remaining <= 0) { 
+        clearInterval(timerInterval); 
+        resolveTimer = null;
+        timerEnded = true;
+        resolve(); 
+      }
     }, 1000);
   });
 }
 
-// ── Speech Recognition with Enhanced Logging ──
 function startRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   
   if (!SR) {
-    logE('SpeechRecognition not supported in this browser');
+    logE('SpeechRecognition not supported');
     showStatus('error', '🎙️ Browser không hỗ trợ Speech Recognition');
     return;
   }
@@ -959,7 +934,6 @@ function startRecognition() {
         log('✅ Final:', t);
       } else {
         interimTranscript += t;
-        log('⏳ Interim:', t);
       }
     }
     
@@ -978,7 +952,6 @@ function startRecognition() {
       transcriptEl.scrollHeight - 10;
     
     userManuallyScrolled = !isAtBottom;
-    console.log('User scrolled away from bottom:', userManuallyScrolled);
   });
   
   try {
@@ -993,7 +966,6 @@ function stopRecognition() {
   try { if (recognition) recognition.stop(); } catch(e) {}
 }
 
-// ── Audio Quality Detector ──
 async function checkAudioQuality(audioStream) {
   audioContext = new (window.AudioContext || window.webkitAudioContext)();
   analyser = audioContext.createAnalyser();
@@ -1012,8 +984,6 @@ async function checkAudioQuality(audioStream) {
       const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
       maxVolume = Math.max(maxVolume, average);
       
-      console.log(`📊 Audio level: ${average.toFixed(2)}`);
-      
       checkCount++;
       if (checkCount > 10) {
         clearInterval(checkInterval);
@@ -1030,7 +1000,6 @@ async function checkAudioQuality(audioStream) {
   });
 }
 
-// ── MediaRecorder with Enhanced Audio Monitoring ──
 async function startRecording() {
   log('🎤 Requesting microphone...');
   
@@ -1056,7 +1025,6 @@ async function startRecording() {
       
       if (average > 10) {
         waveform.classList.add('active');
-        log(`🔊 Audio detected: ${average.toFixed(2)}`);
       } else {
         waveform.classList.remove('active');
       }
@@ -1067,7 +1035,7 @@ async function startRecording() {
     mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
     mediaRecorder.start();
     
-    log('✅ Recording started, monitoring audio...');
+    log('✅ Recording started');
     
     mediaRecorder.onstop = () => {
       clearInterval(monitorAudioInterval);
@@ -1104,10 +1072,8 @@ function stopRecording() {
   });
 }
 
-// ── Upload ──
 async function uploadAttempt(audioBlob) {
   const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-  if (!csrf) logE('CSRF token missing');
 
   log('Uploading, transcript chars:', finalTranscript.length);
   const form = new FormData();
@@ -1125,19 +1091,18 @@ async function uploadAttempt(audioBlob) {
 
   const text = await res.text();
   log('Response status:', res.status);
-  log('Response body:', text);
   if (!res.ok) throw new Error(`Server ${res.status}: ${text}`);
   return JSON.parse(text);
 }
 
-// ── Finish Speaking ──
 async function finishSpeaking() {
   if (currentPhase !== 'speaking') return;
   currentPhase = 'uploading';
   log('Finishing speaking...');
 
   btnDone.classList.add('hidden');
-  btnRetryRecording.classList.add('hidden');
+  btnRerecord.classList.add('hidden');
+  btnSubmit.classList.add('hidden');
   waveform.classList.remove('active');
   stopRecognition();
   if (resolveTimer) { resolveTimer(); resolveTimer = null; }
@@ -1151,7 +1116,8 @@ async function finishSpeaking() {
   if (!audioBlob || audioBlob.size === 0) {
     logE('Blob empty');
     showStatus('error', 'Recording is empty. Please try again.');
-    showRetry(); return;
+    showRetryAfterError(); 
+    return;
   }
 
   try {
@@ -1163,12 +1129,11 @@ async function finishSpeaking() {
   } catch(err) {
     logE('Upload failed', err);
     showStatus('error', 'Upload failed: ' + err.message);
-    showRetry();
+    showRetryAfterError();
   }
 }
 
-// ── Show Result ──
-function showResult(result, animate) {
+function showResult(result) {
   currentPhase = 'done';
   document.getElementById('res-overall').textContent      = result.overall ?? '—';
   document.getElementById('res-fluency').textContent      = result.fluency ?? '—';
@@ -1180,23 +1145,30 @@ function showResult(result, animate) {
   resultPanel.classList.add('visible');
   setPhaseBadge('Completed', 'active-done');
   showStatus('success', 'Evaluation complete. A result email will be sent to you.');
-  showRetry();
+  showRetryButton();
 }
 
-function showRetry() {
+function showRetryButton() {
   btnStart.classList.add('hidden');
   btnDone.classList.add('hidden');
-  btnRetryRecording.classList.add('hidden');
+  btnRerecord.classList.add('hidden');
+  btnSubmit.classList.add('hidden');
   btnRetry.classList.remove('hidden');
 }
 
-// ── View previous result ──
+function showRetryAfterError() {
+  btnStart.classList.add('hidden');
+  btnDone.classList.add('hidden');
+  btnRerecord.classList.add('hidden');
+  btnSubmit.classList.add('hidden');
+  btnRetry.classList.remove('hidden');
+}
+
 function showPrevResult(qid) {
   const btn = document.querySelector(`[data-qid="${qid}"]`);
   if (btn) btn.click();
 }
 
-// ── Button events ──
 btnStart.addEventListener('click', async () => {
   log('Begin Session');
   btnStart.disabled = true;
@@ -1218,17 +1190,22 @@ btnStart.addEventListener('click', async () => {
   startRecognition();
 
   currentPhase = 'speaking';
+  timerEnded = false;
   setPhaseBadge('Speaking', 'active-speak');
   btnStart.classList.add('hidden');
   btnDone.classList.remove('hidden');
-  btnRetryRecording.classList.remove('hidden');  // 🔥 Show Re-record button
-  showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
+  btnRerecord.classList.remove('hidden');
+  showStatus('info', 'Recording in progress. "Stop & Submit" to finish early, "Re-record" to try again.');
 
   await runTimer(currentData.speak, 'Speaking', 'active-speak', 'speaking');
 
   if (currentPhase === 'speaking') {
     log('Timer ended naturally');
-    await finishSpeaking();
+    timerEnded = true;
+    btnDone.classList.add('hidden');
+    btnRerecord.classList.add('hidden');
+    btnSubmit.classList.remove('hidden');
+    showStatus('warn', '⏱️ Time ended. Click "Submit" to submit or "Re-record" to try again.');
   }
 });
 
@@ -1237,7 +1214,7 @@ btnDone.addEventListener('click', async () => {
   await finishSpeaking();
 });
 
-btnRetryRecording.addEventListener('click', () => {
+btnRerecord.addEventListener('click', () => {
   log('Re-record clicked');
   stopRecording(); 
   stopRecognition();
@@ -1245,30 +1222,39 @@ btnRetryRecording.addEventListener('click', () => {
   clearInterval(monitorAudioInterval);
   if (resolveTimer) { resolveTimer(); resolveTimer = null; }
   
-  // Reset and restart from speaking phase
   finalTranscript = ''; 
   interimTranscript = '';
   transcriptEl.innerHTML = '<span class="transcript-placeholder">Your words will appear here as you speak...</span>';
   currentPhase = 'speaking';
+  timerEnded = false;
   setPhaseBadge('Speaking', 'active-speak');
   waveform.classList.remove('active');
+  btnSubmit.classList.add('hidden');
   
-  showStatus('info', 'Recording in progress. Press "Stop & Submit" when you are done.');
+  showStatus('info', 'Recording in progress. "Stop & Submit" to finish early, "Re-record" to try again.');
   
-  // Restart recording and recognition
   startRecording().then(success => {
     if (success) {
       startRecognition();
       runTimer(currentData.speak, 'Speaking', 'active-speak', 'speaking').then(() => {
         if (currentPhase === 'speaking') {
-          log('Timer ended naturally after re-record');
-          finishSpeaking();
+          log('Timer ended after re-record');
+          timerEnded = true;
+          btnDone.classList.add('hidden');
+          btnRerecord.classList.add('hidden');
+          btnSubmit.classList.remove('hidden');
+          showStatus('warn', '⏱️ Time ended. Click "Submit" to submit or "Re-record" to try again.');
         }
       });
     } else {
       showStatus('error', 'Failed to start recording');
     }
   });
+});
+
+btnSubmit.addEventListener('click', async () => {
+  log('Submit clicked');
+  await finishSpeaking();
 });
 
 btnRetry.addEventListener('click', () => {
