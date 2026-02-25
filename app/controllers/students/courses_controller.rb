@@ -35,7 +35,12 @@ def show
   @course = Course.find(params[:id])
   @sections = @course.course_sections.includes(lessons: [:speaking_topics => :speaking_questions])
 end
-
+  def dashboard
+    @course = Course.find(params[:id])
+    @attempts = current_user.speaking_attempts
+                            .where(course_id: @course.id)
+                            .order(:created_at)
+  end
 
   private
 
