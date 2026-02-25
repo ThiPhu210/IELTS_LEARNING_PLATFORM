@@ -912,19 +912,38 @@ function startRecognition() {
   recognition.onstart = () => log('Recognition started');
   recognition.onend   = () => log('Recognition ended');
   recognition.onerror = e => logE('Recognition error', e.error);
-  recognition.onresult = event => {
-    interimTranscript = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const t = event.results[i][0].transcript;
-      if (event.results[i].isFinal) { finalTranscript += t + ' '; }
-      else interimTranscript += t;
-    }
-    transcriptEl.innerHTML =
-      '<span>' + finalTranscript + '</span>' +
-      '<span class="transcript-interim">' + interimTranscript + '</span>';
-    // Auto scroll xuống cuối
+// ✅ NEW - Smart auto-scroll
+let userManuallyScrolled = false;
+
+// Detect user scroll
+transcriptEl.addEventListener('scroll', () => {
+  // Check if user scrolled away from bottom
+  const isAtBottom = 
+    transcriptEl.scrollTop + transcriptEl.clientHeight >= 
+    transcriptEl.scrollHeight - 10;  // 10px tolerance
+  
+  userManuallyScrolled = !isAtBottom;
+  console.log('User scrolled away from bottom:', userManuallyScrolled);
+});
+
+recognition.onresult = event => {
+  interimTranscript = '';
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const t = event.results[i][0].transcript;
+    if (event.results[i].isFinal) { finalTranscript += t + ' '; }
+    else interimTranscript += t;
+  }
+  transcriptEl.innerHTML =
+    '<span>' + finalTranscript + '</span>' +
+    '<span class="transcript-interim">' + interimTranscript + '</span>';
+  
+  // 🔥 Smart auto-scroll
+  if (!userManuallyScrolled) {
+    // User ở cuối → auto-scroll xuống
     transcriptEl.scrollTop = transcriptEl.scrollHeight;
-  };
+  }
+  // Nếu user đã scroll lên → không auto-scroll
+};
   recognition.start();
 }
 
