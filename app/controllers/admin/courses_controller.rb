@@ -183,8 +183,8 @@ class Admin::CoursesController < Admin::BaseController
             
             question.question_text = q_data[:question_text]
             question.cue_card = q_data[:cue_card]
-            question.preparation_time = q_data[:preparation_time]
-            question.speaking_time = q_data[:speaking_time]
+            question.preparation_time = q_data[:preparation_time].to_i if q_data[:preparation_time].present?
+            question.speaking_time = q_data[:speaking_time].to_i if q_data[:speaking_time].present?
             
             unless question.save
               Rails.logger.debug "Question save failed: #{question.errors.full_messages}"
