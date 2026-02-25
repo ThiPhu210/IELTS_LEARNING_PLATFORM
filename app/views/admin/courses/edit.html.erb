@@ -694,31 +694,54 @@ function showAlert(type, message) {
 }
 
 // ============ FORM SUBMIT CLEANUP ============
-// Trước khi submit, xoá những lessons không thuộc section này
+// Thêm course_section_id vào mỗi lesson để Rails biết lesson thuộc section nào
 document.querySelectorAll("form").forEach(form => {
   form.addEventListener("submit", function(e) {
-    // Validate: xoá lessons không hợp lệ
     const sections = document.querySelectorAll(".section-item");
+    
     sections.forEach((section, sIdx) => {
+      // Lấy section ID từ hidden field hoặc data attribute
+      const sectionIdInput = section.querySelector("input[name*='_destroy']");
+      let sectionId = null;
+      
+      // Parse section ID từ name attribute: course[course_sections_attributes][0][_destroy]
+      const sectionNameMatch = sectionIdInput?.name?.match(/course_sections_attributes\]\[(\d+)\]/);
+      if (sectionNameMatch) {
+        const oldSectionIdx = sectionNameMatch[1];
+        const idInput = section.querySelector(`input[name*="course_sections_attributes][${oldSectionIdx}][id]"`);
+        if (idInput) {
+          sectionId = idInput.value;
+        }
+      }
+      
+      if (!sectionId) {
+        console.warn("Could not find section ID for section", sIdx);
+        return;
+      }
+      
       const lessons = section.querySelectorAll(".lesson-item");
       lessons.forEach((lesson, lIdx) => {
-        // Đảm bảo lesson input names match với section index
-        const inputs = lesson.querySelectorAll("input[name], textarea[name], select[name]");
-        inputs.forEach(inp => {
-          if (!inp.name) return;
-          // Chỉ fix nếu name không khớp
-          if (!inp.name.includes(`course_sections_attributes][${sIdx}]`)) {
-            console.warn("Fixing nested name for lesson", inp.name);
-            inp.name = inp.name.replace(
-              /course_sections_attributes\]\[\d+\]/,
-              `course_sections_attributes][${sIdx}]`
-            );
+        // Thêm hidden input course_section_id nếu chưa có
+        if (!lesson.querySelector("input[name*='course_section_id']")) {
+          const hiddenInput = document.createElement("input");
+          hiddenInput.type = "hidden";
+          // Extract lesson index từ name
+          const lessonInputs = lesson.querySelectorAll("input[name], textarea[name], select[name]");
+          const firstInput = Array.from(lessonInputs)[0];
+          if (firstInput && firstInput.name) {
+            const lessonIdxMatch = firstInput.name.match(/lessons_attributes\]\[(\d+)\]/);
+            if (lessonIdxMatch) {
+              const lessonIdx = lessonIdxMatch[1];
+              hiddenInput.name = `course[course_sections_attributes][${sIdx}][lessons_attributes][${lessonIdx}][course_section_id]`;
+              hiddenInput.value = sectionId;
+              lesson.insertBefore(hiddenInput, lesson.firstChild);
+            }
           }
-        });
+        }
       });
     });
     
-    console.log("✅ Form ready to submit");
+    console.log("✅ Form ready to submit with course_section_id");
   });
 });
 function handleVideoUpload(input) {
