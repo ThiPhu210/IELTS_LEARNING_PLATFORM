@@ -33,15 +33,18 @@ namespace :students do
       get  :stripe_success
       get  :stripe_cancel
       post :stripe_webhook
-
     end
   end
 
   # ================== COURSES ==================
   resources :courses, only: [ :index, :show ] do
+    member do
+      get :dashboard
+    end
+
     resources :orders, only: [ :new, :create, :show ] do
       member do
-        get  :checkout
+        get :checkout
       end
     end
   end
