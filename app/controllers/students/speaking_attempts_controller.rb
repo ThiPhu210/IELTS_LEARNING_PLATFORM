@@ -5,14 +5,8 @@ class Students::SpeakingAttemptsController < ApplicationController
   def create
     audio = params[:audio]
 
-    return render json: { error: "Audio file missing" }, status: :unprocessable_entity if audio.blank?
-
     key = "speaking/#{SecureRandom.uuid}.webm"
-
-    s3 = Aws::S3::Resource.new(
-      region: ENV["AWS_REGION"]
-    )
-
+    s3  = Aws::S3::Resource.new
     obj = s3.bucket("ielts-learning-platform-uploads").object(key)
     obj.put(body: audio.read)
 
@@ -26,14 +20,7 @@ class Students::SpeakingAttemptsController < ApplicationController
       status: "processing"
     )
 
-    # =============================
-    # Call Bedrock AI
-    # =============================
     result = BedrockService.evaluate_speaking(attempt.transcript)
-
-    # Safe parsing
-    strengths_text = Array(result["strengths"]).join("\n• ")
-    improvements_text = Array(result["improvements"]).join("\n• ")
 
     attempt.update!(
       overall_band: result["overall"],
@@ -41,10 +28,10 @@ class Students::SpeakingAttemptsController < ApplicationController
       lexical_score: result["lexical"],
       grammar_score: result["grammar"],
       pronunciation_score: result["pronunciation"],
-      strength: strengths_text.presence,
-      improvement: improvements_text.presence,
-      sample_correction: result["sample_correction"],
       feedback: result["feedback"],
+      strength: Array(result["strengths"]).join("\n• "),
+      improvement: Array(result["improvements"]).join("\n• "),
+      sample_correction: result["sample_correction"],
       status: "evaluated"
     )
 
@@ -56,21 +43,16 @@ class Students::SpeakingAttemptsController < ApplicationController
       lexical: attempt.lexical_score,
       grammar: attempt.grammar_score,
       pronunciation: attempt.pronunciation_score,
+      feedback: attempt.feedback,
       strength: attempt.strength,
       improvement: attempt.improvement,
-      sample_correction: attempt.sample_correction,
-      feedback: attempt.feedback
+      sample_correction: attempt.sample_correction
     }
 
-  rescue JSON::ParserError => e
-    Rails.logger.error "JSON parse error: #{e.message}"
-    attempt&.update(status: "failed")
-    render json: { error: "AI returned invalid JSON" }, status: :unprocessable_entity
-
   rescue => e
-    Rails.logger.error "Bedrock error: #{e.message}"
-    Rails.logger.error e.backtrace.first(5).join("\n")
     attempt&.update(status: "failed")
-    render json: { error: "AI evaluation failed" }, status: :unprocessable_entity
+
+    render json: { error: "AI evaluation failed: #{e.message}" },
+           status: :unprocessable_entity
   end
 end
