@@ -1,167 +1,270 @@
 <!-- NAVBAR -->
 <%= render "admin/shared/navbar" %>
+
+<!-- ALERT CONTAINER - Fixed góc phải dưới navbar -->
 <div id="alert-container"
-     class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3">
+     class="fixed top-24 right-6 z-50 w-full max-w-sm space-y-2 pointer-events-none">
 </div>
-<div class="pt-24 px-8 pb-16 bg-slate-100 min-h-screen">
-<div class="max-w-6xl mx-auto">
-<h1 class="text-3xl font-bold text-slate-800 mb-10">
-🎓 Admin Course Editor
+
+<!-- MAIN CONTAINER -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 pt-24 pb-16 px-6">
+<div class="max-w-5xl mx-auto">
+
+<!-- HEADER SECTION -->
+<div class="mb-12">
+<h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+Chỉnh sửa Khóa học
 </h1>
+<p class="text-slate-500 text-sm">Quản lý nội dung, bài học và bài tập nói tiếng Anh</p>
+</div>
 
 <%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
 
-<!-- COURSE INFO -->
-<div class="bg-white rounded-2xl shadow-lg p-8 mb-10 space-y-6">
+<!-- COURSE INFO SECTION -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 mb-8">
 
-<h2 class="text-xl font-semibold border-b pb-3">📘 Course Information</h2>
+<div class="flex items-center gap-2 mb-6 pb-4 border-b border-slate-200">
+<span class="text-2xl">📚</span>
+<h2 class="text-xl font-semibold text-slate-800">Thông tin khóa học</h2>
+</div>
 
-<%= f.text_field :title,class:"w-full border rounded-lg px-4 py-2",placeholder:"Course Title"%>
-
-<%= f.text_area :description,rows:4,class:"w-full border rounded-lg px-4 py-2",placeholder:"Description"%>
-
-<div class="grid grid-cols-2 gap-6">
-
-<%= f.number_field :price,min:0,step:1000,class:"w-full border rounded-lg px-4 py-2"%>
-
+<div class="space-y-5">
+<!-- Course Title -->
 <div>
+<label class="block text-sm font-semibold text-slate-700 mb-2">Tên khóa học</label>
+<%= f.text_field :title,
+    class:"w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition",
+    placeholder:"VD: IELTS Speaking Band 7+"
+%>
+</div>
+
+<!-- Course Description -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-2">Mô tả</label>
+<%= f.text_area :description,
+    rows:4,
+    class:"w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition resize-none",
+    placeholder:"Mô tả chi tiết về nội dung khóa học..."
+%>
+</div>
+
+<!-- Price & Thumbnail -->
+<div class="grid grid-cols-2 gap-6">
+<!-- Price -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-2">Giá (VNĐ)</label>
+<%= f.number_field :price,
+    min:0,
+    step:1000,
+    class:"w-full border border-slate-300 rounded-lg px-4 py-3 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition"
+%>
+</div>
+
+<!-- Thumbnail -->
+<div>
+<label class="block text-sm font-semibold text-slate-700 mb-2">Hình thumbnail</label>
 <% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
-
-  <%= image_tag(
-        @course.thumbnail.variant(resize_to_limit:[260,160]),
-        class:"rounded-lg mb-3 border"
-      ) %>
-
+<div class="mb-3 overflow-hidden rounded-lg border border-slate-200">
+<%= image_tag(
+      @course.thumbnail.variant(resize_to_limit:[300,180]),
+      class:"w-full h-auto object-cover"
+  ) %>
+</div>
 <% end %>
-
-<%= f.file_field :thumbnail %>
+<div class="relative">
+<%= f.file_field :thumbnail,
+    class:"block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer"
+%>
+</div>
+</div>
+</div>
 </div>
 
 </div>
+
+<!-- COURSE STRUCTURE SECTION -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
+
+<div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-200">
+<div class="flex items-center gap-2">
+<span class="text-2xl">📖</span>
+<h2 class="text-xl font-semibold text-slate-800">Cấu trúc khóa học</h2>
 </div>
-
-<!-- COURSE STRUCTURE -->
-<div class="bg-white rounded-2xl shadow-lg p-8">
-
-<h2 class="text-xl font-semibold mb-8 border-b pb-3">
-📚 Course Structure
-</h2>
-
 <button type="button"
-onclick="addSection()"
-class="mb-6 px-5 py-2 bg-indigo-600 text-white rounded-lg">
-➕ Add Section
+    onclick="addSection()"
+    class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition shadow-sm">
+<span>+</span> Thêm chương
 </button>
+</div>
 
-<div id="sections" class="space-y-8">
+<div id="sections" class="space-y-6 pb-6" data-draggable-list="true">
 
 <%= f.fields_for :course_sections do |section| %>
 
-<div class="bg-slate-50 border rounded-xl p-6 section-item">
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl p-6 section-item cursor-grab active:cursor-grabbing transition hover:shadow-md"
+     draggable="true"
+     data-section-id="<%= section.index %>">
 
 <%= section.hidden_field :_destroy %>
 
-<%= section.text_field :title,
-placeholder:"Section Title",
-class:"border rounded px-3 py-2 w-full mb-6"%>
+<!-- Section Header -->
+<div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-300">
+<span class="text-lg">::::</span>
+<input type="text"
+       value="<%= section.object.title %>"
+       name="<%= section.object_name %>[title]"
+       placeholder="Tên chương"
+       class="flex-1 border border-slate-300 rounded-lg px-4 py-2 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+<button type="button"
+        onclick="removeSection(this)"
+        class="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition text-sm font-medium">
+🗑 Xóa
+</button>
+</div>
 
-<div class="lessons space-y-6">
+<!-- Lessons in Section -->
+<div class="lessons space-y-6 ml-2">
 
 <%= section.fields_for :lessons do |lesson| %>
 
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
+<div class="lesson-item bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:shadow-sm transition">
 
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<%= lesson.text_field :title,class:"border rounded px-3 py-2"%>
-
-<%= lesson.number_field :duration,class:"border rounded px-3 py-2"%>
-
+<!-- Lesson Title & Duration -->
+<div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-200">
+<span class="text-lg">📹</span>
+<div class="flex-1 grid grid-cols-3 gap-4">
+<div class="col-span-2">
+<label class="block text-xs font-semibold text-slate-600 mb-1">Tên bài học</label>
+<%= lesson.text_field :title,
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+%>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Thời lượng (phút)</label>
+<%= lesson.number_field :duration,
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+%>
+</div>
+</div>
 </div>
 
-<label class="text-sm font-semibold">🎬 Video Upload</label>
-<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
-onchange:"handleVideoUpload(this)" %>
+<!-- Video Upload -->
+<div class="mb-6">
+<label class="block text-sm font-semibold text-slate-700 mb-2">Video bài học (MP4)</label>
+<div class="relative">
+<%= lesson.file_field :video,
+    accept:"video/mp4",
+    class:"block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer",
+    onchange:"handleVideoUpload(this)"
+%>
+</div>
 <% if lesson.object.persisted? && lesson.object.video.attached? %>
-  <video controls class="mt-3 w-64 rounded">
-    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
-  </video>
+<div class="mt-3 rounded-lg overflow-hidden border border-slate-200 bg-black">
+<video controls class="w-full h-64">
+  <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
+</video>
+</div>
 <% end %>
+</div>
 
-
-
-<label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
-<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
-
+<!-- PDF Materials -->
+<div class="mb-6">
+<label class="block text-sm font-semibold text-slate-700 mb-2">Tài liệu PDF</label>
+<div class="relative">
+<%= lesson.file_field :pdfs,
+    multiple:true,
+    accept:"application/pdf",
+    class:"block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition cursor-pointer",
+    onchange:"handlePDFUpload(this)"
+%>
+</div>
 <% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
-
-  <ul class="mt-3 space-y-1 text-sm">
-
-    <% lesson.object.pdfs.each do |pdf| %>
-
-      <% next unless pdf.persisted? %>
-
-      <li>
-        📄 <%= link_to pdf.filename,
-              rails_blob_url(pdf),
-              target:"_blank",
-              class:"text-indigo-600 underline" %>
-      </li>
-
-    <% end %>
-
-  </ul>
-
+<div class="mt-3 space-y-2">
+<% lesson.object.pdfs.each do |pdf| %>
+<% next unless pdf.persisted? %>
+<div class="flex items-center gap-2 p-2 bg-amber-50 border border-amber-200 rounded-lg">
+<span>📄</span>
+<%= link_to pdf.filename,
+      rails_blob_url(pdf),
+      target:"_blank",
+      class:"text-amber-700 hover:text-amber-900 underline text-sm"
+%>
+</div>
 <% end %>
+</div>
+<% end %>
+</div>
 
+<!-- Speaking Exercises -->
+<div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 mt-6">
 
-
-<!-- SPEAKING -->
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises
-</h5>
+<div class="flex items-center gap-2 mb-5 pb-3 border-b border-emerald-300">
+<span class="text-lg">🎤</span>
+<h4 class="font-bold text-emerald-900">Bài tập nói</h4>
+</div>
 
 <%= lesson.fields_for :speaking_topics do |topic| %>
 
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
+<div class="topic-box bg-white border border-emerald-300 rounded-xl p-5 mb-5">
 
-<div class="grid grid-cols-2 gap-3 mb-3">
-
-<%= topic.text_field :title,class:"border px-3 py-2"%>
-
+<!-- Topic Title & Part -->
+<div class="grid grid-cols-2 gap-4 mb-5 pb-4 border-b border-emerald-200">
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Chủ đề</label>
+<%= topic.text_field :title,
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+%>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Phần thi</label>
 <%= topic.select :part,
-SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
-{},
-class:"border px-3 py-2 part-select",
-onchange:"toggleCueCard(this)"%>
-
+    SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
+    {},
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition part-select",
+    onchange:"toggleCueCard(this)"
+%>
+</div>
 </div>
 
-<div class="questions">
+<!-- Questions -->
+<div class="questions space-y-4">
 
 <%= topic.fields_for :speaking_questions do |q| %>
 
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+<div class="question-item bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-300 rounded-lg p-4">
 
-<label class="text-xs font-semibold">Question</label>
+<label class="block text-xs font-semibold text-slate-700 mb-2">Câu hỏi</label>
+<%= q.text_area :question_text,
+    class:"border border-slate-300 w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition resize-none",
+    rows:3
+%>
 
-<%= q.text_area :question_text,class:"border w-full px-3 py-2 mb-3"%>
-
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-<%= q.text_area :cue_card,class:"border w-full px-3 py-2 mb-3"%>
+<div class="cue-card-field hidden mt-4">
+<label class="block text-xs font-semibold text-slate-700 mb-2">Cue Card</label>
+<%= q.text_area :cue_card,
+    class:"border border-slate-300 w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition resize-none",
+    rows:3
+%>
 </div>
 
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-3 mt-4">
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Thời gian chuẩn bị (s)</label>
+<%= q.number_field :preparation_time,
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+%>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Thời gian nói (s)</label>
+<%= q.number_field :speaking_time,
+    class:"w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"
+%>
+</div>
+</div>
 
-<%= q.number_field :preparation_time,class:"border px-3 py-2 w-full"%>
+</div>
 
-<%= q.number_field :speaking_time,class:"border px-3 py-2 w-full"%>
+<% end %>
 
 </div>
 
@@ -170,6 +273,13 @@ onchange:"toggleCueCard(this)"%>
 <% end %>
 
 </div>
+
+</div>
+
+<% end %>
+
+</div>
+
 </div>
 
 <% end %>
@@ -178,140 +288,130 @@ onchange:"toggleCueCard(this)"%>
 
 </div>
 
-<% end %>
-
-</div>
-
-<button type="button"
-onclick="removeSection(this)"
-class="text-red-500 mt-4">
-🗑 Remove Section
-</button>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
-<!-- TEMPLATE -->
+<!-- TEMPLATE (Hidden) -->
 <template id="section-template">
 
-<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
+<div class="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl p-6 mt-8 section-item cursor-grab active:cursor-grabbing transition hover:shadow-md"
+     draggable="true"
+     data-section-id="NEW_SECTION">
 
 <input type="hidden"
 name="course[course_sections_attributes][NEW_SECTION][_destroy]"
 value="0">
 
-<h3 class="font-bold text-lg mb-4 text-indigo-700">
-📂 Section
-</h3>
-
+<!-- Section Header -->
+<div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-300">
+<span class="text-lg">::::</span>
+<input type="text"
+       placeholder="Tên chương"
+       name="course[course_sections_attributes][NEW_SECTION][title]"
+       class="flex-1 border border-slate-300 rounded-lg px-4 py-2 text-slate-900 font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
 <button type="button"
-onclick="removeSection(this)"
-class="text-sm text-red-500 mb-4">
-🗑 Remove Section
+        onclick="removeSection(this)"
+        class="px-3 py-1 text-red-600 hover:bg-red-50 rounded-lg transition text-sm font-medium">
+🗑 Xóa
 </button>
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][title]"
-placeholder="Section Title"
-class="border rounded px-3 py-2 w-full mb-6"/>
-
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
-
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
-placeholder="Lesson Title"
-class="border rounded px-3 py-2"/>
-
-<input type="number"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
-placeholder="Duration"
-class="border rounded px-3 py-2"/>
-
 </div>
 
-<label class="text-sm font-semibold">🎬 Admin Video Upload</label>
+<!-- Lesson -->
+<div class="lesson-item bg-white border border-slate-200 rounded-xl p-6 shadow-xs hover:shadow-sm transition">
 
-<input type="file"
-accept="video/mp4"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
-class="video-input mt-2"
-onchange="handleVideoUpload(this)"/>
-
-<label class="text-sm font-semibold mt-4 block">📄 Admin PDF Materials</label>
-
-<input type="file"
-multiple
-accept="application/pdf"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
-class="pdf-input mt-2"
-onchange="handlePDFUpload(this)"/>
-
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises (Admin)
-</h5>
-
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
-
-<div class="grid grid-cols-2 gap-3 mb-3">
-
+<!-- Lesson Title & Duration -->
+<div class="flex items-center gap-3 mb-5 pb-4 border-b border-slate-200">
+<span class="text-lg">📹</span>
+<div class="flex-1 grid grid-cols-3 gap-4">
+<div class="col-span-2">
+<label class="block text-xs font-semibold text-slate-600 mb-1">Tên bài học</label>
 <input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
-placeholder="Topic Title"
-class="border px-3 py-2"/>
+       placeholder="Tên bài học"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+</div>
+<div>
+<label class="block text-xs font-semibold text-slate-600 mb-1">Thời lượng (phút)</label>
+<input type="number"
+       placeholder="Thời lượng"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition"/>
+</div>
+</div>
+</div>
+
+<!-- Video Upload -->
+<div class="mb-6">
+<label class="block text-sm font-semibold text-slate-700 mb-2">Video bài học (MP4)</label>
+<input type="file"
+       accept="video/mp4"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
+       class="video-input block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition cursor-pointer"
+       onchange="handleVideoUpload(this)"/>
+</div>
+
+<!-- PDF Upload -->
+<div class="mb-6">
+<label class="block text-sm font-semibold text-slate-700 mb-2">Tài liệu PDF</label>
+<input type="file"
+       multiple
+       accept="application/pdf"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
+       class="pdf-input block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100 transition cursor-pointer"
+       onchange="handlePDFUpload(this)"/>
+</div>
+
+<!-- Speaking Exercises -->
+<div class="bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-xl p-6 mt-6">
+
+<div class="flex items-center gap-2 mb-5 pb-3 border-b border-emerald-300">
+<span class="text-lg">🎤</span>
+<h4 class="font-bold text-emerald-900">Bài tập nói</h4>
+</div>
+
+<div class="topic-box bg-white border border-emerald-300 rounded-xl p-5">
+
+<!-- Topic Title & Part -->
+<div class="grid grid-cols-2 gap-4 mb-5 pb-4 border-b border-emerald-200">
+<input type="text"
+       placeholder="Chủ đề"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"/>
 
 <select
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
-class="border px-3 py-2 part-select"
-onchange="toggleCueCard(this)">
-
-<option value="part1">PART1</option>
-<option value="part2">PART2</option>
-<option value="part3">PART3</option>
-
+    name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
+    class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition part-select"
+    onchange="toggleCueCard(this)">
+<option value="part1">PART 1</option>
+<option value="part2">PART 2</option>
+<option value="part3">PART 3</option>
 </select>
-
 </div>
 
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
+<!-- Question -->
+<div class="question-item bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-300 rounded-lg p-4">
 
-<label class="text-xs font-semibold">Question</label>
-
+<label class="block text-xs font-semibold text-slate-700 mb-2">Câu hỏi</label>
 <textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
-class="border w-full px-3 py-2 mb-3"></textarea>
+    name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
+    class="border border-slate-300 w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition resize-none"
+    rows="3"></textarea>
 
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-
+<div class="cue-card-field hidden mt-4">
+<label class="block text-xs font-semibold text-slate-700 mb-2">Cue Card</label>
 <textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
-class="border w-full px-3 py-2 mb-3"></textarea>
-
+    name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
+    class="border border-slate-300 w-full px-3 py-2 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition resize-none"
+    rows="3"></textarea>
 </div>
 
-<div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-3 mt-4">
+<input type="number"
+       placeholder="Thời gian chuẩn bị"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"/>
 
 <input type="number"
-placeholder="Preparation Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
-class="border px-3 py-2"/>
-
-<input type="number"
-placeholder="Speaking Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
-class="border px-3 py-2"/>
-
+       placeholder="Thời gian nói"
+       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
+       class="w-full border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition"/>
 </div>
 
 </div>
@@ -324,13 +424,16 @@ class="border px-3 py-2"/>
 
 </template>
 
+<!-- ACTION BUTTONS -->
+<div class="flex justify-end gap-3 mt-12 pt-8 border-t border-slate-200">
 
-<div class="flex justify-end gap-4 mt-10">
+<%= link_to "Hủy",admin_courses_path,
+    class:"inline-flex items-center gap-2 px-6 py-3 border border-slate-300 rounded-lg bg-white text-slate-700 hover:bg-slate-50 font-medium transition"
+%>
 
-<%= link_to "Cancel",admin_courses_path,class:"px-6 py-2 border rounded-lg bg-white"%>
-
-<%= f.submit "💾 Save Course",
-class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"%>
+<%= f.submit "💾 Lưu khóa học",
+    class:"inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-medium shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-blue-800 transition"
+%>
 
 </div>
 
@@ -339,164 +442,219 @@ class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"
 </div>
 </div>
 
+<!-- JAVASCRIPT -->
 <script>
 
-function addSection(){
+// ============ DRAG & DROP SECTIONS ============
+let draggedElement = null;
 
-  let template =
-    document.getElementById("section-template").innerHTML
+document.addEventListener("DOMContentLoaded", function() {
+  setupDragDrop();
+  setupCueCards();
+});
 
-  let uniqueId = new Date().getTime()
+function setupDragDrop() {
+  const sectionsContainer = document.getElementById("sections");
+  if (!sectionsContainer) return;
 
-  template = template.replace(/NEW_SECTION/g, uniqueId)
-
-  let wrapper = document.createElement("div")
-  wrapper.innerHTML = template
-
-  let newSection = wrapper.firstElementChild
-
-  document.getElementById("sections")
-          .appendChild(newSection)
-
-  newSection
-    .querySelectorAll(".part-select")
-    .forEach(select => toggleCueCard(select))
+  const sections = sectionsContainer.querySelectorAll(".section-item");
+  
+  sections.forEach(section => {
+    section.addEventListener("dragstart", handleDragStart);
+    section.addEventListener("dragend", handleDragEnd);
+    section.addEventListener("dragover", handleDragOver);
+    section.addEventListener("drop", handleDrop);
+    section.addEventListener("dragenter", handleDragEnter);
+    section.addEventListener("dragleave", handleDragLeave);
+  });
 }
 
-
-
-function removeSection(btn){
-
-let section=btn.closest(".section-item")
-
-let destroyInput=section.querySelector("input[name*='_destroy']")
-
-if(destroyInput){
-destroyInput.value="1"
-section.style.display="none"
-}else{
-section.remove()
+function handleDragStart(e) {
+  draggedElement = this;
+  this.style.opacity = "0.5";
+  e.dataTransfer.effectAllowed = "move";
 }
 
+function handleDragEnd(e) {
+  this.style.opacity = "1";
+  document.querySelectorAll(".section-item").forEach(el => {
+    el.classList.remove("border-blue-400", "bg-blue-50");
+  });
+  draggedElement = null;
 }
 
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+}
 
-function toggleCueCard(select){
-
-  const box = select.closest(".topic-box")
-  const cue = box.querySelector(".cue-card-field")
-
-  if(select.value==="part2"){
-    cue.classList.remove("hidden")
-  }else{
-    cue.classList.add("hidden")
+function handleDragEnter(e) {
+  if (this !== draggedElement) {
+    this.classList.add("border-blue-400", "bg-blue-50");
   }
 }
-</script>
 
-<script>
+function handleDragLeave(e) {
+  this.classList.remove("border-blue-400", "bg-blue-50");
+}
 
-const MAX_VIDEO = 5 * 1024 * 1024
-const MAX_PDF   = 500 * 1024
-function showAlert(type, message){
+function handleDrop(e) {
+  e.preventDefault();
+  
+  if (this !== draggedElement && draggedElement) {
+    const container = document.getElementById("sections");
+    const allSections = Array.from(container.querySelectorAll(".section-item"));
+    const draggedIndex = allSections.indexOf(draggedElement);
+    const targetIndex = allSections.indexOf(this);
+    
+    if (draggedIndex < targetIndex) {
+      this.parentNode.insertBefore(draggedElement, this.nextSibling);
+    } else {
+      this.parentNode.insertBefore(draggedElement, this);
+    }
+  }
+  
+  this.classList.remove("border-blue-400", "bg-blue-50");
+}
 
-  const container = document.getElementById("alert-container")
-  if(!container) return
+// ============ ADD SECTION ============
+function addSection() {
+  let template = document.getElementById("section-template").innerHTML;
+  let uniqueId = new Date().getTime();
+  template = template.replace(/NEW_SECTION/g, uniqueId);
 
-  const div = document.createElement("div")
+  let wrapper = document.createElement("div");
+  wrapper.innerHTML = template;
+  let newSection = wrapper.firstElementChild;
 
-  if(type==="danger"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-pink-800 rounded-xl bg-pink-100 border border-pink-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-      </svg>
-      <p><span class="font-semibold me-1">Error:</span>${message}</p>
-    `
+  document.getElementById("sections").appendChild(newSection);
+
+  // Setup drag-drop cho section mới
+  newSection.addEventListener("dragstart", handleDragStart);
+  newSection.addEventListener("dragend", handleDragEnd);
+  newSection.addEventListener("dragover", handleDragOver);
+  newSection.addEventListener("drop", handleDrop);
+  newSection.addEventListener("dragenter", handleDragEnter);
+  newSection.addEventListener("dragleave", handleDragLeave);
+
+  // Setup cue card toggle
+  newSection.querySelectorAll(".part-select").forEach(select => {
+    select.addEventListener("change", () => toggleCueCard(select));
+    toggleCueCard(select);
+  });
+}
+
+// ============ REMOVE SECTION ============
+function removeSection(btn) {
+  let section = btn.closest(".section-item");
+  let destroyInput = section.querySelector("input[name*='_destroy']");
+
+  if (destroyInput) {
+    destroyInput.value = "1";
+    section.style.display = "none";
+  } else {
+    section.remove();
+  }
+}
+
+// ============ CUE CARD TOGGLE ============
+function setupCueCards() {
+  document.querySelectorAll(".part-select").forEach(select => {
+    toggleCueCard(select);
+  });
+}
+
+function toggleCueCard(select) {
+  const box = select.closest(".topic-box");
+  if (!box) return;
+  
+  const cueField = box.querySelector(".cue-card-field");
+  if (!cueField) return;
+
+  if (select.value === "part2") {
+    cueField.classList.remove("hidden");
+  } else {
+    cueField.classList.add("hidden");
+  }
+}
+
+// ============ ALERTS ============
+const MAX_VIDEO = 5 * 1024 * 1024;
+const MAX_PDF = 500 * 1024;
+
+function showAlert(type, message) {
+  const container = document.getElementById("alert-container");
+  if (!container) return;
+
+  const div = document.createElement("div");
+  div.className = "pointer-events-auto";
+
+  if (type === "danger") {
+    div.innerHTML = `
+      <div class="flex items-start p-4 text-sm text-red-800 rounded-lg bg-red-50 border border-red-200 shadow-lg">
+        <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4v.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <p><span class="font-semibold">Lỗi:</span> ${message}</p>
+      </div>
+    `;
+  } else if (type === "success") {
+    div.innerHTML = `
+      <div class="flex items-start p-4 text-sm text-green-800 rounded-lg bg-green-50 border border-green-200 shadow-lg">
+        <svg class="w-5 h-5 mr-3 flex-shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        <p><span class="font-semibold">Thành công:</span> ${message}</p>
+      </div>
+    `;
   }
 
-  if(type==="success"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-emerald-800 rounded-xl bg-emerald-100 border border-emerald-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M5 13l4 4L19 7"/>
-      </svg>
-      <p><span class="font-semibold me-1">Success:</span>${message}</p>
-    `
+  container.appendChild(div);
+
+  setTimeout(() => {
+    div.remove();
+  }, 4000);
+}
+
+// ============ FILE UPLOADS ============
+function handleVideoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  if (!file.type.includes("mp4")) {
+    showAlert("danger", "Video phải là MP4");
+    input.value = "";
+    return;
   }
 
-  container.appendChild(div)
+  if (file.size > MAX_VIDEO) {
+    showAlert("danger", "Video vượt quá 5MB");
+    input.value = "";
+    return;
+  }
 
-  setTimeout(()=>{
-    div.remove()
-  },4000)
+  showAlert("success", `Video đã chọn: <b>${file.name}</b>`);
 }
 
+function handlePDFUpload(input) {
+  const files = Array.from(input.files);
+  if (files.length === 0) return;
 
-function handleVideoUpload(input){
-const file=input.files[0]
-if(!file)return
+  for (const file of files) {
+    if (file.type !== "application/pdf") {
+      showAlert("danger", `${file.name} không phải PDF`);
+      input.value = "";
+      return;
+    }
 
-if(!file.type.includes("mp4")){
-showAlert("danger","❌ Video phải là MP4")
-input.value=""
-return
+    if (file.size > MAX_PDF) {
+      showAlert("danger", `${file.name} vượt quá 500KB`);
+      input.value = "";
+      return;
+    }
+  }
+
+  showAlert("success", `Đã chọn ${files.length} file PDF`);
 }
-
-if(file.size>MAX_VIDEO){
-showAlert("danger","❌ Video vượt quá 5MB")
-input.value=""
-return
-}
-
-showAlert("success",`🎬 Upload video: <b>${file.name}</b>`)
-}
-
-function handlePDFUpload(input){
-
-const files=Array.from(input.files)
-if(files.length===0)return
-
-for(const file of files){
-
-if(file.type!=="application/pdf"){
-showAlert("danger",`❌ ${file.name} không phải PDF`)
-input.value=""
-return
-}
-
-if(file.size>MAX_PDF){
-showAlert("danger",`❌ ${file.name} vượt quá 500KB`)
-input.value=""
-return
-}
-
-}
-
-showAlert("success",`📄 Upload ${files.length} file PDF`)
-}
-</script>
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-
-  document.querySelectorAll(".part-select").forEach(select=>{
-    toggleCueCard(select)
-  })
-
-})
 
 </script>
