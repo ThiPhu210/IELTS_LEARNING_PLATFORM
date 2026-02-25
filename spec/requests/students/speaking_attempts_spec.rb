@@ -6,7 +6,9 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
 
   let(:user)   { create(:user) }
   let(:course) { create(:course) }
-  let(:topic)  { create(:speaking_topic, course: course) }
+  let(:lesson) { create(:lesson, course: course) }
+  let(:topic)  { create(:speaking_topic, lesson: lesson) }
+
 
   let(:fake_ai_result) do
     {
