@@ -101,6 +101,7 @@ Chỉnh sửa Khóa học
 
 <%= f.fields_for :course_sections do |section| %>
 
+<!-- ⚠️ Section Item - CÓ THỂ DRAG & DROP để thay đổi thứ tự -->
 <div class="bg-gradient-to-br from-slate-50 to-slate-100 border-2 border-slate-200 rounded-xl p-6 section-item cursor-grab active:cursor-grabbing transition hover:shadow-md"
      draggable="true"
      data-section-id="<%= section.index %>">
@@ -122,7 +123,7 @@ Chỉnh sửa Khóa học
 </button>
 </div>
 
-<!-- Lessons in Section -->
+<!-- Lessons in Section (NO DRAG for lessons - they belong to this section) -->
 <div class="lessons space-y-6 ml-2">
 
 <%= section.fields_for :lessons do |lesson| %>
@@ -692,7 +693,34 @@ function showAlert(type, message) {
   }, 4000);
 }
 
-// ============ FILE UPLOADS ============
+// ============ FORM SUBMIT CLEANUP ============
+// Trước khi submit, xoá những lessons không thuộc section này
+document.querySelectorAll("form").forEach(form => {
+  form.addEventListener("submit", function(e) {
+    // Validate: xoá lessons không hợp lệ
+    const sections = document.querySelectorAll(".section-item");
+    sections.forEach((section, sIdx) => {
+      const lessons = section.querySelectorAll(".lesson-item");
+      lessons.forEach((lesson, lIdx) => {
+        // Đảm bảo lesson input names match với section index
+        const inputs = lesson.querySelectorAll("input[name], textarea[name], select[name]");
+        inputs.forEach(inp => {
+          if (!inp.name) return;
+          // Chỉ fix nếu name không khớp
+          if (!inp.name.includes(`course_sections_attributes][${sIdx}]`)) {
+            console.warn("Fixing nested name for lesson", inp.name);
+            inp.name = inp.name.replace(
+              /course_sections_attributes\]\[\d+\]/,
+              `course_sections_attributes][${sIdx}]`
+            );
+          }
+        });
+      });
+    });
+    
+    console.log("✅ Form ready to submit");
+  });
+});
 function handleVideoUpload(input) {
   const file = input.files[0];
   if (!file) return;
