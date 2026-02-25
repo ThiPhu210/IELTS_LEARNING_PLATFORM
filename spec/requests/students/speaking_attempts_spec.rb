@@ -4,10 +4,11 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
   include Devise::Test::IntegrationHelpers
   include ActionDispatch::TestProcess::FixtureFile
 
-  let(:user)   { create(:user) }
-  let(:course) { create(:course) }
-  let(:lesson) { create(:lesson, course: course) }
-  let(:topic)  { create(:speaking_topic, lesson: lesson) }
+let(:user)           { create(:user) }
+let(:course)         { create(:course) }
+let(:course_section) { create(:course_section, course: course) }
+let(:lesson)         { create(:lesson, course_section: course_section) }
+let(:topic)          { create(:speaking_topic, lesson: lesson) }
 
   let(:fake_ai_result) do
     {
