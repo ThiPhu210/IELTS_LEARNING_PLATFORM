@@ -512,9 +512,82 @@ function handleDrop(e) {
     } else {
       this.parentNode.insertBefore(draggedElement, this);
     }
+    
+    // 🔥 CRITICAL: Reorder field names sau khi drag-drop
+    reorderSectionAttributes();
   }
   
   this.classList.remove("border-blue-400", "bg-blue-50");
+}
+
+// 🔥 Reorder tất cả field names để Rails nhận đúng thứ tự
+function reorderSectionAttributes() {
+  const container = document.getElementById("sections");
+  const sections = container.querySelectorAll(".section-item");
+  
+  sections.forEach((section, sectionIndex) => {
+    // Update tất cả input/textarea trong section này
+    const inputs = section.querySelectorAll("input, textarea, select");
+    
+    inputs.forEach(input => {
+      if (!input.name) return;
+      
+      // Replace index trong name: course[course_sections_attributes][OLD_INDEX][...]
+      // -> course[course_sections_attributes][NEW_INDEX][...]
+      input.name = input.name.replace(
+        /course_sections_attributes\]\[\d+\]/,
+        `course_sections_attributes][${sectionIndex}]`
+      );
+    });
+    
+    // Update lessons trong section
+    const lessons = section.querySelectorAll(".lesson-item");
+    lessons.forEach((lesson, lessonIndex) => {
+      const lessonInputs = lesson.querySelectorAll("input, textarea, select");
+      
+      lessonInputs.forEach(input => {
+        if (!input.name) return;
+        
+        // Replace: course[course_sections_attributes][...][lessons_attributes][OLD_INDEX][...]
+        input.name = input.name.replace(
+          /lessons_attributes\]\[\d+\]/,
+          `lessons_attributes][${lessonIndex}]`
+        );
+      });
+      
+      // Update speaking topics
+      const topics = lesson.querySelectorAll(".topic-box");
+      topics.forEach((topic, topicIndex) => {
+        const topicInputs = topic.querySelectorAll("input, textarea, select");
+        
+        topicInputs.forEach(input => {
+          if (!input.name) return;
+          
+          input.name = input.name.replace(
+            /speaking_topics_attributes\]\[\d+\]/,
+            `speaking_topics_attributes][${topicIndex}]`
+          );
+        });
+        
+        // Update questions
+        const questions = topic.querySelectorAll(".question-item");
+        questions.forEach((question, questionIndex) => {
+          const qInputs = question.querySelectorAll("input, textarea, select");
+          
+          qInputs.forEach(input => {
+            if (!input.name) return;
+            
+            input.name = input.name.replace(
+              /speaking_questions_attributes\]\[\d+\]/,
+              `speaking_questions_attributes][${questionIndex}]`
+            );
+          });
+        });
+      });
+    });
+  });
+  
+  console.log("✅ Reordered all field names");
 }
 
 // ============ ADD SECTION ============
@@ -542,6 +615,9 @@ function addSection() {
     select.addEventListener("change", () => toggleCueCard(select));
     toggleCueCard(select);
   });
+  
+  // 🔥 Reorder tất cả indices
+  reorderSectionAttributes();
 }
 
 // ============ REMOVE SECTION ============
