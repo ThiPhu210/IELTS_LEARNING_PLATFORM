@@ -1,16 +1,34 @@
 class Students::SpeakingAttemptsController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:create]
   before_action :authenticate_user!
+  skip_before_action :verify_authenticity_token, only: :create
 
   def create
     audio = params[:audio]
+    return render_audio_missing unless audio.present?
 
+    attempt = create_attempt(audio)
+
+    evaluate_with_ai!(attempt)
+
+    SpeakingResultMailer.result_email(attempt).deliver_later
+
+    render json: serialize_attempt(attempt), status: :ok
+  rescue StandardError => e
+    attempt&.update(status: "failed")
+    render json: { error: "AI evaluation failed: #{e.message}" },
+           status: :unprocessable_entity
+  end
+
+  private
+
+  def create_attempt(audio)
     key = "speaking/#{SecureRandom.uuid}.webm"
+
     s3  = Aws::S3::Resource.new
-    obj = s3.bucket("ielts-learning-platform-uploads").object(key)
+    obj = s3.bucket(ENV.fetch("AWS_BUCKET")).object(key)
     obj.put(body: audio.read)
 
-    attempt = SpeakingAttempt.create!(
+    SpeakingAttempt.create!(
       user: current_user,
       course_id: params[:course_id],
       speaking_topic_id: params[:speaking_topic_id],
@@ -19,7 +37,9 @@ class Students::SpeakingAttemptsController < ApplicationController
       audio_url: obj.public_url,
       status: "processing"
     )
+  end
 
+  def evaluate_with_ai!(attempt)
     result = BedrockService.evaluate_speaking(attempt.transcript)
 
     attempt.update!(
@@ -34,10 +54,10 @@ class Students::SpeakingAttemptsController < ApplicationController
       sample_correction: result["sample_correction"],
       status: "evaluated"
     )
+  end
 
-    SpeakingResultMailer.result_email(attempt).deliver_later
-
-    render json: {
+  def serialize_attempt(attempt)
+    {
       overall: attempt.overall_band,
       fluency: attempt.fluency_score,
       lexical: attempt.lexical_score,
@@ -48,11 +68,10 @@ class Students::SpeakingAttemptsController < ApplicationController
       improvements: attempt.improvements,
       sample_correction: attempt.sample_correction
     }
+  end
 
-  rescue => e
-    attempt&.update(status: "failed")
-
-    render json: { error: "AI evaluation failed: #{e.message}" },
+  def render_audio_missing
+    render json: { error: "Audio file is required" },
            status: :unprocessable_entity
   end
 end
