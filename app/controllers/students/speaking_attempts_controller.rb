@@ -29,8 +29,8 @@ class Students::SpeakingAttemptsController < ApplicationController
       grammar_score: result["grammar"],
       pronunciation_score: result["pronunciation"],
       feedback: result["feedback"],
-      strength: Array(result["strengths"]).join("\n• "),
-      improvement: Array(result["improvements"]).join("\n• "),
+      strengths: result["strengths"] || [],
+      improvements: result["improvements"] || [],
       sample_correction: result["sample_correction"],
       status: "evaluated"
     )
@@ -44,8 +44,8 @@ class Students::SpeakingAttemptsController < ApplicationController
       grammar: attempt.grammar_score,
       pronunciation: attempt.pronunciation_score,
       feedback: attempt.feedback,
-      strength: attempt.strength,
-      improvement: attempt.improvement,
+      strengths: attempt.strengths,
+      improvements: attempt.improvements,
       sample_correction: attempt.sample_correction
     }
 
