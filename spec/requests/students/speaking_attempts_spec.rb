@@ -75,6 +75,7 @@ RSpec.describe "Students::SpeakingAttempts", type: :request do
            speaking_topic_id: topic.id,
            course_id: course.id,
            part: "part2"
+           transcript: "I think technology is very important nowadays."
          }
 
     expect(response).to have_http_status(:unprocessable_entity)
