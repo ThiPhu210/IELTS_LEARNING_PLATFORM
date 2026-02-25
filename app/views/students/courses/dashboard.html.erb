@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Speaking Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      background: #f4f6fb;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 30px;
+    }
+
+    .dashboard-container {
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .header {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 30px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card-title {
+      font-size: 14px;
+      color: #888;
+    }
+
+    .card-value {
+      font-size: 26px;
+      font-weight: 700;
+      margin-top: 5px;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    canvas {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: center;
+    }
+
+    th {
+      background: #f9fafc;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #f7f9fc;
+    }
+
+    tr:hover {
+      background: #eef3ff;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+<div class="dashboard-container">
+
+  <div class="header">
+    🎤 <%= @course.title %> – Speaking Dashboard
+  </div>
+
+  <!-- SUMMARY CARDS -->
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-title">Total Attempts</div>
+      <div class="card-value" id="totalAttempts"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Average Band</div>
+      <div class="card-value" id="avgBand"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Best Band</div>
+      <div class="card-value" id="bestBand"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Latest Band</div>
+      <div class="card-value" id="latestBand"></div>
+    </div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chart-grid">
+    <canvas id="progressChart"></canvas>
+    <canvas id="radarChart"></canvas>
+  </div>
+
+  <!-- HISTORY TABLE -->
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Part</th>
+        <th>Overall</th>
+        <th>Fluency</th>
+        <th>Lexical</th>
+        <th>Grammar</th>
+        <th>Pronunciation</th>
+      </tr>
+    </thead>
+    <tbody id="attemptTable"></tbody>
+  </table>
+
+</div>
+
+<script>
+  const attempts = <%= raw @attempts.to_json %>;
+
+  // =========================
+  // SUMMARY CALCULATION
+  // =========================
+  const total = attempts.length;
+  const avg = (attempts.reduce((s,a)=> s+a.overall_band,0)/total || 0).toFixed(2);
+  const best = Math.max(...attempts.map(a=>a.overall_band),0);
+  const latest = attempts[attempts.length-1]?.overall_band || 0;
+
+  document.getElementById("totalAttempts").innerText = total;
+  document.getElementById("avgBand").innerText = avg;
+  document.getElementById("bestBand").innerText = best;
+  document.getElementById("latestBand").innerText = latest;
+
+  // =========================
+  // LINE CHART
+  // =========================
+  new Chart(document.getElementById('progressChart'), {
+    type: 'line',
+    data: {
+      labels: attempts.map(a=> new Date(a.created_at).toLocaleDateString()),
+      datasets: [{
+        label: 'Overall Band Progress',
+        data: attempts.map(a=> a.overall_band),
+        borderColor: '#4f46e5',
+        backgroundColor: 'rgba(79,70,229,0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    }
+  });
+
+  // =========================
+  // RADAR CHART
+  // =========================
+  const avgFluency = attempts.reduce((s,a)=>s+a.fluency_score,0)/total || 0;
+  const avgLexical = attempts.reduce((s,a)=>s+a.lexical_score,0)/total || 0;
+  const avgGrammar = attempts.reduce((s,a)=>s+a.grammar_score,0)/total || 0;
+  const avgPron = attempts.reduce((s,a)=>s+a.pronunciation_score,0)/total || 0;
+
+  new Chart(document.getElementById('radarChart'), {
+    type: 'radar',
+    data: {
+      labels: ['Fluency', 'Lexical', 'Grammar', 'Pronunciation'],
+      datasets: [{
+        label: 'Average Score Breakdown',
+        data: [avgFluency, avgLexical, avgGrammar, avgPron],
+        backgroundColor: 'rgba(16,185,129,0.2)',
+        borderColor: '#10b981'
+      }]
+    },
+    options: {
+      scales: {
+        r: {
+          min: 0,
+          max: 9,
+          ticks: { stepSize: 1 }
+        }
+      }
+    }
+  });
+
+  // =========================
+  // TABLE
+  // =========================
+  const table = document.getElementById("attemptTable");
+  attempts.forEach(a=>{
+    table.innerHTML += `
+      <tr>
+        <td>${new Date(a.created_at).toLocaleDateString()}</td>
+        <td>${a.part}</td>
+        <td>${a.overall_band}</td>
+        <td>${a.fluency_score}</td>
+        <td>${a.lexical_score}</td>
+        <td>${a.grammar_score}</td>
+        <td>${a.pronunciation_score}</td>
+      </tr>
+    `;
+  });
+
+</script>
+</body>
+</html>
