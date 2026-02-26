@@ -38,6 +38,9 @@ namespace :students do
 
   # ================== COURSES ==================
   resources :courses, only: [ :index, :show ] do
+    collection do
+      get :progress       
+    end
     member do
       get :dashboard
     end
