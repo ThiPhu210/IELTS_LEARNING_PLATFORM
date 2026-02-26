@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - main
+      - recover-6c83cae
 
 env:
   DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
