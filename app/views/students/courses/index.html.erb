@@ -1,168 +1,376 @@
- <%= render "students/shared/navbar" %>
-<!-- SEARCH BAR -->
-<div class="pt-28">
-<div class="flex justify-center mb-10">
+<%= render "students/shared/navbar" %>
 
-<%= form_with url: students_courses_path,
-              method: :get,
-              local: true,
-              class: "flex items-center max-w-sm mx-auto space-x-2" do %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
-    <%= hidden_field_tag :paid, params[:paid] %>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — shared with landing page
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <label for="simple-search" class="sr-only">Search</label>
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
 
-    <div class="relative w-full">
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); line-height: 1.6; }
 
-        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-            <svg class="w-4 h-4 text-body" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M8 8v8m0-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 0a4 4 0 0 1-4 4h-1a3 3 0 0 0-3 3"/>
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+/* ═══════════════════════════════════════════
+   PAGE HEADER BANNER
+═══════════════════════════════════════════ */
+.page-banner {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--line);
+  padding: 72px 0 56px;
+  position: relative;
+  overflow: hidden;
+}
+.page-banner::before, .page-banner::after {
+  content: ''; position: absolute; border-radius: 50%;
+  pointer-events: none; filter: blur(90px); opacity: .25;
+}
+.page-banner::before { width: 420px; height: 420px; background: var(--primary-lt); top: -140px; left: -80px; }
+.page-banner::after  { width: 320px; height: 320px; background: var(--teal-lt);    bottom: -80px; right: -40px; }
+
+.banner-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 24px;
+}
+
+.banner-left { animation: fadeUp .5s var(--ease) both; }
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+}
+.page-title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 400; letter-spacing: -.03em; color: var(--ink);
+  line-height: 1.12; margin-bottom: 8px;
+}
+.page-title em { font-style: italic; color: var(--primary); }
+.page-subtitle { font-size: 15px; color: var(--ink-3); }
+
+/* ═══════════════════════════════════════════
+   SEARCH BAR
+═══════════════════════════════════════════ */
+.search-wrap {
+  animation: fadeUp .5s var(--ease) .1s both;
+  flex-shrink: 0;
+}
+.search-form {
+  display: flex; align-items: center; gap: 8px;
+}
+.search-field-wrap { position: relative; }
+.search-icon {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  pointer-events: none; color: var(--ink-3);
+  display: flex; align-items: center;
+}
+.search-input {
+  font-family: var(--font);
+  padding: 11px 16px 11px 40px;
+  background: var(--surface-2);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-xl);
+  font-size: 14px; color: var(--ink);
+  width: 280px;
+  transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
+  outline: none;
+}
+.search-input::placeholder { color: var(--ink-3); }
+.search-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+.search-btn {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--primary); color: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 12px var(--primary-glow);
+  transition: background .2s var(--ease), transform .2s var(--ease);
+  flex-shrink: 0;
+}
+.search-btn:hover { background: #b91c1c; transform: scale(1.07); }
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════════ */
+.content-wrap {
+  max-width: 1200px; margin: 0 auto;
+  padding: 48px 32px 80px;
+}
+
+/* stats bar */
+.stats-bar {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 32px; flex-wrap: wrap;
+}
+.stat-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: 20px; padding: 6px 14px;
+  font-size: 13px; font-weight: 600; color: var(--ink-2);
+  box-shadow: var(--shadow-xs);
+}
+.stat-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+
+/* empty state */
+.empty-state {
+  background: var(--surface); border: 1.5px solid #fde68a;
+  border-radius: var(--r-xl); padding: 40px 32px;
+  text-align: center; box-shadow: var(--shadow-xs);
+  animation: fadeUp .5s var(--ease) both;
+}
+.empty-icon { font-size: 40px; margin-bottom: 14px; }
+.empty-state h3 { font-family: var(--font-serif); font-size: 22px; color: var(--ink); margin-bottom: 6px; }
+.empty-state p  { font-size: 14px; color: var(--ink-3); }
+
+/* ═══════════════════════════════════════════
+   COURSE GRID
+═══════════════════════════════════════════ */
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* course card */
+.course-card {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: var(--shadow-xs);
+  display: flex; flex-direction: column;
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  animation: fadeUp .5s var(--ease) both;
+}
+.course-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+
+.course-thumb { position: relative; height: 200px; overflow: hidden; background: var(--primary-lt); display: block; }
+.course-thumb img  { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); display: block; }
+.course-card:hover .course-thumb img { transform: scale(1.05); }
+.course-thumb-ph {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 64px; font-style: italic; color: #fca5a5;
+}
+.band-chip {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 20px;
+  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--primary);
+}
+
+.course-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+.course-title {
+  font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.course-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: auto; padding-top: 14px; border-top: 1.5px solid var(--line); gap: 10px;
+}
+.course-price { font-family: var(--font-serif); font-size: 20px; color: var(--ink); letter-spacing: -.02em; }
+
+.act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 9px 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: all .2s var(--ease); font-family: var(--font); white-space: nowrap; }
+.act-enter { background: var(--ink); color: #fff; }
+.act-enter:hover { background: #000; }
+.act-pay { background: var(--emerald-lt); color: var(--emerald); border: 1.5px solid #a7f3d0; }
+.act-pay:hover { background: #d1fae5; }
+
+/* ═══════════════════════════════════════════
+   PAGINATION
+═══════════════════════════════════════════ */
+.pagination-wrap { margin-top: 48px; display: flex; justify-content: center; }
+
+nav.pagination { display: flex; gap: 6px; align-items: center; }
+nav.pagination a,
+nav.pagination span {
+  padding: 8px 14px; border-radius: var(--r-sm);
+  font-size: 13px; font-weight: 600; font-family: var(--font);
+  text-decoration: none; color: var(--ink-2);
+  background: var(--surface); border: 1.5px solid var(--line);
+  transition: all .2s var(--ease);
+}
+nav.pagination a:hover { border-color: var(--primary); color: var(--primary); }
+nav.pagination .current {
+  background: var(--primary); color: #fff; border-color: var(--primary);
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .course-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 700px) {
+  .banner-inner { flex-direction: column; align-items: flex-start; }
+  .search-input  { width: 220px; }
+  .course-grid   { grid-template-columns: 1fr; }
+  .content-wrap, .banner-inner { padding-left: 20px; padding-right: 20px; }
+}
+</style>
+
+<!-- ═══════ PAGE BANNER ═══════ -->
+<section class="page-banner">
+  <div class="banner-inner">
+
+    <!-- Left: title -->
+    <div class="banner-left">
+      <% if params[:paid] == "true" %>
+        <div class="eyebrow" style="color:var(--teal);background:var(--teal-lt);">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Khóa học của tôi
+        </div>
+        <h1 class="page-title">My <em>Courses</em></h1>
+        <p class="page-subtitle">
+          <% if @courses.any? %>
+            Bạn đang sở hữu <strong style="color:var(--ink)"><%= @courses.size %></strong> khóa học
+          <% else %>
+            Bạn chưa mua khóa học nào.
+          <% end %>
+        </p>
+      <% else %>
+        <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          All Courses
+        </div>
+        <h1 class="page-title">Tất cả <em>khóa học</em></h1>
+        <p class="page-subtitle">Khám phá toàn bộ chương trình IELTS Speaking của chúng tôi.</p>
+      <% end %>
+    </div>
+
+    <!-- Right: search -->
+    <div class="search-wrap">
+      <%= form_with url: students_courses_path,
+                    method: :get,
+                    local: true,
+                    class: "search-form" do %>
+
+        <%= hidden_field_tag :paid, params[:paid] %>
+
+        <div class="search-field-wrap">
+          <span class="search-icon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 8v8m0-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 8a2 2 0 1 0 0 4 2 2 0 0 0 0-4Zm8-8a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm0 0a4 4 0 0 1-4 4h-1a3 3 0 0 0-3 3"/>
             </svg>
+          </span>
+          <%= text_field_tag :q, params[:q],
+                class: "search-input",
+                placeholder: "Tìm kiếm khóa học..." %>
         </div>
 
-        <%= text_field_tag :q,
-              params[:q],
-              id: "simple-search",
-              class: "px-3 py-2.5 bg-neutral-secondary-medium border border-default-medium rounded-full ps-9 text-heading text-sm focus:ring-brand focus:border-brand block w-full placeholder:text-body",
-              placeholder: "Search branch name..." %>
+        <button type="submit" class="search-btn" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
+          </svg>
+        </button>
 
+      <% end %>
     </div>
 
-    <button type="submit"
-        class="inline-flex items-center justify-center shrink-0 text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-brand-medium shadow-xs rounded-full w-10 h-10 focus:outline-none">
+  </div>
+</section>
 
-        <svg class="w-5 h-5"
-             xmlns="http://www.w3.org/2000/svg"
-             fill="none"
-             viewBox="0 0 24 24">
-          <path stroke="currentColor"
-                stroke-linecap="round"
-                stroke-width="2"
-                d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-        </svg>
+<!-- ═══════ MAIN CONTENT ═══════ -->
+<div class="content-wrap">
 
-        <span class="sr-only">Icon description</span>
-
-    </button>
-
-<% end %>
-
-</div>
-
-
-<section class="container mx-auto px-6 py-16 mt-10 mb-10">
-
-  <!-- TITLE -->
-  <h1 class="text-3xl font-bold text-gray-900 mb-2">
-    <%= params[:paid] == "true" ? "Khóa học của tôi" : "Tất cả khóa học" %>
-  </h1>
-
-  <% if params[:paid] == "true" %>
-    <% if @courses.any? %>
-      <p class="text-gray-600 mb-10">
-        Bạn đã mua
-        <span class="font-semibold text-gray-900">
-          <%= @courses.size %>
-        </span>
-        khóa học
-      </p>
-    <% end %>
+  <!-- Stats bar (when courses exist) -->
+  <% if @courses.any? %>
+    <div class="stats-bar">
+      <div class="stat-pill">
+        <span class="dot"></span>
+        <%= @courses.total_count rescue @courses.size %> khóa học
+      </div>
+      <% if params[:q].present? %>
+        <div class="stat-pill" style="color:var(--primary);">
+          🔍 Kết quả cho "<%= params[:q] %>"
+        </div>
+      <% end %>
+    </div>
   <% end %>
 
+  <!-- Empty state -->
   <% if @courses.empty? %>
-
-    <div class="p-6 bg-yellow-50 border border-yellow-200 rounded-2xl">
-      <p class="text-yellow-700 font-medium">
-        Không tìm thấy khóa học phù hợp.
-      </p>
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <h3>Không tìm thấy khóa học</h3>
+      <p>Thử thay đổi từ khóa tìm kiếm hoặc khám phá tất cả khóa học.</p>
+      <%= link_to "Xem tất cả khóa học", students_courses_path,
+            style: "display:inline-flex;align-items:center;gap:6px;margin-top:18px;padding:10px 20px;background:var(--primary);color:#fff;font-size:13px;font-weight:700;border-radius:var(--r-md);text-decoration:none;box-shadow:0 4px 12px var(--primary-glow);" %>
     </div>
 
+  <!-- Course grid -->
   <% else %>
+    <div class="course-grid">
+      <% @courses.each_with_index do |course, i| %>
+        <div class="course-card" style="animation-delay: <%= i * 0.07 %>s">
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-
-    <% @courses.each do |course| %>
-
-      <div class="bg-white border border-gray-200
-                  rounded-2xl overflow-hidden
-                  shadow-sm hover:shadow-xl
-                  hover:-translate-y-1
-                  transition-all duration-300">
-
-        <%= link_to students_course_path(course) do %>
-
-          <% if course.thumbnail.attached? %>
-            <%= image_tag course.thumbnail.variant(resize_to_fill: [400, 220]),
-                class: "w-full h-[220px] object-cover" %>
-          <% else %>
-            <div class="w-full h-[220px]
-                        bg-pink-50 flex items-center justify-center">
-              <span class="text-gray-400 text-sm">
-                No image
-              </span>
-            </div>
-          <% end %>
-
-        <% end %>
-
-        <div class="p-5">
-
-          <% if course.band_min.present? && course.band_max.present? %>
-            <p class="text-xs font-semibold text-blue-600 mb-1">
-              IELTS <%= course.band_min %> – <%= course.band_max %>
-            </p>
-          <% end %>
-
-          <h3 class="text-base font-semibold text-gray-900
-                     line-clamp-2 mb-4">
-            <%= course.title %>
-          </h3>
-
-          <div class="flex items-center justify-between">
-
-            <span class="text-lg font-bold text-gray-900">
-              <%= number_to_currency(course.price,
-                    unit: "₫", precision: 0) %>
-            </span>
-
-            <% if @paid_course_ids.include?(course.id) %>
-
-              <%= link_to "Xem",
-                  students_course_path(course),
-                  class: "px-4 py-2 text-sm font-semibold
-                          bg-gray-900 text-white
-                          rounded-xl hover:bg-black
-                          transition" %>
-
+          <%= link_to students_course_path(course), class: "course-thumb" do %>
+            <% if course.thumbnail.attached? %>
+              <%= image_tag course.thumbnail.variant(resize_to_fill: [400, 220]), alt: course.title %>
             <% else %>
-
-              <%= button_to "Thanh toán",
-                  students_course_orders_path(course),
-                  method: :post,
-                  class: "px-4 py-2 text-sm font-semibold
-                          bg-green-600 text-white
-                          rounded-xl hover:bg-green-700
-                          transition" %>
-
+              <div class="course-thumb-ph"><%= course.title[0] %></div>
             <% end %>
+            <% if course.band_min.present? && course.band_max.present? %>
+              <div class="band-chip">Band <%= course.band_min %> – <%= course.band_max %></div>
+            <% end %>
+          <% end %>
 
+          <div class="course-body">
+            <div class="course-title"><%= course.title %></div>
+
+            <div class="course-footer">
+              <div class="course-price">
+                <%= number_to_currency(course.price, unit: "₫", precision: 0, delimiter: ".") %>
+              </div>
+
+              <% if @paid_course_ids.include?(course.id) %>
+                <%= link_to "Vào học", students_course_path(course), class: "act-btn act-enter" %>
+              <% else %>
+                <%= button_to "Đăng ký",
+                      students_course_orders_path(course),
+                      method: :post,
+                      class: "act-btn act-pay" %>
+              <% end %>
+            </div>
           </div>
 
         </div>
+      <% end %>
+    </div>
 
-      </div>
-
-    <% end %>
-
-  </div>
-
+    <!-- Pagination -->
+    <div class="pagination-wrap">
+      <%= paginate @courses %>
+    </div>
   <% end %>
 
-  <div class="mt-12 flex justify-center">
-    <%= paginate @courses %>
-  </div>
-
-</section>
 </div>
-<style> nav.pagination { display: flex; gap: 0.5rem; } nav.pagination a, nav.pagination span { padding: 0.5rem 0.75rem; border-radius: 0.375rem; } nav.pagination .current { background: #FF1C04; color: white; } </style>
