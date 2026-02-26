@@ -528,16 +528,20 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
                   <div class="course-title"><%= course.title %></div>
                   <div class="course-footer">
                     <div class="course-price"><%= number_to_currency(course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
-                    <%
-                      access  = current_user.course_accesses.active_status.find_by(course: course)
-                      pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: course)
-                    %>
-                    <% if access %>
-                      <%= link_to "Vào học", students_course_path(course), class: "act-btn act-enter" %>
-                    <% elsif pending %>
-                      <span class="act-btn act-pending">⏳ Đang chờ</span>
+                    <% if current_user %>
+                      <%
+                        access  = current_user.course_accesses.active_status.find_by(course: course)
+                        pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: course)
+                      %>
+                      <% if access %>
+                        <%= link_to "Vào học", students_course_path(course), class: "act-btn act-enter" %>
+                      <% elsif pending %>
+                        <span class="act-btn act-pending">⏳ Đang chờ</span>
+                      <% else %>
+                        <%= button_to "Đăng ký", students_course_orders_path(course), method: :post, class: "act-btn act-pay" %>
+                      <% end %>
                     <% else %>
-                      <%= button_to "Đăng ký", students_course_orders_path(course), method: :post, class: "act-btn act-pay" %>
+                      <%= link_to "Đăng ký", new_user_session_path, class: "act-btn act-pay" %>
                     <% end %>
                   </div>
                 </div>
