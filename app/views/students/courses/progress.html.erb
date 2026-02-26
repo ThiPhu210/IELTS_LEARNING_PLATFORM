@@ -508,10 +508,11 @@
   <div class="courses-list">
     <% @paid_courses.each_with_index do |course, i| %>
       <% course_attempts = @attempts_by_course[course.id] || [] %>
-      <% c_total = course_attempts.size %>
-      <% c_avg   = c_total > 0 ? (course_attempts.sum(&:overall_band).to_f / c_total).round(1) : nil %>
-      <% c_best  = c_total > 0 ? course_attempts.map(&:overall_band).max : nil %>
-      <% c_pct   = c_best ? (c_best / 9.0 * 100).round : 0 %>
+      <% c_total   = course_attempts.size %>
+      <% c_bands   = course_attempts.map(&:overall_band).compact.map(&:to_f) %>
+      <% c_avg     = c_bands.any? ? (c_bands.sum / c_bands.size).round(1) : nil %>
+      <% c_best    = c_bands.any? ? c_bands.max : nil %>
+      <% c_pct     = c_best ? (c_best / 9.0 * 100).round : 0 %>
 
       <a href="<%= dashboard_students_course_path(course) %>"
          class="course-row"
