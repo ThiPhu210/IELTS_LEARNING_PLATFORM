@@ -520,8 +520,8 @@
 
         <!-- Thumb -->
         <div class="course-row-thumb">
-          <% if course.respond_to?(:thumbnail) && course.thumbnail.present? %>
-            <img src="<%= course.thumbnail %>" alt="">
+          <% if course.thumbnail.attached? %>
+            <img src="<%= url_for(course.thumbnail) %>" alt="<%= course.title %>">
           <% else %>
             <%= course.title[0].upcase %>
           <% end %>
