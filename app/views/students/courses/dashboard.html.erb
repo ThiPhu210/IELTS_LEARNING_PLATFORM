@@ -23,9 +23,11 @@
   --surface:     #ffffff;
   --surface-2:   #f7f8fc;
 
-  --indigo:      #4f46e5;
-  --indigo-lt:   #eeeeff;
-  --indigo-glow: rgba(79,70,229,.18);
+  /* 🔴 RED SYSTEM */
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
+
   --teal:        #0d9488;
   --teal-lt:     #e6faf8;
   --amber:       #d97706;
@@ -48,6 +50,7 @@
   --font-serif: 'Instrument Serif', serif;
   --ease:       cubic-bezier(.4,0,.2,1);
 }
+}
 
 html { scroll-behavior: smooth; }
 body {
@@ -68,7 +71,7 @@ body {
 .page-eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--indigo); background: var(--indigo-lt);
+  color: var(--primary); background: var(--primary-lt);
   padding: 5px 13px; border-radius: 30px; margin-bottom: 12px;
 }
 .page-title {
@@ -76,7 +79,7 @@ body {
   font-weight: 400; line-height: 1.15; color: var(--ink);
   letter-spacing: -.02em; margin-bottom: 6px;
 }
-.page-title em { font-style: italic; color: var(--indigo); }
+.page-title em { font-style: italic; color: var(--primary); }
 .page-sub { font-size: 14px; color: var(--ink-3); margin-bottom: 22px; }
 
 /* ── Dual arrow nav ── */
@@ -91,9 +94,9 @@ body {
   position: relative;
 }
 .nav-arrow:first-child { border-right: 1.5px solid var(--line); }
-.nav-arrow:hover { background: var(--indigo-lt); }
+.nav-arrow:hover { background: var(--primary-lt); }
 .nav-arrow:hover .nav-arrow-track { opacity: 1; }
-.nav-arrow:hover .nav-arrow-label { color: var(--indigo); }
+.nav-arrow:hover .nav-arrow-label { color: var(--primary); }
 
 .nav-arrow-inner {
   display: flex; align-items: center; width: 100%;
@@ -108,9 +111,9 @@ body {
   overflow: hidden; min-width: 0;
 }
 .nav-arrow-line {
-  flex: 1; height: 1.5px; background: var(--indigo); min-width: 10px;
+  flex: 1; height: 1.5px; background: var(--primary); min-width: 10px;
 }
-.nav-arrow-head { color: var(--indigo); display: flex; align-items: center; flex-shrink: 0; }
+.nav-arrow-head { color: var(--primary); display: flex; align-items: center; flex-shrink: 0; }
 
 /* Text */
 .nav-arrow-text { flex-shrink: 0; }
@@ -152,12 +155,12 @@ body {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--tile-accent, var(--indigo-lt));
+  background: var(--tile-accent, var(--primary-lt));
   opacity: .45;
   pointer-events: none;
   border-radius: inherit;
 }
-.stat-tile:nth-child(1) { --tile-accent: var(--indigo-lt); animation-delay:.05s; }
+.stat-tile:nth-child(1) { --tile-accent: var(--primary-lt); animation-delay:.05s; }
 .stat-tile:nth-child(2) { --tile-accent: var(--teal-lt);   animation-delay:.10s; }
 .stat-tile:nth-child(3) { --tile-accent: var(--amber-lt);  animation-delay:.15s; }
 .stat-tile:nth-child(4) { --tile-accent: var(--emerald-lt);animation-delay:.20s; }
@@ -178,7 +181,7 @@ body {
   letter-spacing: -.02em;
   position: relative;
 }
-.stat-tile:nth-child(1) .stat-tile-value { color: var(--indigo); }
+.stat-tile:nth-child(1) .stat-tile-value { color: var(--primary); }
 .stat-tile:nth-child(2) .stat-tile-value { color: var(--teal); }
 .stat-tile:nth-child(3) .stat-tile-value { color: var(--amber); }
 .stat-tile:nth-child(4) .stat-tile-value { color: var(--emerald); }
@@ -284,8 +287,8 @@ body {
   align-items: center; justify-content: center;
   width: 56px; height: 56px;
   border-radius: var(--r-md);
-  background: var(--indigo);
-  box-shadow: 0 4px 14px var(--indigo-glow);
+  background: var(--primary);
+  box-shadow: 0 4px 14px var(--primary-glow);
   flex-shrink: 0;
 }
 .band-badge-val { font-family: var(--font-serif); font-size: 22px; color: #fff; line-height: 1; }
@@ -298,8 +301,8 @@ body {
   color: var(--ink-3); transition: all .2s var(--ease); flex-shrink: 0;
 }
 .attempt-card.open .attempt-toggle {
-  background: var(--indigo-lt); border-color: var(--indigo);
-  color: var(--indigo); transform: rotate(180deg);
+  background: var(--primary-lt); border-color: var(--primary);
+  color: var(--primary); transform: rotate(180deg);
 }
 
 .attempt-body {
@@ -319,7 +322,7 @@ body {
 }
 .score-chip-val { font-family: var(--font-serif); font-size: 26px; line-height: 1; }
 .score-chip-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
-.chip-fluency .score-chip-val { color: var(--indigo); }
+.chip-fluency .score-chip-val { color: var(--primary); }
 .chip-lexical .score-chip-val { color: var(--teal); }
 .chip-grammar .score-chip-val { color: var(--amber); }
 .chip-pron    .score-chip-val { color: var(--rose); }
@@ -336,8 +339,8 @@ body {
 
 .block-transcript   { background: var(--surface-2); }
 .block-transcript   .cb-label { color: var(--ink-3); } .block-transcript   .cb-dot { background: var(--ink-3); }
-.block-feedback     { background: var(--indigo-lt); border-color: #c7d2fe; }
-.block-feedback     .cb-label { color: var(--indigo); } .block-feedback     .cb-dot { background: var(--indigo); }
+.block-feedback     { background: var(--primary-lt); border-color: #c7d2fe; }
+.block-feedback     .cb-label { color: var(--primary); } .block-feedback     .cb-dot { background: var(--primary); }
 .block-strengths    { background: var(--emerald-lt); border-color: #a7f3d0; }
 .block-strengths    .cb-label { color: var(--emerald); } .block-strengths    .cb-dot { background: var(--emerald); }
 .block-improvements { background: var(--amber-lt); border-color: #fcd34d; }
@@ -506,9 +509,9 @@ if (total > 0) {
       datasets: [{
         label: 'Band Score',
         data: attempts.map(a => a.overall_band),
-        borderColor: '#4f46e5',
-        backgroundColor: 'rgba(79,70,229,.10)',
-        pointBackgroundColor: '#4f46e5',
+       borderColor: '#dc2626',
+backgroundColor: 'rgba(220,38,38,.10)',
+pointBackgroundColor: '#dc2626',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 5,
@@ -543,9 +546,9 @@ if (total > 0) {
       labels: ['Fluency','Lexical','Grammar','Pronunciation'],
       datasets: [{
         data: [+avg('fluency_score').toFixed(2), +avg('lexical_score').toFixed(2), +avg('grammar_score').toFixed(2), +avg('pronunciation_score').toFixed(2)],
-        backgroundColor: 'rgba(13,148,136,.12)', borderColor: '#0d9488',
-        pointBackgroundColor: '#0d9488', pointBorderColor: '#fff',
-        pointBorderWidth: 2, pointRadius: 4, borderWidth: 2
+        backgroundColor: 'rgba(220,38,38,.15)',
+borderColor: '#dc2626',
+pointBackgroundColor: '#dc2626',
       }]
     },
     options: {
