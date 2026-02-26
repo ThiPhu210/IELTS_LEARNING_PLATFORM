@@ -563,39 +563,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
     </div>
 
     <!-- RIGHT: enroll panel -->
-    <div class="enroll-panel">
-      <div class="card-price-row">
-        <div class="card-price"><%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
-        <div class="card-price-label">One-time payment</div>
-      </div>
-      <%
-        access  = current_user.course_accesses.active_status.find_by(course: @course) rescue nil
-        pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: @course) rescue nil
-      %>
-      <% if access %>
-        <%= link_to students_course_path(@course), class: "btn-enter" do %>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Continue Learning
-        <% end %>
-      <% elsif pending %>
-        <div class="btn-pending">⏳ Payment Pending…</div>
-      <% else %>
-        <%= button_to students_course_orders_path(@course), method: :post, class: "btn-enroll" do %>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          Enroll Now
-        <% end %>
-      <% end %>
-
-      <div class="card-includes">
-        <div class="card-includes-title">This course includes</div>
-        <% [["Video lessons","📹"],["AI Speaking Scorer","🤖"],["Downloadable materials","📄"],["Lifetime access","♾️"],["Certificate of completion","🏆"]].each do |item, icon| %>
-          <div class="include-item">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            <%= icon %> <%= item %>
-          </div>
-        <% end %>
-      </div>
-    </div>
 
   </div>
 </section>
@@ -881,8 +848,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
         Begin Session
       </button>
-      <button class="mbtn mbtn-danger  hidden" id="btn-done">⏹ Stop &amp; Submit</button>
-      <button class="mbtn mbtn-ghost   hidden" id="btn-rerecord">🔄 Re-record</button>
+      <button class="mbtn mbtn-danger  hidden" id="btn-done">Stop &amp; Submit</button>
+      <button class="mbtn mbtn-ghost   hidden" id="btn-rerecord">Re-record</button>
       <button class="mbtn mbtn-success hidden" id="btn-submit">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
         Submit
@@ -1173,7 +1140,7 @@ function showResult(result) {
   document.getElementById('res-feedback').textContent      = result.feedback      ?? '';
   resultPanel.classList.add('visible');
   setPhaseBadge('Completed', 'done');
-  showStatus('success', '✅ Evaluation complete!');
+  showStatus('success', 'Evaluation complete!');
   showRetryBtn();
 }
 
@@ -1190,7 +1157,7 @@ function showStatus(type, msg) { statusMsg.className = 'status-msg ' + type; sta
 btnStart.addEventListener('click', async () => {
   btnStart.disabled = true; btnStart.textContent = 'Starting…';
   currentPhase = 'prep';
-  showStatus('info', '📖 Preparation phase. Read the question carefully.');
+  showStatus('info', 'Preparation phase. Read the question carefully !');
   await runPrepTimer(currentData.prep);
   if (currentPhase !== 'prep') return;
 
