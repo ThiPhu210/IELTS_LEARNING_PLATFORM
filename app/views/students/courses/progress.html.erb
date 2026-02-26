@@ -439,9 +439,10 @@
   <%
     all_attempts    = @all_attempts
     total_attempts  = all_attempts.size
-    avg_band        = total_attempts > 0 ? (all_attempts.sum(&:overall_band).to_f / total_attempts).round(2) : 0
-    best_band       = total_attempts > 0 ? all_attempts.map(&:overall_band).max : 0
-    latest_band     = all_attempts.last&.overall_band || 0
+    valid_bands     = all_attempts.map(&:overall_band).compact.map(&:to_f)
+    avg_band        = valid_bands.any? ? (valid_bands.sum / valid_bands.size).round(2) : 0
+    best_band       = valid_bands.any? ? valid_bands.max : 0
+    latest_band     = all_attempts.reverse.find { |a| a.overall_band.present? }&.overall_band.to_f || 0
   %>
   <div class="hero-stats">
     <div class="stat-tile">
@@ -463,8 +464,9 @@
       <div class="stat-tile-label">Band gần nhất</div>
       <div class="stat-tile-value"><%= latest_band %></div>
       <div class="stat-tile-sub">
-        <% if total_attempts >= 2 %>
-          <% diff = (latest_band - all_attempts[-2].overall_band).round(1) %>
+        <% prev = all_attempts.reverse_each.drop(1).find { |a| a.overall_band.present? } %>
+        <% if prev && latest_band > 0 %>
+          <% diff = (latest_band - prev.overall_band.to_f).round(1) %>
           <% if diff > 0 %>↑ +<%= diff %> so với lần trước<% elsif diff < 0 %>↓ <%= diff %> so với lần trước<% else %>= Giữ nguyên<% end %>
         <% else %>
           Lần luyện tập đầu
