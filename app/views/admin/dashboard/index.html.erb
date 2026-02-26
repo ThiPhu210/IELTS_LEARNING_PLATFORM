@@ -1,419 +1,792 @@
+<%# ============================================================
+    app/views/admin/dashboard/index.html.erb
+    Design: Red + Ink — synced with LMS design system
+    ============================================================ %>
+
 <%
-  current_year = Time.current.year
-  data_current = @chart_data[current_year] || Array.new(12, 0)
-  data_last    = @chart_data[current_year - 1] || Array.new(12, 0)
+  current_year  = @current_year
+  data_current  = @chart_data[current_year]     || Array.new(12, 0)
+  data_last     = @chart_data[current_year - 1] || Array.new(12, 0)
+  revenue_data  = @revenue_data  || Array.new(12, 0)
+  attempts_data = @attempts_data || Array.new(12, 0)
 %>
 
+<%= render "admin/shared/navbar" %>
+<%= render "admin/shared/sidebar" %>
 
-<script>
-  window.chartData = {
-    labels: <%= raw @months.to_json %>,
-    currentYear: <%= current_year %>,
-    lastYear: <%= current_year - 1 %>,
-    dataCurrent: <%= raw data_current.to_json %>,
-    dataLast: <%= raw data_last.to_json %>
-  };
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.min.js"></script>
-<script
-function reloadStudentChart() {
-  fetch("/admin/charts/students")
-    .then(res => res.json())
-    .then(data => {
-      window.studentChart.data.datasets[0].data = data.current;
-      window.studentChart.data.datasets[1].data = data.last;
-      window.studentChart.update();
-    });
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --rose:         #e11d48;
+  --rose-lt:      #fce7ef;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --indigo:       #4f46e5;
+  --indigo-lt:    #eef2ff;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease: cubic-bezier(.4,0,.2,1);
 }
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  var data = window.chartData;
 
-  var config = {
-    type: "line",
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+@keyframes countUp  { from { opacity:0; } to { opacity:1; } }
+
+/* ═══════════════════════════════════════════
+   HERO BANNER
+═══════════════════════════════════════════ */
+.dash-hero {
+  position: relative; overflow: hidden;
+  background: var(--ink); min-height: 116px;
+}
+.dash-hero-noise {
+  position: absolute; inset: 0; opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+.dash-hero-glow {
+  position: absolute; right: -80px; top: -80px;
+  width: 360px; height: 360px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.18) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-hero-glow2 {
+  position: absolute; left: 15%; bottom: -100px;
+  width: 240px; height: 240px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(13,148,136,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dash-hero-inner {
+  position: relative; z-index: 1;
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  padding: 28px 32px 32px;
+  animation: fadeUp .4s var(--ease) both;
+}
+.dash-hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; letter-spacing: .10em; text-transform: uppercase;
+  color: #fca5a5; background: rgba(220,38,38,.2);
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 8px;
+  border: 1px solid rgba(252,165,165,.25);
+}
+.dash-hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(22px, 2.4vw, 34px); font-weight: 400;
+  letter-spacing: -.02em; color: #fff; line-height: 1.15;
+}
+.dash-hero-title em { font-style: italic; color: #fca5a5; }
+.dash-hero-sub { font-size: 12.5px; color: rgba(255,255,255,.4); margin-top: 6px; }
+
+.dash-hero-date {
+  font-family: var(--font-mono); font-size: 12px;
+  color: rgba(255,255,255,.3); flex-shrink: 0; text-align: right;
+}
+.dash-hero-date strong { display: block; font-size: 15px; color: rgba(255,255,255,.55); margin-bottom: 2px; }
+
+/* ═══════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════ */
+.dash-body { padding: 28px 32px 64px; }
+
+/* ═══════════════════════════════════════════
+   STAT CARDS GRID
+═══════════════════════════════════════════ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 28px;
+}
+@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 600px)  { .stats-grid { grid-template-columns: 1fr; } }
+
+.stat-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 20px 22px;
+  box-shadow: var(--shadow-xs);
+  display: flex; flex-direction: column; gap: 10px;
+  position: relative; overflow: hidden;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+  animation: fadeUp .45s var(--ease) both;
+}
+.stat-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.stat-card.red::before    { background: var(--primary); }
+.stat-card.teal::before   { background: var(--teal); }
+.stat-card.emerald::before{ background: var(--emerald); }
+.stat-card.amber::before  { background: var(--amber); }
+.stat-card.indigo::before { background: var(--indigo); }
+.stat-card.rose::before   { background: var(--rose); }
+
+.stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; }
+.stat-card-icon {
+  width: 40px; height: 40px; border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.ic-red     { background: var(--primary-lt); }
+.ic-teal    { background: var(--teal-lt); }
+.ic-emerald { background: var(--emerald-lt); }
+.ic-amber   { background: var(--amber-lt); }
+.ic-indigo  { background: var(--indigo-lt); }
+.ic-rose    { background: var(--rose-lt); }
+
+.stat-card-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); margin-bottom: 6px; }
+.stat-card-num   { font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1; }
+.stat-card-sub   { font-size: 11px; color: var(--ink-3); font-weight: 600; margin-top: 2px; }
+
+.stat-card-trend {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 700; font-family: var(--font-mono);
+  padding: 2px 8px; border-radius: 20px; margin-top: 6px; width: fit-content;
+}
+.trend-up   { background: var(--emerald-lt); color: var(--emerald); }
+.trend-down { background: var(--rose-lt);    color: var(--rose); }
+.trend-flat { background: var(--surface-2);  color: var(--ink-3); border: 1px solid var(--line); }
+
+/* ═══════════════════════════════════════════
+   CHARTS ROW
+═══════════════════════════════════════════ */
+.charts-row {
+  display: grid; grid-template-columns: 1fr 380px; gap: 20px; margin-bottom: 28px;
+}
+@media (max-width: 1100px) { .charts-row { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-xs); overflow: hidden;
+  animation: fadeUp .5s var(--ease) .06s both;
+}
+.chart-card-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 22px; border-bottom: 1.5px solid var(--line);
+  background: var(--surface-2);
+}
+.chart-card-title-wrap { display: flex; align-items: center; gap: 9px; }
+.chart-card-icon { font-size: 16px; }
+.chart-card-title { font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.chart-card-sub   { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+.chart-card-body  { padding: 20px 22px; }
+.chart-wrap { position: relative; height: 260px; }
+
+/* Legend */
+.chart-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
+.legend-item  { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+.legend-dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════
+   BOTTOM ROW — 3 PANELS
+═══════════════════════════════════════════ */
+.bottom-row {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 28px;
+}
+@media (max-width: 1100px) { .bottom-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 700px)  { .bottom-row { grid-template-columns: 1fr; } }
+
+/* ═══════════════════════════════════════════
+   TABLE PANEL
+═══════════════════════════════════════════ */
+.panel-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-xs); overflow: hidden;
+  animation: fadeUp .5s var(--ease) .1s both;
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 15px 20px; border-bottom: 1.5px solid var(--line);
+  background: var(--surface-2);
+}
+.panel-title { font-size: 13px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.panel-badge {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5;
+}
+
+/* ── Data table inside panel ── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  padding: 9px 16px; font-size: 9px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3);
+  background: var(--surface-2); border-bottom: 1.5px solid var(--line);
+  text-align: left; white-space: nowrap;
+}
+.data-table td {
+  padding: 10px 16px; font-size: 12.5px; color: var(--ink-2);
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--surface-2); }
+
+/* User avatar row */
+.user-row { display: flex; align-items: center; gap: 9px; }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-lt); border: 1.5px solid #fca5a5;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 12px; font-style: italic; color: var(--primary);
+}
+.user-name  { font-weight: 700; color: var(--ink); font-size: 13px; }
+.user-email { font-size: 11px; color: var(--ink-3); }
+
+/* Status chips */
+.status-chip {
+  display: inline-flex; align-items: center;
+  padding: 2px 9px; border-radius: 20px;
+  font-size: 10px; font-weight: 800; font-family: var(--font-mono);
+}
+.chip-paid    { background: var(--emerald-lt); color: var(--emerald); border: 1px solid #a7f3d0; }
+.chip-pending { background: var(--amber-lt);   color: var(--amber);   border: 1px solid #fde68a; }
+.chip-failed  { background: var(--rose-lt);    color: var(--rose);    border: 1px solid #fecdd3; }
+.chip-active  { background: var(--teal-lt);    color: var(--teal);    border: 1px solid #99f6e4; }
+
+/* Band score */
+.band-pill {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 2px 10px; border-radius: 6px;
+  background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5;
+}
+
+/* Progress bar in top courses */
+.mini-bar-wrap { display: flex; align-items: center; gap: 8px; }
+.mini-bar-bg   { flex: 1; height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; }
+.mini-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+.mini-bar-num  { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--ink-3); white-space: nowrap; flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════
+   FULL-WIDTH RECENT ORDERS
+═══════════════════════════════════════════ */
+.full-panel {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-xs); overflow: hidden;
+  margin-bottom: 28px;
+  animation: fadeUp .5s var(--ease) .14s both;
+}
+
+/* ═══════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════ */
+.dash-footer {
+  padding: 20px 0 0; border-top: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+  font-size: 12px; color: var(--ink-3); font-weight: 500;
+}
+.dash-footer a { color: var(--ink-3); text-decoration: none; transition: color .15s; }
+.dash-footer a:hover { color: var(--primary); }
+.footer-links { display: flex; gap: 18px; }
+
+/* Responsive tweaks */
+@media (max-width: 640px) { .dash-body { padding: 18px; } .dash-hero-inner { padding: 20px 18px 24px; } }
+</style>
+
+<!-- ═══════ HERO ═══════ -->
+<div class="dash-hero">
+  <div class="dash-hero-noise"></div>
+  <div class="dash-hero-glow"></div>
+  <div class="dash-hero-glow2"></div>
+  <div class="dash-hero-inner">
+    <div>
+      <div class="dash-hero-eyebrow">
+        <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Admin Dashboard
+      </div>
+      <h1 class="dash-hero-title">LMS <em>Overview</em></h1>
+      <p class="dash-hero-sub">Real-time stats for courses, students, revenue, and speaking practice</p>
+    </div>
+    <div class="dash-hero-date">
+      <strong><%= Time.current.strftime("%B %Y") %></strong>
+      <%= Time.current.strftime("%A, %d") %>
+    </div>
+  </div>
+</div>
+
+<main class="pt-16 sm:ml-64">
+<div class="dash-body">
+
+  <!-- ═══ STAT CARDS ═══ -->
+  <div class="stats-grid">
+
+    <!-- Students -->
+    <div class="stat-card red" style="animation-delay:.04s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Total Students</div>
+          <div class="stat-card-num"><%= @students_count %></div>
+          <div class="stat-card-sub">Registered learners</div>
+        </div>
+        <div class="stat-card-icon ic-red">🎓</div>
+      </div>
+      <span class="stat-card-trend trend-flat">All time</span>
+    </div>
+
+    <!-- Revenue -->
+    <div class="stat-card emerald" style="animation-delay:.07s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Total Revenue</div>
+          <div class="stat-card-num" style="font-size:22px"><%= number_to_currency(@total_revenue || 0, unit: "₫", precision: 0, format: "%n%u") %></div>
+          <div class="stat-card-sub">From <%= @paid_orders %> paid orders</div>
+        </div>
+        <div class="stat-card-icon ic-emerald">💰</div>
+      </div>
+      <span class="stat-card-trend trend-flat"><%= @pending_orders %> pending</span>
+    </div>
+
+    <!-- Enrollments -->
+    <div class="stat-card teal" style="animation-delay:.10s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Enrollments</div>
+          <div class="stat-card-num"><%= @enrollments_count %></div>
+          <div class="stat-card-sub">Course accesses granted</div>
+        </div>
+        <div class="stat-card-icon ic-teal">📋</div>
+      </div>
+      <span class="stat-card-trend trend-up"><%= @active_enrollments %> active</span>
+    </div>
+
+    <!-- Speaking Attempts -->
+    <div class="stat-card amber" style="animation-delay:.13s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Speaking Attempts</div>
+          <div class="stat-card-num"><%= @attempts_count %></div>
+          <div class="stat-card-sub">Avg band: <%= @avg_band || '—' %></div>
+        </div>
+        <div class="stat-card-icon ic-amber">🎤</div>
+      </div>
+      <span class="stat-card-trend trend-flat">All time</span>
+    </div>
+
+    <!-- Courses -->
+    <div class="stat-card indigo" style="animation-delay:.16s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Courses</div>
+          <div class="stat-card-num"><%= @courses_count %></div>
+          <div class="stat-card-sub"><%= @active_courses %> active</div>
+        </div>
+        <div class="stat-card-icon ic-indigo">📚</div>
+      </div>
+      <span class="stat-card-trend trend-flat"><%= @lessons_count %> lessons total</span>
+    </div>
+
+    <!-- Orders -->
+    <div class="stat-card rose" style="animation-delay:.19s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Orders</div>
+          <div class="stat-card-num"><%= @orders_count %></div>
+          <div class="stat-card-sub"><%= @paid_orders %> paid · <%= @pending_orders %> pending</div>
+        </div>
+        <div class="stat-card-icon ic-rose">🛒</div>
+      </div>
+      <span class="stat-card-trend <%= @pending_orders > 0 ? 'trend-down' : 'trend-up' %>">
+        <%= @pending_orders > 0 ? "#{@pending_orders} need review" : "All clear" %>
+      </span>
+    </div>
+
+    <!-- Total Users -->
+    <div class="stat-card red" style="animation-delay:.22s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">All Users</div>
+          <div class="stat-card-num"><%= @total_users %></div>
+          <div class="stat-card-sub"><%= @admins_count %> admins · <%= @students_count %> students</div>
+        </div>
+        <div class="stat-card-icon ic-red">👥</div>
+      </div>
+      <span class="stat-card-trend trend-flat">Total accounts</span>
+    </div>
+
+    <!-- Sections & Lessons -->
+    <div class="stat-card teal" style="animation-delay:.25s">
+      <div class="stat-card-top">
+        <div>
+          <div class="stat-card-label">Content</div>
+          <div class="stat-card-num"><%= @lessons_count %></div>
+          <div class="stat-card-sub"><%= @sections_count %> sections across all courses</div>
+        </div>
+        <div class="stat-card-icon ic-teal">🎬</div>
+      </div>
+      <span class="stat-card-trend trend-flat">Lessons published</span>
+    </div>
+
+  </div>
+
+  <!-- ═══ CHARTS ROW ═══ -->
+  <div class="charts-row">
+
+    <!-- Student Registration Chart -->
+    <div class="chart-card">
+      <div class="chart-card-head">
+        <div class="chart-card-title-wrap">
+          <span class="chart-card-icon">📈</span>
+          <div>
+            <div class="chart-card-title">Student Registrations</div>
+            <div class="chart-card-sub"><%= current_year - 1 %> vs <%= current_year %></div>
+          </div>
+        </div>
+      </div>
+      <div class="chart-card-body">
+        <div class="chart-wrap">
+          <canvas id="students-chart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#dc2626"></div><%= current_year %></div>
+          <div class="legend-item"><div class="legend-dot" style="background:#fca5a5"></div><%= current_year - 1 %></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Revenue + Attempts mini charts -->
+    <div style="display:flex;flex-direction:column;gap:20px">
+
+      <!-- Revenue Chart -->
+      <div class="chart-card" style="flex:1">
+        <div class="chart-card-head">
+          <div class="chart-card-title-wrap">
+            <span class="chart-card-icon">💰</span>
+            <div>
+              <div class="chart-card-title">Revenue <%= current_year %></div>
+              <div class="chart-card-sub">Monthly (₫)</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div class="chart-wrap" style="height:110px">
+            <canvas id="revenue-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Speaking Attempts Chart -->
+      <div class="chart-card" style="flex:1">
+        <div class="chart-card-head">
+          <div class="chart-card-title-wrap">
+            <span class="chart-card-icon">🎤</span>
+            <div>
+              <div class="chart-card-title">Speaking Attempts <%= current_year %></div>
+              <div class="chart-card-sub">Monthly count</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card-body">
+          <div class="chart-wrap" style="height:110px">
+            <canvas id="attempts-chart"></canvas>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ BOTTOM ROW ═══ -->
+  <div class="bottom-row">
+
+    <!-- Recent Students -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <span class="panel-title">New Students</span>
+        <span class="panel-badge"><%= @recent_students.count %></span>
+      </div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Student</th>
+          <th>Joined</th>
+        </tr></thead>
+        <tbody>
+          <% @recent_students.each do |u| %>
+            <tr>
+              <td>
+                <div class="user-row">
+                  <div class="user-avatar"><%= u.full_name&.first || '?' %></div>
+                  <div>
+                    <div class="user-name"><%= u.full_name.truncate(20) rescue '—' %></div>
+                    <div class="user-email"><%= u.email.truncate(24) rescue '—' %></div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--ink-3);font-size:11px;font-family:var(--font-mono)">
+                <%= u.created_at.strftime("%d/%m/%y") rescue '—' %>
+              </td>
+            </tr>
+          <% end %>
+          <% if @recent_students.empty? %>
+            <tr><td colspan="2" style="text-align:center;color:var(--ink-3);font-style:italic;padding:24px">No students yet</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Top Courses -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <span class="panel-title">Top Courses</span>
+        <span class="panel-badge">by enrollments</span>
+      </div>
+      <% max_enroll = @top_courses.map(&:enrollments_count).max.to_f %>
+      <% max_enroll = 1 if max_enroll == 0 %>
+      <table class="data-table">
+        <thead><tr>
+          <th>Course</th>
+          <th>Enroll</th>
+        </tr></thead>
+        <tbody>
+          <% @top_courses.each do |c| %>
+            <tr>
+              <td>
+                <div style="font-weight:700;color:var(--ink);font-size:12.5px;margin-bottom:4px"><%= c.title.truncate(28) %></div>
+                <div class="mini-bar-wrap">
+                  <div class="mini-bar-bg">
+                    <div class="mini-bar-fill" style="width:<%= (c.enrollments_count / max_enroll * 100).round %>%"></div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="mini-bar-num"><%= c.enrollments_count %></span>
+              </td>
+            </tr>
+          <% end %>
+          <% if @top_courses.empty? %>
+            <tr><td colspan="2" style="text-align:center;color:var(--ink-3);font-style:italic;padding:24px">No data yet</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Speaking Attempts -->
+    <div class="panel-card">
+      <div class="panel-head">
+        <span class="panel-title">Speaking Results</span>
+        <span class="panel-badge">latest</span>
+      </div>
+      <table class="data-table">
+        <thead><tr>
+          <th>Student</th>
+          <th>Band</th>
+          <th>Part</th>
+        </tr></thead>
+        <tbody>
+          <% @recent_attempts.each do |a| %>
+            <tr>
+              <td>
+                <div style="font-weight:600;font-size:12.5px;color:var(--ink)"><%= a.user&.full_name&.truncate(18) || '—' %></div>
+                <div style="font-size:10px;color:var(--ink-3)"><%= a.created_at.strftime("%d/%m/%y") rescue '—' %></div>
+              </td>
+              <td><span class="band-pill"><%= a.overall_band || '—' %></span></td>
+              <td style="font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--teal)"><%= a.part&.upcase || '—' %></td>
+            </tr>
+          <% end %>
+          <% if @recent_attempts.empty? %>
+            <tr><td colspan="3" style="text-align:center;color:var(--ink-3);font-style:italic;padding:24px">No attempts yet</td></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- ═══ RECENT ORDERS ═══ -->
+  <div class="full-panel">
+    <div class="panel-head">
+      <span class="panel-title">Recent Orders</span>
+      <span class="panel-badge"><%= @recent_orders.count %></span>
+    </div>
+    <table class="data-table">
+      <thead><tr>
+        <th>Student</th>
+        <th>Course</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Date</th>
+      </tr></thead>
+      <tbody>
+        <% @recent_orders.each do |o| %>
+          <tr>
+            <td>
+              <div class="user-row">
+                <div class="user-avatar"><%= o.user&.full_name&.first || '?' %></div>
+                <div>
+                  <div class="user-name"><%= o.user&.full_name&.truncate(18) || '—' %></div>
+                  <div class="user-email"><%= o.user&.email&.truncate(22) || '—' %></div>
+                </div>
+              </div>
+            </td>
+            <td style="font-weight:600;color:var(--ink);font-size:12.5px"><%= o.course&.title&.truncate(30) || '—' %></td>
+            <td style="font-family:var(--font-mono);font-weight:700;color:var(--emerald)">
+              <%= number_to_currency(o.total_price || 0, unit: "₫", precision: 0, format: "%n%u") %>
+            </td>
+            <td>
+              <% chip = case o.status.to_s
+                   when "1", "paid"      then ["chip-paid",    "Paid"]
+                   when "0", "pending"   then ["chip-pending", "Pending"]
+                   else                       ["chip-failed",  o.status.to_s.capitalize]
+                 end %>
+              <span class="status-chip <%= chip[0] %>"><%= chip[1] %></span>
+            </td>
+            <td style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3)">
+              <%= o.created_at.strftime("%d/%m/%Y") rescue '—' %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @recent_orders.empty? %>
+          <tr><td colspan="5" style="text-align:center;color:var(--ink-3);font-style:italic;padding:28px">No orders yet</td></tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ FOOTER ═══ -->
+  <div class="dash-footer">
+    <span>© <%= Time.current.year %> LMS Admin — All rights reserved</span>
+    <div class="footer-links">
+      <%= link_to "Courses",  admin_courses_path %>
+      <%= link_to "Students", admin_users_path rescue link_to("Students", "#") %>
+    </div>
+  </div>
+
+</div>
+</main>
+
+<!-- ═══════ CHART DATA ═══════ -->
+<script>
+window.chartData = {
+  labels:       <%= raw @months.to_json %>,
+  currentYear:  <%= current_year %>,
+  lastYear:     <%= current_year - 1 %>,
+  students:     <%= raw data_current.to_json %>,
+  studentsLast: <%= raw data_last.to_json %>,
+  revenue:      <%= raw revenue_data.to_json %>,
+  attempts:     <%= raw attempts_data.to_json %>
+};
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const d = window.chartData;
+
+  const baseOpts = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#0d0e14',
+        titleFont: { family: "'JetBrains Mono'", size: 11 },
+        bodyFont:  { family: "'Plus Jakarta Sans'", size: 12 },
+        padding: 10, cornerRadius: 8,
+        callbacks: {}
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: 'rgba(232,234,242,.7)', drawBorder: false },
+        ticks: { font: { family: "'JetBrains Mono'", size: 10 }, color: '#7b7f96' }
+      },
+      y: {
+        grid: { color: 'rgba(232,234,242,.7)', drawBorder: false },
+        ticks: { font: { family: "'JetBrains Mono'", size: 10 }, color: '#7b7f96', precision: 0 },
+        beginAtZero: true
+      }
+    }
+  };
+
+  /* ── Students chart ── */
+  const sCtx = document.getElementById('students-chart');
+  if (sCtx) new Chart(sCtx, {
+    type: 'line',
     data: {
-      labels: data.labels,
+      labels: d.labels,
       datasets: [
         {
-          label: "Students-" + data.currentYear,
-          backgroundColor: "#4c51bf",
-          borderColor: "#4c51bf",
-          borderWidth: 3,
-          data: data.dataCurrent,
-          fill: false,
+          label: String(d.currentYear),
+          data: d.students,
+          borderColor: '#dc2626',
+          backgroundColor: 'rgba(220,38,38,.08)',
+          borderWidth: 2.5, pointRadius: 3, pointHoverRadius: 5,
+          fill: true, tension: .35
         },
         {
-          label: "Students-" + data.lastYear,
-          backgroundColor: "#ed64a6",
-          borderColor: "#ed64a6",
-          borderWidth: 3,
-          data: data.dataLast,
-          fill: false,
-        },
-      ],
+          label: String(d.lastYear),
+          data: d.studentsLast,
+          borderColor: '#fca5a5',
+          backgroundColor: 'rgba(252,165,165,.06)',
+          borderWidth: 2, pointRadius: 2, pointHoverRadius: 4,
+          fill: false, tension: .35,
+          borderDash: [4,4]
+        }
+      ]
     },
-    options: {
-      maintainAspectRatio: false,
-      responsive: true,
-      title: {
-         display: true,
-         text: "Student Registrations (" + data.lastYear + " vs " + data.currentYear + ")",
-         fontColor: "000",
-         fontSize: 16,
-       },
-      legend: {
-        labels: { fontColor: "#000" },
-        align: "end",
-        position: "bottom",
-      },
-      scales: {
-         xAxes: [
-           {
-             scaleLabel: {
-               display: true,
-               labelString: "Month",
-               fontColor: "white",
-               fontSize: 12,
-             },
-             ticks: {
-               fontColor: "#000",
-             },
-             gridLines: {
-               color: "rgba(0,0,0,0.1)",
-             },
-           },
-         ],
-         yAxes: [
-            {
-              scaleLabel: {
-                display: true,
-                labelString: "Student Count",
-                fontColor: "#000",
-                fontSize: 12,
-              },
-              ticks: {
-                beginAtZero: true,
-                precision: 0,
-                autoSkip: false,
-                maxTicksLimit: 10,
-                fontColor: "#000",
-              },
-              gridLines: {
-                color: "rgba(0,0,0,0.1)",
-              },
-            },
-          ],
-          
-       },
-       
-    },
-  };
+    options: { ...baseOpts }
+  });
 
-  var ctx = document.getElementById("line-chart");
-  if (ctx) {
-    new Chart(ctx.getContext("2d"), config);
+  /* ── Revenue chart ── */
+  const rCtx = document.getElementById('revenue-chart');
+  if (rCtx) {
+    const rOpts = JSON.parse(JSON.stringify(baseOpts));
+    rOpts.plugins.tooltip.callbacks.label = ctx => ' ₫' + ctx.raw.toLocaleString();
+    new Chart(rCtx, {
+      type: 'bar',
+      data: {
+        labels: d.labels,
+        datasets: [{
+          label: 'Revenue',
+          data: d.revenue,
+          backgroundColor: 'rgba(5,150,105,.2)',
+          borderColor: '#059669',
+          borderWidth: 1.5, borderRadius: 5
+        }]
+      },
+      options: rOpts
+    });
   }
+
+  /* ── Attempts chart ── */
+  const aCtx = document.getElementById('attempts-chart');
+  if (aCtx) new Chart(aCtx, {
+    type: 'bar',
+    data: {
+      labels: d.labels,
+      datasets: [{
+        label: 'Attempts',
+        data: d.attempts,
+        backgroundColor: 'rgba(217,119,6,.18)',
+        borderColor: '#d97706',
+        borderWidth: 1.5, borderRadius: 5
+      }]
+    },
+    options: { ...baseOpts }
+  });
 });
 </script>
-<script>
-  document.addEventListener("DOMContentLoaded", function() {
-    const btn = document.getElementById("avatarMenuButton");
-    const dropdown = document.getElementById("avatarDropdown");
-
-    btn.addEventListener("click", function(e) {
-      e.stopPropagation();
-      dropdown.classList.toggle("hidden");
-    });
-
-    document.addEventListener("click", function(e) {
-      if (!dropdown.contains(e.target) && !btn.contains(e.target)) {
-        dropdown.classList.add("hidden");
-      }
-    });
-  });
-</script>
-
-  <!-- NAVBAR -->
-  <%= render "admin/shared/navbar" %>
-
-  <!-- SIDEBAR -->
-  <%= render "admin/shared/sidebar" %>
-  <!-- MAIN CONTENT -->
-  <main class="sm:ml-64 p-12 pt-24">
-       <div class="px-4 md:px-6 mx-auto w-full mt-6">
-          <div class="flex flex-wrap">
-             <div class="w-full xl:w-8/12 px-4 mt-8">
-                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-blueGray-800">
-                   <div class="rounded-t mb-0 px-4 py-3 bg-transparent">
-                      <div class="flex flex-wrap items-center">
-                         <div class="relative w-full max-w-full flex-grow flex-1">
-                            <h6 class="uppercase mb-1 text-xs font-semibold text-blueGray-200">Overview</h6>
-                            <h2 class="text-xl font-semibold text-white">Students Chart</h2>
-                            <div class="p-4 flex-auto">
-                            <div class="relative h-350-px">
-                               <canvas width="500" height="300" style="display: block; box-sizing: border-box; height: 350px; width: 595.5px;" id="line-chart"></canvas>
-                            </div>
-
-                         </div>
-                      </div>
-                   </div>
-
-                   </div>
-                </div>
-             </div>
-             <div class="w-full xl:w-4/12 px-4">
-                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white">
-                   <div class="rounded-t mb-0 px-4 py-3 bg-transparent">
-                      <div class="flex flex-wrap items-center">
-                         <div class="relative w-full max-w-full flex-grow flex-1">
-                            <h6 class="uppercase mb-1 text-xs font-semibold text-blueGray-500">Performance</h6>
-                            <h2 class="text-xl font-semibold text-blueGray-800">Total orders</h2>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="p-4 flex-auto">
-                      <div class="relative h-350-px">
-                         <canvas width="221" height="291" style="display: block; box-sizing: border-box; height: 350px; width: 265.7px;" id="bar-chart"></canvas>
-                      </div>
-                   </div>
-                </div>
-             </div>
-          </div>
-          <div class="flex flex-wrap">
-             <div class="w-full xl:w-8/12 px-4">
-                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white text-blueGray-700">
-                   <div class="px-6 py-4 border-0">
-                      <div class="flex flex-wrap items-center">
-                         <div class="relative w-full max-w-full flex-grow flex-1">
-                            <h3 class="font-bold text-lg text-blueGray-700">Page visits</h3>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="block w-full overflow-x-auto">
-                      <table class="items-center w-full bg-transparent border-collapse">
-                         <thead>
-                            <tr>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Page name</th>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Visitors</th>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Unique Users</th>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Bounce Rate</th>
-                            </tr>
-                         </thead>
-                         <tbody>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">4,569</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">340</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-emerald-500"></i>46,53%</div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/index.html</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">3,985</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">319</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><i class="fas fa-arrow-down mr-2 text-orange-500"></i>46,53%</div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/charts.html</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">3,513</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">294</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><i class="fas fa-arrow-down mr-2 text-orange-500"></i>36,49%</div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/tables.html</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">2,050</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">147</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-emerald-500"></i>50,87%</div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">/argon/profile.html</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">1,795</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">190</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><i class="fas fa-arrow-up mr-2 text-red-500"></i>46,53%</div>
-                               </td>
-                            </tr>
-                         </tbody>
-                      </table>
-                   </div>
-                </div>
-             </div>
-             <div class="w-full xl:w-4/12 px-4">
-                <div class="relative flex flex-col min-w-0 break-words w-full mb-8 shadow-lg rounded-lg bg-white text-blueGray-700">
-                   <div class="px-6 py-4 border-0">
-                      <div class="flex flex-wrap items-center">
-                         <div class="relative w-full max-w-full flex-grow flex-1">
-                            <h3 class="font-bold text-lg text-blueGray-700">Social traffic</h3>
-                         </div>
-                      </div>
-                   </div>
-                   <div class="block w-full overflow-x-auto">
-                      <table class="items-center w-full bg-transparent border-collapse">
-                         <thead>
-                            <tr>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Referral</th>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200">Visitors</th>
-                               <th class="px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-bold text-left bg-blueGray-100 text-blueGray-500 border-blueGray-200"></th>
-                            </tr>
-                         </thead>
-                         <tbody>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Facebook</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">1,480</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
-                                  <div class="flex items-center">
-                                     <span class="mr-2">60%</span>
-                                     <div class="relative w-full">
-                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-red-200">
-                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-red-500" style="width: 60%;"></div>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Facebook</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">5,480</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
-                                  <div class="flex items-center">
-                                     <span class="mr-2">70%</span>
-                                     <div class="relative w-full">
-                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-emerald-200">
-                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-emerald-500" style="width: 70%;"></div>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Google</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">4,807</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
-                                  <div class="flex items-center">
-                                     <span class="mr-2">80%</span>
-                                     <div class="relative w-full">
-                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-indigo-200">
-                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-indigo-500" style="width: 80%;"></div>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Instagram</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">3,678</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
-                                  <div class="flex items-center">
-                                     <span class="mr-2">75%</span>
-                                     <div class="relative w-full">
-                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-lightBlue-200">
-                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-lightBlue-500" style="width: 75%;"></div>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </td>
-                            </tr>
-                            <tr>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center"><span class="ml-3 font-bold NaN">Twitter</span></div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <div class="flex items-center">2,645	</div>
-                               </td>
-                               <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 min-w-140-px">
-                                  <div class="flex items-center">
-                                     <span class="mr-2">30%</span>
-                                     <div class="relative w-full">
-                                        <div class="overflow-hidden h-2 text-xs flex rounded bg-amber-200">
-                                           <div class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-amber-500" style="width: 30%;"></div>
-                                        </div>
-                                     </div>
-                                  </div>
-                               </td>
-                            </tr>
-                         </tbody>
-                      </table>
-                   </div>
-                </div>
-             </div>
-          </div>
-          <footer class="block py-4">
-             <div class="container mx-auto px-4">
-                <hr class="mb-4 border-b-1 border-blueGray-200">
-                <div class="flex flex-wrap items-center md:justify-between justify-center">
-                   <div class="w-full md:w-4/12 px-4">
-                      <div class="text-center mb-2 md:text-left md:mb-0"><a href="https://www.creative-tim.com/?ref=npr-footeradmin" target="_blank" class="text-sm text-blueGray-500 font-semibold py-1 text-center md:text-left">Copyright © 2021 Creative Tim</a></div>
-                   </div>
-                   <div class="w-full md:w-8/12 px-4">
-                      <ul class="flex flex-wrap list-none md:justify-end  justify-center">
-                         <li><a href="https://www.creative-tim.com?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Creative Tim</a></li>
-                         <li><a href="https://www.creative-tim.com/presentation?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">About Us</a></li>
-                         <li><a href="https://www.creative-tim.com/blog/?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Blog</a></li>
-                         <li><a href="https://www.creative-tim.com/license?ref=npr-footeradmin" target="_blank" class="text-blueGray-700 hover:text-blueGray-900 text-sm font-semibold block py-1 px-3">Licenses</a></li>
-                      </ul>
-                   </div>
-                </div>
-             </div>
-          </footer>
-       </div>
-    </div>
- </div>
-  </main>
-
-
-
- 
