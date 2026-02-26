@@ -1,6 +1,6 @@
 <%# ============================================================
     app/views/students/dashboard/index.html.erb
-    Design: synced with progress.html.erb + dashboard.html.erb
+    Design: Red color scheme - synced with progress.html.erb + dashboard.html.erb
     ============================================================ %>
 
 <%= render "students/shared/navbar" %>
@@ -10,7 +10,7 @@
 
 <style>
 /* ═══════════════════════════════════════════
-   DESIGN TOKENS
+   DESIGN TOKENS - RED COLOR SCHEME
 ═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -22,9 +22,9 @@
   --bg:          #f2f4f9;
   --surface:     #ffffff;
   --surface-2:   #f7f8fc;
-  --indigo:      #4f46e5;
-  --indigo-lt:   #eeeeff;
-  --indigo-glow: rgba(79,70,229,.18);
+  --primary:     #dc2626;
+  --primary-lt:  #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
   --teal:        #0d9488;
   --teal-lt:     #e6faf8;
   --amber:       #d97706;
@@ -57,24 +57,24 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   font-size: clamp(26px, 3vw, 36px); font-weight: 400;
   letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px;
 }
-.sec-title em { font-style: italic; color: var(--indigo); }
+.sec-title em { font-style: italic; color: var(--primary); }
 .sec-sub { font-size: 15px; color: var(--ink-3); }
 
 .btn-primary {
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 26px; background: var(--indigo); color: #fff;
+  padding: 12px 26px; background: var(--primary); color: #fff;
   font-size: 14px; font-weight: 700; border-radius: var(--r-md);
   text-decoration: none; transition: all .2s var(--ease);
-  box-shadow: 0 4px 14px var(--indigo-glow); border: none; cursor: pointer;
+  box-shadow: 0 4px 14px var(--primary-glow); border: none; cursor: pointer;
 }
-.btn-primary:hover { background: #4338ca; transform: translateY(-1px); }
+.btn-primary:hover { background: #b91c1c; transform: translateY(-1px); }
 .btn-outline {
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 12px 26px; background: var(--surface); color: var(--indigo);
+  padding: 12px 26px; background: var(--surface); color: var(--primary);
   font-size: 14px; font-weight: 700; border-radius: var(--r-md);
-  text-decoration: none; border: 1.5px solid #c7d2fe; transition: all .2s var(--ease);
+  text-decoration: none; border: 1.5px solid #fca5a5; transition: all .2s var(--ease);
 }
-.btn-outline:hover { background: var(--indigo-lt); }
+.btn-outline:hover { background: var(--primary-lt); }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
 
@@ -92,7 +92,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   content: ''; position: absolute; border-radius: 50%;
   pointer-events: none; filter: blur(90px); opacity: .3;
 }
-.hero::before { width: 520px; height: 520px; background: var(--indigo-lt); top: -140px; left: -100px; }
+.hero::before { width: 520px; height: 520px; background: var(--primary-lt); top: -140px; left: -100px; }
 .hero::after  { width: 380px; height: 380px; background: var(--teal-lt);   bottom: -100px; right: -60px; }
 
 .hero-inner {
@@ -104,16 +104,16 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 .hero-eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--indigo); background: var(--indigo-lt);
+  color: var(--primary); background: var(--primary-lt);
   padding: 5px 13px; border-radius: 30px; margin-bottom: 18px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #fca5a5;
 }
 .hero-title {
   font-family: var(--font-serif);
   font-size: clamp(32px, 4vw, 54px); font-weight: 400;
   line-height: 1.12; letter-spacing: -.03em; color: var(--ink); margin-bottom: 18px;
 }
-.hero-title em { font-style: italic; color: var(--indigo); }
+.hero-title em { font-style: italic; color: var(--primary); }
 .hero-title strong { font-family: var(--font); font-weight: 800; color: var(--ink); }
 .hero-desc { font-size: 16px; color: var(--ink-3); margin-bottom: 28px; max-width: 480px; line-height: 1.7; }
 
@@ -137,7 +137,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 }
 .hero-float-icon {
   width: 42px; height: 42px; border-radius: var(--r-sm);
-  background: var(--indigo-lt); display: flex; align-items: center; justify-content: center; font-size: 20px;
+  background: var(--primary-lt); display: flex; align-items: center; justify-content: center; font-size: 20px;
 }
 .hero-float-card strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); }
 .hero-float-card span   { font-size: 12px; color: var(--ink-3); }
@@ -155,7 +155,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
   animation: fadeUp .5s var(--ease) both;
 }
-.why-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #c7d2fe; }
+.why-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
 .why-card:nth-child(1) { animation-delay:.05s; } .why-card:nth-child(2) { animation-delay:.10s; }
 .why-card:nth-child(3) { animation-delay:.15s; } .why-card:nth-child(4) { animation-delay:.20s; }
 .why-icon {
@@ -191,19 +191,19 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
   display: flex; flex-direction: column;
 }
-.course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #c7d2fe; }
-.course-thumb { position: relative; height: 190px; overflow: hidden; background: var(--indigo-lt); }
+.course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.course-thumb { position: relative; height: 190px; overflow: hidden; background: var(--primary-lt); }
 .course-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); display: block; }
 .course-card:hover .course-thumb img { transform: scale(1.04); }
 .course-thumb-ph {
   width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-serif); font-size: 56px; font-style: italic; color: #c7d2fe;
+  font-family: var(--font-serif); font-size: 56px; font-style: italic; color: #fca5a5;
 }
 .band-chip {
   position: absolute; top: 12px; left: 12px;
   background: rgba(255,255,255,.92); backdrop-filter: blur(6px);
   border: 1px solid var(--line); border-radius: 20px;
-  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--indigo);
+  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--primary);
 }
 .course-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
 .course-title {
@@ -216,8 +216,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 }
 .course-price { font-family: var(--font-serif); font-size: 20px; color: var(--ink); letter-spacing: -.02em; }
 .act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: all .2s var(--ease); font-family: var(--font); }
-.act-enter   { background: var(--indigo); color: #fff; box-shadow: 0 2px 8px var(--indigo-glow); }
-.act-enter:hover { background: #4338ca; }
+.act-enter   { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
+.act-enter:hover { background: #b91c1c; }
 .act-pay     { background: var(--emerald-lt); color: var(--emerald); border: 1.5px solid #a7f3d0; }
 .act-pay:hover { background: #d1fae5; }
 .act-pending { background: var(--amber-lt); color: var(--amber); border: 1.5px solid #fcd34d; cursor: default; }
@@ -225,7 +225,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 /* slider dots */
 .slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; list-style: none; }
 .slider-dots li button { width: 8px; height: 8px; border-radius: 4px; background: var(--line); border: none; cursor: pointer; padding: 0; transition: all .2s var(--ease); }
-.slider-dots li.active button { background: var(--indigo); width: 22px; }
+.slider-dots li.active button { background: var(--primary); width: 22px; }
 
 /* ═══════════════════════════════════════════
    TEACHERS
@@ -239,15 +239,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   border-radius: var(--r-xl); padding: 28px 22px; text-align: center;
   box-shadow: var(--shadow-xs); transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
 }
-.teacher-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #c7d2fe; }
+.teacher-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
 .teacher-avatar {
   width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
-  margin: 0 auto 16px; border: 3px solid var(--indigo-lt); display: block;
+  margin: 0 auto 16px; border: 3px solid var(--primary-lt); display: block;
 }
 .teacher-avatar-ph {
-  width: 88px; height: 88px; border-radius: 50%; background: var(--indigo-lt);
+  width: 88px; height: 88px; border-radius: 50%; background: var(--primary-lt);
   display: flex; align-items: center; justify-content: center;
-  margin: 0 auto 16px; font-family: var(--font-serif); font-size: 32px; font-style: italic; color: var(--indigo);
+  margin: 0 auto 16px; font-family: var(--font-serif); font-size: 32px; font-style: italic; color: var(--primary);
 }
 .teacher-name { font-size: 15.5px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
 .teacher-tag {
@@ -286,30 +286,30 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 .modal-close:hover { background: var(--rose-lt); color: var(--rose); border-color: #fecdd3; }
 .modal-heading { font-family: var(--font-serif); font-size: 26px; margin-bottom: 4px; }
 .modal-course  { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
-.modal-price   { font-family: var(--font-serif); font-size: 32px; color: var(--rose); letter-spacing: -.02em; margin-bottom: 22px; }
+.modal-price   { font-family: var(--font-serif); font-size: 32px; color: var(--primary); letter-spacing: -.02em; margin-bottom: 22px; }
 .pay-method {
   display: flex; align-items: center; gap: 12px;
   padding: 13px 16px; border: 1.5px solid var(--line);
   border-radius: var(--r-md); cursor: pointer; margin-bottom: 10px;
   background: var(--surface-2); transition: all .2s var(--ease);
 }
-.pay-method:has(input:checked) { border-color: var(--indigo); background: var(--indigo-lt); }
-.pay-method input { accent-color: var(--indigo); }
+.pay-method:has(input:checked) { border-color: var(--primary); background: var(--primary-lt); }
+.pay-method input { accent-color: var(--primary); }
 .pay-method span { font-size: 14px; font-weight: 600; color: var(--ink-2); }
 .modal-submit {
-  width: 100%; padding: 14px; background: var(--indigo); color: #fff;
+  width: 100%; padding: 14px; background: var(--primary); color: #fff;
   border: none; border-radius: var(--r-md); font-size: 15px; font-weight: 700;
   font-family: var(--font); cursor: pointer; margin-top: 18px;
-  transition: all .2s var(--ease); box-shadow: 0 4px 14px var(--indigo-glow);
+  transition: all .2s var(--ease); box-shadow: 0 4px 14px var(--primary-glow);
 }
-.modal-submit:hover { background: #4338ca; transform: translateY(-1px); }
+.modal-submit:hover { background: #b91c1c; transform: translateY(-1px); }
 
 /* ═══════════════════════════════════════════
    RESPONSIVE
 ═══════════════════════════════════════════ */
 @media (max-width: 960px) {
   .hero-inner { grid-template-columns: 1fr; gap: 40px; }
-  .hero-visual { display: none; }
+  .hero-visual { display: block !important; }
   .why-grid { grid-template-columns: repeat(2,1fr); }
 }
 @media (max-width: 640px) {
@@ -357,13 +357,14 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
         <% end %>
       </ul>
 
-<div class="hero-cta">
-  <%= link_to students_courses_path(paid: true), class: "btn-primary" do %>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-    Start Learning Now
-  <% end %>
-  <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
-</div>
+      <div class="hero-cta">
+        <%= link_to students_courses_path(paid: true), class: "btn-primary" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Learning Now
+        <% end %>
+        <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
+      </div>
+    </div>
 
     <!-- RIGHT -->
     <div class="hero-visual" style="animation: fadeUp .5s var(--ease) .1s both">
@@ -387,7 +388,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
     <p class="sec-sub">Kết hợp giáo viên IELTS giàu kinh nghiệm với công nghệ AI tiên tiến.</p>
     <div class="why-grid">
       <% [
-        { icon: "📝", bg: "var(--indigo-lt)", title: "Real IELTS Topics",    desc: "Speaking topics cập nhật thường xuyên theo đề thi thực tế." },
+        { icon: "📝", bg: "var(--primary-lt)", title: "Real IELTS Topics",    desc: "Speaking topics cập nhật thường xuyên theo đề thi thực tế." },
         { icon: "🤖", bg: "var(--teal-lt)",   title: "AI Feedback",          desc: "Chấm điểm tự động theo IELTS Band Descriptors 4 kỹ năng." },
         { icon: "🎯", bg: "var(--amber-lt)",  title: "Personalized Path",    desc: "Lộ trình học cá nhân hoá theo band mục tiêu của bạn." },
         { icon: "📊", bg: "var(--rose-lt)",   title: "Progress Tracking",    desc: "Biểu đồ tiến độ, lịch sử bài thi và phân tích kỹ năng." },
@@ -407,7 +408,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   <div class="courses-inner">
     <div class="section-header">
       <div>
-        <div class="eyebrow" style="color:var(--indigo);background:var(--indigo-lt);">Popular Courses</div>
+        <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">Popular Courses</div>
         <h2 class="sec-title" style="margin-bottom:0">Khóa học <em>nổi bật</em></h2>
       </div>
       <%= link_to students_courses_path, class: "btn-outline" do %>
