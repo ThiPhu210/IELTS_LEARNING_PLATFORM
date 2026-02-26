@@ -357,14 +357,13 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
         <% end %>
       </ul>
 
-      <div class="hero-cta">
-        <%= link_to "Start Learning Now", students_courses_path(paid: true), class: "btn-primary" do %>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-          Start Learning Now
-        <% end %>
-        <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
-      </div>
-    </div>
+<div class="hero-cta">
+  <%= link_to students_courses_path(paid: true), class: "btn-primary" do %>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Start Learning Now
+  <% end %>
+  <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
+</div>
 
     <!-- RIGHT -->
     <div class="hero-visual" style="animation: fadeUp .5s var(--ease) .1s both">
