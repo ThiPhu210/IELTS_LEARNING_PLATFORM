@@ -1,6 +1,6 @@
 <%# ============================================================
     app/views/students/courses/show.html.erb
-    Design: Red color scheme - synced with dashboard/index.html.erb
+    Design: Red color scheme — synced with dashboard/index.html.erb
     ============================================================ %>
 
 <%= render "students/shared/navbar" %>
@@ -10,7 +10,7 @@
 
 <style>
 /* ═══════════════════════════════════════════
-   DESIGN TOKENS — RED COLOR SCHEME (synced with dashboard)
+   DESIGN TOKENS — RED COLOR SCHEME
 ═══════════════════════════════════════════ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -50,151 +50,118 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 @keyframes fadeUp   { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
 @keyframes slideUp  { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
 @keyframes wave     { 0%,100%{height:4px} 50%{height:24px} }
-@keyframes spin     { to { transform:rotate(360deg); } }
 @keyframes pulseGlow { 0%,100%{box-shadow:0 0 0 0 var(--primary-glow)} 50%{box-shadow:0 0 0 8px transparent} }
 
 /* ═══════════════════════════════════════════
-   COURSE HERO BANNER
+   1. COURSE HERO — full-width banner (NO thumb card)
 ═══════════════════════════════════════════ */
 .course-hero {
-  background: var(--surface);
-  border-bottom: 1.5px solid var(--line);
-  padding-top: 80px; /* navbar offset */
   position: relative;
+  padding-top: 80px;
+  background: var(--ink);
   overflow: hidden;
+  min-height: 300px;
 }
-.course-hero::before {
+/* Blurred bg image */
+.course-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: .2;
+}
+.course-hero-bg.no-image {
+  background: linear-gradient(135deg, #7f1d1d 0%, #1e1b4b 100%);
+  opacity: 1;
+}
+/* Dark vignette */
+.course-hero::after {
   content: '';
-  position: absolute; border-radius: 50%;
-  width: 600px; height: 600px;
-  background: var(--primary-lt);
-  top: -200px; right: -150px;
-  filter: blur(100px); opacity: .35;
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, rgba(13,14,20,.93) 0%, rgba(13,14,20,.72) 55%, rgba(13,14,20,.28) 100%);
   pointer-events: none;
 }
 .course-hero-inner {
-  max-width: 1200px; margin: 0 auto; padding: 40px 32px 48px;
-  display: grid; grid-template-columns: 1fr 340px; gap: 56px; align-items: start;
   position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto; padding: 44px 32px 52px;
+  display: grid; grid-template-columns: 1fr 300px; gap: 48px; align-items: start;
 }
 
 .breadcrumb {
   display: flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600; color: var(--ink-3);
-  margin-bottom: 16px;
-  animation: fadeUp .4s var(--ease) both;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.45);
+  margin-bottom: 16px; animation: fadeUp .4s var(--ease) both;
 }
-.breadcrumb a { color: var(--primary); text-decoration: none; transition: opacity .15s; }
-.breadcrumb a:hover { opacity: .75; }
-.breadcrumb svg { flex-shrink: 0; }
+.breadcrumb a { color: #fca5a5; text-decoration: none; transition: opacity .15s; }
+.breadcrumb a:hover { opacity: .8; }
 
 .course-hero-eyebrow {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--primary); background: var(--primary-lt);
+  color: #fca5a5; background: rgba(220,38,38,.22);
   padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
-  border: 1px solid #fca5a5;
+  border: 1px solid rgba(252,165,165,.28);
   animation: fadeUp .4s var(--ease) .05s both;
 }
-
 .course-hero-title {
   font-family: var(--font-serif);
-  font-size: clamp(28px, 3.5vw, 44px); font-weight: 400;
-  line-height: 1.15; letter-spacing: -.03em; color: var(--ink);
-  margin-bottom: 14px;
-  animation: fadeUp .4s var(--ease) .08s both;
+  font-size: clamp(26px, 3vw, 42px); font-weight: 400;
+  line-height: 1.15; letter-spacing: -.02em; color: #fff;
+  margin-bottom: 14px; animation: fadeUp .4s var(--ease) .08s both;
 }
-.course-hero-title em { font-style: italic; color: var(--primary); }
-
+.course-hero-title em { font-style: italic; color: #fca5a5; }
 .course-hero-desc {
-  font-size: 15px; color: var(--ink-3); line-height: 1.75;
-  max-width: 560px; margin-bottom: 24px;
+  font-size: 14.5px; color: rgba(255,255,255,.6); line-height: 1.75;
+  max-width: 540px; margin-bottom: 22px;
   animation: fadeUp .4s var(--ease) .12s both;
 }
-
 .course-stats-row {
-  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
-  margin-bottom: 24px;
-  animation: fadeUp .4s var(--ease) .16s both;
+  display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin-bottom: 24px;
+  animation: fadeUp .4s var(--ease) .15s both;
 }
-.stat-item {
-  display: flex; align-items: center; gap: 7px;
-  font-size: 13px; font-weight: 600; color: var(--ink-2);
-}
-.stat-item svg { color: var(--primary); }
-.stat-divider { width: 1px; height: 14px; background: var(--line); }
+.stat-item { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.65); }
+.stat-item svg { color: #fca5a5; }
+.stat-divider { width: 1px; height: 14px; background: rgba(255,255,255,.16); }
 
 .teacher-mini {
   display: flex; align-items: center; gap: 10px;
-  padding: 10px 14px; background: var(--surface-2);
-  border: 1.5px solid var(--line); border-radius: var(--r-md);
-  width: fit-content;
-  animation: fadeUp .4s var(--ease) .18s both;
+  padding: 10px 14px; background: rgba(255,255,255,.08); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.12); border-radius: var(--r-md);
+  width: fit-content; animation: fadeUp .4s var(--ease) .18s both;
 }
-.teacher-mini-avatar {
-  width: 34px; height: 34px; border-radius: 50%;
-  object-fit: cover; border: 2px solid var(--primary-lt);
-}
+.teacher-mini-avatar { width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 2px solid rgba(252,165,165,.4); }
 .teacher-mini-avatar-ph {
   width: 34px; height: 34px; border-radius: 50%;
-  background: var(--primary-lt); display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-serif); font-size: 15px; font-style: italic; color: var(--primary);
-  flex-shrink: 0;
+  background: rgba(220,38,38,.3); display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 15px; font-style: italic; color: #fca5a5; flex-shrink: 0;
 }
-.teacher-mini-info { line-height: 1.2; }
-.teacher-mini-name { font-size: 13px; font-weight: 700; color: var(--ink); }
-.teacher-mini-role { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+.teacher-mini-name { font-size: 13px; font-weight: 700; color: #fff; }
+.teacher-mini-role { font-size: 11px; color: rgba(255,255,255,.45); margin-top: 1px; }
 
-/* Sticky card (right column) */
-.course-card-sticky {
-  position: sticky; top: 88px;
+/* Enrollment panel (right of hero) */
+.enroll-panel {
   background: var(--surface); border: 1.5px solid var(--line);
-  border-radius: var(--r-xl); box-shadow: var(--shadow-md);
-  overflow: hidden;
+  border-radius: var(--r-xl); box-shadow: var(--shadow-lg);
+  padding: 24px 22px;
   animation: fadeUp .4s var(--ease) .1s both;
 }
-.course-card-thumb {
-  position: relative; height: 200px; background: var(--primary-lt); overflow: hidden;
-}
-.course-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.course-card-thumb-ph {
-  width: 100%; height: 100%;
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-serif); font-size: 72px; font-style: italic; color: #fca5a5;
-}
-.band-badge {
-  position: absolute; top: 12px; left: 12px;
-  background: rgba(255,255,255,.92); backdrop-filter: blur(8px);
-  border: 1px solid var(--line); border-radius: 20px;
-  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--primary);
-}
-.course-card-body { padding: 22px 20px; }
-.card-price-row {
-  display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px;
-}
-.card-price {
-  font-family: var(--font-serif);
-  font-size: 34px; line-height: 1; letter-spacing: -.03em; color: var(--ink);
-}
+.card-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; }
+.card-price { font-family: var(--font-serif); font-size: 34px; line-height: 1; letter-spacing: -.03em; color: var(--ink); }
 .card-price-label { font-size: 12px; font-weight: 600; color: var(--ink-3); }
 
-.btn-primary {
+.btn-enroll {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 14px; background: var(--primary); color: #fff;
   font-size: 15px; font-weight: 700; border-radius: var(--r-md);
   text-decoration: none; border: none; cursor: pointer;
-  transition: all .2s var(--ease);
-  box-shadow: 0 4px 14px var(--primary-glow); font-family: var(--font);
+  transition: all .2s var(--ease); box-shadow: 0 4px 14px var(--primary-glow); font-family: var(--font);
   animation: pulseGlow 2.5s ease-in-out infinite;
 }
-.btn-primary:hover { background: #b91c1c; transform: translateY(-1px); }
+.btn-enroll:hover { background: #b91c1c; transform: translateY(-1px); }
 .btn-enter {
   display: flex; align-items: center; justify-content: center; gap: 8px;
   width: 100%; padding: 14px; background: var(--emerald); color: #fff;
   font-size: 15px; font-weight: 700; border-radius: var(--r-md);
   text-decoration: none; border: none; cursor: pointer;
-  transition: all .2s var(--ease);
-  box-shadow: 0 4px 14px rgba(5,150,105,.2); font-family: var(--font);
+  transition: all .2s var(--ease); box-shadow: 0 4px 14px rgba(5,150,105,.2); font-family: var(--font);
 }
 .btn-enter:hover { background: #047857; transform: translateY(-1px); }
 .btn-pending {
@@ -203,145 +170,132 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   font-size: 15px; font-weight: 700; border-radius: var(--r-md);
   border: 1.5px solid #fcd34d; cursor: default; font-family: var(--font);
 }
-
 .card-includes { margin-top: 18px; padding-top: 18px; border-top: 1.5px solid var(--line); }
 .card-includes-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); margin-bottom: 12px; }
-.include-item {
-  display: flex; align-items: center; gap: 9px;
-  font-size: 13px; color: var(--ink-2); font-weight: 500; margin-bottom: 9px;
-}
+.include-item { display: flex; align-items: center; gap: 9px; font-size: 13px; color: var(--ink-2); font-weight: 500; margin-bottom: 8px; }
+.include-item:last-child { margin-bottom: 0; }
 .include-item svg { color: var(--emerald); flex-shrink: 0; }
 
 /* ═══════════════════════════════════════════
-   MAIN CONTENT LAYOUT
+   MAIN LAYOUT
 ═══════════════════════════════════════════ */
 .lms-layout {
-  max-width: 1200px; margin: 0 auto; padding: 40px 32px 80px;
-  display: grid; grid-template-columns: 1fr 340px; gap: 32px; align-items: start;
+  max-width: 1200px; margin: 0 auto; padding: 36px 32px 80px;
+  display: grid; grid-template-columns: 1fr 300px; gap: 28px; align-items: start;
 }
 .lms-main { min-width: 0; }
 .lms-sidebar { position: sticky; top: 88px; }
 
-/* ── Progress Overview Card ── */
+/* Progress card */
 .progress-card {
   background: var(--surface); border: 1.5px solid var(--line);
-  border-radius: var(--r-lg); padding: 20px 22px; margin-bottom: 28px;
-  box-shadow: var(--shadow-xs);
-  animation: fadeUp .45s var(--ease) .1s both;
+  border-radius: var(--r-lg); padding: 20px 22px; margin-bottom: 24px;
+  box-shadow: var(--shadow-xs); animation: fadeUp .45s var(--ease) .1s both;
 }
-.progress-card-head {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
-}
-.progress-card-title { font-size: 13px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .07em; }
-.progress-pct { font-family: var(--font-mono); font-size: 22px; font-weight: 500; color: var(--primary); }
-.progress-track {
-  height: 6px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 14px;
-}
-.progress-fill {
-  height: 100%; background: linear-gradient(90deg, var(--primary), #f87171);
-  border-radius: 3px; transition: width .6s var(--ease);
-}
-.progress-stats {
-  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-}
-.pstat {
-  text-align: center; padding: 10px 8px;
-  background: var(--surface-2); border: 1.5px solid var(--line);
-  border-radius: var(--r-sm);
-}
-.pstat-num { font-family: var(--font-mono); font-size: 18px; font-weight: 500; color: var(--ink); }
+.progress-card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.progress-card-title { font-size: 12px; font-weight: 700; color: var(--ink-2); text-transform: uppercase; letter-spacing: .07em; }
+.progress-pct { font-family: var(--font-mono); font-size: 20px; font-weight: 500; color: var(--primary); }
+.progress-track { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 14px; }
+.progress-fill  { height: 100%; background: linear-gradient(90deg, var(--primary), #f87171); border-radius: 3px; }
+.progress-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.pstat { text-align: center; padding: 10px 8px; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r-sm); }
+.pstat-num   { font-family: var(--font-mono); font-size: 18px; font-weight: 500; color: var(--ink); }
 .pstat-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); margin-top: 2px; }
 
-/* ── Section & Lesson Cards ── */
-.section-group { margin-bottom: 20px; animation: fadeUp .5s var(--ease) both; }
+/* Section accordion */
+.section-group { margin-bottom: 16px; animation: fadeUp .5s var(--ease) both; }
 .section-header-bar {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; background: var(--surface-2);
+  padding: 13px 18px; background: var(--surface-2);
   border: 1.5px solid var(--line); border-radius: var(--r-lg) var(--r-lg) 0 0;
   cursor: pointer; user-select: none; transition: background .15s;
 }
-.section-header-bar:hover { background: var(--primary-lt); }
-.section-header-bar.open { background: var(--primary-lt); border-color: #fca5a5; }
+.section-header-bar:hover, .section-header-bar.open { background: var(--primary-lt); border-color: #fca5a5; }
 .section-header-left { display: flex; align-items: center; gap: 11px; }
 .section-num {
-  width: 28px; height: 28px; border-radius: 50%;
+  width: 26px; height: 26px; border-radius: 50%;
   background: var(--primary); color: #fff;
-  font-size: 12px; font-weight: 800; font-family: var(--font-mono);
+  font-size: 11px; font-weight: 800; font-family: var(--font-mono);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-.section-name { font-size: 14px; font-weight: 700; color: var(--ink); }
+.section-name  { font-size: 14px; font-weight: 700; color: var(--ink); }
 .section-count { font-size: 11px; font-weight: 600; color: var(--ink-3); margin-top: 1px; }
-.section-chevron {
-  width: 22px; height: 22px; color: var(--ink-3);
-  transition: transform .25s var(--ease);
-}
+.section-chevron { width: 20px; height: 20px; color: var(--ink-3); transition: transform .25s var(--ease); }
 .section-header-bar.open .section-chevron { transform: rotate(180deg); }
-
 .section-body {
   border: 1.5px solid var(--line); border-top: none;
-  border-radius: 0 0 var(--r-lg) var(--r-lg);
-  overflow: hidden;
-  /* accordion */
+  border-radius: 0 0 var(--r-lg) var(--r-lg); overflow: hidden;
   display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s var(--ease);
 }
 .section-body.open { grid-template-rows: 1fr; }
 .section-body-inner { overflow: hidden; }
 
+/* ── 2. Lesson item with inline video + PDF ── */
 .lesson-item {
-  display: flex; align-items: center; gap: 14px;
-  padding: 15px 18px; background: var(--surface);
-  border-bottom: 1px solid var(--line);
-  transition: background .15s;
+  background: var(--surface); border-bottom: 1px solid var(--line);
 }
 .lesson-item:last-child { border-bottom: none; }
-.lesson-item:hover { background: var(--surface-2); }
+
+.lesson-item-head {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 18px; cursor: pointer; transition: background .15s;
+}
+.lesson-item-head:hover { background: var(--surface-2); }
 
 .lesson-icon-wrap {
-  width: 38px; height: 38px; border-radius: var(--r-sm);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  background: var(--primary-lt); color: var(--primary);
-  border: 1.5px solid #fca5a5;
+  width: 36px; height: 36px; border-radius: var(--r-sm); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--primary-lt); color: var(--primary); border: 1.5px solid #fca5a5;
 }
 .lesson-info { flex: 1; min-width: 0; }
 .lesson-name { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.lesson-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; flex-wrap: wrap; }
-.lesson-tag {
-  font-size: 10px; font-weight: 700; padding: 2px 7px;
-  border-radius: 4px; font-family: var(--font-mono); text-transform: uppercase;
-}
+.lesson-meta { display: flex; align-items: center; gap: 7px; margin-top: 3px; flex-wrap: wrap; }
+.lesson-tag { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); text-transform: uppercase; }
 .tag-video    { background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5; }
 .tag-pdf      { background: var(--amber-lt);   color: var(--amber);   border: 1px solid #fcd34d; }
 .tag-speaking { background: var(--teal-lt);    color: var(--teal);    border: 1px solid #99f6e4; }
 .tag-duration { background: var(--surface-2);  color: var(--ink-3);   border: 1px solid var(--line); }
-.lesson-status { flex-shrink: 0; }
-.status-dot-done {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--emerald-lt); color: var(--emerald);
-  display: flex; align-items: center; justify-content: center;
-  border: 1.5px solid #a7f3d0;
-}
-.status-dot-lock {
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--surface-2); color: var(--ink-3);
-  display: flex; align-items: center; justify-content: center;
-  border: 1.5px solid var(--line);
-}
 
-/* ── Speaking Practice Area ── */
-.speaking-area {
-  margin-top: 32px;
-  animation: fadeUp .5s var(--ease) .15s both;
+.lesson-expand-icon { color: var(--ink-3); transition: transform .25s var(--ease); flex-shrink: 0; }
+.lesson-item.open .lesson-expand-icon { transform: rotate(180deg); }
+
+.lesson-content {
+  display: grid; grid-template-rows: 0fr; transition: grid-template-rows .3s var(--ease);
 }
+.lesson-content.open { grid-template-rows: 1fr; }
+.lesson-content-inner { overflow: hidden; border-top: 1px solid var(--line); background: var(--surface-2); }
+.lesson-content-body  { padding: 18px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+/* Video */
+.content-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .08em; color: var(--ink-3); margin-bottom: 10px;
+}
+.video-player-wrap {
+  border-radius: var(--r-md); overflow: hidden;
+  border: 1.5px solid var(--line); background: #000; box-shadow: var(--shadow-sm);
+}
+.video-player-wrap video { width: 100%; display: block; max-height: 380px; }
+
+/* PDFs */
+.pdf-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.pdf-link {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 8px 14px; background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: var(--r-sm);
+  color: var(--ink-2); font-size: 13px; font-weight: 600;
+  text-decoration: none; transition: all .15s; cursor: pointer;
+}
+.pdf-link:hover { border-color: var(--amber); color: var(--amber); background: var(--amber-lt); }
+
+/* Speaking area */
+.speaking-area { margin-top: 28px; animation: fadeUp .5s var(--ease) .15s both; }
 .speaking-area-title {
   display: flex; align-items: center; gap: 10px;
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--ink-3);
   margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1.5px solid var(--line);
 }
-.speaking-area-title::before {
-  content: '';
-  display: block; width: 3px; height: 18px;
-  background: var(--primary); border-radius: 2px;
-}
+.speaking-area-title::before { content: ''; display: block; width: 3px; height: 18px; background: var(--primary); border-radius: 2px; }
 
 .topic-card {
   background: var(--surface); border: 1.5px solid var(--line);
@@ -349,34 +303,21 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   box-shadow: var(--shadow-xs); transition: box-shadow .2s, border-color .2s;
 }
 .topic-card:hover { box-shadow: var(--shadow-sm); border-color: #fca5a5; }
-
 .topic-head {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 18px; background: var(--surface-2);
-  border-bottom: 1.5px solid var(--line);
+  padding: 13px 18px; background: var(--surface-2); border-bottom: 1.5px solid var(--line);
 }
 .topic-left { display: flex; align-items: center; gap: 10px; }
-.topic-icon {
-  width: 34px; height: 34px; border-radius: var(--r-sm);
-  background: var(--teal-lt); color: var(--teal);
-  display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0;
-}
+.topic-icon { width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--teal-lt); color: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
 .topic-title { font-size: 14px; font-weight: 700; color: var(--ink); }
 .topic-sub   { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
-
-.part-chip {
-  font-size: 10px; font-weight: 800; font-family: var(--font-mono);
-  padding: 3px 9px; border-radius: 5px; text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0;
-}
+.part-chip { font-size: 10px; font-weight: 800; font-family: var(--font-mono); padding: 3px 9px; border-radius: 5px; text-transform: uppercase; letter-spacing: .05em; flex-shrink: 0; }
 .part1 { background: var(--emerald-lt); color: var(--emerald); border: 1px solid #a7f3d0; }
 .part2 { background: var(--amber-lt);   color: var(--amber);   border: 1px solid #fde68a; }
 .part3 { background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5; }
 
-.question-row {
-  padding: 18px 18px; border-bottom: 1px solid var(--line);
-}
+.question-row { padding: 16px 18px; border-bottom: 1px solid var(--line); }
 .question-row:last-child { border-bottom: none; }
-
 .q-number {
   display: inline-flex; align-items: center; justify-content: center;
   width: 20px; height: 20px; border-radius: 50%;
@@ -384,28 +325,15 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   font-size: 10px; font-weight: 800; font-family: var(--font-mono);
   margin-right: 8px; flex-shrink: 0; vertical-align: middle;
 }
-.q-text {
-  font-size: 14.5px; font-weight: 500; color: var(--ink); line-height: 1.6;
-  margin-bottom: 12px;
-}
-
-.cue-card {
-  background: var(--amber-lt); border: 1.5px solid #fde68a;
-  border-radius: var(--r-md); padding: 14px 16px; margin-bottom: 12px;
-}
-.cue-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--amber); margin-bottom: 6px; }
+.q-text { font-size: 14.5px; font-weight: 500; color: var(--ink); line-height: 1.6; margin-bottom: 12px; }
+.cue-card { background: var(--amber-lt); border: 1.5px solid #fde68a; border-radius: var(--r-md); padding: 13px 15px; margin-bottom: 12px; }
+.cue-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .07em; color: var(--amber); margin-bottom: 5px; }
 .cue-text  { font-size: 13px; color: var(--ink-2); line-height: 1.65; white-space: pre-line; }
-
-.q-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-.meta-pill {
-  font-size: 11px; font-weight: 600; font-family: var(--font-mono);
-  padding: 3px 10px; border-radius: 20px;
-}
+.q-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.meta-pill { font-size: 11px; font-weight: 600; font-family: var(--font-mono); padding: 3px 10px; border-radius: 20px; }
 .meta-prep  { background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5; }
 .meta-speak { background: var(--teal-lt);    color: var(--teal);    border: 1px solid #99f6e4; }
-
 .q-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
-
 .btn-start-speaking {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 9px 18px; background: var(--primary); color: #fff;
@@ -414,79 +342,74 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   box-shadow: 0 2px 8px var(--primary-glow); font-family: var(--font);
 }
 .btn-start-speaking:hover { background: #b91c1c; transform: translateY(-1px); }
-
 .chip-result {
   display: none; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 700;
-  padding: 5px 12px; border-radius: 20px;
-  background: var(--emerald-lt); color: var(--emerald);
-  border: 1.5px solid #a7f3d0; cursor: pointer;
-  transition: background .15s;
+  font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 20px;
+  background: var(--emerald-lt); color: var(--emerald); border: 1.5px solid #a7f3d0;
+  cursor: pointer; transition: background .15s;
 }
 .chip-result:hover { background: #d1fae5; }
 .chip-result.visible { display: inline-flex; }
 
-/* ── Sidebar ── */
-.sidebar-card {
-  background: var(--surface); border: 1.5px solid var(--line);
-  border-radius: var(--r-lg); margin-bottom: 16px;
-  box-shadow: var(--shadow-xs); overflow: hidden;
-  animation: fadeUp .45s var(--ease) both;
-}
-.sidebar-card-head {
-  padding: 14px 18px; border-bottom: 1.5px solid var(--line);
-  background: var(--surface-2);
-}
-.sidebar-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+/* Sidebar */
+.sidebar-card { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-lg); margin-bottom: 16px; box-shadow: var(--shadow-xs); overflow: hidden; animation: fadeUp .45s var(--ease) both; }
+.sidebar-card-head { padding: 13px 18px; border-bottom: 1.5px solid var(--line); background: var(--surface-2); }
+.sidebar-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
 .sidebar-card-body { padding: 16px 18px; }
-
-.teacher-full {
-  display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px;
-}
-.teacher-full-avatar {
-  width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
-  border: 3px solid var(--primary-lt);
-}
-.teacher-full-ph {
-  width: 72px; height: 72px; border-radius: 50%;
-  background: var(--primary-lt); display: flex; align-items: center; justify-content: center;
-  font-family: var(--font-serif); font-size: 28px; font-style: italic; color: var(--primary);
-}
-.teacher-full-name { font-size: 15px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
-.teacher-full-tag  {
-  font-size: 11px; font-weight: 700; color: var(--teal);
-  background: var(--teal-lt); padding: 3px 10px; border-radius: 20px; display: inline-block;
-}
-.teacher-full-bio  { font-size: 13px; color: var(--ink-3); line-height: 1.6; margin-top: 4px; }
-
+.teacher-full { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; }
+.teacher-full-avatar { width: 68px; height: 68px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-lt); }
+.teacher-full-ph { width: 68px; height: 68px; border-radius: 50%; background: var(--primary-lt); display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 26px; font-style: italic; color: var(--primary); }
+.teacher-full-name { font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.teacher-full-tag  { font-size: 11px; font-weight: 700; color: var(--teal); background: var(--teal-lt); padding: 3px 10px; border-radius: 20px; display: inline-block; }
+.teacher-full-bio  { font-size: 12.5px; color: var(--ink-3); line-height: 1.6; margin-top: 4px; }
 .outline-list { list-style: none; }
-.outline-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 9px 0; border-bottom: 1px solid var(--line);
-  font-size: 13px; color: var(--ink-2); font-weight: 500;
-  cursor: pointer; transition: color .15s;
-}
+.outline-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 13px; color: var(--ink-2); font-weight: 500; cursor: pointer; transition: color .15s; }
 .outline-item:last-child { border-bottom: none; }
 .outline-item:hover { color: var(--primary); }
-.outline-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: var(--primary-lt); border: 1.5px solid #fca5a5;
-  flex-shrink: 0;
-}
+.outline-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--primary-lt); border: 1.5px solid #fca5a5; flex-shrink: 0; }
 .outline-item:hover .outline-dot { background: var(--primary); }
 
 /* ═══════════════════════════════════════════
-   SPEAKING MODAL (synced)
+   PDF LIGHTBOX
+═══════════════════════════════════════════ */
+.pdf-lightbox {
+  position: fixed; inset: 0; z-index: 10000;
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.pdf-lightbox.open { display: flex; }
+.pdf-lightbox-bg { position: absolute; inset: 0; background: rgba(13,14,20,.72); backdrop-filter: blur(6px); }
+.pdf-lightbox-box {
+  position: relative; z-index: 1; background: var(--surface);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-lg);
+  width: 100%; max-width: 900px; height: 90vh;
+  display: flex; flex-direction: column; overflow: hidden;
+  animation: slideUp .25s var(--ease);
+}
+.pdf-lightbox-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 20px; border-bottom: 1.5px solid var(--line);
+  background: var(--surface-2); flex-shrink: 0;
+}
+.pdf-lightbox-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.pdf-lightbox-close {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--surface); border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink-3); transition: all .15s;
+}
+.pdf-lightbox-close:hover { background: var(--rose-lt); color: var(--rose); }
+.pdf-lightbox-body { flex: 1; overflow: hidden; }
+.pdf-lightbox-body iframe { width: 100%; height: 100%; border: none; display: block; }
+
+/* ═══════════════════════════════════════════
+   SPEAKING MODAL
 ═══════════════════════════════════════════ */
 .modal-overlay {
   position: fixed; inset: 0; z-index: 9999;
   display: none; align-items: center; justify-content: center; padding: 20px;
 }
 .modal-overlay.open { display: flex; }
-.modal-bg {
-  position: absolute; inset: 0;
-  background: rgba(13,14,20,.55); backdrop-filter: blur(6px);
-}
+.modal-bg { position: absolute; inset: 0; background: rgba(13,14,20,.55); backdrop-filter: blur(6px); }
 .modal-box {
   position: relative; z-index: 1; background: var(--surface);
   border: 1.5px solid var(--line); border-radius: var(--r-xl);
@@ -494,14 +417,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   max-height: 92vh; overflow-y: auto;
   animation: slideUp .25s var(--ease);
 }
-.modal-header {
-  display: flex; align-items: flex-start; justify-content: space-between;
-  padding: 22px 24px 18px; border-bottom: 1.5px solid var(--line);
-}
-.modal-q-text {
-  font-size: 15px; font-weight: 600; color: var(--ink);
-  line-height: 1.5; padding-right: 12px; flex: 1;
-}
+.modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 16px; border-bottom: 1.5px solid var(--line); }
+.modal-q-text { font-size: 15px; font-weight: 600; color: var(--ink); line-height: 1.5; padding-right: 12px; flex: 1; }
 .modal-close {
   width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
   background: var(--surface-2); border: 1.5px solid var(--line);
@@ -509,116 +426,46 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
   cursor: pointer; color: var(--ink-3); transition: all .15s;
 }
 .modal-close:hover { background: var(--rose-lt); color: var(--rose); border-color: #fecdd3; }
-
 .modal-body { padding: 20px 24px; }
-
-.phase-row {
-  display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
-}
-.phase-badge {
-  font-size: 12px; font-weight: 700; padding: 4px 12px;
-  border-radius: 20px; border: 1.5px solid var(--line);
-  color: var(--ink-3); background: var(--surface-2);
-}
-.phase-badge.prep  { background: var(--primary-lt); color: var(--primary);  border-color: #fca5a5; }
-.phase-badge.speak { background: var(--rose-lt);    color: var(--rose);     border-color: #fecdd3; }
-.phase-badge.done  { background: var(--emerald-lt); color: var(--emerald);  border-color: #a7f3d0; }
-.phase-badge.eval  { background: var(--amber-lt);   color: var(--amber);    border-color: #fde68a; }
-
-.timer-display {
-  font-family: var(--font-mono); font-size: 28px; font-weight: 700;
-  color: var(--ink); letter-spacing: -1px;
-}
+.phase-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.phase-badge { font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; border: 1.5px solid var(--line); color: var(--ink-3); background: var(--surface-2); }
+.phase-badge.prep  { background: var(--primary-lt); color: var(--primary); border-color: #fca5a5; }
+.phase-badge.speak { background: var(--rose-lt);    color: var(--rose);    border-color: #fecdd3; }
+.phase-badge.done  { background: var(--emerald-lt); color: var(--emerald); border-color: #a7f3d0; }
+.phase-badge.eval  { background: var(--amber-lt);   color: var(--amber);   border-color: #fde68a; }
+.timer-display { font-family: var(--font-mono); font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -1px; }
 .timer-track { height: 5px; background: var(--line); border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
-.timer-fill {
-  height: 100%; background: var(--primary); border-radius: 3px;
-  width: 100%; transition: width 1s linear, background .3s;
-}
+.timer-fill  { height: 100%; background: var(--primary); border-radius: 3px; width: 100%; transition: width 1s linear, background .3s; }
 .timer-fill.speaking { background: var(--rose); }
-
-.waveform {
-  display: flex; align-items: center; justify-content: center; gap: 3px;
-  height: 36px; margin-bottom: 14px; opacity: 0; transition: opacity .3s;
-}
+.waveform { display: flex; align-items: center; justify-content: center; gap: 3px; height: 36px; margin-bottom: 14px; opacity: 0; transition: opacity .3s; }
 .waveform.active { opacity: 1; }
-.wf-bar {
-  width: 3px; border-radius: 2px;
-  background: var(--rose); animation: wave .7s ease-in-out infinite;
-}
-
-.transcript-box {
-  background: var(--surface-2); border: 1.5px solid var(--line);
-  border-radius: var(--r-md); padding: 14px; margin-bottom: 16px;
-}
-.transcript-label {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--ink-3); margin-bottom: 8px;
-}
-.transcript-content {
-  font-size: 14px; line-height: 1.75; color: var(--ink-2);
-  max-height: 160px; overflow-y: auto;
-  word-wrap: break-word; white-space: pre-wrap;
-  scroll-behavior: smooth;
-}
+.wf-bar { width: 3px; border-radius: 2px; background: var(--rose); animation: wave .7s ease-in-out infinite; }
+.transcript-box { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 14px; margin-bottom: 16px; }
+.transcript-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); margin-bottom: 8px; }
+.transcript-content { font-size: 14px; line-height: 1.75; color: var(--ink-2); max-height: 140px; overflow-y: auto; word-wrap: break-word; white-space: pre-wrap; scroll-behavior: smooth; }
 .transcript-content::-webkit-scrollbar { width: 4px; }
 .transcript-content::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
 .t-placeholder { color: var(--ink-3); font-style: italic; }
-.t-interim { color: var(--ink-3); font-style: italic; }
-
+.t-interim     { color: var(--ink-3); font-style: italic; }
 .result-panel { display: none; }
 .result-panel.visible { display: block; animation: fadeUp .3s var(--ease); }
-
-.result-overall {
-  text-align: center; padding: 18px;
-  background: var(--emerald-lt); border: 1.5px solid #a7f3d0;
-  border-radius: var(--r-md); margin-bottom: 12px;
-}
-.result-band-num {
-  font-family: var(--font-mono); font-size: 42px; font-weight: 700;
-  color: var(--emerald); line-height: 1;
-}
-.result-band-label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--emerald); margin-top: 4px;
-}
-.result-scores {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
-}
-.score-item {
-  background: var(--surface-2); border: 1.5px solid var(--line);
-  border-radius: var(--r-sm); padding: 10px 12px;
-}
+.result-overall { text-align: center; padding: 16px; background: var(--emerald-lt); border: 1.5px solid #a7f3d0; border-radius: var(--r-md); margin-bottom: 12px; }
+.result-band-num   { font-family: var(--font-mono); font-size: 40px; font-weight: 700; color: var(--emerald); line-height: 1; }
+.result-band-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--emerald); margin-top: 4px; }
+.result-scores { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.score-item  { background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; }
 .score-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); margin-bottom: 3px; }
 .score-val   { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: var(--ink); }
-.result-feedback {
-  background: var(--surface-2); border: 1.5px solid var(--line);
-  border-left: 3px solid var(--primary);
-  border-radius: 0 var(--r-sm) var(--r-sm) 0;
-  padding: 12px 14px; font-size: 13.5px; line-height: 1.7; color: var(--ink-2);
-}
-
-.status-msg {
-  padding: 10px 13px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500;
-  margin-bottom: 12px; display: none;
-}
+.result-feedback { background: var(--surface-2); border: 1.5px solid var(--line); border-left: 3px solid var(--primary); border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 12px 14px; font-size: 13.5px; line-height: 1.7; color: var(--ink-2); }
+.status-msg { padding: 10px 13px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; margin-bottom: 12px; display: none; }
 .status-msg.info    { background: var(--primary-lt); color: var(--primary); border: 1px solid #fca5a5; display: block; }
 .status-msg.success { background: var(--emerald-lt); color: var(--emerald); border: 1px solid #a7f3d0; display: block; }
 .status-msg.warn    { background: var(--amber-lt);   color: var(--amber);   border: 1px solid #fde68a; display: block; }
 .status-msg.error   { background: var(--rose-lt);    color: var(--rose);    border: 1px solid #fecdd3; display: block; }
-
-.modal-footer {
-  display: flex; gap: 8px; flex-wrap: wrap;
-  padding: 16px 24px; border-top: 1.5px solid var(--line);
-  background: var(--surface-2); border-radius: 0 0 var(--r-xl) var(--r-xl);
-}
-.mbtn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 10px 18px; border-radius: var(--r-sm); border: none;
-  font-family: var(--font); font-size: 13px; font-weight: 700;
-  cursor: pointer; transition: all .2s var(--ease); white-space: nowrap;
-}
+.modal-footer { display: flex; gap: 8px; flex-wrap: wrap; padding: 16px 24px; border-top: 1.5px solid var(--line); background: var(--surface-2); border-radius: 0 0 var(--r-xl) var(--r-xl); }
+.mbtn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: var(--r-sm); border: none; font-family: var(--font); font-size: 13px; font-weight: 700; cursor: pointer; transition: all .2s var(--ease); white-space: nowrap; }
 .mbtn:disabled { opacity: .4; cursor: not-allowed; }
-.mbtn.hidden   { display: none; }
+.mbtn.hidden   { display: none !important; }
 .mbtn-primary { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
 .mbtn-primary:hover:not(:disabled) { background: #b91c1c; }
 .mbtn-danger  { background: var(--rose-lt); color: var(--rose); border: 1.5px solid #fecdd3; }
@@ -633,22 +480,24 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 ═══════════════════════════════════════════ */
 @media (max-width: 980px) {
   .course-hero-inner { grid-template-columns: 1fr; }
-  .course-card-sticky { position: static; }
   .lms-layout { grid-template-columns: 1fr; }
   .lms-sidebar { position: static; }
 }
 @media (max-width: 640px) {
   .course-hero-inner, .lms-layout { padding-left: 20px; padding-right: 20px; }
-  .hero-title { font-size: 28px; }
-  .progress-stats { grid-template-columns: repeat(3,1fr); }
 }
 </style>
 
 <!-- ═══════ COURSE HERO ═══════ -->
 <section class="course-hero">
-  <div class="course-hero-inner">
+  <% if @course.thumbnail.attached? %>
+    <div class="course-hero-bg" style="background-image:url('<%= url_for(@course.thumbnail) %>')"></div>
+  <% else %>
+    <div class="course-hero-bg no-image"></div>
+  <% end %>
 
-    <!-- LEFT: Course Info -->
+  <div class="course-hero-inner">
+    <!-- LEFT -->
     <div>
       <nav class="breadcrumb">
         <a href="<%= students_dashboard_path %>">Home</a>
@@ -667,7 +516,8 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 
       <h1 class="course-hero-title">
         <em><%= @course.title.split.first(2).join(' ') %></em>
-        <%= @course.title.split.drop(2).join(' ') %>
+        <% rest = @course.title.split.drop(2).join(' ') %>
+        <%= " #{rest}" if rest.present? %>
       </h1>
 
       <% if @course.description.present? %>
@@ -704,65 +554,46 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
           <% else %>
             <div class="teacher-mini-avatar-ph"><%= teacher.full_name[0] %></div>
           <% end %>
-          <div class="teacher-mini-info">
+          <div>
             <div class="teacher-mini-name"><%= teacher.full_name %></div>
-            <div class="teacher-mini-role"><%= teacher.expertise %> • <%= teacher.experience_years %> yrs exp</div>
+            <div class="teacher-mini-role"><%= teacher.expertise %> · <%= teacher.experience_years %> yrs exp</div>
           </div>
         </div>
       <% end %>
     </div>
 
-    <!-- RIGHT: Sticky enrollment card -->
-    <div class="course-card-sticky">
-      <div class="course-card-thumb">
-        <% if @course.thumbnail.attached? %>
-          <%= image_tag url_for(@course.thumbnail), alt: @course.title %>
-        <% else %>
-          <div class="course-card-thumb-ph"><%= @course.title[0] %></div>
-        <% end %>
-        <% if @course.band_min.present? && @course.band_max.present? %>
-          <div class="band-badge">Band <%= @course.band_min %> – <%= @course.band_max %></div>
-        <% end %>
+    <!-- RIGHT: enroll panel -->
+    <div class="enroll-panel">
+      <div class="card-price-row">
+        <div class="card-price"><%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
+        <div class="card-price-label">One-time payment</div>
       </div>
-      <div class="course-card-body">
-        <div class="card-price-row">
-          <div class="card-price"><%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
-          <div class="card-price-label">One-time payment</div>
-        </div>
-
-        <%
-          access  = current_user.course_accesses.active_status.find_by(course: @course) rescue nil
-          pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: @course) rescue nil
-        %>
-        <% if access %>
-          <%= link_to students_course_path(@course), class: "btn-enter" do %>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-            Continue Learning
-          <% end %>
-        <% elsif pending %>
-          <div class="btn-pending">⏳ Payment Pending…</div>
-        <% else %>
-          <%= button_to students_course_orders_path(@course), method: :post, class: "btn-primary" do %>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-            Enroll Now
-          <% end %>
+      <%
+        access  = current_user.course_accesses.active_status.find_by(course: @course) rescue nil
+        pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: @course) rescue nil
+      %>
+      <% if access %>
+        <%= link_to students_course_path(@course), class: "btn-enter" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Continue Learning
         <% end %>
+      <% elsif pending %>
+        <div class="btn-pending">⏳ Payment Pending…</div>
+      <% else %>
+        <%= button_to students_course_orders_path(@course), method: :post, class: "btn-enroll" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          Enroll Now
+        <% end %>
+      <% end %>
 
-        <div class="card-includes">
-          <div class="card-includes-title">This course includes</div>
-          <% [
-            ["Video lessons", "📹"],
-            ["AI Speaking Scorer", "🤖"],
-            ["Downloadable materials", "📄"],
-            ["Lifetime access", "♾️"],
-            ["Certificate of completion", "🏆"]
-          ].each do |item, icon| %>
-            <div class="include-item">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-              <%= icon %> <%= item %>
-            </div>
-          <% end %>
-        </div>
+      <div class="card-includes">
+        <div class="card-includes-title">This course includes</div>
+        <% [["Video lessons","📹"],["AI Speaking Scorer","🤖"],["Downloadable materials","📄"],["Lifetime access","♾️"],["Certificate of completion","🏆"]].each do |item, icon| %>
+          <div class="include-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            <%= icon %> <%= item %>
+          </div>
+        <% end %>
       </div>
     </div>
 
@@ -772,35 +603,23 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 <!-- ═══════ MAIN LMS CONTENT ═══════ -->
 <div class="lms-layout">
 
-  <!-- ═══ LEFT: Curriculum ═══ -->
   <div class="lms-main">
 
-    <!-- Progress Overview -->
+    <!-- Progress -->
     <div class="progress-card">
       <div class="progress-card-head">
         <span class="progress-card-title">Your Progress</span>
         <span class="progress-pct">0%</span>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" style="width:0%"></div>
-      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
       <div class="progress-stats">
-        <div class="pstat">
-          <div class="pstat-num"><%= @sections.sum { |s| s.lessons.count } %></div>
-          <div class="pstat-label">Lessons</div>
-        </div>
-        <div class="pstat">
-          <div class="pstat-num"><%= @sections.sum { |s| s.lessons.sum { |l| l.speaking_topics.count rescue 0 } } %></div>
-          <div class="pstat-label">Topics</div>
-        </div>
-        <div class="pstat">
-          <div class="pstat-num">0</div>
-          <div class="pstat-label">Completed</div>
-        </div>
+        <div class="pstat"><div class="pstat-num"><%= @sections.sum { |s| s.lessons.count } %></div><div class="pstat-label">Lessons</div></div>
+        <div class="pstat"><div class="pstat-num"><%= @sections.sum { |s| s.lessons.sum { |l| l.speaking_topics.count rescue 0 } } %></div><div class="pstat-label">Topics</div></div>
+        <div class="pstat"><div class="pstat-num">0</div><div class="pstat-label">Completed</div></div>
       </div>
     </div>
 
-    <!-- Course Curriculum Accordion -->
+    <!-- Curriculum -->
     <% @sections.each_with_index do |section, si| %>
       <div class="section-group" style="animation-delay:<%= si * 0.06 %>s">
         <div class="section-header-bar <%= si == 0 ? 'open' : '' %>" onclick="toggleSection(this)">
@@ -816,33 +635,71 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 
         <div class="section-body <%= si == 0 ? 'open' : '' %>">
           <div class="section-body-inner">
-            <% section.lessons.each_with_index do |lesson, li| %>
-              <div class="lesson-item">
-                <div class="lesson-icon-wrap">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                </div>
-                <div class="lesson-info">
-                  <div class="lesson-name"><%= lesson.title %></div>
-                  <div class="lesson-meta">
-                    <% if lesson.video.attached? %>
-                      <span class="lesson-tag tag-video">Video</span>
-                    <% end %>
-                    <% if lesson.pdfs.attached? %>
-                      <span class="lesson-tag tag-pdf">PDF</span>
-                    <% end %>
-                    <% if lesson.speaking_topics.any? %>
-                      <span class="lesson-tag tag-speaking">Speaking</span>
-                    <% end %>
-                    <% if lesson.duration.present? %>
-                      <span class="lesson-tag tag-duration">⏱ <%= lesson.duration %>min</span>
-                    <% end %>
+            <% section.lessons.each do |lesson| %>
+              <%
+                has_video = lesson.video.attached?
+                has_pdfs  = lesson.pdfs.attached?
+                has_content = has_video || has_pdfs
+              %>
+              <div class="lesson-item" id="lesson-item-<%= lesson.id %>">
+
+                <div class="lesson-item-head" onclick="<%= has_content ? "toggleLesson(#{lesson.id})" : '' %>">
+                  <div class="lesson-icon-wrap">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                   </div>
-                </div>
-                <div class="lesson-status">
-                  <div class="status-dot-lock">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                  <div class="lesson-info">
+                    <div class="lesson-name"><%= lesson.title %></div>
+                    <div class="lesson-meta">
+                      <% if has_video %><span class="lesson-tag tag-video">📹 Video</span><% end %>
+                      <% if has_pdfs  %><span class="lesson-tag tag-pdf">📄 PDF</span><% end %>
+                      <% if lesson.speaking_topics.any? %><span class="lesson-tag tag-speaking">🎤 Speaking</span><% end %>
+                      <% if lesson.duration.present? %><span class="lesson-tag tag-duration">⏱ <%= lesson.duration %>min</span><% end %>
+                    </div>
                   </div>
+                  <% if has_content %>
+                    <svg class="lesson-expand-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                  <% end %>
                 </div>
+
+                <% if has_content %>
+                  <div class="lesson-content" id="lesson-content-<%= lesson.id %>">
+                    <div class="lesson-content-inner">
+                      <div class="lesson-content-body">
+
+                        <% if has_video %>
+                          <div>
+                            <div class="content-label">📹 Video Lesson</div>
+                            <div class="video-player-wrap">
+                              <video controls preload="none">
+                                <source src="<%= url_for(lesson.video) %>" type="video/mp4">
+                              </video>
+                            </div>
+                          </div>
+                        <% end %>
+
+                        <% if has_pdfs %>
+                          <div>
+                            <div class="content-label">📄 Lesson Materials</div>
+                            <div class="pdf-list">
+                              <% lesson.pdfs.each do |pdf| %>
+                                <a class="pdf-link"
+                                   href="<%= url_for(pdf) %>"
+                                   onclick="openPdf(event, '<%= url_for(pdf) %>', '<%= pdf.filename %>')">
+                                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                                  </svg>
+                                  <%= pdf.filename %>
+                                </a>
+                              <% end %>
+                            </div>
+                          </div>
+                        <% end %>
+
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+
               </div>
             <% end %>
           </div>
@@ -850,12 +707,11 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
       </div>
     <% end %>
 
-    <!-- ══ Speaking Practice ══ -->
+    <!-- Speaking Practice -->
     <% all_topics = @sections.flat_map { |s| s.lessons.flat_map(&:speaking_topics) } %>
     <% if all_topics.any? %>
       <div class="speaking-area">
         <div class="speaking-area-title">Speaking Practice</div>
-
         <% @sections.each do |section| %>
           <% section.lessons.each do |lesson| %>
             <% lesson.speaking_topics.each do |topic| %>
@@ -870,30 +726,22 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
                   </div>
                   <span class="part-chip <%= topic.part %>"><%= topic.part.upcase %></span>
                 </div>
-
                 <% topic.speaking_questions.each_with_index do |q, qi| %>
                   <div class="question-row" id="qrow-<%= q.id %>">
                     <p class="q-text">
                       <span class="q-number"><%= qi + 1 %></span>
                       <%= q.question_text %>
                     </p>
-
                     <% if q.cue_card.present? %>
                       <div class="cue-card">
                         <p class="cue-label">📋 Cue Card</p>
                         <p class="cue-text"><%= q.cue_card %></p>
                       </div>
                     <% end %>
-
                     <div class="q-meta">
-                      <% if q.preparation_time.present? %>
-                        <span class="meta-pill meta-prep">⏱ Prep <%= q.preparation_time %>s</span>
-                      <% end %>
-                      <% if q.speaking_time.present? %>
-                        <span class="meta-pill meta-speak">🎤 Speaking <%= q.speaking_time %>s</span>
-                      <% end %>
+                      <% if q.preparation_time.present? %><span class="meta-pill meta-prep">⏱ Prep <%= q.preparation_time %>s</span><% end %>
+                      <% if q.speaking_time.present? %><span class="meta-pill meta-speak">🎤 Speaking <%= q.speaking_time %>s</span><% end %>
                     </div>
-
                     <div class="q-footer">
                       <button class="btn-start-speaking open-modal-btn"
                         data-prep="<%= q.preparation_time || 60 %>"
@@ -922,38 +770,29 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 
   </div>
 
-  <!-- ═══ RIGHT: Sidebar ═══ -->
+  <!-- SIDEBAR -->
   <div class="lms-sidebar">
-
-    <!-- Teacher Card -->
     <% teacher = @course.teacher_profile rescue nil %>
     <% if teacher %>
       <div class="sidebar-card" style="animation-delay:.05s">
-        <div class="sidebar-card-head">
-          <div class="sidebar-card-title">Your Instructor</div>
-        </div>
+        <div class="sidebar-card-head"><div class="sidebar-card-title">Your Instructor</div></div>
         <div class="sidebar-card-body">
           <div class="teacher-full">
             <% if teacher.avatar.attached? %>
-              <%= image_tag teacher.avatar.variant(resize_to_fill: [72,72]), class: "teacher-full-avatar", alt: teacher.full_name %>
+              <%= image_tag teacher.avatar.variant(resize_to_fill: [68,68]), class: "teacher-full-avatar", alt: teacher.full_name %>
             <% else %>
               <div class="teacher-full-ph"><%= teacher.full_name[0] %></div>
             <% end %>
             <div class="teacher-full-name"><%= teacher.full_name.upcase %></div>
             <span class="teacher-full-tag"><%= teacher.expertise %></span>
-            <% if teacher.bio.present? %>
-              <p class="teacher-full-bio"><%= teacher.bio.truncate(120) %></p>
-            <% end %>
+            <% if teacher.bio.present? %><p class="teacher-full-bio"><%= teacher.bio.truncate(120) %></p><% end %>
           </div>
         </div>
       </div>
     <% end %>
 
-    <!-- Course Outline mini-nav -->
     <div class="sidebar-card" style="animation-delay:.10s">
-      <div class="sidebar-card-head">
-        <div class="sidebar-card-title">Course Outline</div>
-      </div>
+      <div class="sidebar-card-head"><div class="sidebar-card-title">Course Outline</div></div>
       <div class="sidebar-card-body" style="padding-top:8px;padding-bottom:8px;">
         <ul class="outline-list">
           <% @sections.each_with_index do |section, i| %>
@@ -966,27 +805,34 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
       </div>
     </div>
 
-    <!-- What you'll learn -->
     <div class="sidebar-card" style="animation-delay:.15s">
-      <div class="sidebar-card-head">
-        <div class="sidebar-card-title">What You'll Learn</div>
-      </div>
+      <div class="sidebar-card-head"><div class="sidebar-card-title">What You'll Learn</div></div>
       <div class="sidebar-card-body">
-        <% [
-          "Master IELTS Speaking Parts 1, 2 & 3",
-          "AI-powered instant band score feedback",
-          "Build fluency with real exam topics",
-          "Improve grammar & vocabulary range",
-          "Confidence in pronunciation & delivery"
-        ].each do |point| %>
-          <div class="include-item" style="margin-bottom:9px">
+        <% ["Master IELTS Speaking Parts 1, 2 & 3","AI-powered instant band score feedback","Build fluency with real exam topics","Improve grammar & vocabulary range","Confidence in pronunciation & delivery"].each do |pt| %>
+          <div class="include-item" style="margin-bottom:8px">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
-            <span style="font-size:13px;color:var(--ink-2);font-weight:500"><%= point %></span>
+            <span style="font-size:13px;color:var(--ink-2);font-weight:500"><%= pt %></span>
           </div>
         <% end %>
       </div>
     </div>
+  </div>
 
+</div>
+
+<!-- ═══════ PDF LIGHTBOX ═══════ -->
+<div class="pdf-lightbox" id="pdf-lightbox">
+  <div class="pdf-lightbox-bg" onclick="closePdf()"></div>
+  <div class="pdf-lightbox-box">
+    <div class="pdf-lightbox-header">
+      <span class="pdf-lightbox-title" id="pdf-lightbox-title">Document</span>
+      <button class="pdf-lightbox-close" onclick="closePdf()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="pdf-lightbox-body">
+      <iframe id="pdf-frame" src="" title="PDF Viewer"></iframe>
+    </div>
   </div>
 </div>
 
@@ -994,36 +840,27 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
 <div class="modal-overlay" id="speaking-modal">
   <div class="modal-bg" onclick="closeModal()"></div>
   <div class="modal-box">
-
     <div class="modal-header">
       <p class="modal-q-text" id="modal-question-text">Question</p>
       <button class="modal-close" id="modal-close-btn">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
     </div>
-
     <div class="modal-body">
       <div class="phase-row">
         <span class="phase-badge" id="phase-badge">Ready</span>
         <span class="timer-display" id="timer-display">—</span>
       </div>
-      <div class="timer-track">
-        <div class="timer-fill" id="timer-fill" style="width:100%"></div>
-      </div>
-
+      <div class="timer-track"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
       <div class="waveform" id="waveform">
-        <% 18.times do |i| %>
-          <div class="wf-bar" style="animation-delay:<%= i * 0.045 %>s"></div>
-        <% end %>
+        <% 18.times do |i| %><div class="wf-bar" style="animation-delay:<%= i * 0.045 %>s"></div><% end %>
       </div>
-
       <div class="transcript-box">
         <div class="transcript-label">Live Transcript</div>
         <div class="transcript-content" id="transcript-content">
           <span class="t-placeholder">Your words will appear here as you speak…</span>
         </div>
       </div>
-
       <div class="result-panel" id="result-panel">
         <div class="result-overall">
           <div class="result-band-num" id="res-overall">—</div>
@@ -1037,48 +874,77 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); line-
         </div>
         <div class="result-feedback" id="res-feedback"></div>
       </div>
-
       <div class="status-msg" id="status-msg"></div>
     </div>
-
     <div class="modal-footer">
-      <button class="mbtn mbtn-primary" id="btn-start">
+      <button class="mbtn mbtn-primary"  id="btn-start">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
         Begin Session
       </button>
-      <button class="mbtn mbtn-danger hidden"   id="btn-done">⏹ Stop &amp; Submit</button>
-      <button class="mbtn mbtn-ghost hidden"    id="btn-rerecord">🔄 Re-record</button>
-      <button class="mbtn mbtn-success hidden"  id="btn-submit">
+      <button class="mbtn mbtn-danger  hidden" id="btn-done">⏹ Stop &amp; Submit</button>
+      <button class="mbtn mbtn-ghost   hidden" id="btn-rerecord">🔄 Re-record</button>
+      <button class="mbtn mbtn-success hidden" id="btn-submit">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 13l4 4L19 7"/></svg>
         Submit
       </button>
-      <button class="mbtn mbtn-ghost hidden"    id="btn-retry">↩ Try Again</button>
+      <button class="mbtn mbtn-ghost   hidden" id="btn-retry">↩ Try Again</button>
     </div>
-
   </div>
 </div>
 
 <script>
-/* ── Accordion ── */
+/* ══════════ ACCORDION ══════════ */
 function toggleSection(el) {
   el.classList.toggle('open');
   el.nextElementSibling.classList.toggle('open');
 }
+function toggleLesson(id) {
+  const item    = document.getElementById('lesson-item-' + id);
+  const content = document.getElementById('lesson-content-' + id);
+  if (!content) return;
+  item.classList.toggle('open');
+  content.classList.toggle('open');
+}
 
-/* ── Speaking Modal Logic ── */
-const LOG = '[Speaking]';
-const log  = (m, d) => d !== undefined ? console.log(LOG, m, d) : console.log(LOG, m);
-const logE = (m, e) => console.error(LOG, '❌', m, e || '');
+/* ══════════ PDF LIGHTBOX ══════════ */
+function openPdf(e, url, name) {
+  e.preventDefault();
+  document.getElementById('pdf-lightbox-title').textContent = name;
+  document.getElementById('pdf-frame').src = url;
+  document.getElementById('pdf-lightbox').classList.add('open');
+}
+function closePdf() {
+  document.getElementById('pdf-lightbox').classList.remove('open');
+  document.getElementById('pdf-frame').src = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closePdf(); closeModal(); } });
+
+/* ══════════ SPEAKING MODAL ══════════ */
+const log  = (m, d) => d !== undefined ? console.log('[Speaking]', m, d) : console.log('[Speaking]', m);
+const logE = (m, e) => console.error('[Speaking] ❌', m, e || '');
 
 let mediaRecorder, audioChunks = [];
 let recognition, finalTranscript = '', interimTranscript = '';
 let currentData = {}, currentQid = null;
-let timerInterval = null, totalSeconds = 0;
 let currentPhase = 'idle';
-let resolveTimer = null;
-let userManuallyScrolled = false;
+
+/* Prep timer state */
+let prepInterval  = null;
+let resolvePrep   = null;
+
+/* Speaking timer state — SHARED across re-records
+   speakTotal    : set once when session begins
+   speakRemaining: counts down, never reset by re-record
+   speakInterval : single interval, never cleared by re-record
+   resolveSpeakDone: resolves the startSpeakTimer() promise when time hits 0
+*/
+let speakTotal         = 0;
+let speakRemaining     = 0;
+let speakInterval      = null;
+let resolveSpeakDone   = null;
+
 let audioContext = null, analyser = null, monitorAudioInterval = null;
-let timerEnded = false;
+let userManuallyScrolled = false;
 const resultCache = {};
 
 const modal        = document.getElementById('speaking-modal');
@@ -1096,6 +962,7 @@ const btnRerecord  = document.getElementById('btn-rerecord');
 const btnSubmit    = document.getElementById('btn-submit');
 const btnRetry     = document.getElementById('btn-retry');
 
+/* ── Open ── */
 document.querySelectorAll('.open-modal-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     currentData = {
@@ -1106,19 +973,18 @@ document.querySelectorAll('.open-modal-btn').forEach(btn => {
     currentQid = btn.dataset.qid;
     modalQText.textContent = btn.dataset.question;
     resetModal();
-    if (resultCache[currentQid]) showResult(resultCache[currentQid], false);
+    if (resultCache[currentQid]) showResult(resultCache[currentQid]);
     modal.classList.add('open');
   });
 });
-
 document.getElementById('modal-close-btn').addEventListener('click', closeModal);
 modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('modal-bg')) closeModal(); });
 
 function closeModal() {
-  if (currentPhase === 'speaking') {
+  if (currentPhase === 'speaking' || currentPhase === 'prep') {
     stopRecording(); stopRecognition();
-    clearInterval(timerInterval); clearInterval(monitorAudioInterval);
-    if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+    clearInterval(prepInterval); clearInterval(speakInterval); clearInterval(monitorAudioInterval);
+    resolvePrep = null; resolveSpeakDone = null;
   }
   currentPhase = 'idle';
   modal.classList.remove('open');
@@ -1126,8 +992,11 @@ function closeModal() {
 
 function resetModal() {
   finalTranscript = ''; interimTranscript = '';
-  currentPhase = 'idle'; resolveTimer = null;
-  userManuallyScrolled = false; timerEnded = false;
+  currentPhase = 'idle';
+  resolvePrep = null; resolveSpeakDone = null;
+  speakTotal = 0; speakRemaining = 0;
+  userManuallyScrolled = false;
+  clearInterval(prepInterval); clearInterval(speakInterval); clearInterval(monitorAudioInterval);
   transcriptEl.innerHTML = '<span class="t-placeholder">Your words will appear here as you speak…</span>';
   resultPanel.classList.remove('visible');
   statusMsg.className = 'status-msg'; statusMsg.textContent = '';
@@ -1143,30 +1012,59 @@ function setPhaseBadge(text, cls) {
   phaseBadge.className = 'phase-badge' + (cls ? ' ' + cls : '');
 }
 
-function runTimer(seconds, label, badgeCls, barCls) {
+/* ── Prep timer (runs once per session) ── */
+function runPrepTimer(seconds) {
   return new Promise(resolve => {
-    totalSeconds = seconds; let remaining = seconds;
-    setPhaseBadge(label, badgeCls);
-    timerFill.className = 'timer-fill ' + (barCls || '');
-    timerDisp.textContent = remaining; timerFill.style.width = '100%';
-    resolveTimer = () => { clearInterval(timerInterval); resolve(); };
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      remaining--;
-      timerDisp.textContent = remaining;
-      timerFill.style.width = (remaining / totalSeconds * 100) + '%';
-      if (remaining <= 0) { clearInterval(timerInterval); resolveTimer = null; timerEnded = true; resolve(); }
+    let rem = seconds;
+    setPhaseBadge('Preparation', 'prep');
+    timerFill.className = 'timer-fill';
+    timerDisp.textContent = rem; timerFill.style.width = '100%';
+    resolvePrep = () => { clearInterval(prepInterval); resolve(); };
+    clearInterval(prepInterval);
+    prepInterval = setInterval(() => {
+      rem--;
+      timerDisp.textContent = rem;
+      timerFill.style.width = (rem / seconds * 100) + '%';
+      if (rem <= 0) { clearInterval(prepInterval); resolvePrep = null; resolve(); }
     }, 1000);
   });
 }
 
+/* ── Speaking timer — starts ONE interval for the whole session.
+      Re-record does NOT touch this interval at all.
+      Returns a Promise that resolves when speakRemaining hits 0. ── */
+function startSpeakTimer() {
+  return new Promise(resolve => {
+    setPhaseBadge('Speaking', 'speak');
+    timerFill.className = 'timer-fill speaking';
+    timerDisp.textContent = speakRemaining;
+    timerFill.style.width = (speakRemaining / speakTotal * 100) + '%';
+
+    resolveSpeakDone = () => { clearInterval(speakInterval); resolve(); };
+    clearInterval(speakInterval);
+    speakInterval = setInterval(() => {
+      speakRemaining--;
+      timerDisp.textContent = speakRemaining;
+      timerFill.style.width = Math.max(0, speakRemaining / speakTotal * 100) + '%';
+      if (speakRemaining <= 0) {
+        clearInterval(speakInterval); resolveSpeakDone = null; resolve();
+      }
+    }, 1000);
+  });
+}
+
+/* Audio helpers */
 function startRecognition() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) { showStatus('error', '🎙️ Browser không hỗ trợ Speech Recognition'); return; }
   recognition = new SR();
   recognition.continuous = true; recognition.interimResults = true; recognition.lang = 'en-US';
   recognition.onstart  = () => showStatus('info', '🎤 Listening… Speak now!');
-  recognition.onerror  = e => showStatus('error', `❌ Microphone error: ${e.error}`);
+  recognition.onerror  = e => { if (currentPhase === 'speaking') showStatus('error', `❌ Mic error: ${e.error}`); };
+  recognition.onend    = () => {
+    /* Auto-restart recognition if still in speaking phase (browser sometimes stops it) */
+    if (currentPhase === 'speaking') { try { recognition.start(); } catch(e) {} }
+  };
   recognition.onresult = event => {
     interimTranscript = '';
     for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1181,34 +1079,35 @@ function startRecognition() {
   };
   transcriptEl.addEventListener('scroll', () => {
     userManuallyScrolled = !(transcriptEl.scrollTop + transcriptEl.clientHeight >= transcriptEl.scrollHeight - 10);
-  });
+  }, { passive: true });
   try { recognition.start(); } catch(e) { showStatus('error', '❌ Cannot start microphone'); }
 }
 
-function stopRecognition() { try { if (recognition) recognition.stop(); } catch(e) {} }
+function stopRecognition() { try { if (recognition) { recognition.onend = null; recognition.stop(); } } catch(e) {} }
 
 async function startRecording() {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    if (audioContext) try { audioContext.close(); } catch(e) {}
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     analyser = audioContext.createAnalyser();
     audioContext.createMediaStreamSource(stream).connect(analyser);
     analyser.fftSize = 256;
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
+    clearInterval(monitorAudioInterval);
     monitorAudioInterval = setInterval(() => {
       analyser.getByteFrequencyData(dataArray);
-      const avg = dataArray.reduce((a,b) => a+b) / dataArray.length;
-      waveform.classList.toggle('active', avg > 10);
+      waveform.classList.toggle('active', dataArray.reduce((a,b)=>a+b)/dataArray.length > 10);
     }, 100);
     audioChunks = [];
     mediaRecorder = new MediaRecorder(stream);
-    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
-    mediaRecorder.start();
-    mediaRecorder.onstop = () => { clearInterval(monitorAudioInterval); if (audioContext) audioContext.close(); };
+    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) audioChunks.push(e.data); };
+    mediaRecorder.start(200); /* timeslice so data accumulates incrementally */
+    mediaRecorder.onstop = () => { clearInterval(monitorAudioInterval); try { audioContext.close(); } catch(e) {} };
     return true;
   } catch(err) {
-    const msg = { NotAllowedError: 'Microphone permission denied', NotFoundError: 'Microphone not found' }[err.name] || err.message;
-    showStatus('error', '❌ ' + msg);
+    const msgs = { NotAllowedError: 'Microphone permission denied', NotFoundError: 'Microphone not found' };
+    showStatus('error', '❌ ' + (msgs[err.name] || err.message));
     return false;
   }
 }
@@ -1220,20 +1119,21 @@ function stopRecording() {
       const blob = new Blob(audioChunks, { type: 'audio/webm' });
       audioChunks = []; resolve(blob);
     };
-    mediaRecorder.stop();
-    mediaRecorder.stream.getTracks().forEach(t => t.stop());
+    try { mediaRecorder.stop(); mediaRecorder.stream.getTracks().forEach(t => t.stop()); } catch(e) { resolve(null); }
   });
 }
 
 async function uploadAttempt(audioBlob) {
   const csrf = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
   const form = new FormData();
-  form.append('audio', audioBlob, 'recording.webm');
-  form.append('transcript', finalTranscript.trim());
+  form.append('audio',             audioBlob, 'recording.webm');
+  form.append('transcript',        finalTranscript.trim());
   form.append('speaking_topic_id', currentData.topic);
-  form.append('course_id', currentData.course);
-  form.append('part', currentData.part);
-  const res  = await fetch('/students/speaking_attempts', { method: 'POST', headers: csrf ? { 'X-CSRF-Token': csrf } : {}, body: form });
+  form.append('course_id',         currentData.course);
+  form.append('part',              currentData.part);
+  const res  = await fetch('/students/speaking_attempts', {
+    method: 'POST', headers: csrf ? { 'X-CSRF-Token': csrf } : {}, body: form
+  });
   const text = await res.text();
   if (!res.ok) throw new Error(`Server ${res.status}: ${text}`);
   return JSON.parse(text);
@@ -1245,102 +1145,145 @@ async function finishSpeaking() {
   [btnDone, btnRerecord, btnSubmit].forEach(b => b.classList.add('hidden'));
   waveform.classList.remove('active');
   stopRecognition();
-  if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+  clearInterval(speakInterval);
+  if (resolveSpeakDone) { resolveSpeakDone(); resolveSpeakDone = null; }
   setPhaseBadge('Evaluating…', 'eval');
   timerDisp.textContent = '—';
-  showStatus('warn', '⏳ AI is evaluating your response. You can close and come back later.');
+  showStatus('warn', '⏳ AI is evaluating… You can close this window and come back later.');
   const audioBlob = await stopRecording();
-  if (!audioBlob || audioBlob.size === 0) { showStatus('error', 'Recording is empty. Please try again.'); showRetry(); return; }
+  if (!audioBlob || audioBlob.size === 0) { showStatus('error', 'Recording is empty. Try again.'); showRetryBtn(); return; }
   try {
     const result = await uploadAttempt(audioBlob);
     resultCache[currentQid] = result;
-    showResult(result, true);
+    showResult(result);
     const chip = document.getElementById('chip-' + currentQid);
     if (chip) chip.classList.add('visible');
   } catch(err) {
-    showStatus('error', 'Upload failed: ' + err.message); showRetry();
+    showStatus('error', 'Upload failed: ' + err.message); showRetryBtn();
   }
 }
 
 function showResult(result) {
   currentPhase = 'done';
-  document.getElementById('res-overall').textContent       = result.overall ?? '—';
-  document.getElementById('res-fluency').textContent       = result.fluency ?? '—';
-  document.getElementById('res-lexical').textContent       = result.lexical ?? '—';
-  document.getElementById('res-grammar').textContent       = result.grammar ?? '—';
+  document.getElementById('res-overall').textContent       = result.overall       ?? '—';
+  document.getElementById('res-fluency').textContent       = result.fluency       ?? '—';
+  document.getElementById('res-lexical').textContent       = result.lexical       ?? '—';
+  document.getElementById('res-grammar').textContent       = result.grammar       ?? '—';
   document.getElementById('res-pronunciation').textContent = result.pronunciation ?? '—';
-  document.getElementById('res-feedback').textContent      = result.feedback ?? '';
+  document.getElementById('res-feedback').textContent      = result.feedback      ?? '';
   resultPanel.classList.add('visible');
   setPhaseBadge('Completed', 'done');
-  showStatus('success', '✅ Evaluation complete! Check your scores above.');
-  showRetry();
+  showStatus('success', '✅ Evaluation complete!');
+  showRetryBtn();
 }
 
-function showRetry() {
+function showRetryBtn() {
   [btnStart, btnDone, btnRerecord, btnSubmit].forEach(b => b.classList.add('hidden'));
   btnRetry.classList.remove('hidden');
 }
 
-function showPrevResult(qid) {
-  document.querySelector(`[data-qid="${qid}"]`)?.click();
-}
+function showPrevResult(qid) { document.querySelector(`[data-qid="${qid}"]`)?.click(); }
 
-function showStatus(type, msg) {
-  statusMsg.className = 'status-msg ' + type;
-  statusMsg.textContent = msg;
-}
+function showStatus(type, msg) { statusMsg.className = 'status-msg ' + type; statusMsg.textContent = msg; }
 
+/* ── BEGIN SESSION ── */
 btnStart.addEventListener('click', async () => {
   btnStart.disabled = true; btnStart.textContent = 'Starting…';
   currentPhase = 'prep';
   showStatus('info', '📖 Preparation phase. Read the question carefully.');
-  await runTimer(currentData.prep, 'Preparation', 'prep', '');
+  await runPrepTimer(currentData.prep);
   if (currentPhase !== 'prep') return;
+
   const ok = await startRecording();
   if (!ok) { btnStart.disabled = false; btnStart.textContent = 'Begin Session'; currentPhase = 'idle'; return; }
   startRecognition();
-  currentPhase = 'speaking'; timerEnded = false;
+
+  /* Initialise speaking timer ONCE */
+  speakTotal     = currentData.speak;
+  speakRemaining = currentData.speak;
+  currentPhase   = 'speaking';
+
   btnStart.classList.add('hidden');
-  btnDone.classList.remove('hidden'); btnRerecord.classList.remove('hidden');
-  showStatus('info', '🔴 Recording… "Stop & Submit" to finish early.');
-  await runTimer(currentData.speak, 'Speaking', 'speak', 'speaking');
+  btnDone.classList.remove('hidden');
+  btnRerecord.classList.remove('hidden');
+  showStatus('info', '🔴 Recording… "Stop & Submit" to finish early, "Re-record" to restart mic.');
+
+  /* Start the single speaking countdown */
+  await startSpeakTimer();
+
+  /* Only reached when time runs out naturally */
   if (currentPhase === 'speaking') {
-    timerEnded = true;
-    btnDone.classList.add('hidden'); btnRerecord.classList.add('hidden');
+    btnDone.classList.add('hidden');
+    btnRerecord.classList.remove('hidden'); /* still allow re-record even after time! */
     btnSubmit.classList.remove('hidden');
-    showStatus('warn', '⏱️ Time up! Click "Submit" or "Re-record".');
+    showStatus('warn', '⏱️ Time up! Click "Submit" to send, or "Re-record" for one more take.');
   }
 });
 
-btnDone.addEventListener('click',     () => finishSpeaking());
-btnSubmit.addEventListener('click',   () => finishSpeaking());
+/* ── STOP & SUBMIT ── */
+btnDone.addEventListener('click', () => finishSpeaking());
 
-btnRerecord.addEventListener('click', () => {
-  stopRecording(); stopRecognition();
-  clearInterval(timerInterval); clearInterval(monitorAudioInterval);
-  if (resolveTimer) { resolveTimer(); resolveTimer = null; }
+/* ── SUBMIT (after time-up) ── */
+btnSubmit.addEventListener('click', () => finishSpeaking());
+
+/* ── RE-RECORD
+     3. Stops mic & recognition, clears transcript, restarts mic.
+        The speaking countdown (speakInterval) is NOT touched — it keeps running.
+        User can re-record as many times as they want until time hits 0.
+── */
+btnRerecord.addEventListener('click', async () => {
+  if (currentPhase !== 'speaking') return;
+  log('Re-record requested, remaining:', speakRemaining);
+
+  /* Temporarily hide action buttons while mic restarts */
+  btnDone.classList.add('hidden');
+  btnRerecord.classList.add('hidden');
+  btnSubmit.classList.add('hidden');
+
+  /* Stop previous mic & recognition (do NOT clear speakInterval!) */
+  stopRecognition();
+  await stopRecording();
+  waveform.classList.remove('active');
+
+  /* Clear transcript for fresh take */
   finalTranscript = ''; interimTranscript = '';
   transcriptEl.innerHTML = '<span class="t-placeholder">Your words will appear here as you speak…</span>';
-  currentPhase = 'speaking'; timerEnded = false;
-  waveform.classList.remove('active'); btnSubmit.classList.add('hidden');
-  showStatus('info', '🔴 Recording… "Stop & Submit" to finish early.');
-  startRecording().then(ok => {
-    if (!ok) { showStatus('error', 'Failed to start recording'); return; }
-    startRecognition();
-    runTimer(currentData.speak, 'Speaking', 'speak', 'speaking').then(() => {
-      if (currentPhase === 'speaking') {
-        timerEnded = true;
-        btnDone.classList.add('hidden'); btnRerecord.classList.add('hidden');
-        btnSubmit.classList.remove('hidden');
-        showStatus('warn', '⏱️ Time up! Click "Submit" or "Re-record".');
-      }
-    });
-  });
+
+  /* If time ran out during the mic switch */
+  if (speakRemaining <= 0) {
+    btnSubmit.classList.remove('hidden');
+    btnRerecord.classList.remove('hidden');
+    showStatus('warn', '⏱️ Time up! Submit or try again.');
+    return;
+  }
+
+  showStatus('info', '🔄 Restarting mic… timer still running!');
+
+  const ok = await startRecording();
+  if (!ok) {
+    /* Mic failed, restore buttons so user isn't stuck */
+    btnDone.classList.remove('hidden');
+    btnRerecord.classList.remove('hidden');
+    return;
+  }
+  startRecognition();
+
+  /* Restore appropriate buttons based on whether time is still left */
+  if (speakRemaining > 0) {
+    btnDone.classList.remove('hidden');
+    btnRerecord.classList.remove('hidden');
+    showStatus('info', '🔴 Recording again… timer still running.');
+  } else {
+    btnSubmit.classList.remove('hidden');
+    btnRerecord.classList.remove('hidden');
+    showStatus('warn', '⏱️ Time up! Submit or re-record again.');
+  }
 });
 
+/* ── TRY AGAIN — full reset, new session ── */
 btnRetry.addEventListener('click', () => {
   stopRecording(); stopRecognition();
-  clearInterval(timerInterval); clearInterval(monitorAudioInterval);
+  clearInterval(prepInterval); clearInterval(speakInterval); clearInterval(monitorAudioInterval);
   resetModal();
 });
 </script>
