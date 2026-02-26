@@ -27,42 +27,42 @@
     ═══════════════════════════════════════════ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    :root {
-      --ink:       #0d0e14;
-      --ink-2:     #3a3d52;
-      --ink-3:     #7b7f96;
-      --line:      #e8eaf2;
-      --bg:        #f2f4f9;
-      --surface:   #ffffff;
-      --surface-2: #f7f8fc;
+   :root {
+  --ink:       #0d0e14;
+  --ink-2:     #3a3d52;
+  --ink-3:     #7b7f96;
+  --line:      #e8eaf2;
+  --bg:        #f2f4f9;
+  --surface:   #ffffff;
+  --surface-2: #f7f8fc;
 
-      --indigo:    #4f46e5;
-      --indigo-lt: #eeeeff;
-      --indigo-glow: rgba(79,70,229,.18);
-      --teal:      #0d9488;
-      --teal-lt:   #e6faf8;
-      --amber:     #d97706;
-      --amber-lt:  #fef3e1;
-      --rose:      #e11d48;
-      --rose-lt:   #fce7ef;
-      --emerald:   #059669;
-      --emerald-lt:#e6f7f1;
+  /* 🔴 PRIMARY RED SYSTEM */
+  --primary:    #dc2626;
+  --primary-lt: #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
 
-      --r-sm: 10px;
-      --r-md: 16px;
-      --r-lg: 22px;
-      --r-xl: 28px;
+  --teal:      #0d9488;
+  --teal-lt:   #e6faf8;
+  --amber:     #d97706;
+  --amber-lt:  #fef3e1;
+  --emerald:   #059669;
+  --emerald-lt:#e6f7f1;
 
-      --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
-      --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
-      --shadow-md: 0 6px 24px rgba(0,0,0,.09);
-      --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 22px;
+  --r-xl: 28px;
 
-      --font: 'Plus Jakarta Sans', sans-serif;
-      --font-serif: 'Instrument Serif', serif;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
 
-      --ease: cubic-bezier(.4,0,.2,1);
-    }
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+
+  --ease: cubic-bezier(.4,0,.2,1);
+}
 
     html { scroll-behavior: smooth; }
     body {
@@ -102,8 +102,8 @@
       font-weight: 700;
       letter-spacing: .12em;
       text-transform: uppercase;
-      color: var(--indigo);
-      background: var(--indigo-lt);
+      color: var(--primary);
+      background: var(--primary-lt);
       padding: 5px 13px;
       border-radius: 30px;
       margin-bottom: 12px;
@@ -116,7 +116,7 @@
       color: var(--ink);
       letter-spacing: -.02em;
     }
-    .page-title em { font-style: italic; color: var(--indigo); }
+    .page-title em { font-style: italic; color: var(--primary); }
     .page-sub {
       margin-top: 8px;
       font-size: 15px;
@@ -150,12 +150,12 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: var(--tile-accent, var(--indigo-lt));
+      background: var(--tile-accent, var(--primary-lt));
       opacity: .5;
       pointer-events: none;
       border-radius: inherit;
     }
-    .stat-tile:nth-child(1) { --tile-accent: var(--indigo-lt); animation-delay:.05s; }
+    .stat-tile:nth-child(1) { --tile-accent: var(--primary-lt); animation-delay:.05s; }
     .stat-tile:nth-child(2) { --tile-accent: var(--teal-lt);   animation-delay:.10s; }
     .stat-tile:nth-child(3) { --tile-accent: var(--amber-lt);  animation-delay:.15s; }
     .stat-tile:nth-child(4) { --tile-accent: var(--emerald-lt);animation-delay:.20s; }
@@ -177,7 +177,7 @@
       letter-spacing: -.02em;
       position: relative;
     }
-    .stat-tile:nth-child(1) .stat-tile-value { color: var(--indigo); }
+    .stat-tile:nth-child(1) .stat-tile-value { color: var(--primary); }
     .stat-tile:nth-child(2) .stat-tile-value { color: var(--teal); }
     .stat-tile:nth-child(3) .stat-tile-value { color: var(--amber); }
     .stat-tile:nth-child(4) .stat-tile-value { color: var(--emerald); }
@@ -267,8 +267,8 @@
       color: inherit;
     }
     .course-row:hover {
-      border-color: var(--indigo);
-      box-shadow: var(--shadow-md), 0 0 0 4px var(--indigo-glow);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-md), 0 0 0 4px var(--primary-glow);
       transform: translateX(4px);
     }
 
@@ -278,13 +278,13 @@
       border-radius: var(--r-sm);
       object-fit: cover;
       flex-shrink: 0;
-      background: var(--indigo-lt);
+      background: var(--primary-lt);
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--font-serif);
       font-size: 22px;
-      color: var(--indigo);
+      color: var(--primary);
       font-style: italic;
       overflow: hidden;
     }
@@ -315,7 +315,7 @@
       padding: 3px 10px;
       border-radius: 20px;
     }
-    .chip-attempts { background: var(--indigo-lt); color: var(--indigo); }
+    .chip-attempts { background: var(--primary-lt); color: var(--primary); }
     .chip-best     { background: var(--amber-lt);  color: var(--amber); }
     .chip-avg      { background: var(--teal-lt);   color: var(--teal); }
     .chip-none     { background: var(--surface-2); color: var(--ink-3); }
@@ -335,7 +335,7 @@
     .band-bar-fill {
       height: 100%;
       border-radius: 3px;
-      background: linear-gradient(90deg, var(--indigo), #818cf8);
+      background: linear-gradient(90deg, var(--primary), #818cf8);
       transition: width 1s var(--ease);
     }
     .band-bar-label {
@@ -359,8 +359,8 @@
       transition: all .2s var(--ease);
     }
     .course-row:hover .course-row-arrow {
-      background: var(--indigo);
-      border-color: var(--indigo);
+      background: var(--primary);
+      border-color: var(--primary);
       color: #fff;
       transform: translateX(3px);
     }
@@ -589,9 +589,9 @@ if (allAttempts.length > 0) {
       datasets: [{
         label: 'Band Score',
         data: allAttempts.map(a => a.overall_band),
-        borderColor: '#4f46e5',
-        backgroundColor: 'rgba(79,70,229,.10)',
-        pointBackgroundColor: '#4f46e5',
+        borderColor: '#dc2626',
+        backgroundColor: 'rgba(220,38,38,.10)',
+        pointBackgroundColor: '#dc2626',
         pointRadius: 5,
         pointHoverRadius: 7,
         fill: true,
@@ -644,9 +644,9 @@ if (allAttempts.length > 0) {
           +avg('grammar_score').toFixed(2),
           +avg('pronunciation_score').toFixed(2)
         ],
-        backgroundColor: 'rgba(13,148,136,.15)',
-        borderColor: '#0d9488',
-        pointBackgroundColor: '#0d9488',
+        backgroundColor: 'rgba(220,38,38,.15)',
+borderColor: '#dc2626',
+pointBackgroundColor: '#dc2626',
         pointRadius: 4,
         borderWidth: 2
       }]
