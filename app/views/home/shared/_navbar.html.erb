@@ -1,23 +1,24 @@
-<nav class="fixed top-0 left-0 z-[9999] w-full h-20 bg-white border-b border-gray-200">
-  <div class="h-full px-6 flex items-center justify-between">
+<nav class="fixed top-0 left-0 z-[9999] w-full h-20 bg-white/90 backdrop-blur-md border-b border-gray-100">
+  <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
 
     <!-- LEFT -->
-    <div class="flex items-center">
+    <div class="flex items-center gap-12">
+      
       <!-- Logo -->
-      <a href="<%= root_path %>" class="flex items-center">
+      <a href="<%= root_path %>" class="flex items-center shrink-0">
         <img
           src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png"
-          class="h-10"
+          class="h-9 w-auto"
         />
       </a>
 
-      <!-- Explore trigger -->
+      <!-- Explore -->
       <div
         id="exploreTrigger"
-        class="ml-16 flex items-center gap-1 cursor-pointer select-none
-               text-sm font-semibold text-gray-700 hover:text-red-600"
+        class="flex items-center gap-1 cursor-pointer select-none
+               text-sm font-semibold text-gray-700 hover:text-red-600 transition"
       >
-        EXPLORE
+        Explore
         <svg id="exploreIcon"
              class="w-4 h-4 transition-transform duration-200"
              fill="none" stroke="currentColor" stroke-width="2"
@@ -26,19 +27,25 @@
                 d="M19 9l-7 7-7-7" />
         </svg>
       </div>
+
     </div>
 
     <!-- RIGHT -->
-    <div class="flex items-center space-x-4">
+    <div class="flex items-center gap-4 shrink-0">
+
       <a href="<%= new_user_session_path %>"
-         class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">
+         class="px-5 py-2.5 text-sm font-semibold text-gray-700
+                hover:text-red-600 transition">
         Login
       </a>
 
       <a href="<%= new_user_registration_path %>"
-         class="px-4 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50">
+         class="px-6 py-2.5 text-sm font-semibold text-white
+                bg-red-600 rounded-xl hover:bg-red-700
+                shadow-sm transition">
         Sign Up
       </a>
+
     </div>
 
   </div>
