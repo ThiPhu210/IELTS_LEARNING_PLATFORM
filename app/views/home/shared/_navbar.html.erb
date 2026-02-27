@@ -1,126 +1,197 @@
-<% navbar_courses = @navbar_courses || Course.limit(8) %>
+<% navbar_courses = defined?(@navbar_courses) ? @navbar_courses : Course.limit(12) %>
 
-<nav class="fixed top-0 left-0 z-[9999] w-full h-[68px] bg-white border-b border-gray-100 shadow-sm">
-  <div class="max-w-7xl mx-auto h-full px-6 flex items-center justify-between">
+<style>
+.nav-root {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  height: 64px; background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.nav-inner {
+  max-width: 1200px; margin: 0 auto; height: 100%;
+  padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+}
+.nav-left { display: flex; align-items: center; gap: 32px; }
+.nav-logo img { height: 32px; display: block; }
 
-    <!-- LEFT -->
-    <div class="flex items-center gap-10">
-      <a href="<%= root_path %>" class="flex items-center shrink-0">
-        <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" class="h-8 w-auto"/>
+/* Explore trigger */
+.nav-explore-btn {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 13.5px; font-weight: 600; color: #374151;
+  cursor: pointer; border: none; background: none;
+  padding: 6px 2px; transition: color .15s;
+  font-family: inherit;
+}
+.nav-explore-btn:hover { color: #dc2626; }
+.nav-explore-btn svg { transition: transform .2s; }
+.nav-explore-btn.open svg { transform: rotate(180deg); }
+
+.nav-link {
+  font-size: 13.5px; font-weight: 600; color: #374151;
+  text-decoration: none; transition: color .15s;
+}
+.nav-link:hover { color: #dc2626; }
+
+/* Right buttons */
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.btn-login {
+  padding: 7px 18px; font-size: 13.5px; font-weight: 600;
+  color: #374151; background: transparent;
+  border: 1.5px solid #d1d5db; border-radius: 8px;
+  text-decoration: none; transition: all .15s; white-space: nowrap;
+}
+.btn-login:hover { border-color: #dc2626; color: #dc2626; }
+.btn-signup {
+  padding: 7px 18px; font-size: 13.5px; font-weight: 700;
+  color: #fff; background: #dc2626;
+  border: 1.5px solid #dc2626; border-radius: 8px;
+  text-decoration: none; transition: all .15s; white-space: nowrap;
+}
+.btn-signup:hover { background: #b91c1c; border-color: #b91c1c; }
+
+/* Dropdown */
+.nav-dropdown {
+  position: fixed; top: 64px; left: 0; right: 0; z-index: 9998;
+  background: #fff; border-top: 1px solid #f3f4f6;
+  box-shadow: 0 20px 40px rgba(0,0,0,.10);
+  opacity: 0; pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity .18s ease, transform .18s ease;
+}
+.nav-dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.nav-dropdown-inner { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+/* Dropdown header */
+.dd-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.dd-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #9ca3af; }
+.dd-viewall { font-size: 13px; font-weight: 700; color: #dc2626; text-decoration: none; }
+.dd-viewall:hover { color: #b91c1c; }
+
+/* Course list - Coursera style */
+.dd-courses-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+}
+.dd-course-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; border-radius: 10px;
+  text-decoration: none; color: inherit;
+  transition: background .12s;
+  cursor: pointer;
+}
+.dd-course-item:hover { background: #fef2f2; }
+.dd-course-icon {
+  width: 36px; height: 36px; border-radius: 8px;
+  background: #fee2e2; display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif; font-style: italic;
+  font-size: 16px; color: #dc2626; flex-shrink: 0;
+}
+.dd-course-info { min-width: 0; }
+.dd-course-name {
+  font-size: 13px; font-weight: 600; color: #111827;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  display: block;
+}
+.dd-course-meta { font-size: 11.5px; color: #9ca3af; margin-top: 1px; }
+
+/* Divider + sidebar */
+.dd-body { display: flex; gap: 0; }
+.dd-courses-wrap { flex: 1; }
+.dd-sidebar {
+  width: 220px; flex-shrink: 0;
+  border-left: 1px solid #f3f4f6; padding-left: 28px; margin-left: 28px;
+}
+.dd-sidebar-section { margin-bottom: 20px; }
+.dd-sidebar-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
+.dd-sidebar-link {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0; font-size: 13px; font-weight: 500; color: #374151;
+  text-decoration: none; transition: color .12s; border-bottom: none;
+}
+.dd-sidebar-link:hover { color: #dc2626; }
+.dd-sidebar-link .icon { font-size: 15px; }
+</style>
+
+<nav class="nav-root">
+  <div class="nav-inner">
+    <div class="nav-left">
+      <a href="<%= root_path %>" class="nav-logo">
+        <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" alt="IELTS">
       </a>
 
-      <!-- Explore trigger -->
-      <div id="exploreTrigger" class="flex items-center gap-1.5 cursor-pointer select-none text-sm font-semibold text-gray-700 hover:text-red-600 transition-colors duration-150">
+      <button class="nav-explore-btn" id="navExploreBtn">
         Courses
-        <svg id="exploreIcon" class="w-3.5 h-3.5 transition-transform duration-200" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
         </svg>
-      </div>
+      </button>
 
-      <a href="#" class="text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors">Teachers</a>
-      <a href="#" class="text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors">Blog</a>
+      <a href="#" class="nav-link">Teachers</a>
+      <a href="#" class="nav-link">Blog</a>
     </div>
 
-    <!-- RIGHT -->
-    <div class="flex items-center gap-3 shrink-0">
-      <a href="<%= new_user_session_path %>" class="px-4 py-2 text-sm font-semibold text-gray-700 hover:text-red-600 transition-colors">Login</a>
-      <a href="<%= new_user_registration_path %>" class="px-5 py-2.5 text-sm font-semibold text-white bg-red-600 rounded-xl hover:bg-red-700 shadow-sm transition-colors">Sign Up</a>
+    <div class="nav-right">
+      <a href="<%= new_user_session_path %>" class="btn-login">Log in</a>
+      <a href="<%= new_user_registration_path %>" class="btn-signup">Sign up free</a>
     </div>
   </div>
 </nav>
 
-<!-- DROPDOWN -->
-<div id="exploreDropdown"
-     class="fixed left-0 top-[68px] w-screen bg-white border-t border-gray-100 shadow-2xl
-            opacity-0 pointer-events-none transition-all duration-200 z-[9998]">
-  <div class="max-w-7xl mx-auto px-8 py-8">
-    <div class="flex gap-10">
-
-      <!-- Course grid - main area -->
-      <div class="flex-1">
-        <div class="flex items-center justify-between mb-5">
-          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Popular Courses</h3>
-          <%= link_to "View all →", students_courses_path, class: "text-xs font-bold text-red-600 hover:text-red-700" %>
+<div class="nav-dropdown" id="navDropdown">
+  <div class="nav-dropdown-inner">
+    <div class="dd-body">
+      <div class="dd-courses-wrap">
+        <div class="dd-header">
+          <span class="dd-title">All Courses</span>
+          <%= link_to "Browse all →", students_courses_path, class: "dd-viewall" %>
         </div>
-        <div class="grid grid-cols-4 gap-3">
+        <div class="dd-courses-grid">
           <% navbar_courses.each do |course| %>
-            <%= link_to students_course_path(course), class: "group flex flex-col rounded-xl border border-gray-100 hover:border-red-200 hover:shadow-md transition-all duration-200 overflow-hidden bg-white" do %>
-              <!-- Thumb -->
-              <div class="h-28 bg-red-50 overflow-hidden flex items-center justify-center relative">
-                <% if course.thumbnail.attached? %>
-                  <%= image_tag url_for(course.thumbnail), class: "w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" %>
-                <% else %>
-                  <span class="font-serif text-4xl italic text-red-300"><%= course.title[0] %></span>
-                <% end %>
+            <%= link_to students_course_path(course), class: "dd-course-item" do %>
+              <div class="dd-course-icon"><%= course.title[0].upcase %></div>
+              <div class="dd-course-info">
+                <span class="dd-course-name"><%= course.title %></span>
                 <% if course.respond_to?(:band_min) && course.band_min.present? %>
-                  <div class="absolute top-2 left-2 bg-white/90 backdrop-blur text-red-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-red-100">
-                    Band <%= course.band_min %>–<%= course.band_max %>
-                  </div>
-                <% end %>
-              </div>
-              <!-- Info -->
-              <div class="p-3">
-                <p class="text-xs font-bold text-gray-800 leading-snug line-clamp-2 group-hover:text-red-600 transition-colors"><%= course.title %></p>
-                <% if course.respond_to?(:price) && course.price.present? %>
-                  <p class="text-xs text-gray-400 mt-1.5 font-medium"><%= number_to_currency(course.price, unit: "₫", precision: 0, delimiter: ".") %></p>
+                  <div class="dd-course-meta">Band <%= course.band_min %>–<%= course.band_max %></div>
                 <% end %>
               </div>
             <% end %>
           <% end %>
           <% if navbar_courses.empty? %>
-            <p class="text-sm text-gray-400 col-span-4 py-4 text-center">Chưa có khóa học nào</p>
+            <p style="color:#9ca3af;font-size:13px;padding:12px;grid-column:1/-1">Chưa có khóa học nào.</p>
           <% end %>
         </div>
       </div>
 
-      <!-- Sidebar -->
-      <div class="w-52 shrink-0 border-l border-gray-100 pl-8">
-        <div class="mb-6">
-          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Practice</h3>
-          <ul class="space-y-2">
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">🤖</span> AI Mock Test</a></li>
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">🎤</span> Speaking AI</a></li>
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">✍️</span> Writing Check</a></li>
-          </ul>
+      <div class="dd-sidebar">
+        <div class="dd-sidebar-section">
+          <div class="dd-sidebar-label">Practice</div>
+          <a href="#" class="dd-sidebar-link"><span class="icon">🤖</span> AI Mock Test</a>
+          <a href="#" class="dd-sidebar-link"><span class="icon">🎤</span> Speaking AI</a>
+          <a href="#" class="dd-sidebar-link"><span class="icon">✍️</span> Writing Checker</a>
         </div>
-        <div>
-          <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Resources</h3>
-          <ul class="space-y-2">
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">🗺️</span> Roadmap</a></li>
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">📖</span> Blog</a></li>
-            <li><a href="#" class="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600 transition-colors font-medium"><span class="text-base">👥</span> Community</a></li>
-          </ul>
-        </div>
-
-        <!-- CTA -->
-        <div class="mt-6 p-4 bg-red-50 rounded-xl border border-red-100">
-          <p class="text-xs font-bold text-red-700 mb-1">🎯 Free Trial</p>
-          <p class="text-xs text-red-500 mb-3">Thử học miễn phí ngay hôm nay</p>
-          <%= link_to "Bắt đầu ngay →", students_courses_path, class: "block text-center text-xs font-bold text-white bg-red-600 hover:bg-red-700 rounded-lg py-2 transition-colors" %>
+        <div class="dd-sidebar-section">
+          <div class="dd-sidebar-label">Resources</div>
+          <a href="#" class="dd-sidebar-link"><span class="icon">🗺️</span> Study Roadmap</a>
+          <a href="#" class="dd-sidebar-link"><span class="icon">📖</span> Blog</a>
+          <a href="#" class="dd-sidebar-link"><span class="icon">👥</span> Community</a>
         </div>
       </div>
-
     </div>
   </div>
 </div>
 
 <script>
-  const trigger = document.getElementById("exploreTrigger");
-  const dropdown = document.getElementById("exploreDropdown");
-  const icon = document.getElementById("exploreIcon");
-  let hovering = false;
+(function() {
+  const btn = document.getElementById("navExploreBtn");
+  const dd  = document.getElementById("navDropdown");
+  let hoveringBtn = false, hoveringDd = false;
 
-  const show = () => {
-    dropdown.classList.remove("opacity-0", "pointer-events-none");
-    icon.classList.add("rotate-180");
-  };
-  const hide = () => {
-    dropdown.classList.add("opacity-0", "pointer-events-none");
-    icon.classList.remove("rotate-180");
-  };
+  function open()  { dd.classList.add("open"); btn.classList.add("open"); }
+  function close() { dd.classList.remove("open"); btn.classList.remove("open"); }
 
-  trigger.addEventListener("mouseenter", show);
-  trigger.addEventListener("mouseleave", () => setTimeout(() => { if (!hovering) hide(); }, 80));
-  dropdown.addEventListener("mouseenter", () => { hovering = true; show(); });
-  dropdown.addEventListener("mouseleave", () => { hovering = false; hide(); });
+  btn.addEventListener("mouseenter", () => { hoveringBtn = true; open(); });
+  btn.addEventListener("mouseleave", () => { hoveringBtn = false; setTimeout(() => { if (!hoveringDd) close(); }, 80); });
+  dd.addEventListener("mouseenter",  () => { hoveringDd = true; });
+  dd.addEventListener("mouseleave",  () => { hoveringDd = false; setTimeout(() => { if (!hoveringBtn) close(); }, 80); });
+})();
 </script>
