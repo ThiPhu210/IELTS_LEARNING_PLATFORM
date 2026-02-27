@@ -1,87 +1,393 @@
-<section class="min-h-screen bg-pink-50 flex items-center justify-center px-6 py-16">
+<%# app/views/students/orders/new.html.erb
+    Trang xác nhận đơn hàng — hiển thị thông tin order trước khi chuyển sang checkout
+    Style: đồng bộ với landing.html.erb (red color scheme, Plus Jakarta Sans + Instrument Serif)
+%>
 
-  <div class="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10">
+<%= render "students/shared/navbar" rescue nil %>
 
-    <!-- LEFT: COURSE INFO -->
-    <div class="bg-white rounded-3xl shadow-lg p-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">
-        Thông tin khóa học
-      </h2>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red:        #dc2626;
+  --red-dark:   #b91c1c;
+  --red-lt:     #fee2e2;
+  --red-glow:   rgba(220,38,38,.15);
+  --ink:        #0d0e14;
+  --ink-2:      #374151;
+  --ink-3:      #6b7280;
+  --line:       #e8eaf2;
+  --bg:         #f2f4f9;
+  --surface:    #ffffff;
+  --emerald:    #059669;
+  --emerald-lt: #d1fae5;
+  --amber:      #d97706;
+  --amber-lt:   #fef3c7;
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --serif:      'Instrument Serif', serif;
+  --ease:       cubic-bezier(.4,0,.2,1);
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); min-height: 100vh; }
 
-      <% if @course.thumbnail.attached? %>
-        <%= image_tag @course.thumbnail.variant(resize_to_fill: [600, 300]),
-              class: "rounded-2xl mb-6 w-full object-cover" %>
-      <% end %>
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
 
-      <h3 class="text-xl font-semibold text-gray-900 mb-2">
-        <%= @course.title %>
-      </h3>
+/* ── PAGE WRAPPER ── */
+.order-page {
+  padding-top: 60px; /* navbar offset */
+  min-height: 100vh;
+  display: flex; align-items: flex-start; justify-content: center;
+  padding-bottom: 60px;
+}
+.order-inner {
+  max-width: 900px; width: 100%;
+  padding: 44px 24px 0;
+}
 
-      <% if @course.band_min.present? && @course.band_max.present? %>
-        <p class="text-sm font-semibold text-pink-600 mb-4">
-          IELTS <%= @course.band_min %> – <%= @course.band_max %>
-        </p>
-      <% end %>
+/* ── BREADCRUMB ── */
+.order-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
+  margin-bottom: 28px; animation: fadeUp .35s var(--ease) both;
+}
+.order-breadcrumb a { color: var(--red); text-decoration: none; transition: opacity .15s; }
+.order-breadcrumb a:hover { opacity: .75; }
 
-      <p class="text-gray-600 leading-relaxed">
-        Học IELTS với AI cá nhân hóa lộ trình, chấm Speaking – Writing tự động,
-        phản hồi chi tiết theo band score.
-      </p>
+/* ── HEADING ── */
+.order-heading {
+  margin-bottom: 32px; animation: fadeUp .4s var(--ease) .04s both;
+}
+.order-step-label {
+  font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--red); margin-bottom: 8px; display: flex; align-items: center; gap: 7px;
+}
+.order-step-label::before {
+  content: '01'; display: inline-flex; align-items: center; justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--red); color: #fff; font-size: 10px; font-weight: 800;
+}
+.order-title {
+  font-family: var(--serif); font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400; letter-spacing: -.02em; color: var(--ink); line-height: 1.2;
+}
+.order-title em { font-style: italic; color: var(--red); }
+
+/* ── STEPS INDICATOR ── */
+.order-steps {
+  display: flex; align-items: center; gap: 0;
+  margin-bottom: 36px; animation: fadeUp .4s var(--ease) .07s both;
+}
+.step-item { display: flex; align-items: center; gap: 8px; }
+.step-num {
+  width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 800;
+}
+.step-num.active { background: var(--red); color: #fff; }
+.step-num.inactive { background: var(--line); color: var(--ink-3); }
+.step-num.done { background: var(--emerald); color: #fff; }
+.step-label { font-size: 13px; font-weight: 600; }
+.step-label.active { color: var(--ink); }
+.step-label.inactive { color: var(--ink-3); }
+.step-connector { flex: 1; height: 2px; background: var(--line); margin: 0 12px; min-width: 32px; }
+.step-connector.done { background: var(--emerald); }
+
+/* ── MAIN GRID ── */
+.order-grid {
+  display: grid; grid-template-columns: 1fr 340px; gap: 24px;
+  animation: fadeUp .45s var(--ease) .1s both;
+}
+
+/* ── COURSE CARD ── */
+.course-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+}
+.course-card-thumb {
+  width: 100%; height: 200px; object-fit: cover; display: block;
+  background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 60%, #1e1b4b 100%);
+}
+.course-card-thumb-ph {
+  width: 100%; height: 200px;
+  background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 60%, #1e1b4b 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 64px; font-style: italic;
+  color: rgba(255,255,255,.2); letter-spacing: -3px;
+}
+.course-card-body { padding: 22px 24px; }
+.course-card-eyebrow {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--red); background: var(--red-lt);
+  padding: 3px 10px; border-radius: 20px; margin-bottom: 10px;
+  border: 1px solid rgba(220,38,38,.2);
+}
+.course-card-title {
+  font-family: var(--serif); font-size: 22px; font-weight: 400;
+  letter-spacing: -.015em; color: var(--ink); line-height: 1.25; margin-bottom: 10px;
+}
+.course-card-desc { font-size: 14px; color: var(--ink-3); line-height: 1.7; margin-bottom: 18px; }
+.course-card-stats {
+  display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding-top: 16px; border-top: 1.5px solid var(--line);
+}
+.course-stat { display: flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--ink-3); }
+.course-stat svg { color: var(--red); }
+
+/* ── ORDER SUMMARY CARD ── */
+.summary-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  position: sticky; top: 88px;
+}
+.summary-card-head {
+  padding: 18px 22px; border-bottom: 1.5px solid var(--line);
+  background: var(--bg);
+  font-size: 11px; font-weight: 800; letter-spacing: .09em;
+  text-transform: uppercase; color: var(--ink-3);
+  display: flex; align-items: center; gap: 7px;
+}
+.summary-card-head svg { color: var(--red); }
+.summary-body { padding: 20px 22px; }
+
+.summary-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 0; border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.summary-row:last-of-type { border-bottom: none; }
+.summary-row-label { color: var(--ink-3); font-weight: 500; }
+.summary-row-value { color: var(--ink); font-weight: 700; }
+
+.summary-total {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 0 4px; margin-top: 4px; border-top: 2px solid var(--line);
+}
+.summary-total-label { font-size: 13px; font-weight: 800; color: var(--ink); text-transform: uppercase; letter-spacing: .05em; }
+.summary-total-price {
+  font-family: var(--serif); font-size: 30px; letter-spacing: -.03em;
+  color: var(--red); line-height: 1;
+}
+
+.order-id-badge {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg); border: 1.5px solid var(--line);
+  border-radius: 8px; padding: 9px 13px; margin-bottom: 18px;
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
+}
+.order-id-badge span { font-weight: 800; color: var(--ink); font-family: 'JetBrains Mono', monospace; }
+
+/* ── ACTION BUTTONS ── */
+.action-row {
+  display: flex; flex-direction: column; gap: 10px; padding-top: 18px;
+}
+.btn-proceed {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 14px 20px;
+  background: var(--red); color: #fff;
+  font-size: 15px; font-weight: 800; border-radius: 12px;
+  text-decoration: none; border: none; cursor: pointer; font-family: var(--font);
+  transition: all .2s var(--ease);
+  box-shadow: 0 4px 16px var(--red-glow);
+}
+.btn-proceed:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 6px 20px var(--red-glow); }
+.btn-proceed:active { transform: translateY(0); }
+
+.btn-cancel {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 13px 20px;
+  background: transparent; color: var(--ink-3);
+  font-size: 14px; font-weight: 700; border-radius: 12px;
+  text-decoration: none; border: 1.5px solid var(--line); font-family: var(--font);
+  transition: all .15s var(--ease);
+}
+.btn-cancel:hover { border-color: var(--ink-3); color: var(--ink-2); background: var(--bg); }
+
+.guarantee-note {
+  display: flex; align-items: center; gap: 7px;
+  padding: 11px 14px; background: var(--emerald-lt);
+  border-radius: 10px; margin-top: 14px;
+  font-size: 12px; font-weight: 600; color: #065f46;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  .order-grid { grid-template-columns: 1fr; }
+  .summary-card { position: static; }
+}
+@media (max-width: 480px) {
+  .order-inner { padding: 28px 16px 0; }
+}
+</style>
+
+<div class="order-page">
+  <div class="order-inner">
+
+    <!-- Breadcrumb -->
+    <nav class="order-breadcrumb">
+      <a href="<%= landing_students_course_path(@course) %>">
+        <%= @course.title.truncate(28) %>
+      </a>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      <span>Xác nhận đơn hàng</span>
+    </nav>
+
+    <!-- Heading -->
+    <div class="order-heading">
+      <div class="order-step-label">Bước 1 / 2</div>
+      <h1 class="order-title">Xác nhận <em>đơn hàng</em></h1>
     </div>
 
-    <!-- RIGHT: PAYMENT BOX -->
-    <div class="bg-white rounded-3xl shadow-xl p-8">
+    <!-- Steps indicator -->
+    <div class="order-steps">
+      <div class="step-item">
+        <div class="step-num active">1</div>
+        <div class="step-label active">Xác nhận</div>
+      </div>
+      <div class="step-connector"></div>
+      <div class="step-item">
+        <div class="step-num inactive">2</div>
+        <div class="step-label inactive">Thanh toán</div>
+      </div>
+    </div>
 
-      <h2 class="text-2xl font-bold text-gray-900 mb-6">
-        Thanh toán
-      </h2>
+    <!-- Grid -->
+    <div class="order-grid">
 
-      <!-- PRICE -->
-      <div class="flex items-center justify-between mb-6">
-        <span class="text-gray-600 text-lg">Giá khóa học</span>
-        <span class="text-3xl font-bold text-gray-900">
-          <%= number_to_currency(@course.price, unit: "₫", precision: 0) %>
-        </span>
+      <!-- LEFT: Course info -->
+      <div class="course-card">
+        <% if @course.thumbnail.attached? %>
+          <%= image_tag @course.thumbnail.variant(resize_to_fill: [700, 200]),
+                        class: "course-card-thumb", alt: @course.title %>
+        <% else %>
+          <div class="course-card-thumb-ph"><%= @course.title[0..1].upcase %></div>
+        <% end %>
+
+        <div class="course-card-body">
+          <% if @course.band_min.present? %>
+            <div class="course-card-eyebrow">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              Band <%= @course.band_min %><% if @course.band_max.present? %> – <%= @course.band_max %><% end %>
+            </div>
+          <% end %>
+
+          <h2 class="course-card-title"><%= @course.title %></h2>
+
+          <% if @course.description.present? %>
+            <p class="course-card-desc"><%= @course.description.truncate(160) %></p>
+          <% else %>
+            <p class="course-card-desc">
+              Khóa học IELTS toàn diện với AI chấm Speaking & Writing tức thì,
+              lộ trình cá nhân hóa theo band mục tiêu của bạn.
+            </p>
+          <% end %>
+
+          <div class="course-card-stats">
+            <% if @course.course_sections.present? %>
+              <div class="course-stat">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                <%= @course.course_sections.count %> sections
+              </div>
+            <% end %>
+            <div class="course-stat">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Truy cập trọn đời
+            </div>
+            <div class="course-stat">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+              AI Speaking
+            </div>
+            <div class="course-stat">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+              Chứng chỉ
+            </div>
+          </div>
+        </div>
       </div>
 
-      <!-- DIVIDER -->
-      <div class="border-t my-6"></div>
+      <!-- RIGHT: Order summary -->
+      <div class="summary-card">
+        <div class="summary-card-head">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Tóm tắt đơn hàng
+        </div>
 
-      <!-- PAYMENT METHODS -->
-      <div class="space-y-4 mb-8">
+        <div class="summary-body">
+          <!-- Order ID nếu đã có @order -->
+          <% if defined?(@order) && @order&.persisted? %>
+            <div class="order-id-badge">
+              Mã đơn hàng: <span>#<%= @order.id.to_s.rjust(6, '0') %></span>
+            </div>
+          <% end %>
 
-      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
-        <%= radio_button_tag :payment_method, "bank", true, class: "accent-pink-500" %>
-        <span class="font-medium">Chuyển khoản ngân hàng</span>
-      </label>
-    
-      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
-        <%= radio_button_tag :payment_method, "vnpay", false, class: "accent-pink-500" %>
-        <span class="font-medium">VNPay</span>
-      </label>
-    
-      <label class="flex items-center gap-3 p-4 border rounded-xl cursor-pointer">
-        <%= radio_button_tag :payment_method, "momo", false, class: "accent-pink-500" %>
-        <span class="font-medium">MoMo</span>
-      </label>
-    
-    </div>
-    
+          <!-- Summary rows -->
+          <div class="summary-row">
+            <span class="summary-row-label">Khóa học</span>
+            <span class="summary-row-value" style="max-width:160px;text-align:right;font-size:13px;">
+              <%= @course.title.truncate(30) %>
+            </span>
+          </div>
 
-      <!-- PAY BUTTON -->
-      <%= button_to "Xác nhận thanh toán",
-            students_course_orders_path(@course),
-            method: :post,
-            class: "w-full py-4 text-lg font-semibold text-white
-                    bg-pink-500 rounded-xl hover:bg-pink-600
-                    transition shadow-lg" %>
+          <% if @course.respond_to?(:original_price) && @course.original_price.present? && @course.original_price > @course.price %>
+            <div class="summary-row">
+              <span class="summary-row-label">Giá gốc</span>
+              <span class="summary-row-value" style="text-decoration:line-through;color:var(--ink-3);">
+                <%= number_to_currency(@course.original_price, unit: "₫", precision: 0, delimiter: ".") %>
+              </span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-row-label">Giảm giá</span>
+              <span class="summary-row-value" style="color:var(--emerald);">
+                -<%= number_to_currency(@course.original_price - @course.price, unit: "₫", precision: 0, delimiter: ".") %>
+              </span>
+            </div>
+          <% end %>
 
-      <p class="text-sm text-gray-500 mt-4 text-center">
-        Bằng việc thanh toán, bạn đồng ý với điều khoản sử dụng
-      </p>
+          <div class="summary-row">
+            <span class="summary-row-label">Học viên</span>
+            <span class="summary-row-value"><%= current_user.full_name || current_user.email %></span>
+          </div>
 
-    </div>
+          <div class="summary-row">
+            <span class="summary-row-label">Trạng thái</span>
+            <span class="summary-row-value" style="color:var(--amber);">⏳ Chờ thanh toán</span>
+          </div>
 
-  </div>
-</section>
+          <!-- Total -->
+          <div class="summary-total">
+            <span class="summary-total-label">Tổng cộng</span>
+            <span class="summary-total-price">
+              <%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %>
+            </span>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="action-row">
+            <%= link_to checkout_students_course_order_path(@course, @order),
+                        class: "btn-proceed" do %>
+              Chuyển đến trang thanh toán
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            <% end %>
+
+            <%= link_to landing_students_course_path(@course),
+                        class: "btn-cancel",
+                        data: { confirm: "Bạn chắc chắn muốn huỷ đơn hàng này?" } do %>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+              Huỷ, quay lại trang khóa học
+            <% end %>
+          </div>
+
+          <div class="guarantee-note">
+            🔒 Hoàn tiền 30 ngày nếu không hài lòng
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.order-grid -->
+
+  </div><!-- /.order-inner -->
+</div><!-- /.order-page -->
