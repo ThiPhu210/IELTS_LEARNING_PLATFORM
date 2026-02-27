@@ -1,0 +1,129 @@
+<%# app/views/students/courses/_buy_card.html.erb
+    Dùng trong landing.html.erb
+    Xử lý 3 trạng thái:
+      1. Chưa đăng nhập      → nút đăng nhập (redirect về trang này sau login)
+      2. Đăng nhập, chưa mua → nút đăng ký / thanh toán
+      3. Đã mua              → nút vào học (redirect handled in controller)
+%>
+
+<div class="buy-card">
+  <!-- Thumbnail -->
+  <div class="buy-card-thumb">
+    <% if @course.respond_to?(:thumbnail) && @course.thumbnail.attached? %>
+      <img src="<%= url_for(@course.thumbnail) %>" alt="<%= @course.title %>">
+    <% else %>
+      <%= @course.title[0..1].upcase %>
+    <% end %>
+  </div>
+
+  <div class="buy-card-body">
+    <!-- Price -->
+    <div class="buy-price-row">
+      <% if @course.respond_to?(:price) && @course.price.present? && @course.price > 0 %>
+        <span class="buy-price">
+          <%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %>
+        </span>
+        <% if @course.respond_to?(:original_price) && @course.original_price.present? && @course.original_price > @course.price %>
+          <span class="buy-price-orig">
+            <%= number_to_currency(@course.original_price, unit: "₫", precision: 0, delimiter: ".") %>
+          </span>
+          <span class="buy-discount">
+            -<%= ((1 - @course.price.to_f / @course.original_price) * 100).round %>%
+          </span>
+        <% end %>
+      <% else %>
+        <span class="buy-price buy-price-free">Miễn phí</span>
+      <% end %>
+    </div>
+
+    <% if @course.respond_to?(:original_price) && @course.original_price.present? &&
+          @course.price.present? && @course.original_price > @course.price %>
+      <div class="buy-timer">
+        ⏰ Giá ưu đãi — chỉ còn trong thời gian có hạn!
+      </div>
+    <% else %>
+      <div style="height:16px"></div>
+    <% end %>
+
+    <!-- CTA -->
+    <% if user_signed_in? %>
+      <%# Kiểm tra đã mua chưa — controller đã redirect nếu có access, nhưng để an toàn %>
+      <% has_access = current_user.respond_to?(:has_course_access?) && current_user.has_course_access?(@course) %>
+      <% if has_access %>
+        <%= link_to dashboard_students_course_path(@course), class: "btn-buy",
+                    style: "background:#059669;animation:none;box-shadow:0 4px 14px rgba(5,150,105,.2);" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Tiếp tục học
+        <% end %>
+      <% elsif @course.respond_to?(:price) && @course.price.present? && @course.price > 0 %>
+        <%= link_to new_students_course_order_path(@course), class: "btn-buy" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.99 1.61h9.72a2 2 0 001.99-1.74L23 6H6"/></svg>
+          Đăng ký ngay
+        <% end %>
+        <a href="#" class="btn-login">❤️ Thêm vào yêu thích</a>
+      <% else %>
+        <%# Free course: enroll via payment controller %>
+        <%= button_to students_payments_path,
+                      method: :post,
+                      params: { course_id: @course.id, payment_method: "free" },
+                      class: "btn-buy",
+                      form: { style: "width:100%;margin-bottom:10px;" } do %>
+          🎉 Đăng ký học miễn phí
+        <% end %>
+      <% end %>
+    <% else %>
+      <%# Chưa đăng nhập: nút đăng nhập có return_to %>
+      <%= link_to new_user_session_path(return_to: request.path), class: "btn-buy" do %>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Đăng nhập để đăng ký
+      <% end %>
+      <%= link_to new_user_registration_path, class: "btn-login" do %>
+        ✨ Tạo tài khoản miễn phí
+      <% end %>
+    <% end %>
+
+    <!-- Includes -->
+    <div class="buy-includes">
+      <div class="buy-includes-label">Khóa học bao gồm</div>
+
+      <% if @total_lessons.to_i > 0 %>
+        <div class="buy-include">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <%= @total_lessons %> bài học video
+        </div>
+      <% end %>
+
+      <div class="buy-include">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+        Luyện Speaking với AI
+      </div>
+
+      <div class="buy-include">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Truy cập trọn đời
+      </div>
+
+      <div class="buy-include">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Học trên mọi thiết bị
+      </div>
+
+      <div class="buy-include">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Chứng chỉ hoàn thành
+      </div>
+
+      <div class="buy-include">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Hỗ trợ từ giảng viên
+      </div>
+
+      <div class="buy-guarantee">
+        🔒 Hoàn tiền 30 ngày nếu không hài lòng
+      </div>
+    </div>
+
+    <!-- Share -->
+    <a class="buy-share" href="#">🔗 Chia sẻ khóa học này</a>
+  </div>
+</div>
