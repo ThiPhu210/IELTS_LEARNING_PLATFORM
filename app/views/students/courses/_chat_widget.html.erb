@@ -1,306 +1,143 @@
+<%# app/views/students/courses/_chat_widget.html.erb %>
+
 <style>
-/* ══════════════════════════════════════════
-   IELTS SPEAKING COACH — CHAT WIDGET
-   Red scheme · Plus Jakarta Sans
-══════════════════════════════════════════ */
-.cw {
-  position: fixed; bottom: 24px; right: 24px; z-index: 9990;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
+.cw{position:fixed;bottom:24px;right:24px;z-index:9990;font-family:'Plus Jakarta Sans',sans-serif}
+.cw-fab{width:54px;height:54px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(220,38,38,.45);transition:transform .2s cubic-bezier(.34,1.56,.64,1),background .15s;position:relative}
+.cw-fab:hover{background:#b91c1c;transform:scale(1.1)}
+.cw-fab:active{transform:scale(.95)}
+.cw-fab-ic,.cw-fab-x{position:absolute;transition:opacity .2s,transform .2s cubic-bezier(.4,0,.2,1)}
+.cw-fab-x{opacity:0;transform:rotate(-80deg) scale(.5)}
+.cw.open .cw-fab-ic{opacity:0;transform:rotate(80deg) scale(.5)}
+.cw.open .cw-fab-x{opacity:1;transform:rotate(0) scale(1)}
+.cw-fab::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(220,38,38,.3);animation:cw-ring 2.5s ease-in-out infinite}
+@keyframes cw-ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:0}}
+.cw-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#fbbf24;border:2px solid #fff;font-size:9px;font-weight:800;color:#78350f;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.cw-badge.show{opacity:1;transform:scale(1)}
+.cw-panel{position:absolute;bottom:66px;right:0;width:356px;background:#fff;border-radius:20px;border:1.5px solid #e8eaf2;box-shadow:0 24px 64px rgba(0,0,0,.16);display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(14px) scale(.96);transform-origin:bottom right;transition:opacity .22s,transform .22s cubic-bezier(.4,0,.2,1);max-height:560px}
+.cw.open .cw-panel{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
+.cw-head{display:flex;align-items:center;gap:10px;padding:13px 16px;background:#dc2626;flex-shrink:0}
+.cw-head-icon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cw-head-info{flex:1;min-width:0}
+.cw-head-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2}
+.cw-head-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:5px;margin-top:1px}
+.cw-online-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:cw-blink 2s ease-in-out infinite}
+@keyframes cw-blink{0%,100%{opacity:1}50%{opacity:.35}}
+.cw-quota{font-size:11px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.25);padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
+.cw-quota.warn{background:rgba(251,191,36,.3);color:#fef3c7}
+.cw-quota.danger{background:rgba(239,68,68,.3);color:#fecaca}
 
-/* ── FAB ── */
-.cw-fab {
-  width: 54px; height: 54px; border-radius: 50%;
-  background: #dc2626; color: #fff; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 4px 18px rgba(220,38,38,.45), 0 2px 6px rgba(0,0,0,.12);
-  transition: transform .2s cubic-bezier(.34,1.56,.64,1), background .15s;
-  position: relative;
-}
-.cw-fab:hover { background: #b91c1c; transform: scale(1.1); }
-.cw-fab:active { transform: scale(.95); }
+/* ── Messages scroll area ── */
+.cw-msgs{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:320px;scroll-behavior:smooth}
+.cw-msgs::-webkit-scrollbar{width:3px}
+.cw-msgs::-webkit-scrollbar-thumb{background:#e8eaf2;border-radius:2px}
 
-.cw-fab-ic, .cw-fab-x {
-  position: absolute;
-  transition: opacity .2s, transform .2s cubic-bezier(.4,0,.2,1);
-}
-.cw-fab-x { opacity: 0; transform: rotate(-80deg) scale(.5); }
-.cw.open .cw-fab-ic { opacity: 0; transform: rotate(80deg) scale(.5); }
-.cw.open .cw-fab-x  { opacity: 1; transform: rotate(0) scale(1); }
+.cw-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 14px;text-align:center;color:#9ca3af}
+.cw-empty-emoji{font-size:34px}
+.cw-empty-title{font-size:14px;font-weight:700;color:#374151}
+.cw-empty-body{font-size:12.5px;line-height:1.6;max-width:260px}
 
-/* Pulse ring */
-.cw-fab::before {
-  content: '';
-  position: absolute; inset: -4px; border-radius: 50%;
-  border: 2px solid rgba(220,38,38,.3);
-  animation: cw-ring 2.5s ease-in-out infinite;
-}
-@keyframes cw-ring { 0%,100%{transform:scale(1);opacity:.5} 50%{transform:scale(1.15);opacity:0} }
+/* Bubbles */
+.cw-row{display:flex;align-items:flex-end;gap:6px;animation:cw-up .2s ease both}
+.cw-row.usr{flex-direction:row-reverse}
+@keyframes cw-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.cw-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-bottom:2px}
+.cw-av.ai{background:#fee2e2;color:#dc2626}
+.cw-av.usr{background:#e8eaf2;color:#374151}
+.cw-bub{max-width:80%;padding:9px 12px;font-size:13.5px;line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
+.cw-bub.ai{background:#f7f8fc;border:1.5px solid #e8eaf2;color:#0d0e14;border-radius:14px 14px 14px 3px}
+.cw-bub.usr{background:#dc2626;color:#fff;border:none;border-radius:14px 14px 3px 14px}
+.cw-bub ul{margin:6px 0 0 16px}
+.cw-bub li{margin-bottom:3px}
+.cw-bub strong{font-weight:700}
 
-/* Unread badge */
-.cw-badge {
-  position: absolute; top: -3px; right: -3px;
-  min-width: 18px; height: 18px; border-radius: 9px;
-  background: #fbbf24; border: 2px solid #fff;
-  font-size: 9px; font-weight: 800; color: #78350f;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 4px;
-  opacity: 0; transform: scale(0);
-  transition: all .25s cubic-bezier(.34,1.56,.64,1);
-}
-.cw-badge.show { opacity: 1; transform: scale(1); }
+/* Typing — nằm TRONG .cw-msgs */
+.cw-typing{display:none;align-items:flex-end;gap:6px}
+.cw-typing.on{display:flex}
+.cw-typ-bub{background:#f7f8fc;border:1.5px solid #e8eaf2;border-radius:14px 14px 14px 3px;padding:10px 13px;display:flex;gap:4px;align-items:center}
+.cw-dot{width:6px;height:6px;border-radius:50%;background:#9ca3af;animation:cw-bounce .85s ease-in-out infinite}
+.cw-dot:nth-child(2){animation-delay:.14s}
+.cw-dot:nth-child(3){animation-delay:.28s}
+@keyframes cw-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-/* ── PANEL ── */
-.cw-panel {
-  position: absolute; bottom: 66px; right: 0;
-  width: 356px;
-  background: #fff; border-radius: 20px;
-  border: 1.5px solid #e8eaf2;
-  box-shadow: 0 24px 64px rgba(0,0,0,.16), 0 4px 14px rgba(0,0,0,.07);
-  display: flex; flex-direction: column; overflow: hidden;
-  opacity: 0; pointer-events: none;
-  transform: translateY(14px) scale(.96);
-  transform-origin: bottom right;
-  transition: opacity .22s, transform .22s cubic-bezier(.4,0,.2,1);
-  max-height: 560px;
-}
-.cw.open .cw-panel {
-  opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
-}
-
-/* Header */
-.cw-head {
-  display: flex; align-items: center; gap: 10px;
-  padding: 13px 16px; background: #dc2626; flex-shrink: 0;
-}
-.cw-head-icon {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: rgba(255,255,255,.18);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.cw-head-info { flex: 1; min-width: 0; }
-.cw-head-name  { font-size: 14px; font-weight: 800; color: #fff; line-height: 1.2; }
-.cw-head-sub   {
-  font-size: 11px; font-weight: 600; color: rgba(255,255,255,.7);
-  display: flex; align-items: center; gap: 5px; margin-top: 1px;
-}
-.cw-online-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
-  animation: cw-blink 2s ease-in-out infinite;
-}
-@keyframes cw-blink { 0%,100%{opacity:1} 50%{opacity:.35} }
-
-.cw-quota {
-  font-size: 11px; font-weight: 700; color: #fff;
-  background: rgba(255,255,255,.2); border: 1px solid rgba(255,255,255,.25);
-  padding: 3px 9px; border-radius: 20px; flex-shrink: 0; white-space: nowrap;
-}
-.cw-quota.warn   { background: rgba(251,191,36,.3); border-color: rgba(251,191,36,.5); color: #fef3c7; }
-.cw-quota.danger { background: rgba(239,68,68,.3);  border-color: rgba(239,68,68,.5);  color: #fecaca; }
-
-/* Messages */
-.cw-msgs {
-  flex: 1; overflow-y: auto; padding: 14px 12px 8px;
-  display: flex; flex-direction: column; gap: 10px;
-  min-height: 260px; max-height: 320px;
-  scroll-behavior: smooth;
-}
-.cw-msgs::-webkit-scrollbar { width: 3px; }
-.cw-msgs::-webkit-scrollbar-thumb { background: #e8eaf2; border-radius: 2px; }
-
-/* Empty state */
-.cw-empty {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 8px; padding: 20px 14px;
-  text-align: center; color: #9ca3af; flex: 1;
-}
-.cw-empty-emoji { font-size: 34px; }
-.cw-empty-title { font-size: 14px; font-weight: 700; color: #374151; }
-.cw-empty-body  { font-size: 12.5px; line-height: 1.6; max-width: 260px; }
-
-/* Bubble */
-.cw-row { display: flex; align-items: flex-end; gap: 6px; animation: cw-up .2s ease both; }
-.cw-row.usr { flex-direction: row-reverse; }
-@keyframes cw-up { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-
-.cw-av {
-  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; margin-bottom: 2px;
-}
-.cw-av.ai  { background: #fee2e2; color: #dc2626; }
-.cw-av.usr { background: #e8eaf2; color: #374151; }
-
-.cw-bub {
-  max-width: 80%; padding: 9px 12px; font-size: 13.5px; line-height: 1.6;
-  word-wrap: break-word; white-space: pre-wrap;
-}
-.cw-bub.ai  {
-  background: #f7f8fc; border: 1.5px solid #e8eaf2;
-  color: #0d0e14; border-radius: 14px 14px 14px 3px;
-}
-.cw-bub.usr {
-  background: #dc2626; color: #fff; border: none;
-  border-radius: 14px 14px 3px 14px;
-}
-.cw-bub ul  { margin: 6px 0 0 16px; }
-.cw-bub li  { margin-bottom: 3px; }
-.cw-bub strong { font-weight: 700; }
-
-/* Typing dots */
-.cw-typing {
-  display: none; align-items: flex-end; gap: 6px;
-  animation: cw-up .2s ease both;
-}
-.cw-typing.on { display: flex; }
-.cw-typ-bub {
-  background: #f7f8fc; border: 1.5px solid #e8eaf2;
-  border-radius: 14px 14px 14px 3px;
-  padding: 10px 13px; display: flex; gap: 4px; align-items: center;
-}
-.cw-dot {
-  width: 6px; height: 6px; border-radius: 50%; background: #9ca3af;
-  animation: cw-bounce .85s ease-in-out infinite;
-}
-.cw-dot:nth-child(2) { animation-delay: .14s; }
-.cw-dot:nth-child(3) { animation-delay: .28s; }
-@keyframes cw-bounce { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-5px)} }
-
-/* Quick chips */
-.cw-chips {
-  padding: 0 12px 8px; display: flex; flex-wrap: wrap; gap: 5px; flex-shrink: 0;
-}
-.cw-chip {
-  font-size: 11.5px; font-weight: 600; color: #dc2626;
-  background: #fee2e2; border: 1px solid rgba(220,38,38,.22);
-  border-radius: 20px; padding: 4px 11px; cursor: pointer;
-  transition: all .13s; font-family: inherit;
-  white-space: nowrap;
-}
-.cw-chip:hover { background: #fecaca; border-color: rgba(220,38,38,.4); }
-
-/* Warning bar */
-.cw-warn {
-  margin: 0 12px 8px; padding: 8px 11px;
-  background: #fef3c7; border: 1px solid #fde68a;
-  border-radius: 9px; font-size: 12px; font-weight: 600; color: #92400e;
-  display: none; align-items: center; gap: 6px; flex-shrink: 0;
-}
-.cw-warn.on { display: flex; }
-
-/* Input */
-.cw-foot {
-  padding: 9px 11px 11px; border-top: 1.5px solid #f3f4f6;
-  background: #fafafa; flex-shrink: 0;
-}
-.cw-irow { display: flex; align-items: flex-end; gap: 7px; }
-.cw-ta {
-  flex: 1; resize: none; border: 1.5px solid #e8eaf2;
-  border-radius: 11px; padding: 8px 11px;
-  font-size: 13.5px; font-family: inherit; color: #0d0e14;
-  background: #fff; outline: none; line-height: 1.5;
-  max-height: 96px; min-height: 38px;
-  transition: border-color .14s;
-}
-.cw-ta:focus { border-color: #dc2626; }
-.cw-ta::placeholder { color: #9ca3af; }
-.cw-ta:disabled { background: #f3f4f6; cursor: not-allowed; }
-
-.cw-send {
-  width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0;
-  background: #dc2626; color: #fff; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .14s; box-shadow: 0 2px 8px rgba(220,38,38,.22);
-}
-.cw-send:hover:not(:disabled) { background: #b91c1c; }
-.cw-send:disabled { background: #e5e7eb; box-shadow: none; cursor: not-allowed; }
-
-.cw-meta {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 5px; padding: 0 1px;
-}
-.cw-hint  { font-size: 10.5px; color: #9ca3af; font-weight: 500; }
-.cw-left  { font-size: 11px; font-weight: 700; color: #9ca3af; }
-.cw-left.warn   { color: #d97706; }
-.cw-left.danger { color: #dc2626; }
-
-@media (max-width: 420px) {
-  .cw { bottom: 16px; right: 16px; }
-  .cw-panel { width: calc(100vw - 32px); }
-}
+.cw-chips{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0}
+.cw-chip{font-size:11.5px;font-weight:600;color:#dc2626;background:#fee2e2;border:1px solid rgba(220,38,38,.22);border-radius:20px;padding:4px 11px;cursor:pointer;transition:all .13s;font-family:inherit;white-space:nowrap}
+.cw-chip:hover{background:#fecaca}
+.cw-warn{margin:0 12px 8px;padding:8px 11px;background:#fef3c7;border:1px solid #fde68a;border-radius:9px;font-size:12px;font-weight:600;color:#92400e;display:none;align-items:center;gap:6px;flex-shrink:0}
+.cw-warn.on{display:flex}
+.cw-err{margin:0 12px 8px;padding:8px 11px;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;font-size:11px;font-weight:600;color:#991b1b;display:none;word-break:break-all;font-family:monospace;flex-shrink:0}
+.cw-err.on{display:block}
+.cw-foot{padding:9px 11px 11px;border-top:1.5px solid #f3f4f6;background:#fafafa;flex-shrink:0}
+.cw-irow{display:flex;align-items:flex-end;gap:7px}
+.cw-ta{flex:1;resize:none;border:1.5px solid #e8eaf2;border-radius:11px;padding:8px 11px;font-size:13.5px;font-family:inherit;color:#0d0e14;background:#fff;outline:none;line-height:1.5;max-height:96px;min-height:38px;transition:border-color .14s}
+.cw-ta:focus{border-color:#dc2626}
+.cw-ta::placeholder{color:#9ca3af}
+.cw-ta:disabled{background:#f3f4f6;cursor:not-allowed}
+.cw-send{width:36px;height:36px;border-radius:9px;flex-shrink:0;background:#dc2626;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s;box-shadow:0 2px 8px rgba(220,38,38,.22)}
+.cw-send:hover:not(:disabled){background:#b91c1c}
+.cw-send:disabled{background:#e5e7eb;box-shadow:none;cursor:not-allowed}
+.cw-meta{display:flex;align-items:center;justify-content:space-between;margin-top:5px;padding:0 1px}
+.cw-hint{font-size:10.5px;color:#9ca3af;font-weight:500}
+.cw-left{font-size:11px;font-weight:700;color:#9ca3af}
+.cw-left.warn{color:#d97706}
+.cw-left.danger{color:#dc2626}
+@media(max-width:420px){.cw{bottom:16px;right:16px}.cw-panel{width:calc(100vw - 32px)}}
 </style>
 
 <div class="cw" id="cw">
-  <!-- FAB -->
-  <button class="cw-fab" id="cw-fab" aria-label="IELTS Speaking Coach">
+  <button class="cw-fab" id="cw-fab">
     <svg class="cw-fab-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
       <path d="M19 10v2a7 7 0 01-14 0v-2"/>
-      <line x1="12" y1="19" x2="12" y2="23"/>
-      <line x1="8"  y1="23" x2="16" y2="23"/>
+      <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
     </svg>
     <svg class="cw-fab-x" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <line x1="18" y1="6" x2="6" y2="18"/>
-      <line x1="6"  y1="6" x2="18" y2="18"/>
+      <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
     </svg>
     <div class="cw-badge" id="cw-badge"></div>
   </button>
 
-  <!-- PANEL -->
   <div class="cw-panel" id="cw-panel">
-
-    <!-- Header -->
     <div class="cw-head">
       <div class="cw-head-icon">🎤</div>
       <div class="cw-head-info">
         <div class="cw-head-name">IELTS Speaking Coach</div>
-        <div class="cw-head-sub">
-          <div class="cw-online-dot"></div>
-          AI · Sẵn sàng hỗ trợ
-        </div>
+        <div class="cw-head-sub"><div class="cw-online-dot"></div>AI · Sẵn sàng hỗ trợ</div>
       </div>
       <div class="cw-quota" id="cw-quota">10 lượt</div>
     </div>
 
-    <!-- Messages -->
+    <%# ── Messages: typing indicator nằm TRONG đây ── %>
     <div class="cw-msgs" id="cw-msgs">
       <div class="cw-empty" id="cw-empty">
         <div class="cw-empty-emoji">🎯</div>
         <div class="cw-empty-title">Xin chào! Tôi là Coach của bạn</div>
         <div class="cw-empty-body">Hỏi tôi bất cứ điều gì về IELTS Speaking — tips, band scores, cách luyện tập, hay nhờ tôi sửa câu trả lời.</div>
       </div>
-      <!-- bubbles injected here -->
-    </div>
-
-    <!-- Typing indicator (inside msgs scroll area) -->
-    <div class="cw-typing" id="cw-typing">
-      <div class="cw-av ai">AI</div>
-      <div class="cw-typ-bub">
-        <div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div>
+      <%# Typing dots — nằm TRONG .cw-msgs để insertBefore hoạt động %>
+      <div class="cw-typing" id="cw-typing">
+        <div class="cw-av ai">AI</div>
+        <div class="cw-typ-bub">
+          <div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Quick chips -->
     <div class="cw-chips" id="cw-chips">
       <button class="cw-chip" data-msg="Cho tôi tips quan trọng nhất để làm tốt IELTS Speaking Part 1.">💡 Tips Part 1</button>
-      <button class="cw-chip" data-msg="Làm thế nào để cải thiện từ Band 6 lên Band 7 Speaking?">📈 Band 6 → 7</button>
-      <button class="cw-chip" data-msg="Hướng dẫn cách trả lời Cue Card trong Part 2 hiệu quả.">🎯 Cue Card Part 2</button>
-      <button class="cw-chip" data-msg="Tôi muốn bạn sửa câu trả lời IELTS Speaking của tôi. Tôi sẽ paste vào ngay.">✏️ Sửa câu trả lời</button>
+      <button class="cw-chip" data-msg="Làm thế nào để cải thiện từ Band 6 lên Band 7 Speaking?">📈 Band 6→7</button>
+      <button class="cw-chip" data-msg="Hướng dẫn cách trả lời Cue Card trong Part 2 hiệu quả.">🎯 Cue Card</button>
+      <button class="cw-chip" data-msg="Tôi muốn bạn sửa câu trả lời IELTS Speaking của tôi.">✏️ Sửa câu</button>
     </div>
 
-    <!-- Limit warning -->
     <div class="cw-warn" id="cw-warn"></div>
+    <div class="cw-err"  id="cw-err"></div>
 
-    <!-- Input -->
     <div class="cw-foot">
       <div class="cw-irow">
-        <textarea class="cw-ta" id="cw-ta" rows="1" maxlength="600"
-          placeholder="Hỏi về IELTS Speaking..."></textarea>
+        <textarea class="cw-ta" id="cw-ta" rows="1" maxlength="600" placeholder="Hỏi về IELTS Speaking..."></textarea>
         <button class="cw-send" id="cw-send" disabled>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="22" y1="2" x2="11" y2="13"/>
-            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
         </button>
       </div>
@@ -313,54 +150,45 @@
 </div>
 
 <script>
-(function () {
-  /* ── CONFIG ── */
-  const CSRF      = document.querySelector('meta[name="csrf-token"]')?.content || '';
-  const COURSE_ID = '<%= course.id %>';
-  const USER_INIT = '<%= current_user.full_name.present? ? current_user.full_name[0].upcase : current_user.email[0].upcase rescue "U" %>';
-  const API_POST  = '/students/courses/' + COURSE_ID + '/chats';
-  const API_HIST  = '/students/courses/' + COURSE_ID + '/chats/history';
-  const LIMIT     = 10;
+(function(){
+  const CSRF     = document.querySelector('meta[name="csrf-token"]')?.content || '';
+  const CID      = '<%= course.id %>';
+  const UINIT    = '<%= begin; (current_user.full_name.presence || current_user.email)[0].upcase; rescue; "U"; end %>';
+  const API_POST = '/students/courses/' + CID + '/chats';
+  const API_HIST = '/students/courses/' + CID + '/chats/history';
+  const LIMIT    = 10;
 
-  /* ── REFS ── */
-  const root     = document.getElementById('cw');
-  const fab      = document.getElementById('cw-fab');
-  const badge    = document.getElementById('cw-badge');
-  const panel    = document.getElementById('cw-panel');
-  const msgsEl   = document.getElementById('cw-msgs');
-  const emptyEl  = document.getElementById('cw-empty');
-  const typingEl = document.getElementById('cw-typing');
-  const chipsEl  = document.getElementById('cw-chips');
-  const warnEl   = document.getElementById('cw-warn');
-  const quotaEl  = document.getElementById('cw-quota');
-  const leftEl   = document.getElementById('cw-left');
-  const ta       = document.getElementById('cw-ta');
-  const sendBtn  = document.getElementById('cw-send');
+  const root    = document.getElementById('cw');
+  const fab     = document.getElementById('cw-fab');
+  const badge   = document.getElementById('cw-badge');
+  const msgsEl  = document.getElementById('cw-msgs');
+  const emptyEl = document.getElementById('cw-empty');
+  const typEl   = document.getElementById('cw-typing'); // ← nằm trong msgsEl
+  const chipsEl = document.getElementById('cw-chips');
+  const warnEl  = document.getElementById('cw-warn');
+  const errEl   = document.getElementById('cw-err');
+  const quotaEl = document.getElementById('cw-quota');
+  const leftEl  = document.getElementById('cw-left');
+  const ta      = document.getElementById('cw-ta');
+  const sendBtn = document.getElementById('cw-send');
 
-  /* ── STATE ── */
-  let isOpen    = false;
-  let loading   = false;
-  let remaining = LIMIT;
-  let hasLoaded = false;
+  let isOpen = false, loading = false, remaining = LIMIT, loaded = false;
 
-  /* ── TOGGLE ── */
+  /* ── Toggle ── */
   fab.addEventListener('click', () => {
     isOpen = !isOpen;
     root.classList.toggle('open', isOpen);
     if (isOpen) {
       badge.classList.remove('show');
-      if (!hasLoaded) { hasLoaded = true; loadHistory(); }
+      if (!loaded) { loaded = true; loadHistory(); }
       setTimeout(() => ta.focus(), 220);
     }
   });
-
   document.addEventListener('click', e => {
-    if (isOpen && !root.contains(e.target)) {
-      isOpen = false; root.classList.remove('open');
-    }
+    if (isOpen && !root.contains(e.target)) { isOpen = false; root.classList.remove('open'); }
   });
 
-  /* ── TEXTAREA ── */
+  /* ── Textarea ── */
   ta.addEventListener('input', () => {
     ta.style.height = 'auto';
     ta.style.height = Math.min(ta.scrollHeight, 96) + 'px';
@@ -371,7 +199,7 @@
   });
   sendBtn.addEventListener('click', send);
 
-  /* ── QUICK CHIPS ── */
+  /* ── Quick chips ── */
   chipsEl.querySelectorAll('.cw-chip').forEach(btn => {
     btn.addEventListener('click', () => {
       ta.value = btn.dataset.msg;
@@ -380,7 +208,7 @@
     });
   });
 
-  /* ── LOAD HISTORY ── */
+  /* ── Load history ── */
   async function loadHistory() {
     try {
       const res  = await fetch(API_HIST, { headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } });
@@ -391,10 +219,10 @@
         data.messages.forEach(m => addBubble(m.role, m.content, false));
         scrollDown();
       }
-    } catch (e) { console.error('[ChatWidget] history error', e); }
+    } catch(e) { showErr('History error: ' + e.message); }
   }
 
-  /* ── SEND ── */
+  /* ── Send ── */
   async function send() {
     const text = ta.value.trim();
     if (!text || loading || remaining <= 0) return;
@@ -402,35 +230,42 @@
     loading = true;
     sendBtn.disabled = true;
     ta.value = ''; ta.style.height = 'auto';
-
     hideEmpty();
     chipsEl.style.display = 'none';
+    errEl.classList.remove('on');
+
     addBubble('user', text);
     showTyping(true);
     scrollDown();
 
     try {
-      const res  = await fetch(API_POST, {
-        method: 'POST',
+      const res     = await fetch(API_POST, {
+        method:  'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF, Accept: 'application/json' },
-        body: JSON.stringify({ message: text })
+        body:    JSON.stringify({ message: text })
       });
-      const data = await res.json();
+      const rawText = await res.text();
       showTyping(false);
+
+      let data;
+      try { data = JSON.parse(rawText); }
+      catch(_) { showErr('Bad response (' + res.status + '): ' + rawText.slice(0, 200)); loading = false; sendBtn.disabled = false; return; }
 
       if (res.status === 429 || data.error === 'limit_reached') {
         setRemaining(0);
-        showWarn(data.message || 'Bạn đã hết lượt hôm nay. 🌙');
-      } else if (data.error) {
-        addBubble('assistant', '❌ ' + data.error);
+        showWarn(data.message || 'Hết lượt hôm nay 🌙');
+      } else if (!res.ok || data.error) {
+        showErr(data.error || 'HTTP ' + res.status);
+        addBubble('assistant', '❌ ' + (data.error || 'Lỗi không xác định'));
       } else {
         addBubble('assistant', data.message);
         setRemaining(data.remaining ?? 0);
-        if (!isOpen) { badge.textContent = ''; badge.classList.add('show'); }
+        if (!isOpen) badge.classList.add('show');
       }
-    } catch (e) {
+    } catch(e) {
       showTyping(false);
-      addBubble('assistant', '❌ Không thể kết nối. Vui lòng thử lại.');
+      showErr('Network error: ' + e.message);
+      addBubble('assistant', '❌ Không thể kết nối.');
     }
 
     loading = false;
@@ -438,23 +273,24 @@
     scrollDown();
   }
 
-  /* ── HELPERS ── */
+  /* ── Helpers ── */
   function addBubble(role, content, animate = true) {
     const isUser = role === 'user';
     const row = document.createElement('div');
     row.className = 'cw-row ' + (isUser ? 'usr' : 'ai');
     if (!animate) row.style.animation = 'none';
 
-    const av = document.createElement('div');
+    const av  = document.createElement('div');
     av.className = 'cw-av ' + (isUser ? 'usr' : 'ai');
-    av.textContent = isUser ? USER_INIT : 'AI';
+    av.textContent = isUser ? UINIT : 'AI';
 
     const bub = document.createElement('div');
     bub.className = 'cw-bub ' + (isUser ? 'usr' : 'ai');
     bub.innerHTML = fmt(content);
 
     row.appendChild(av); row.appendChild(bub);
-    msgsEl.insertBefore(row, typingEl);
+    // insertBefore typEl — cả hai đều là con của msgsEl nên hoạt động đúng
+    msgsEl.insertBefore(row, typEl);
   }
 
   function fmt(t) {
@@ -466,38 +302,21 @@
       .replace(/\n/g,'<br>');
   }
 
-  function showTyping(on) { typingEl.classList.toggle('on', on); }
-
-  function scrollDown() {
-    requestAnimationFrame(() => { msgsEl.scrollTop = msgsEl.scrollHeight; });
-  }
-
-  function hideEmpty() { emptyEl.style.display = 'none'; }
+  function showTyping(on) { typEl.classList.toggle('on', on); }
+  function scrollDown()   { requestAnimationFrame(() => { msgsEl.scrollTop = msgsEl.scrollHeight; }); }
+  function hideEmpty()    { emptyEl.style.display = 'none'; }
 
   function setRemaining(n) {
     remaining = n;
-    const pct = n / LIMIT;
-
-    // Quota badge in header
     quotaEl.textContent = n + ' lượt';
     quotaEl.className   = 'cw-quota' + (n <= 0 ? ' danger' : n <= 3 ? ' warn' : '');
-
-    // Footer counter
     leftEl.textContent  = n + ' / ' + LIMIT + ' hôm nay';
-    leftEl.className    = 'cw-left' + (n <= 0 ? ' danger' : n <= 3 ? ' warn' : '');
-
-    if (n <= 0) {
-      ta.disabled = true; sendBtn.disabled = true;
-      showWarn('Bạn đã dùng hết ' + LIMIT + ' lượt hôm nay. Quay lại vào ngày mai! 🌙');
-    } else if (n <= 3) {
-      showWarn('⚠️ Còn ' + n + ' lượt hỏi hôm nay. Reset lúc 00:00.');
-    }
+    leftEl.className    = 'cw-left'  + (n <= 0 ? ' danger' : n <= 3 ? ' warn' : '');
+    if (n <= 0) { ta.disabled = true; sendBtn.disabled = true; showWarn('Hết ' + LIMIT + ' lượt hôm nay. Quay lại ngày mai! 🌙'); }
+    else if (n <= 3) showWarn('⚠️ Còn ' + n + ' lượt hỏi hôm nay.');
   }
 
-  function showWarn(msg) {
-    warnEl.textContent = msg;
-    warnEl.classList.add('on');
-  }
-
+  function showWarn(msg) { warnEl.textContent = msg; warnEl.classList.add('on'); }
+  function showErr(msg)  { errEl.textContent  = '🔴 ' + msg; errEl.classList.add('on'); console.error('[CW]', msg); }
 })();
 </script>
