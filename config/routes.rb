@@ -51,6 +51,9 @@ namespace :students do
       member do
         get :checkout
       end
+      resources :chats, only: [:create] do
+      collection { get :history }
+    end
     end
   end
 end
