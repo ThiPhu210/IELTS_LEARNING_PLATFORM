@@ -1,35 +1,109 @@
-<h2 class="text-xl font-bold mb-4">Thông tin Giáo viên</h2>
-  <!-- ===== FORM UPDATE (PATCH) ===== -->
-  <%= form_with model: teacher,
-                url: admin_teacher_path(teacher),
-                method: :patch,
-                local: true do |f| %>
+<%# app/views/admin/teachers/_form.html.erb
+    Rendered inside edit modal via AJAX %>
 
-    <!-- BASIC INFO -->
-    <div class="grid grid-cols-2 gap-6">
-      <div>
-        <%= f.label :full_name, "Họ tên", class: "label" %>
-        <%= f.text_field :full_name, class: "input" %>
-      </div>
+<style>
+.tf-errors {
+  background: #fef2f2; border: 1.5px solid #fca5a5;
+  border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+}
+.tf-errors li { font-size: 12.5px; color: #dc2626; font-weight: 600; margin-bottom: 2px; }
 
-    </div>
+/* Avatar section */
+.tf-avatar-wrap {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px; background: #f7f8fc;
+  border: 1.5px solid #e8eaf2; border-radius: 12px; margin-bottom: 20px;
+}
+.tf-avatar-preview {
+  width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
+  background: #e6faf8; border: 2px solid #99f6e4;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif; font-size: 24px; font-style: italic;
+  color: #0d9488; overflow: hidden; cursor: pointer; transition: opacity .15s;
+}
+.tf-avatar-preview:hover { opacity: .85; }
+.tf-avatar-preview img { width: 100%; height: 100%; object-fit: cover; }
 
-  
-      <div class="mt-6">
-        <%= f.label :avatar, "Avatar", class: "label" %>
+.tf-avatar-info { flex: 1; min-width: 0; }
+.tf-avatar-name { font-size: 14px; font-weight: 800; color: #0d0e14; margin-bottom: 2px; }
+.tf-avatar-sub  { font-size: 11px; color: #7b7f96; margin-bottom: 8px; }
+.tf-file-label {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 14px; border-radius: 8px;
+  background: #fff; border: 1.5px solid #e8eaf2;
+  font-size: 11.5px; font-weight: 700; color: #3a3d52; cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.tf-file-label:hover { border-color: #0d9488; color: #0d9488; }
+.tf-file-input { display: none; }
 
-         <% if teacher.avatar.attached? %> <div class="mb-3"> <%= image_tag teacher.avatar.variant(resize_to_fill: [80, 80]).processed, class: "rounded-full object-cover border", alt: "Avatar", srcset: "#{url_for(teacher.avatar.variant(resize_to_fill: [80, 80]).processed)}?#{Time.current.to_i}" %> </div> <% end %> <%= f.file_field :avatar, class: "input" %> </div> <div class="mt-6"> <%= f.label :expertise, "Chuyên môn", class: "label" %> <%= f.text_field :expertise, class: "input" %> </div> <div class="mt-4"> <%= f.label :experience_years, "Số năm kinh nghiệm", class: "label" %> <%= f.number_field :experience_years, class: "input" %> </div> <div class="mt-4"> <%= f.label :bio, "Giới thiệu", class: "label" %> <%= f.text_area :bio, rows: 4, class: "input" %> </div>
+/* Sections */
+.tf-section-title {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+  color: #7b7f96; padding-bottom: 8px;
+  border-bottom: 1.5px solid #e8eaf2; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 7px;
+}
+.tf-section-title span {
+  font-size: 14px; line-height: 1;
+}
 
-    <!-- SAVE BUTTON -->
-    <div class="mt-8 text-right">
-      <%= f.submit "💾 Lưu thay đổi",
-            class: "px-5 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-500" %>
-    </div>
+.tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.tf-field { display: flex; flex-direction: column; gap: 5px; }
+.tf-field.full { grid-column: 1 / -1; }
 
-  <% end %>
+.tf-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: #7b7f96;
+}
+.tf-input, .tf-textarea, .tf-number {
+  padding: 9px 13px; border-radius: 10px;
+  border: 1.5px solid #e8eaf2; background: #f7f8fc;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13.5px; color: #0d0e14;
+  outline: none; transition: border-color .15s, box-shadow .15s, background .15s; width: 100%;
+}
+.tf-input:focus, .tf-textarea:focus, .tf-number:focus {
+  border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,.1); background: #fff;
+}
+.tf-input::placeholder, .tf-textarea::placeholder { color: #b0b4c8; }
+.tf-textarea { resize: vertical; min-height: 90px; }
+.tf-number { -moz-appearance: textfield; }
+.tf-number::-webkit-inner-spin-button { opacity: 1; }
 
-  <% if teacher.errors.any? %>
-  <div class="bg-red-100 text-red-700 p-4 rounded mb-4">
+/* Exp years — with suffix */
+.tf-exp-wrap { position: relative; }
+.tf-exp-wrap .tf-number { padding-right: 52px; }
+.tf-exp-suffix {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  font-size: 11px; font-weight: 700; color: #7b7f96; pointer-events: none;
+}
+
+/* Submit row */
+.tf-footer {
+  display: flex; justify-content: flex-end; gap: 10px;
+  padding-top: 16px; border-top: 1.5px solid #e8eaf2; margin-top: 4px;
+}
+.tf-btn-cancel {
+  padding: 9px 18px; border-radius: 10px;
+  border: 1.5px solid #e8eaf2; background: #f7f8fc;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 700;
+  color: #7b7f96; cursor: pointer; transition: all .15s;
+}
+.tf-btn-cancel:hover { border-color: #7b7f96; color: #0d0e14; }
+.tf-btn-save {
+  padding: 9px 22px; border-radius: 10px;
+  background: #0d9488; color: #fff; border: none;
+  font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: background .15s, transform .1s;
+  display: inline-flex; align-items: center; gap: 7px;
+}
+.tf-btn-save:hover { background: #0f766e; }
+.tf-btn-save:active { transform: scale(.98); }
+
+@media (max-width: 520px) { .tf-grid { grid-template-columns: 1fr; } }
+</style>
+
+<% if teacher.errors.any? %>
+  <div class="tf-errors">
     <ul>
       <% teacher.errors.full_messages.each do |msg| %>
         <li>• <%= msg %></li>
@@ -38,39 +112,109 @@
   </div>
 <% end %>
 
-</div>
-<style>
-.label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
+<%= form_with model: teacher,
+              url: admin_teacher_path(teacher),
+              method: :patch,
+              local: true,
+              html: { enctype: "multipart/form-data" } do |f| %>
 
-.input {
-  width: 100%;
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-}
+  <!-- Avatar -->
+  <div class="tf-avatar-wrap">
+    <div class="tf-avatar-preview" id="tf-avatar-preview" onclick="document.getElementById('tf-avatar-file').click()">
+      <% if teacher.avatar&.attached? %>
+        <%= image_tag teacher.avatar.variant(resize_to_fill: [60, 60]), id: "tf-avatar-img", alt: teacher.full_name %>
+      <% else %>
+        <span id="tf-avatar-initial"><%= teacher.full_name&.first&.upcase || 'T' %></span>
+      <% end %>
+    </div>
+    <div class="tf-avatar-info">
+      <div class="tf-avatar-name"><%= teacher.full_name %></div>
+      <div class="tf-avatar-sub">Click avatar to change · JPG, PNG · max 2MB</div>
+      <label class="tf-file-label" for="tf-avatar-file">
+        <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        Upload photo
+      </label>
+      <%= f.file_field :avatar,
+          id: "tf-avatar-file", class: "tf-file-input",
+          accept: "image/*",
+          onchange: "tfPreviewAvatar(this)" %>
+    </div>
+  </div>
 
-.avatar-wrapper {
-  border-radius: 9999px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #f3f4f6;
-}
+  <!-- Basic info -->
+  <div class="tf-section-title"><span>👤</span> Basic Information</div>
+  <div class="tf-grid">
+    <div class="tf-field full">
+      <%= f.label :full_name, "Full Name", class: "tf-label" %>
+      <%= f.text_field :full_name, class: "tf-input", placeholder: "Teacher's full name" %>
+    </div>
+  </div>
 
-.avatar-img {
-  width: 50%;
-  height: 50%;
-  object-fit: cover;
-  display: block;
-}
+  <!-- Teaching info -->
+  <div class="tf-section-title"><span>🎓</span> Teaching Details</div>
+  <div class="tf-grid">
+    <div class="tf-field">
+      <%= f.label :expertise, "Expertise / Subject", class: "tf-label" %>
+      <%= f.text_field :expertise, class: "tf-input", placeholder: "e.g. IELTS Writing, Grammar" %>
+    </div>
+    <div class="tf-field">
+      <%= f.label :experience_years, "Years of Experience", class: "tf-label" %>
+      <div class="tf-exp-wrap">
+        <%= f.number_field :experience_years, class: "tf-number",
+            placeholder: "0", min: 0, max: 60 %>
+        <span class="tf-exp-suffix">yrs</span>
+      </div>
+    </div>
+    <div class="tf-field full">
+      <%= f.label :bio, "Bio / Introduction", class: "tf-label" %>
+      <%= f.text_area :bio, class: "tf-textarea",
+          placeholder: "Brief introduction about this teacher's background and teaching style…" %>
+    </div>
+  </div>
 
-.avatar-placeholder {
-  width: 100%;
-  height: 100%;
-  background: #e5e7eb;
-}
+  <div class="tf-footer">
+    <button type="button" class="tf-btn-cancel" onclick="document.getElementById('edit-modal').classList.remove('open')">
+      Cancel
+    </button>
+    <%= f.submit class: "tf-btn-save" do %>
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+      </svg>
+      Save Changes
+    <% end %>
+    <%= f.submit "Save Changes", class: "tf-btn-save" %>
+  </div>
 
-</style>
+<% end %>
+
+<script>
+function tfPreviewAvatar(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (file.size > 2 * 1024 * 1024) {
+    alert('Max file size is 2MB');
+    input.value = '';
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var wrap    = document.getElementById('tf-avatar-preview');
+    var initial = document.getElementById('tf-avatar-initial');
+    var img     = document.getElementById('tf-avatar-img');
+    if (initial) initial.style.display = 'none';
+    if (img) {
+      img.src = e.target.result;
+    } else {
+      var newImg = document.createElement('img');
+      newImg.id  = 'tf-avatar-img';
+      newImg.src = e.target.result;
+      newImg.style.cssText = 'width:100%;height:100%;object-fit:cover;';
+      wrap.appendChild(newImg);
+    }
+  };
+  reader.readAsDataURL(file);
+}
+</script>
