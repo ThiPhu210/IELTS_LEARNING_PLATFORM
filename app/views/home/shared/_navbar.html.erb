@@ -1,197 +1,260 @@
 <% navbar_courses = defined?(@navbar_courses) ? @navbar_courses : Course.limit(12) %>
 
 <style>
-.nav-root {
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.hn-root {
   position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
-  height: 64px; background: #fff;
-  border-bottom: 1px solid #e5e7eb;
+  height: 62px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 1px 0 rgba(0,0,0,.04);
   font-family: 'Plus Jakarta Sans', sans-serif;
 }
-.nav-inner {
+.hn-inner {
   max-width: 1200px; margin: 0 auto; height: 100%;
-  padding: 0 24px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 28px; display: flex; align-items: center; justify-content: space-between;
 }
-.nav-left { display: flex; align-items: center; gap: 32px; }
-.nav-logo img { height: 32px; display: block; }
+.hn-left  { display: flex; align-items: center; gap: 6px; }
+.hn-right { display: flex; align-items: center; gap: 6px; }
 
-/* Explore trigger */
-.nav-explore-btn {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 13.5px; font-weight: 600; color: #374151;
-  cursor: pointer; border: none; background: none;
-  padding: 6px 2px; transition: color .15s;
+/* Logo */
+.hn-logo img { height: 30px; display: block; }
+
+/* Nav links */
+.hn-trigger, .hn-link {
+  display: flex; align-items: center; gap: 4px;
+  padding: 7px 12px; border-radius: 8px;
+  font-size: 13.5px; font-weight: 600; color: #1f2937;
+  background: none; border: none; cursor: pointer;
+  text-decoration: none; font-family: inherit;
+  transition: background .12s, color .12s;
+}
+.hn-trigger:hover, .hn-link:hover { background: #f5f5f5; color: #111; }
+.hn-trigger.active { background: #fef2f2; color: #dc2626; }
+.hn-trigger svg { transition: transform .2s; color: #9ca3af; }
+.hn-trigger.active svg { transform: rotate(180deg); color: #dc2626; }
+
+/* Buttons */
+.hn-btn-login {
+  padding: 7px 16px; font-size: 13.5px; font-weight: 600;
+  color: #374151; background: transparent;
+  border: 1.5px solid #e5e7eb; border-radius: 9px;
+  text-decoration: none; transition: border-color .15s, color .15s;
   font-family: inherit;
 }
-.nav-explore-btn:hover { color: #dc2626; }
-.nav-explore-btn svg { transition: transform .2s; }
-.nav-explore-btn.open svg { transform: rotate(180deg); }
+.hn-btn-login:hover { border-color: #9ca3af; color: #111; }
 
-.nav-link {
-  font-size: 13.5px; font-weight: 600; color: #374151;
-  text-decoration: none; transition: color .15s;
-}
-.nav-link:hover { color: #dc2626; }
-
-/* Right buttons */
-.nav-right { display: flex; align-items: center; gap: 8px; }
-.btn-login {
-  padding: 7px 18px; font-size: 13.5px; font-weight: 600;
-  color: #374151; background: transparent;
-  border: 1.5px solid #d1d5db; border-radius: 8px;
-  text-decoration: none; transition: all .15s; white-space: nowrap;
-}
-.btn-login:hover { border-color: #dc2626; color: #dc2626; }
-.btn-signup {
+.hn-btn-signup {
   padding: 7px 18px; font-size: 13.5px; font-weight: 700;
   color: #fff; background: #dc2626;
-  border: 1.5px solid #dc2626; border-radius: 8px;
-  text-decoration: none; transition: all .15s; white-space: nowrap;
+  border: none; border-radius: 9px;
+  text-decoration: none; transition: background .15s;
+  font-family: inherit;
 }
-.btn-signup:hover { background: #b91c1c; border-color: #b91c1c; }
+.hn-btn-signup:hover { background: #b91c1c; }
 
-/* Dropdown */
-.nav-dropdown {
-  position: fixed; top: 64px; left: 0; right: 0; z-index: 9998;
-  background: #fff; border-top: 1px solid #f3f4f6;
-  box-shadow: 0 20px 40px rgba(0,0,0,.10);
-  opacity: 0; pointer-events: none;
-  transform: translateY(-6px);
-  transition: opacity .18s ease, transform .18s ease;
+/* Separator */
+.hn-sep { width: 1px; height: 22px; background: #e5e7eb; margin: 0 4px; }
+
+/* ── DROPDOWN ── */
+.hn-dropdown {
+  position: fixed; top: 62px; left: 0; right: 0; z-index: 9998;
+  background: #fff;
+  border-top: 1px solid #f3f4f6;
+  box-shadow: 0 8px 30px rgba(0,0,0,.09), 0 2px 8px rgba(0,0,0,.04);
+  opacity: 0; pointer-events: none; transform: translateY(-4px);
+  transition: opacity .15s ease, transform .15s ease;
 }
-.nav-dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.nav-dropdown-inner { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+.hn-dropdown.open { opacity: 1; pointer-events: auto; transform: translateY(0); }
 
-/* Dropdown header */
-.dd-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-.dd-title { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #9ca3af; }
-.dd-viewall { font-size: 13px; font-weight: 700; color: #dc2626; text-decoration: none; }
-.dd-viewall:hover { color: #b91c1c; }
-
-/* Course list - Coursera style */
-.dd-courses-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+.hn-dd-inner {
+  max-width: 1200px; margin: 0 auto;
+  padding: 28px 28px 24px;
+  display: flex; gap: 0;
 }
-.dd-course-item {
-  display: flex; align-items: center; gap: 12px;
-  padding: 12px 14px; border-radius: 10px;
+
+/* Course list */
+.hn-dd-courses { flex: 1; min-width: 0; }
+.hn-dd-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.hn-dd-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: #9ca3af;
+}
+.hn-dd-viewall {
+  font-size: 12.5px; font-weight: 700; color: #dc2626;
+  text-decoration: none; transition: color .12s;
+}
+.hn-dd-viewall:hover { color: #b91c1c; }
+
+/* Course grid — Coursera style */
+.hn-course-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+}
+.hn-course-item {
+  display: flex; align-items: flex-start; gap: 11px;
+  padding: 10px 12px; border-radius: 10px;
   text-decoration: none; color: inherit;
-  transition: background .12s;
-  cursor: pointer;
+  transition: background .1s; cursor: pointer;
 }
-.dd-course-item:hover { background: #fef2f2; }
-.dd-course-icon {
-  width: 36px; height: 36px; border-radius: 8px;
-  background: #fee2e2; display: flex; align-items: center; justify-content: center;
+.hn-course-item:hover { background: #fef2f2; }
+.hn-course-icon {
+  width: 38px; height: 38px; border-radius: 8px; flex-shrink: 0;
+  background: #fee2e2;
+  display: flex; align-items: center; justify-content: center;
   font-family: 'Instrument Serif', serif; font-style: italic;
-  font-size: 16px; color: #dc2626; flex-shrink: 0;
+  font-size: 18px; font-weight: 400; color: #dc2626;
+  margin-top: 1px;
 }
-.dd-course-info { min-width: 0; }
-.dd-course-name {
+.hn-course-info { min-width: 0; }
+.hn-course-name {
   font-size: 13px; font-weight: 600; color: #111827;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  display: block;
+  line-height: 1.35;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.dd-course-meta { font-size: 11.5px; color: #9ca3af; margin-top: 1px; }
+.hn-course-meta { font-size: 11px; color: #9ca3af; margin-top: 3px; font-weight: 500; }
+.hn-course-item:hover .hn-course-name { color: #dc2626; }
 
-/* Divider + sidebar */
-.dd-body { display: flex; gap: 0; }
-.dd-courses-wrap { flex: 1; }
-.dd-sidebar {
-  width: 220px; flex-shrink: 0;
-  border-left: 1px solid #f3f4f6; padding-left: 28px; margin-left: 28px;
+/* Sidebar */
+.hn-dd-sidebar {
+  width: 200px; flex-shrink: 0;
+  border-left: 1px solid #f3f4f6;
+  padding-left: 28px; margin-left: 28px;
 }
-.dd-sidebar-section { margin-bottom: 20px; }
-.dd-sidebar-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #9ca3af; margin-bottom: 10px; }
-.dd-sidebar-link {
-  display: flex; align-items: center; gap: 8px;
-  padding: 7px 0; font-size: 13px; font-weight: 500; color: #374151;
-  text-decoration: none; transition: color .12s; border-bottom: none;
+.hn-sidebar-section { margin-bottom: 22px; }
+.hn-sidebar-section:last-child { margin-bottom: 0; }
+.hn-sidebar-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: #9ca3af; margin-bottom: 10px;
 }
-.dd-sidebar-link:hover { color: #dc2626; }
-.dd-sidebar-link .icon { font-size: 15px; }
+.hn-sidebar-link {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7px 9px; border-radius: 8px;
+  font-size: 13px; font-weight: 500; color: #374151;
+  text-decoration: none; transition: background .1s, color .1s;
+  margin-bottom: 2px;
+}
+.hn-sidebar-link:hover { background: #fef2f2; color: #dc2626; }
+.hn-sidebar-link .si { font-size: 15px; line-height: 1; }
+
+/* CTA box */
+.hn-cta-box {
+  margin-top: 20px; padding: 14px;
+  background: linear-gradient(135deg, #fef2f2, #fff5f5);
+  border: 1px solid #fecaca; border-radius: 12px;
+}
+.hn-cta-box p { font-size: 12px; font-weight: 700; color: #dc2626; margin-bottom: 2px; }
+.hn-cta-box span { font-size: 11.5px; color: #ef4444; display: block; margin-bottom: 10px; }
+.hn-cta-btn {
+  display: block; text-align: center;
+  font-size: 12px; font-weight: 700; color: #fff;
+  background: #dc2626; padding: 8px; border-radius: 8px;
+  text-decoration: none; transition: background .12s;
+}
+.hn-cta-btn:hover { background: #b91c1c; }
+
+/* Empty state */
+.hn-empty { font-size: 13px; color: #9ca3af; padding: 12px; grid-column: 1/-1; text-align: center; }
 </style>
 
-<nav class="nav-root">
-  <div class="nav-inner">
-    <div class="nav-left">
-      <a href="<%= root_path %>" class="nav-logo">
+<nav class="hn-root">
+  <div class="hn-inner">
+    <div class="hn-left">
+      <a href="<%= root_path %>" class="hn-logo" style="margin-right:8px">
         <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" alt="IELTS">
       </a>
 
-      <button class="nav-explore-btn" id="navExploreBtn">
+      <button class="hn-trigger" id="hnTrigger">
         Courses
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
         </svg>
       </button>
 
-      <a href="#" class="nav-link">Teachers</a>
-      <a href="#" class="nav-link">Blog</a>
+      <a href="#" class="hn-link">Teachers</a>
+      <a href="#" class="hn-link">Blog</a>
     </div>
 
-    <div class="nav-right">
-      <a href="<%= new_user_session_path %>" class="btn-login">Log in</a>
-      <a href="<%= new_user_registration_path %>" class="btn-signup">Sign up free</a>
+    <div class="hn-right">
+      <a href="<%= new_user_session_path %>" class="hn-btn-login">Log in</a>
+      <a href="<%= new_user_registration_path %>" class="hn-btn-signup">Get started</a>
     </div>
   </div>
 </nav>
 
-<div class="nav-dropdown" id="navDropdown">
-  <div class="nav-dropdown-inner">
-    <div class="dd-body">
-      <div class="dd-courses-wrap">
-        <div class="dd-header">
-          <span class="dd-title">All Courses</span>
-          <%= link_to "Browse all →", students_courses_path, class: "dd-viewall" %>
-        </div>
-        <div class="dd-courses-grid">
+<div class="hn-dropdown" id="hnDropdown">
+  <div class="hn-dd-inner">
+
+    <!-- Courses -->
+    <div class="hn-dd-courses">
+      <div class="hn-dd-header">
+        <span class="hn-dd-label">All Courses</span>
+        <%= link_to "Browse all →", students_courses_path, class: "hn-dd-viewall" %>
+      </div>
+
+      <div class="hn-course-grid">
+        <% if navbar_courses.any? %>
           <% navbar_courses.each do |course| %>
-            <%= link_to students_course_path(course), class: "dd-course-item" do %>
-              <div class="dd-course-icon"><%= course.title[0].upcase %></div>
-              <div class="dd-course-info">
-                <span class="dd-course-name"><%= course.title %></span>
-                <% if course.respond_to?(:band_min) && course.band_min.present? %>
-                  <div class="dd-course-meta">Band <%= course.band_min %>–<%= course.band_max %></div>
-                <% end %>
+            <%= link_to students_course_path(course), class: "hn-course-item" do %>
+              <div class="hn-course-icon"><%= course.title[0].upcase %></div>
+              <div class="hn-course-info">
+                <div class="hn-course-name"><%= course.title %></div>
+                <div class="hn-course-meta">
+                  <% if course.band_min.present? %>Band <%= course.band_min %>–<%= course.band_max %> · <% end %>IELTS Speaking
+                </div>
               </div>
             <% end %>
           <% end %>
-          <% if navbar_courses.empty? %>
-            <p style="color:#9ca3af;font-size:13px;padding:12px;grid-column:1/-1">Chưa có khóa học nào.</p>
-          <% end %>
-        </div>
-      </div>
-
-      <div class="dd-sidebar">
-        <div class="dd-sidebar-section">
-          <div class="dd-sidebar-label">Practice</div>
-          <a href="#" class="dd-sidebar-link"><span class="icon">🤖</span> AI Mock Test</a>
-          <a href="#" class="dd-sidebar-link"><span class="icon">🎤</span> Speaking AI</a>
-          <a href="#" class="dd-sidebar-link"><span class="icon">✍️</span> Writing Checker</a>
-        </div>
-        <div class="dd-sidebar-section">
-          <div class="dd-sidebar-label">Resources</div>
-          <a href="#" class="dd-sidebar-link"><span class="icon">🗺️</span> Study Roadmap</a>
-          <a href="#" class="dd-sidebar-link"><span class="icon">📖</span> Blog</a>
-          <a href="#" class="dd-sidebar-link"><span class="icon">👥</span> Community</a>
-        </div>
+        <% else %>
+          <p class="hn-empty">No courses yet.</p>
+        <% end %>
       </div>
     </div>
+
+    <!-- Sidebar -->
+    <div class="hn-dd-sidebar">
+      <div class="hn-sidebar-section">
+        <div class="hn-sidebar-label">Practice</div>
+        <a href="#" class="hn-sidebar-link"><span class="si">🤖</span> AI Mock Test</a>
+        <a href="#" class="hn-sidebar-link"><span class="si">🎤</span> Speaking AI</a>
+        <a href="#" class="hn-sidebar-link"><span class="si">✍️</span> Writing Checker</a>
+      </div>
+      <div class="hn-sidebar-section">
+        <div class="hn-sidebar-label">Resources</div>
+        <a href="#" class="hn-sidebar-link"><span class="si">🗺️</span> Study Roadmap</a>
+        <a href="#" class="hn-sidebar-link"><span class="si">📖</span> Blog</a>
+        <a href="#" class="hn-sidebar-link"><span class="si">👥</span> Community</a>
+      </div>
+
+      <div class="hn-cta-box">
+        <p>🎯 Start for free</p>
+        <span>Thử học miễn phí hôm nay</span>
+        <%= link_to "Bắt đầu ngay →", students_courses_path, class: "hn-cta-btn" %>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
 (function() {
-  const btn = document.getElementById("navExploreBtn");
-  const dd  = document.getElementById("navDropdown");
-  let hoveringBtn = false, hoveringDd = false;
+  const trigger  = document.getElementById('hnTrigger');
+  const dropdown = document.getElementById('hnDropdown');
+  let ddHover = false;
 
-  function open()  { dd.classList.add("open"); btn.classList.add("open"); }
-  function close() { dd.classList.remove("open"); btn.classList.remove("open"); }
+  function open()  { dropdown.classList.add('open');    trigger.classList.add('active'); }
+  function close() { dropdown.classList.remove('open'); trigger.classList.remove('active'); }
 
-  btn.addEventListener("mouseenter", () => { hoveringBtn = true; open(); });
-  btn.addEventListener("mouseleave", () => { hoveringBtn = false; setTimeout(() => { if (!hoveringDd) close(); }, 80); });
-  dd.addEventListener("mouseenter",  () => { hoveringDd = true; });
-  dd.addEventListener("mouseleave",  () => { hoveringDd = false; setTimeout(() => { if (!hoveringBtn) close(); }, 80); });
+  trigger.addEventListener('mouseenter', open);
+  trigger.addEventListener('mouseleave', () => setTimeout(() => { if (!ddHover) close(); }, 80));
+  dropdown.addEventListener('mouseenter', () => { ddHover = true; });
+  dropdown.addEventListener('mouseleave', () => { ddHover = false; close(); });
+
+  document.addEventListener('click', e => {
+    if (!trigger.contains(e.target) && !dropdown.contains(e.target)) close();
+  });
 })();
 </script>
