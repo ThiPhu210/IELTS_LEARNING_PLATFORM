@@ -1,162 +1,573 @@
-<!-- NAVBAR -->
-<%= render "admin/shared/navbar" %>
+<%# ============================================================
+    app/views/admin/students/index.html.erb
+    Design: Red + Ink — synced with LMS design system
+    ============================================================ %>
 
-<!-- SIDEBAR -->
+<%= render "admin/shared/navbar" %>
 <%= render "admin/shared/sidebar" %>
 
-<!-- MAIN CONTENT -->
-<main class="pt-16 sm:ml-64 p-6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- PAGE TITLE -->
-  <h1 class="text-2xl font-bold mb-6">🎓 Student Management</h1>
-
-  <!-- CARD -->
-  <div class="p-4 bg-white border-b border-gray-200 rounded-lg mb-6">
-    <nav class="flex mb-4 text-sm font-medium">
-      <ol class="inline-flex items-center space-x-1 md:space-x-2">
-        <li class="inline-flex items-center">
-          <%= link_to admin_dashboard_path,
-              class: "text-gray-700 hover:text-indigo-600 flex items-center" do %>
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2L2 9h3v9h10V9h3L10 2z"/>
-            </svg>
-            Dashboard
-          <% end %>
-        </li>
-        <li class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M7.293 14.707L10.586 11 7.293 7.293 8.707 5.879 13.828 11 8.707 16.121z"/>
-          </svg>
-          <span class="text-gray-500">Students</span>
-        </li>
-      </ol>
-    </nav>
-
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold text-gray-900">All students</h2>
-    </div>
-  </div>
-
-  <!-- TABLE -->
-  <div class="overflow-x-auto bg-white rounded-lg shadow">
-    <table class="w-full text-sm text-left text-gray-500">
-      <thead class="bg-gray-100 text-xs uppercase">
-        <tr>
-          <th class="p-4">Student</th>
-          <th class="p-4">Email</th>
-          <th class="p-4">Phone</th>
-          <th class="p-4">Actions</th>
-        </tr>
-      </thead>
-
-      <tbody class="divide-y">
-        <% @students.each do |student| %>
-          <tr class="hover:bg-gray-50">
-
-            <!-- AVATAR + NAME -->
-            <td class="p-4 flex items-center gap-3">
-  <% if student.thumbnail.attached? %>
-    <%= image_tag student.thumbnail.variant(resize_to_fill: [40, 40]),
-        class: "w-10 h-10 rounded-full object-cover" %>
-  <% else %>
-    <div class="w-10 h-10 rounded-full bg-indigo-500
-                flex items-center justify-center text-white font-bold">
-      <%= student.full_name.first.upcase %>
-    </div>
-  <% end %>
-
-  <div>
-    <div class="font-medium text-gray-900"><%= student.full_name %></div>
-    <div class="text-xs text-gray-500">ID: <%= student.id %></div>
-  </div>
-</td>
-
-
-            <!-- EMAIL -->
-            <td class="p-4"><%= student.email %></td>
-
-            <!-- PHONE -->
-            <td class="p-4"><%= student.phone || "N/A" %></td>
-
-            <!-- ACTIONS -->
-            <td class="p-4 flex gap-2">
-              <%= link_to "Edit",
-                  "#",
-                  class: "btn-edit px-3 py-1 text-sm text-white bg-blue-600 rounded",
-                  data: { student_id: student.id } %>
-
-              <%= button_to "Destroy",
-    admin_student_path(student),
-    method: :delete,
-    data: { confirm: "Bạn chắc chắn?" },
-    class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
-
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
-
-    <!-- PAGINATION -->
-    <div class="p-4">
-      <%= paginate @students %>
-    </div>
-  </div>
-</main>
 <style>
-nav.pagination {
-  display: flex;
-  gap: 0.5rem;
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-brd:  #fca5a5;
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --indigo:       #4f46e5;
+  --indigo-lt:    #eef2ff;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease:       cubic-bezier(.4,0,.2,1);
 }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+/* ── Main wrapper offset for sidebar + navbar ── */
+.stu-wrapper {
+  margin-left: 256px;
+  padding-top: 64px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+@media (max-width: 640px) { .stu-wrapper { margin-left: 0; padding-top: 56px; } }
+
+/* ════════════════════════════════
+   HERO
+════════════════════════════════ */
+.stu-hero {
+  position: relative; overflow: hidden;
+  background: var(--ink); padding: 28px 32px 36px;
+  animation: fadeUp .4s var(--ease) both;
+}
+.stu-hero::before {
+  content: '';
+  position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+.stu-hero-glow {
+  position: absolute; right: -60px; top: -60px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.16) 0%, transparent 70%);
+  pointer-events: none;
+}
+.stu-hero-inner { position: relative; z-index: 1; }
+.stu-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,.3); margin-bottom: 12px; letter-spacing: .04em;
+}
+.stu-breadcrumb a { color: rgba(255,255,255,.4); text-decoration: none; transition: color .15s; }
+.stu-breadcrumb a:hover { color: #fca5a5; }
+.stu-breadcrumb-sep { color: rgba(255,255,255,.18); }
+.stu-hero-title {
+  font-family: var(--font-serif); font-size: clamp(24px, 2.4vw, 36px);
+  font-weight: 400; letter-spacing: -.02em; color: #fff; line-height: 1.15;
+}
+.stu-hero-title em { font-style: italic; color: #fca5a5; }
+.stu-hero-sub { font-size: 12.5px; color: rgba(255,255,255,.4); margin-top: 6px; }
+
+/* ── Mini stat cards in hero ── */
+.stu-hero-stats {
+  display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;
+}
+.stu-hero-stat {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-md); padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.stu-hero-stat-icon {
+  width: 32px; height: 32px; border-radius: var(--r-sm); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.stu-hero-stat-num {
+  font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: #fff; line-height: 1;
+}
+.stu-hero-stat-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+/* ════════════════════════════════
+   BODY
+════════════════════════════════ */
+.stu-body { padding: 28px 32px 64px; }
+@media (max-width: 640px) { .stu-body { padding: 18px; } }
+
+/* ── Toolbar ── */
+.stu-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+  animation: fadeUp .45s var(--ease) .05s both;
+}
+.stu-search-wrap {
+  position: relative; flex: 1; min-width: 220px; max-width: 380px;
+}
+.stu-search-icon {
+  position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
+  color: var(--ink-3); pointer-events: none;
+  width: 15px; height: 15px;
+}
+.stu-search {
+  width: 100%; padding: 9px 12px 9px 36px;
+  border: 1.5px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); font-family: var(--font); font-size: 13px;
+  color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.stu-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220,38,38,.08); }
+.stu-search::placeholder { color: var(--ink-3); }
+
+.stu-sort-wrap { display: flex; gap: 8px; align-items: center; }
+.stu-sort-label { font-size: 11px; font-weight: 700; color: var(--ink-3); white-space: nowrap; }
+.stu-sort-select {
+  padding: 8px 12px; border: 1.5px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); font-family: var(--font); font-size: 12.5px;
+  color: var(--ink); outline: none; cursor: pointer; transition: border-color .15s;
+}
+.stu-sort-select:focus { border-color: var(--primary); }
+
+/* ── Student card grid ── */
+.stu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+  animation: fadeUp .5s var(--ease) .08s both;
+}
+
+.stu-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); overflow: hidden;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+  position: relative;
+}
+.stu-card:hover {
+  box-shadow: var(--shadow-sm); transform: translateY(-2px);
+  border-color: rgba(220,38,38,.25);
+}
+.stu-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+  background: linear-gradient(90deg, var(--primary), #f87171);
+  opacity: 0; transition: opacity .2s;
+}
+.stu-card:hover::before { opacity: 1; }
+
+.stu-card-body { padding: 18px 20px; display: flex; align-items: flex-start; gap: 14px; }
+
+.stu-avatar {
+  width: 46px; height: 46px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-lt); border: 2px solid var(--primary-brd);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 18px; font-style: italic;
+  color: var(--primary); overflow: hidden;
+}
+.stu-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.stu-info { flex: 1; min-width: 0; }
+.stu-name {
+  font-size: 14px; font-weight: 800; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2; margin-bottom: 2px;
+}
+.stu-email {
+  font-size: 11.5px; color: var(--ink-3); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stu-meta {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px;
+}
+.stu-meta-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; font-family: var(--font-mono);
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--surface-2); color: var(--ink-3);
+  border: 1px solid var(--line);
+}
+.stu-meta-chip.phone { background: var(--teal-lt); color: var(--teal); border-color: #99f6e4; }
+.stu-meta-chip.joined { background: var(--indigo-lt); color: var(--indigo); border-color: #c7d2fe; }
+
+.stu-id {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,.7); background: var(--ink-2);
+  padding: 1px 6px; border-radius: 4px; flex-shrink: 0; align-self: flex-start;
+}
+
+/* ── Card footer with actions ── */
+.stu-card-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 20px; border-top: 1.5px solid var(--line);
+  background: var(--surface-2);
+}
+.stu-card-footer-info { font-size: 10.5px; color: var(--ink-3); font-weight: 600; }
+
+.stu-actions { display: flex; gap: 6px; }
+.btn-edit-card {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  background: var(--indigo-lt); color: var(--indigo);
+  border: 1px solid #c7d2fe; font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+  text-decoration: none;
+}
+.btn-edit-card:hover { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+
+.btn-view-card {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  background: var(--teal-lt); color: var(--teal);
+  border: 1px solid #99f6e4; font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+  text-decoration: none;
+}
+.btn-view-card:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+.btn-del-card {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 10px; border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink-3);
+  border: 1.5px solid var(--line); font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+}
+.btn-del-card:hover { background: #fef2f2; color: var(--primary); border-color: var(--primary-brd); }
+
+/* ── Empty state ── */
+.stu-empty {
+  text-align: center; padding: 64px 32px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl);
+}
+.stu-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.stu-empty-title { font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink-2); }
+.stu-empty-sub   { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+
+/* ── Pagination ── */
+.stu-pagination {
+  display: flex; justify-content: center; margin-top: 8px;
+  animation: fadeUp .5s var(--ease) .12s both;
+}
+nav.pagination { display: flex; gap: 4px; align-items: center; }
 nav.pagination a,
 nav.pagination span {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--line); background: var(--surface);
+  color: var(--ink-3); text-decoration: none; transition: all .15s;
 }
-nav.pagination .current { 
-  background: #4f46e5;
-  color: white;
-}   
+nav.pagination a:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+nav.pagination .current {
+  background: var(--primary); color: #fff;
+  border-color: var(--primary);
+}
+nav.pagination .disabled { opacity: .35; pointer-events: none; }
+
+/* ════════════════════════════════
+   EDIT MODAL
+════════════════════════════════ */
+.stu-modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(13,14,20,.7); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.stu-modal-overlay.open { display: flex; }
+
+.stu-modal {
+  background: var(--surface); border-radius: var(--r-xl);
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+  animation: fadeUp .25s var(--ease) both;
+  position: relative;
+}
+.stu-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1.5px solid var(--line);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.stu-modal-title { font-family: var(--font-serif); font-size: 20px; font-style: italic; color: var(--ink); }
+.stu-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--line); background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; color: var(--ink-3);
+  font-size: 16px; line-height: 1;
+}
+.stu-modal-close:hover { background: var(--primary-lt); border-color: var(--primary-brd); color: var(--primary); }
+.stu-modal-body { padding: 24px; }
+
+/* ── Alert toast ── */
+.stu-toast {
+  position: fixed; top: 80px; right: 20px; z-index: 9999;
+  background: var(--ink); color: #fff;
+  padding: 12px 18px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  display: flex; align-items: center; gap: 8px;
+  animation: fadeUp .3s var(--ease) both;
+  border-left: 3px solid var(--emerald);
+  max-width: 320px;
+}
+.stu-toast.error { border-left-color: var(--primary); }
 </style>
-<!-- EDIT MODAL -->
-<div id="edit-modal"
-     class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
-    <button id="close-modal"
-            class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
-      ✕
-    </button>
-    <div id="modal-body" class="p-2">
-      <!-- form load vào đây -->
+
+<div class="stu-wrapper">
+
+  <!-- ═══ HERO ═══ -->
+  <div class="stu-hero">
+    <div class="stu-hero-glow"></div>
+    <div class="stu-hero-inner">
+      <div class="stu-breadcrumb">
+        <a href="<%= admin_dashboard_path %>">Dashboard</a>
+        <span class="stu-breadcrumb-sep">›</span>
+        <span>Students</span>
+      </div>
+      <h1 class="stu-hero-title">Student <em>Management</em></h1>
+      <p class="stu-hero-sub">View, edit and manage all registered learners</p>
+
+      <div class="stu-hero-stats">
+        <div class="stu-hero-stat">
+          <div class="stu-hero-stat-icon" style="background:rgba(220,38,38,.2)">🎓</div>
+          <div>
+            <div class="stu-hero-stat-num"><%= @total_students %></div>
+            <div class="stu-hero-stat-label">Total Students</div>
+          </div>
+        </div>
+        <div class="stu-hero-stat">
+          <div class="stu-hero-stat-icon" style="background:rgba(5,150,105,.2)">📅</div>
+          <div>
+            <div class="stu-hero-stat-num"><%= @new_this_month %></div>
+            <div class="stu-hero-stat-label">New This Month</div>
+          </div>
+        </div>
+        <div class="stu-hero-stat">
+          <div class="stu-hero-stat-icon" style="background:rgba(13,148,136,.2)">📋</div>
+          <div>
+            <div class="stu-hero-stat-num"><%= @enrolled_students %></div>
+            <div class="stu-hero-stat-label">Enrolled</div>
+          </div>
+        </div>
+        <div class="stu-hero-stat">
+          <div class="stu-hero-stat-icon" style="background:rgba(217,119,6,.2)">🎤</div>
+          <div>
+            <div class="stu-hero-stat-num"><%= @avg_band || '—' %></div>
+            <div class="stu-hero-stat-label">Avg Band</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BODY ═══ -->
+  <div class="stu-body">
+
+    <!-- Flash notice -->
+    <% if notice.present? %>
+      <div class="stu-toast" id="flash-toast">
+        <span>✓</span> <%= notice %>
+      </div>
+      <script>setTimeout(() => { var t = document.getElementById('flash-toast'); if(t) t.style.opacity='0'; }, 3500);</script>
+    <% end %>
+
+    <!-- Toolbar -->
+    <div class="stu-toolbar">
+      <%= form_with url: admin_students_path, method: :get, local: true, style: "display:flex;gap:10px;flex:1;flex-wrap:wrap;align-items:center" do |f| %>
+        <div class="stu-search-wrap">
+          <svg class="stu-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <%= f.text_field :q, value: params[:q], placeholder: "Search name or email…", class: "stu-search", autocomplete: "off" %>
+        </div>
+
+        <div class="stu-sort-wrap">
+          <span class="stu-sort-label">Sort:</span>
+          <%= f.select :sort,
+            [["Newest", "created_at"], ["Name A–Z", "full_name"], ["Email", "email"]],
+            { selected: params[:sort] || "created_at" },
+            class: "stu-sort-select" %>
+          <%= f.select :dir,
+            [["↓ Desc", "desc"], ["↑ Asc", "asc"]],
+            { selected: params[:dir] || "desc" },
+            class: "stu-sort-select" %>
+          <%= f.submit "Apply", style: "padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:12.5px;font-weight:700;cursor:pointer;" %>
+        </div>
+      <% end %>
+
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--ink-3);white-space:nowrap">
+        <%= @students.total_count %> students
+      </div>
+    </div>
+
+    <!-- Student cards grid -->
+    <% if @students.any? %>
+      <div class="stu-grid">
+        <% @students.each_with_index do |student, i| %>
+          <div class="stu-card" style="animation: fadeUp .4s var(--ease) <%= (i * 0.04).round(2) %>s both">
+
+            <div class="stu-card-body">
+              <!-- Avatar -->
+              <div class="stu-avatar">
+                <% if student.respond_to?(:thumbnail) && student.thumbnail&.attached? %>
+                  <%= image_tag student.thumbnail.variant(resize_to_fill: [46, 46]), alt: student.full_name %>
+                <% else %>
+                  <%= student.full_name&.first&.upcase || '?' %>
+                <% end %>
+              </div>
+
+              <!-- Info -->
+              <div class="stu-info">
+                <div class="stu-name"><%= student.full_name %></div>
+                <div class="stu-email"><%= student.email %></div>
+                <div class="stu-meta">
+                  <% if student.phone.present? %>
+                    <span class="stu-meta-chip phone">📞 <%= student.phone %></span>
+                  <% end %>
+                  <span class="stu-meta-chip joined">
+                    Joined <%= student.created_at.strftime("%b %Y") %>
+                  </span>
+                  <% if student.school.present? %>
+                    <span class="stu-meta-chip">🏫 <%= student.school.truncate(20) %></span>
+                  <% end %>
+                </div>
+              </div>
+
+              <!-- ID badge -->
+              <span class="stu-id">#<%= student.id %></span>
+            </div>
+
+            <div class="stu-card-footer">
+              <span class="stu-card-footer-info">
+                <%= student.country.present? ? "#{student.city}, #{student.country}" : "No location" %>
+              </span>
+              <div class="stu-actions">
+                <a href="#" class="btn-view-card" onclick="openView(<%= student.id %>); return false;">
+                  <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  View
+                </a>
+                <a href="#" class="btn-edit-card btn-edit" data-student-id="<%= student.id %>">
+                  <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                  Edit
+                </a>
+                <%= button_to admin_student_path(student), method: :delete,
+                    class: "btn-del-card",
+                    form: { data: { turbo_confirm: "Remove #{student.full_name}? This cannot be undone." } } do %>
+                  <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                <% end %>
+              </div>
+            </div>
+
+          </div>
+        <% end %>
+      </div>
+
+    <% else %>
+      <div class="stu-empty">
+        <div class="stu-empty-icon">🎓</div>
+        <div class="stu-empty-title">No students found</div>
+        <div class="stu-empty-sub">
+          <% if params[:q].present? %>
+            No results for "<%= params[:q] %>". <a href="<%= admin_students_path %>" style="color:var(--primary)">Clear search</a>
+          <% else %>
+            Students will appear here once they register.
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Pagination -->
+    <div class="stu-pagination">
+      <%= paginate @students %>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="stu-modal-overlay" id="edit-modal">
+  <div class="stu-modal">
+    <div class="stu-modal-header">
+      <span class="stu-modal-title">Edit <em>Student</em></span>
+      <button class="stu-modal-close" id="close-modal">✕</button>
+    </div>
+    <div class="stu-modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ═══ VIEW MODAL ═══ -->
+<div class="stu-modal-overlay" id="view-modal">
+  <div class="stu-modal">
+    <div class="stu-modal-header">
+      <span class="stu-modal-title">Student <em>Profile</em></span>
+      <button class="stu-modal-close" id="close-view-modal">✕</button>
+    </div>
+    <div class="stu-modal-body" id="view-modal-body">
+      <div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>
     </div>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const editButtons = document.querySelectorAll(".btn-edit");
-    const modal = document.getElementById("edit-modal");
-    const modalBody = document.getElementById("modal-body");
-    const closeModalBtn = document.getElementById("close-modal");
+// ── Edit modal ──
+document.addEventListener("DOMContentLoaded", function() {
+  var editBtns     = document.querySelectorAll(".btn-edit");
+  var editModal    = document.getElementById("edit-modal");
+  var modalBody    = document.getElementById("modal-body");
+  var closeBtn     = document.getElementById("close-modal");
+  var viewModal    = document.getElementById("view-modal");
+  var viewBody     = document.getElementById("view-modal-body");
+  var closeViewBtn = document.getElementById("close-view-modal");
 
-    editButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        const studentId = button.getAttribute("data-student-id");
-
-        fetch(`/admin/students/${studentId}/edit`, {
-          headers: { "Accept": "text/html" }
-        })
-        .then(response => response.text())
-        .then(html => {
-          modalBody.innerHTML = html;
-          modal.classList.remove("hidden");
-        });
-      });
-    });
-
-    closeModalBtn.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      modalBody.innerHTML = "";
+  editBtns.forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      var id = btn.getAttribute("data-student-id");
+      modalBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>';
+      editModal.classList.add("open");
+      fetch("/admin/students/" + id + "/edit", { headers: { "Accept": "text/html" } })
+        .then(function(r) { return r.text(); })
+        .then(function(html) { modalBody.innerHTML = html; });
     });
   });
+
+  closeBtn.addEventListener("click", function() {
+    editModal.classList.remove("open");
+    modalBody.innerHTML = "";
+  });
+  editModal.addEventListener("click", function(e) {
+    if (e.target === editModal) { editModal.classList.remove("open"); modalBody.innerHTML = ""; }
+  });
+
+  closeViewBtn.addEventListener("click", function() { viewModal.classList.remove("open"); });
+  viewModal.addEventListener("click", function(e) { if (e.target === viewModal) viewModal.classList.remove("open"); });
+});
+
+function openView(id) {
+  var viewModal = document.getElementById("view-modal");
+  var viewBody  = document.getElementById("view-modal-body");
+  viewBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>';
+  viewModal.classList.add("open");
+  fetch("/admin/students/" + id, { headers: { "Accept": "text/html" } })
+    .then(function(r) { return r.text(); })
+    .then(function(html) { viewBody.innerHTML = html; });
+}
+
+// ── Auto-dismiss flash ──
+setTimeout(function() {
+  var t = document.getElementById("flash-toast");
+  if (t) { t.style.transition = "opacity .4s"; t.style.opacity = "0"; }
+}, 3500);
 </script>
