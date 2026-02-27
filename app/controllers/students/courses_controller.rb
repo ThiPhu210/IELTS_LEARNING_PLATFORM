@@ -83,7 +83,7 @@ class Students::CoursesController < ApplicationController
   def require_course_access!
     return if current_user&.has_course_access?(@course)
 
-    redirect_to students_course_landing_path(@course),
+    redirect_to landing_students_course_path(@course),
                 alert: "Bạn cần thanh toán để truy cập khóa học này."
   end
 end
