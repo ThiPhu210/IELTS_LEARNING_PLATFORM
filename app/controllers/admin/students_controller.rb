@@ -5,7 +5,6 @@ class Admin::StudentsController < ApplicationController
   def index
     @students = User.where(role: :student)
 
-    # Search by name or email
     if params[:q].present?
       q = "%#{params[:q].downcase}%"
       @students = @students.where(
@@ -13,12 +12,10 @@ class Admin::StudentsController < ApplicationController
       )
     end
 
-    # Sort
     sort_col = %w[full_name email created_at].include?(params[:sort]) ? params[:sort] : "created_at"
     sort_dir = params[:dir] == "asc" ? "asc" : "desc"
     @students = @students.order("#{sort_col} #{sort_dir}")
 
-    # Stats for header cards
     @total_students    = User.where(role: :student).count
     @new_this_month    = User.where(role: :student)
                              .where(created_at: Time.current.beginning_of_month..)
@@ -31,6 +28,8 @@ class Admin::StudentsController < ApplicationController
   end
 
   def show
+    # Render just the partial for AJAX modal; full page fallback if needed
+    render layout: false
   end
 
   def edit
@@ -39,10 +38,7 @@ class Admin::StudentsController < ApplicationController
 
   def update
     if @student.update(student_params)
-      respond_to do |format|
-        format.html { redirect_to admin_students_path, notice: "✓ Student updated successfully" }
-        format.json { render json: { success: true } }
-      end
+      redirect_to admin_students_path, notice: "Student updated successfully"
     else
       render partial: "form", locals: { student: @student }, status: :unprocessable_entity
     end
