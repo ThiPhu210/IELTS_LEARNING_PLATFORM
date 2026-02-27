@@ -304,9 +304,26 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); }
 .dash-footer a:hover { color: var(--primary); }
 .footer-links { display: flex; gap: 18px; }
 
+/* ═══════════════════════════════════════════
+   MAIN WRAPPER — offset for sidebar + navbar
+═══════════════════════════════════════════ */
+.dash-main-wrapper {
+  margin-left: 256px;   /* sidebar width */
+  padding-top: 64px;    /* navbar height */
+  min-height: 100vh;
+  background: var(--bg);
+}
+
 /* Responsive tweaks */
-@media (max-width: 640px) { .dash-body { padding: 18px; } .dash-hero-inner { padding: 20px 18px 24px; } }
+@media (max-width: 640px) {
+  .dash-main-wrapper { margin-left: 0; padding-top: 56px; }
+  .dash-body { padding: 18px; }
+  .dash-hero-inner { padding: 20px 18px 24px; }
+}
 </style>
+
+<!-- ═══════ MAIN WRAPPER ═══════ -->
+<div class="dash-main-wrapper">
 
 <!-- ═══════ HERO ═══════ -->
 <div class="dash-hero">
@@ -329,7 +346,6 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); }
   </div>
 </div>
 
-<main class="pt-16 sm:ml-64">
 <div class="dash-body">
 
   <!-- ═══ STAT CARDS ═══ -->
@@ -676,7 +692,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--ink); }
   </div>
 
 </div>
-</main>
+</div><!-- /.dash-main-wrapper -->
 
 <!-- ═══════ CHART DATA ═══════ -->
 <script>
