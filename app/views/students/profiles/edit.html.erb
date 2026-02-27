@@ -1,241 +1,474 @@
-<div class="flex flex-col items-center justify-center px-6 pt-8 mx-auto min-h-screen dark:bg-gray-900">
+<%# app/views/students/profiles/edit.html.erb %>
 
-  <!-- Logo -->
-  <%= link_to root_path,
-      class: "flex items-center justify-center mb-8 text-2xl font-semibold lg:mb-10 dark:text-white" do %>
-    <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" class="h-12"/>
-  <% end %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <div class="w-full max-w-xl p-6 space-y-8 sm:p-8 bg-white rounded-lg shadow dark:bg-gray-800">
+<style>
+:root {
+  --ink:        #0d0e14;
+  --ink-2:      #3a3d52;
+  --ink-3:      #7b7f96;
+  --line:       #e8eaf2;
+  --bg:         #f2f4f9;
+  --surface:    #ffffff;
+  --surface-2:  #f7f8fc;
+  --primary:    #dc2626;
+  --primary-lt: #fee2e2;
+  --primary-brd:#fca5a5;
+  --teal:       #0d9488;
+  --teal-lt:    #e6faf8;
+  --amber:      #d97706;
+  --amber-lt:   #fef3e1;
+  --emerald:    #059669;
+  --indigo:     #4f46e5;
+  --indigo-lt:  #eef2ff;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 26px;
+  --shadow-xs:  0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm:  0 2px 12px rgba(0,0,0,.08);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease:       cubic-bezier(.4,0,.2,1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
 
-    <h2 class="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">
-      Edit Profile
-    </h2>
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+
+/* ── Page shell ── */
+.ep-page {
+  min-height: 100vh;
+  background: var(--bg);
+  padding-bottom: 64px;
+}
+
+/* ════════════════════
+   HERO BANNER
+════════════════════ */
+.ep-hero {
+  position: relative; overflow: hidden;
+  background: var(--ink);
+  padding: 0 0 56px;
+}
+.ep-hero::before {
+  content: '';
+  position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+.ep-hero-glow {
+  position: absolute; right: -80px; top: -80px;
+  width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ep-hero-glow2 {
+  position: absolute; left: 10%; bottom: -120px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(13,148,136,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ep-hero-top {
+  position: relative; z-index: 1;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px 24px;
+}
+.ep-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+  color: rgba(255,255,255,.4); text-decoration: none;
+  transition: color .15s;
+}
+.ep-back:hover { color: #fca5a5; }
+.ep-hero-title-row {
+  position: relative; z-index: 1;
+  text-align: center; padding: 0 24px;
+}
+.ep-hero-title {
+  font-family: var(--font-serif); font-size: clamp(24px, 3vw, 36px);
+  font-weight: 400; letter-spacing: -.02em; color: #fff; line-height: 1.15;
+}
+.ep-hero-title em { font-style: italic; color: #fca5a5; }
+.ep-hero-sub { font-size: 13px; color: rgba(255,255,255,.4); margin-top: 6px; }
+
+/* ── Avatar floating card ── */
+.ep-avatar-anchor {
+  position: relative; z-index: 10;
+  display: flex; justify-content: center;
+  margin-top: -44px;
+  margin-bottom: 0;
+}
+.ep-avatar-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: 20px; padding: 20px 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex; align-items: center; gap: 18px;
+  width: 100%; max-width: 560px;
+  animation: fadeUp .4s var(--ease) .1s both;
+}
+.ep-avatar-img {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-lt); border: 3px solid var(--primary-brd);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 28px; font-style: italic;
+  color: var(--primary); overflow: hidden; cursor: pointer;
+  transition: opacity .15s;
+}
+.ep-avatar-img:hover { opacity: .85; }
+.ep-avatar-img img { width: 100%; height: 100%; object-fit: cover; }
+.ep-avatar-info { flex: 1; min-width: 0; }
+.ep-avatar-name {
+  font-size: 16px; font-weight: 800; color: var(--ink); line-height: 1.2;
+}
+.ep-avatar-email { font-size: 12px; color: var(--ink-3); font-family: var(--font-mono); margin-top: 2px; }
+.ep-avatar-sub   { font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+.ep-avatar-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 7px 14px; border-radius: var(--r-sm);
+  background: var(--primary-lt); color: var(--primary);
+  border: 1.5px solid var(--primary-brd);
+  font-size: 11.5px; font-weight: 700; cursor: pointer;
+  transition: all .15s; white-space: nowrap; flex-shrink: 0;
+}
+.ep-avatar-btn:hover { background: var(--primary); color: #fff; }
+
+/* ════════════════════
+   FORM CARD
+════════════════════ */
+.ep-container {
+  max-width: 560px; margin: 20px auto 0; padding: 0 20px;
+  animation: fadeUp .45s var(--ease) .15s both;
+}
+.ep-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); box-shadow: var(--shadow-xs);
+  overflow: hidden;
+}
+.ep-card-section {
+  padding: 22px 24px;
+  border-bottom: 1.5px solid var(--line);
+}
+.ep-card-section:last-of-type { border-bottom: none; }
+
+.ep-section-head {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 18px;
+}
+.ep-section-icon {
+  width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+}
+.ep-section-title {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--ink-2);
+}
+
+/* Fields */
+.ep-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ep-field { display: flex; flex-direction: column; gap: 5px; }
+.ep-field.full { grid-column: 1 / -1; }
+
+.ep-label {
+  font-size: 11px; font-weight: 800; text-transform: uppercase;
+  letter-spacing: .06em; color: var(--ink-3);
+}
+.ep-input, .ep-textarea {
+  padding: 9px 13px; border-radius: var(--r-md);
+  border: 1.5px solid var(--line); background: var(--surface-2);
+  font-family: var(--font); font-size: 13.5px; color: var(--ink);
+  outline: none; transition: border-color .15s, box-shadow .15s, background .15s;
+  width: 100%;
+}
+.ep-input:focus, .ep-textarea:focus {
+  border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220,38,38,.08);
+  background: var(--surface);
+}
+.ep-input.error { border-color: var(--primary); background: var(--primary-lt); }
+.ep-input::placeholder, .ep-textarea::placeholder { color: var(--ink-3); }
+.ep-textarea { resize: vertical; min-height: 90px; }
+
+.ep-field-hint { font-size: 11px; color: var(--ink-3); margin-top: 3px; }
+.ep-field-error { font-size: 11px; color: var(--primary); font-weight: 600; margin-top: 3px; display: none; }
+.ep-field-error.show { display: block; }
+
+/* Unconfirmed email notice */
+.ep-notice {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 13px; border-radius: var(--r-sm);
+  background: var(--amber-lt); border: 1.5px solid #fde68a;
+  font-size: 12px; color: var(--amber); font-weight: 600;
+  margin-top: 8px;
+}
+
+/* Form footer */
+.ep-footer {
+  display: flex; gap: 10px; padding: 20px 24px;
+  border-top: 1.5px solid var(--line);
+  background: var(--surface-2);
+}
+.ep-btn-cancel {
+  flex: 1; padding: 11px; border-radius: var(--r-md); text-align: center;
+  border: 1.5px solid var(--line); background: var(--surface);
+  font-family: var(--font); font-size: 13px; font-weight: 700;
+  color: var(--ink-3); text-decoration: none; cursor: pointer;
+  transition: all .15s;
+}
+.ep-btn-cancel:hover { border-color: var(--ink-3); color: var(--ink); }
+.ep-btn-save {
+  flex: 2; padding: 11px; border-radius: var(--r-md);
+  background: var(--primary); color: #fff; border: none;
+  font-family: var(--font); font-size: 13px; font-weight: 800;
+  cursor: pointer; transition: background .15s, transform .1s;
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+}
+.ep-btn-save:hover { background: #b91c1c; }
+.ep-btn-save:active { transform: scale(.98); }
+
+/* Error summary */
+.ep-errors {
+  background: var(--primary-lt); border: 1.5px solid var(--primary-brd);
+  border-radius: var(--r-md); padding: 14px 18px; margin-bottom: 16px;
+}
+.ep-errors li { font-size: 12.5px; color: var(--primary); font-weight: 600; margin-bottom: 3px; }
+
+/* File toast */
+.ep-toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 9999; background: var(--ink); color: #fff;
+  padding: 12px 20px; border-radius: var(--r-md); border-left: 3px solid var(--primary);
+  font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  display: flex; align-items: center; gap: 10px;
+  transition: opacity .3s; white-space: nowrap;
+}
+.ep-toast.hidden { display: none; }
+
+@media (max-width: 600px) { .ep-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="ep-page">
+
+  <!-- ═══ HERO ═══ -->
+  <div class="ep-hero">
+    <div class="ep-hero-glow"></div>
+    <div class="ep-hero-glow2"></div>
+
+    <div class="ep-hero-top">
+      <%= link_to students_dashboard_path, class: "ep-back" do %>
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Back to Dashboard
+      <% end %>
+    </div>
+
+    <div class="ep-hero-title-row">
+      <h1 class="ep-hero-title">Edit <em>Profile</em></h1>
+      <p class="ep-hero-sub">Update your personal information and settings</p>
+    </div>
+  </div>
+
+  <!-- ═══ AVATAR CARD ═══ -->
+  <div class="ep-avatar-anchor">
+    <div class="ep-avatar-card">
+      <div class="ep-avatar-img" id="avatar-preview-wrap" onclick="document.getElementById('avatar-file').click()">
+        <% if current_user.thumbnail.attached? && current_user.thumbnail.blob&.persisted? %>
+          <%# FIX: pass current_user (not current_user.thumbnail) to safe_avatar %>
+          <%= safe_avatar(current_user, size: 72) %>
+        <% else %>
+          <span id="avatar-initial"><%= current_user.full_name&.first&.upcase || '?' %></span>
+        <% end %>
+      </div>
+      <div class="ep-avatar-info">
+        <div class="ep-avatar-name"><%= current_user.full_name %></div>
+        <div class="ep-avatar-email"><%= current_user.email %></div>
+        <div class="ep-avatar-sub">Click avatar to change • JPG, PNG, WEBP · max 2MB</div>
+      </div>
+      <button type="button" class="ep-avatar-btn" onclick="document.getElementById('avatar-file').click()">
+        <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        Upload
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ FORM ═══ -->
+  <div class="ep-container">
+
+    <% if current_user.errors.any? %>
+      <div class="ep-errors" style="margin-bottom:16px">
+        <ul>
+          <% current_user.errors.full_messages.each do |msg| %>
+            <li>• <%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
 
     <%= form_with model: current_user,
                   url: students_profile_path,
                   method: :patch,
                   local: true,
-                  multipart: true do |f| %>
+                  html: { enctype: "multipart/form-data" } do |f| %>
 
-      <!-- AVATAR -->
-      <div class="flex flex-col items-center mb-8 relative">
+      <!-- Hidden file input (triggered by avatar click) -->
+      <%= f.file_field :thumbnail,
+          id: "avatar-file",
+          accept: "image/png,image/jpeg,image/webp",
+          style: "display:none",
+          onchange: "handleAvatarChange(this)" %>
 
-   <% if current_user.thumbnail.attached? && current_user.thumbnail.blob&.persisted? %>
-    <%= safe_avatar(current_user.thumbnail, size: 128) %>
-  <% else %>
-    <img class="w-32 h-32 rounded-full"
-         src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-         alt="user photo">
-  <% end %>
+      <div class="ep-card">
 
-        <label class="mt-3 text-sm font-medium text-blue-600 cursor-pointer hover:underline text-center">
-          Change avatar
-          <%= f.file_field :thumbnail,
-                accept: "image/png,image/jpeg,image/webp",
-                class: "hidden",
-                id: "avatar-input" %>
-        </label>
-
-        <!-- TOAST -->
-        <div
-          id="toast-file-error"
-          class="hidden mt-3 flex items-center max-w-xs p-4 text-sm
-                 text-red-800 bg-red-100 rounded-lg shadow"
-          role="alert"
-        >
-          <div class="inline-flex items-center justify-center w-8 h-8
-                      text-red-500 bg-red-200 rounded-lg">
-            ⚠️
+        <!-- BASIC INFO -->
+        <div class="ep-card-section">
+          <div class="ep-section-head">
+            <div class="ep-section-icon" style="background:#fee2e2">👤</div>
+            <span class="ep-section-title">Basic Information</span>
           </div>
-
-          <div class="ml-3 text-sm font-medium" id="file-error-message">
-            File không hợp lệ
+          <div class="ep-grid">
+            <div class="ep-field">
+              <%= f.label :full_name, "Full Name", class: "ep-label" %>
+              <%= f.text_field :full_name, class: "ep-input", placeholder: "Your full name" %>
+            </div>
+            <div class="ep-field">
+              <%= f.label :email, "Email Address", class: "ep-label" %>
+              <%= f.email_field :email, class: "ep-input", placeholder: "email@example.com" %>
+              <% if current_user.unconfirmed_email.present? %>
+                <div class="ep-notice">
+                  <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                  </svg>
+                  Please confirm your new email address
+                </div>
+              <% end %>
+            </div>
           </div>
-
-          <button type="button"
-                  class="ml-auto text-red-500 hover:text-red-700"
-                  onclick="hideFileToast()">
-            ✕
-          </button>
-        </div>
-      </div>
-
-      <!-- BASIC INFO -->
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-        Thông tin cơ bản
-      </h3>
-
-      <div class="space-y-6 mb-4">
-        <div>
-          <%= f.label :full_name, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-          <%= f.text_field :full_name,
-                class: "w-full rounded-lg border border-gray-300 px-3 py-2
-                        focus:ring-blue-500 focus:border-blue-500
-                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
         </div>
 
-        <div>
-          <%= f.label :email, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-          <%= f.email_field :email,
-                class: "w-full rounded-lg border border-gray-300 px-3 py-2
-                        focus:ring-blue-500 focus:border-blue-500
-                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
+        <!-- STUDENT INFO -->
+        <div class="ep-card-section">
+          <div class="ep-section-head">
+            <div class="ep-section-icon" style="background:#eef2ff">🎓</div>
+            <span class="ep-section-title">Student Information</span>
+          </div>
+          <div class="ep-grid">
+            <div class="ep-field">
+              <%= f.label :school, "School / Institution", class: "ep-label" %>
+              <%= f.text_field :school, class: "ep-input", placeholder: "University name" %>
+            </div>
+            <div class="ep-field">
+              <%= f.label :phone, "Phone Number", class: "ep-label" %>
+              <%= f.telephone_field :phone, class: "ep-input", placeholder: "0xxxxxxxxx", id: "phone-input" %>
+              <span class="ep-field-error" id="phone-error">Must start with 0, 10–11 digits</span>
+            </div>
+            <div class="ep-field full">
+              <%= f.label :bio, "Bio", class: "ep-label" %>
+              <%= f.text_area :bio, rows: 3, class: "ep-textarea", placeholder: "Tell us a little about yourself…" %>
+            </div>
+          </div>
+        </div>
 
-          <% if current_user.unconfirmed_email.present? %>
-            <p class="mt-2 text-sm text-yellow-600">
-              📩 Vui lòng kiểm tra email để xác nhận địa chỉ mới
-            </p>
+        <!-- ADDRESS -->
+        <div class="ep-card-section">
+          <div class="ep-section-head">
+            <div class="ep-section-icon" style="background:#e6faf8">📍</div>
+            <span class="ep-section-title">Address</span>
+          </div>
+          <div class="ep-grid">
+            <div class="ep-field">
+              <%= f.label :country, "Country", class: "ep-label" %>
+              <%= f.text_field :country, class: "ep-input", placeholder: "Vietnam" %>
+            </div>
+            <div class="ep-field">
+              <%= f.label :city, "City", class: "ep-label" %>
+              <%= f.text_field :city, class: "ep-input", placeholder: "Ho Chi Minh City" %>
+            </div>
+            <div class="ep-field">
+              <%= f.label :province, "Province / District", class: "ep-label" %>
+              <%= f.text_field :province, class: "ep-input", placeholder: "District 7" %>
+            </div>
+            <div class="ep-field">
+              <%= f.label :postal_code, "Postal Code", class: "ep-label" %>
+              <%= f.text_field :postal_code, class: "ep-input", placeholder: "700000" %>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="ep-footer">
+          <%= link_to "Cancel", students_dashboard_path, class: "ep-btn-cancel" %>
+          <%= f.submit class: "ep-btn-save" do %>
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/>
+              <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+            </svg>
+            Save Changes
           <% end %>
         </div>
-      </div>
 
-      <!-- STUDENT INFO -->
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-        Student information
-      </h3>
-
-      <div class="grid grid-cols-2 gap-6 mb-4">
-        <div>
-          <%= f.label :school, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-          <%= f.text_field :school,
-                class: "w-full rounded-lg border px-3 py-2
-                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-        </div>
-
-        <div>
-          <%= f.label :phone, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-          <%= f.telephone_field :phone,
-                class: "w-full rounded-lg border px-3 py-2
-                        dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-        </div>
-      </div>
-
-      <!-- ADDRESS -->
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-        Địa chỉ
-      </h3>
-
-      <div class="space-y-6 mb-4">
-        <div class="grid grid-cols-2 gap-6">
-          <div>
-            <%= f.label :country, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-            <%= f.text_field :country, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-          </div>
-
-          <div>
-            <%= f.label :city, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-            <%= f.text_field :city, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
-          <div>
-            <%= f.label :province, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-            <%= f.text_field :province, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-          </div>
-
-          <div>
-            <%= f.label :postal_code, class: "block mb-2 text-sm font-medium text-gray-900 dark:text-white" %>
-            <%= f.text_field :postal_code, class: "w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-          </div>
-        </div>
-      </div>
-
-      <!-- DESCRIPTION -->
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">
-        Description
-      </h3>
-
-      <div class="mb-6">
-        <%= f.text_area :bio, rows: 3,
-              class: "w-full rounded-lg border px-3 py-2
-                      dark:bg-gray-700 dark:border-gray-600 dark:text-white" %>
-      </div>
-
-      <!-- BUTTONS -->
-      <div class="flex gap-4 mt-6">
-        <%= link_to "Cancel",
-            students_dashboard_path,
-            class: "w-1/2 text-center py-3 rounded-lg font-medium border border-gray-300
-                    text-gray-700 hover:bg-gray-100
-                    dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700" %>
-
-        <%= f.submit "Save changes",
-            class: "w-1/2 py-3 text-white font-medium rounded-lg
-                    bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300" %>
       </div>
 
     <% end %>
   </div>
 </div>
 
+<!-- File error toast -->
+<div class="ep-toast hidden" id="ep-toast">
+  <span>⚠️</span>
+  <span id="ep-toast-msg">File không hợp lệ</span>
+  <button onclick="hideToast()" style="margin-left:8px;background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px">✕</button>
+</div>
+
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const phoneInput = document.querySelector("#user_phone");
+var toastTimer;
 
-  if (!phoneInput) return;
+function showToast(msg) {
+  var t = document.getElementById('ep-toast');
+  document.getElementById('ep-toast-msg').textContent = msg;
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 3500);
+}
+function hideToast() {
+  document.getElementById('ep-toast').classList.add('hidden');
+}
 
-  const error = document.createElement("p");
-  error.className = "mt-1 text-sm text-red-600 hidden";
-  phoneInput.parentNode.appendChild(error);
-
-  phoneInput.addEventListener("input", () => {
-    const value = phoneInput.value;
-    const regex = /^0\d{9,10}$/;
-
-    if (!regex.test(value)) {
-      phoneInput.classList.add("border-red-500");
-      error.textContent = "Phone number begins with 0-letter and must have 10 digits";
-      error.classList.remove("hidden");
-    } else {
-      phoneInput.classList.remove("border-red-500");
-      error.classList.add("hidden");
-    }
-  });
-});
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("avatar-input");
-  if (!input) return;
-
-  const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
-  const maxSize = 2 * 1024 * 1024; // 2MB
-
-  const toast = document.getElementById("toast-file-error");
-  const toastMessage = document.getElementById("file-error-message");
-  let toastTimeout;
-
-  window.showFileToast = (message) => {
-    toastMessage.textContent = message;
-    toast.classList.remove("hidden");
-
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => {
-      hideFileToast();
-    }, 3000);
+function handleAvatarChange(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var allowed = ['image/png', 'image/jpeg', 'image/webp'];
+  if (!allowed.includes(file.type)) {
+    input.value = '';
+    showToast('Only PNG, JPG, WEBP accepted');
+    return;
+  }
+  if (file.size > 2 * 1024 * 1024) {
+    input.value = '';
+    showToast('Max file size is 2MB');
+    return;
+  }
+  // Live preview
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var wrap = document.getElementById('avatar-preview-wrap');
+    wrap.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;" alt="preview">';
   };
+  reader.readAsDataURL(file);
+}
 
-  window.hideFileToast = () => {
-    toast.classList.add("hidden");
-  };
-
-  input.addEventListener("change", () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    if (!allowedTypes.includes(file.type)) {
-      input.value = "";
-      showFileToast("Chỉ chấp nhận PNG, JPG, JPEG, WEBP.");
-      return;
-    }
-
-    if (file.size > maxSize) {
-      input.value = "";
-      showFileToast("Dung lượng ảnh tối đa là 2MB.");
-      return;
-    }
+// Phone validation
+document.addEventListener('DOMContentLoaded', function() {
+  var phone = document.getElementById('phone-input');
+  var err   = document.getElementById('phone-error');
+  if (!phone) return;
+  phone.addEventListener('input', function() {
+    var v = phone.value;
+    if (v.length === 0) { phone.classList.remove('error'); err.classList.remove('show'); return; }
+    var ok = /^0\d{9,10}$/.test(v);
+    if (!ok) { phone.classList.add('error'); err.classList.add('show'); }
+    else      { phone.classList.remove('error'); err.classList.remove('show'); }
   });
 });
 </script>
