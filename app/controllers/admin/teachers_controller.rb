@@ -1,12 +1,26 @@
 class Admin::TeachersController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_teacher, only: [ :show, :edit, :update, :destroy ]
+  before_action :set_teacher, only: [:show, :edit, :update, :destroy]
 
   def index
-    @teachers = TeacherProfile.order(created_at: :asc).page(params[:page]).per(5)
+    @teachers = TeacherProfile.all
+
+    # Search by name or expertise
+    if params[:q].present?
+      q = "%#{params[:q].downcase}%"
+      @teachers = @teachers.where(
+        "LOWER(full_name) LIKE :q OR LOWER(expertise) LIKE :q", q: q
+      )
+    end
+
+    sort_col = %w[full_name experience_years created_at].include?(params[:sort]) ? params[:sort] : "created_at"
+    sort_dir = params[:dir] == "asc" ? "asc" : "desc"
+    @teachers = @teachers.order("#{sort_col} #{sort_dir}")
+                         .page(params[:page]).per(10)
   end
 
   def show
+    render layout: false
   end
 
   def edit
@@ -15,7 +29,7 @@ class Admin::TeachersController < ApplicationController
 
   def update
     if @teacher.update(teacher_params)
-      redirect_to admin_teachers_path, notice: "Cập nhật thành công"
+      redirect_to admin_teachers_path, notice: "Teacher updated successfully"
     else
       render partial: "form", locals: { teacher: @teacher }, status: :unprocessable_entity
     end
@@ -23,7 +37,7 @@ class Admin::TeachersController < ApplicationController
 
   def destroy
     @teacher.destroy
-    redirect_to admin_teachers_path, notice: "🗑 Đã xóa giáo viên"
+    redirect_to admin_teachers_path, notice: "Teacher removed successfully"
   end
 
   private
@@ -34,11 +48,7 @@ class Admin::TeachersController < ApplicationController
 
   def teacher_params
     params.require(:teacher_profile).permit(
-      :full_name,
-      :bio,
-      :expertise,
-      :experience_years,
-      :avatar
+      :full_name, :bio, :expertise, :experience_years, :avatar
     )
   end
 end
