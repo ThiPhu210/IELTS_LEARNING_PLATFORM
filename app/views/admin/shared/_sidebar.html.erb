@@ -1,162 +1,391 @@
-<aside class="fixed top-16 left-0 z-40 w-64 h-full bg-white">
+<%# ============================================================
+    app/views/admin/shared/_sidebar.html.erb
+    Design: Red + Ink — synced with LMS design system
+    ============================================================ %>
 
-   <div class="px-3 py-2">
-    <div class="flex flex-col flex-1 pt-2 pb-4 overflow-y-auto">
-      <div class="flex-1 px-3 space-y-1 bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-        <ul class="pb-2 space-y-1">
-            <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" aria-controls="dropdown-crud" data-collapse-toggle="dropdown-crud">
-                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path clip-rule="evenodd" fill-rule="evenodd" d="M.99 5.24A2.25 2.25 0 013.25 3h13.5A2.25 2.25 0 0119 5.25l.01 9.5A2.25 2.25 0 0116.76 17H3.26A2.267 2.267 0 011 14.74l-.01-9.5zm8.26 9.52v-.625a.75.75 0 00-.75-.75H3.25a.75.75 0 00-.75.75v.615c0 .414.336.75.75.75h5.373a.75.75 0 00.627-.74zm1.5 0a.75.75 0 00.627.74h5.373a.75.75 0 00.75-.75v-.615a.75.75 0 00-.75-.75H11.5a.75.75 0 00-.75.75v.625zm6.75-3.63v-.625a.75.75 0 00-.75-.75H11.5a.75.75 0 00-.75.75v.625c0 .414.336.75.75.75h5.25a.75.75 0 00.75-.75zm-8.25 0v-.625a.75.75 0 00-.75-.75H3.25a.75.75 0 00-.75.75v.625c0 .414.336.75.75.75H8.5a.75.75 0 00.75-.75zM17.5 7.5v-.625a.75.75 0 00-.75-.75H11.5a.75.75 0 00-.75.75V7.5c0 .414.336.75.75.75h5.25a.75.75 0 00.75-.75zm-8.25 0v-.625a.75.75 0 00-.75-.75H3.25a.75.75 0 00-.75.75V7.5c0 .414.336.75.75.75H8.5a.75.75 0 00.75-.75z"></path>
-                </svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>CRUD</span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-            </button>
-            <ul id="dropdown-crud" class="space-y-2 py-2 {{ if not (eq .Params.group "crud") }}hidden {{ end }}">
-              <li>
-                <a href="<%= admin_courses_path %>"  class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "products" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Courses</a>
-              </li>
-              <li>
-                <a href="<%= admin_teachers_path %>" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "users" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Teachers</a>
-              </li>
-              <li>
-                <a href="<%= admin_students_path %>" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "users" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Students</a>
-              </li>
-              <li>
-              <a href="<%= admin_achievements_path %>" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "users" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Achievements</a>
-            </li>
-            </ul>
-          </li>
-          <li>
-            <a href="{{ "settings/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "settings" }} bg-gray-100 dark:bg-gray-700 {{ end }}">
-                <svg class="w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path clip-rule="evenodd" fill-rule="evenodd" d="M8.34 1.804A1 1 0 019.32 1h1.36a1 1 0 01.98.804l.295 1.473c.497.144.971.342 1.416.587l1.25-.834a1 1 0 011.262.125l.962.962a1 1 0 01.125 1.262l-.834 1.25c.245.445.443.919.587 1.416l1.473.294a1 1 0 01.804.98v1.361a1 1 0 01-.804.98l-1.473.295a6.95 6.95 0 01-.587 1.416l.834 1.25a1 1 0 01-.125 1.262l-.962.962a1 1 0 01-1.262.125l-1.25-.834a6.953 6.953 0 01-1.416.587l-.294 1.473a1 1 0 01-.98.804H9.32a1 1 0 01-.98-.804l-.295-1.473a6.957 6.957 0 01-1.416-.587l-1.25.834a1 1 0 01-1.262-.125l-.962-.962a1 1 0 01-.125-1.262l.834-1.25a6.957 6.957 0 01-.587-1.416l-1.473-.294A1 1 0 011 10.68V9.32a1 1 0 01.804-.98l1.473-.295c.144-.497.342-.971.587-1.416l-.834-1.25a1 1 0 01.125-1.262l.962-.962A1 1 0 015.38 3.03l1.25.834a6.957 6.957 0 011.416-.587l.294-1.473zM13 10a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <span class="ml-3" sidebar-toggle-item>Settings</span>
-            </a>
-          </li>
-          <li>
-            <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" aria-controls="dropdown-pages" data-collapse-toggle="dropdown-pages">
-                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm2 10a1 1 0 10-2 0v3a1 1 0 102 0v-3zm2-3a1 1 0 011 1v5a1 1 0 11-2 0v-5a1 1 0 011-1zm4-1a1 1 0 10-2 0v7a1 1 0 102 0V8z" clip-rule="evenodd"></path></svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>Pages</span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-            </button>
-            <ul id="dropdown-pages" class="hidden py-2 space-y-2">
-              <li>
-                <a href="{{ "pages/pricing/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Pricing</a>
-              </li>
-              <li>
-                <a href="{{ "pages/maintenance/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Maintenance</a>
-              </li>
-              <li>
-                <a href="{{ "pages/404/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">404 not found</a>
-              </li>
-              <li>
-                <a href="{{ "pages/500/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">500 server error</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" aria-controls="dropdown-auth" data-collapse-toggle="dropdown-auth">
-                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>Authentication</span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-            </button>
-            <ul id="dropdown-auth" class="hidden py-2 space-y-2">
-              <li>
-                <a href="{{ "authentication/sign-in/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Sign in</a>
-              </li>
-              <li>
-                <a href="{{ "authentication/sign-up/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Sign up</a>
-              </li>
-              <li>
-                <a href="{{ "authentication/forgot-password/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Forgot password</a>
-              </li>
-              <li>
-                <a href="{{ "authentication/reset-password/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Reset password</a>
-              </li>
-              <li>
-                <a href="{{ "authentication/profile-lock/" | relURL }}" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">Profile lock</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" aria-controls="dropdown-playground" data-collapse-toggle="dropdown-playground">
-                <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                  <path clip-rule="evenodd" fill-rule="evenodd" d="M6.672 1.911a1 1 0 10-1.932.518l.259.966a1 1 0 001.932-.518l-.26-.966zM2.429 4.74a1 1 0 10-.517 1.932l.966.259a1 1 0 00.517-1.932l-.966-.26zm8.814-.569a1 1 0 00-1.415-1.414l-.707.707a1 1 0 101.415 1.415l.707-.708zm-7.071 7.072l.707-.707A1 1 0 003.465 9.12l-.708.707a1 1 0 001.415 1.415zm3.2-5.171a1 1 0 00-1.3 1.3l4 10a1 1 0 001.823.075l1.38-2.759 3.018 3.02a1 1 0 001.414-1.415l-3.019-3.02 2.76-1.379a1 1 0 00-.076-1.822l-10-4z"></path>
-                </svg>
-                <span class="flex-1 ml-3 text-left whitespace-nowrap" sidebar-toggle-item>Playground</span>
-                <svg sidebar-toggle-item class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-            </button>
-            <ul id="dropdown-playground" class="space-y-2 py-2 {{ if not (eq .Params.group "playground") }}hidden {{ end }}">
-              <li>
-                <a href="{{ "playground/stacked/" | relURL }}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "stacked" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Stacked</a>
-              </li>
-              <li>
-                <a href="{{ "playground/sidebar/" | relURL }}" class="text-base text-gray-900 rounded-lg flex items-center p-2 group hover:bg-gray-100 transition duration-75 pl-11 dark:text-gray-200 dark:hover:bg-gray-700 {{ if eq $page_slug "sidebar" }} bg-gray-100 dark:bg-gray-700 {{ end }}">Sidebar</a>
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <div class="pt-2 space-y-2">
-          <a href="https://flowbite.com/application-ui/demo/" target="_blank" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700">
-            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-              <path fill-rule="evenodd" d="M20.337 3.664c.213.212.354.486.404.782.294 1.711.657 5.195-.906 6.76-1.77 1.768-8.485 5.517-10.611 6.683a.987.987 0 0 1-1.176-.173l-.882-.88-.877-.884a.988.988 0 0 1-.173-1.177c1.165-2.126 4.913-8.841 6.682-10.611 1.562-1.563 5.046-1.198 6.757-.904.296.05.57.191.782.404ZM5.407 7.576l4-.341-2.69 4.48-2.857-.334a.996.996 0 0 1-.565-1.694l2.112-2.111Zm11.357 7.02-.34 4-2.111 2.113a.996.996 0 0 1-1.69-.565l-.422-2.807 4.563-2.74Zm.84-6.21a1.99 1.99 0 1 1-3.98 0 1.99 1.99 0 0 1 3.98 0Z" clip-rule="evenodd"/>
-            </svg>
-            <span class="ml-3" sidebar-toggle-item>View Pro Version</span>
-          </a>
-          <a href="https://github.com/themesberg/flowbite-admin-dashboard" target="_blank" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700">
-            <svg aria-hidden="true" class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Pro 6.2.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
-            <span class="ml-3" sidebar-toggle-item>GitHub Repository</span>
-          </a>
-          <a href="https://flowbite.com/docs/getting-started/introduction/" target="_blank" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700">
-            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"></path></svg>
-            <span class="ml-3" sidebar-toggle-item>Flowbite Docs</span>
-          </a>
-          <a href="https://flowbite.com/docs/components/alerts/" target="_blank" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700">
-            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
-            <span class="ml-3" sidebar-toggle-item>Components</span>
-          </a>
-          <a href="https://github.com/themesberg/flowbite-admin-dashboard/issues" target="_blank" class="flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700">
-            <svg class="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.954 0 1.856.223 2.657.619l-1.54 1.54a4.002 4.002 0 00-2.346.033L7.246 4.668zM12 10a2 2 0 11-4 0 2 2 0 014 0z" clip-rule="evenodd"></path></svg>
-            <span class="ml-3" sidebar-toggle-item>Support</span>
-          </a>
-        </div>
-      </div>
-    </div>
-    
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --sb-bg:         #0d0e14;
+  --sb-line:       rgba(255,255,255,.07);
+  --sb-text:       rgba(255,255,255,.55);
+  --sb-text-hover: #ffffff;
+  --sb-primary:    #dc2626;
+  --sb-primary-lt: rgba(220,38,38,.15);
+  --sb-primary-brd:rgba(252,165,165,.2);
+  --sb-active-bg:  rgba(220,38,38,.12);
+  --font:          'Plus Jakarta Sans', sans-serif;
+  --font-mono:     'JetBrains Mono', monospace;
+  --ease:          cubic-bezier(.4,0,.2,1);
+}
+
+#admin-sidebar {
+  position: fixed; top: 64px; left: 0; bottom: 0; z-index: 40;
+  width: 256px;
+  background: var(--sb-bg);
+  border-right: 1.5px solid var(--sb-line);
+  display: flex; flex-direction: column;
+  overflow: hidden;
+  transition: transform .3s var(--ease);
+}
+#admin-sidebar::before {
+  content: '';
+  position: absolute; inset: 0; pointer-events: none; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+.sb-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 18px 14px;
+  border-bottom: 1.5px solid var(--sb-line);
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.sb-brand-icon {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  background: var(--sb-primary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; box-shadow: 0 2px 8px rgba(220,38,38,.4);
+}
+.sb-brand-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 17px; font-style: italic; color: #fff; line-height: 1;
+}
+.sb-brand-sub {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 500;
+  color: rgba(255,255,255,.3); letter-spacing: .06em; text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.sb-scroll {
+  flex: 1; overflow-y: auto; padding: 14px 10px;
+  position: relative; z-index: 1;
+}
+.sb-scroll::-webkit-scrollbar { width: 3px; }
+.sb-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 2px; }
+
+.sb-section-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: rgba(255,255,255,.22);
+  padding: 14px 10px 6px;
+}
+
+.sb-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 10px; margin-bottom: 2px;
+  color: var(--sb-text); text-decoration: none;
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  transition: background .15s, color .15s;
+  cursor: pointer; border: none; background: transparent; width: 100%;
+  text-align: left; position: relative;
+}
+.sb-item:hover { background: rgba(255,255,255,.06); color: var(--sb-text-hover); }
+.sb-item.active {
+  background: var(--sb-active-bg); color: #fff;
+  border: 1px solid var(--sb-primary-brd);
+}
+.sb-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 3px; border-radius: 0 2px 2px 0;
+  background: var(--sb-primary);
+}
+.sb-item-icon {
+  width: 18px; height: 18px; flex-shrink: 0;
+  color: rgba(255,255,255,.3); transition: color .15s;
+}
+.sb-item:hover .sb-item-icon  { color: rgba(255,255,255,.65); }
+.sb-item.active .sb-item-icon { color: #fca5a5; }
+.sb-item-label { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.sb-chevron {
+  width: 14px; height: 14px; flex-shrink: 0;
+  color: rgba(255,255,255,.25);
+  transition: transform .25s var(--ease), color .15s;
+}
+.sb-item[aria-expanded="true"] .sb-chevron {
+  transform: rotate(180deg); color: rgba(255,255,255,.5);
+}
+
+.sb-dropdown {
+  overflow: hidden; max-height: 0; opacity: 0;
+  transition: max-height .3s var(--ease), opacity .2s;
+}
+.sb-dropdown.open { max-height: 400px; opacity: 1; }
+
+.sb-sub-item {
+  display: flex; align-items: center;
+  padding: 7px 10px 7px 38px; border-radius: 8px; margin-bottom: 1px;
+  color: rgba(255,255,255,.4); text-decoration: none;
+  font-family: var(--font); font-size: 12.5px; font-weight: 600;
+  transition: background .15s, color .15s; position: relative;
+}
+.sb-sub-item::before {
+  content: '';
+  position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+  width: 4px; height: 4px; border-radius: 50%;
+  background: rgba(255,255,255,.2); transition: background .15s;
+}
+.sb-sub-item:hover { background: rgba(255,255,255,.05); color: rgba(255,255,255,.8); }
+.sb-sub-item:hover::before { background: #fca5a5; }
+.sb-sub-item.active { color: #fca5a5; }
+.sb-sub-item.active::before { background: var(--sb-primary); }
+
+.sb-divider { height: 1.5px; background: var(--sb-line); margin: 10px 0; }
+
+.sb-footer {
+  padding: 12px 14px;
+  border-top: 1.5px solid var(--sb-line);
+  background: rgba(0,0,0,.2);
+  flex-shrink: 0; position: relative; z-index: 1;
+}
+.sb-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border-radius: 10px;
+  transition: background .15s; cursor: default;
+}
+.sb-user-avatar {
+  width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+  background: var(--sb-primary-lt); border: 1.5px solid var(--sb-primary-brd);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif; font-size: 13px; font-style: italic;
+  color: #fca5a5;
+}
+.sb-user-name { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.8); line-height: 1.2; }
+.sb-user-role { font-size: 10px; font-family: var(--font-mono); color: rgba(255,255,255,.3); margin-top: 1px; }
+
+#sb-overlay {
+  position: fixed; inset: 0; z-index: 39;
+  background: rgba(13,14,20,.6); backdrop-filter: blur(4px);
+  display: none;
+}
+#sb-overlay.open { display: block; }
+
+@media (max-width: 640px) {
+  #admin-sidebar { transform: translateX(-100%); }
+  #admin-sidebar.open { transform: translateX(0); }
+}
+</style>
+
+<% # Compute active states once up front
+   dash_active     = current_page?(admin_dashboard_path)         ? 'active' : ''
+   courses_active  = current_page?(admin_courses_path)           ? 'active' : ''
+   new_course_act  = current_page?(new_admin_course_path)        ? 'active' : ''
+   teachers_active = current_page?(admin_teachers_path)          ? 'active' : ''
+   new_teacher_act = current_page?(new_admin_teacher_path)       ? 'active' : ''
+   students_active = current_page?(admin_students_path)          ? 'active' : ''
+   achiev_active   = current_page?(admin_achievements_path)      ? 'active' : ''
+   orders_active   = current_page?(admin_orders_path)            ? 'active' : ''
+   payments_active = current_page?(admin_payments_path)          ? 'active' : ''
+   attempts_active = current_page?(admin_speaking_attempts_path) ? 'active' : ''
+%>
+
+<aside id="admin-sidebar">
+
+  <!-- Brand -->
+  <div class="sb-brand">
+    <div class="sb-brand-icon">🎓</div>
+    <div>
+      <div class="sb-brand-name">LMS Admin</div>
+      <div class="sb-brand-sub">Control Panel</div>
     </div>
   </div>
+
+  <!-- Nav -->
+  <nav class="sb-scroll">
+
+    <!-- OVERVIEW -->
+    <div class="sb-section-label">Overview</div>
+
+    <a href="<%= admin_dashboard_path %>" class="sb-item <%= dash_active %>">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+        <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+        <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      </svg>
+      <span class="sb-item-label">Dashboard</span>
+    </a>
+
+    <!-- CONTENT -->
+    <div class="sb-section-label">Content</div>
+
+    <!-- Courses dropdown -->
+    <button class="sb-item <%= courses_active.present? || new_course_act.present? ? 'active' : '' %>"
+            onclick="toggleSbDropdown('dd-courses', this)"
+            aria-expanded="false">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 6.25V19.25M12 6.25C10.83 5.48 9.25 5 7.5 5 5.75 5 4.17 5.48 3 6.25V19.25C4.17 18.48 5.75 18 7.5 18c1.75 0 3.33.48 4.5 1.25M12 6.25C13.17 5.48 14.75 5 16.5 5c1.75 0 3.33.48 4.5 1.25V19.25C19.83 18.48 18.25 18 16.5 18c-1.75 0-3.33.48-4.5 1.25"/>
+      </svg>
+      <span class="sb-item-label">Courses</span>
+      <svg class="sb-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="sb-dropdown" id="dd-courses">
+      <a href="<%= admin_courses_path %>"     class="sb-sub-item <%= courses_active %>">All Courses</a>
+      <a href="<%= new_admin_course_path %>"  class="sb-sub-item <%= new_course_act %>">New Course</a>
+    </div>
+
+    <!-- Teachers dropdown -->
+    <button class="sb-item <%= teachers_active.present? || new_teacher_act.present? ? 'active' : '' %>"
+            onclick="toggleSbDropdown('dd-teachers', this)"
+            aria-expanded="false">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+      </svg>
+      <span class="sb-item-label">Teachers</span>
+      <svg class="sb-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="sb-dropdown" id="dd-teachers">
+      <a href="<%= admin_teachers_path %>"     class="sb-sub-item <%= teachers_active %>">All Teachers</a>
+      <a href="<%= new_admin_teacher_path %>"  class="sb-sub-item <%= new_teacher_act %>">New Teacher</a>
+    </div>
+
+    <!-- Students dropdown -->
+    <button class="sb-item <%= students_active.present? ? 'active' : '' %>"
+            onclick="toggleSbDropdown('dd-students', this)"
+            aria-expanded="false">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <span class="sb-item-label">Students</span>
+      <svg class="sb-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="sb-dropdown" id="dd-students">
+      <a href="<%= admin_students_path %>" class="sb-sub-item <%= students_active %>">All Students</a>
+    </div>
+
+    <!-- Achievements -->
+    <a href="<%= admin_achievements_path %>" class="sb-item <%= achiev_active %>">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+      </svg>
+      <span class="sb-item-label">Achievements</span>
+    </a>
+
+    <!-- MANAGEMENT -->
+    <div class="sb-section-label">Management</div>
+
+    <a href="<%= admin_orders_path %>" class="sb-item <%= orders_active %>">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+      </svg>
+      <span class="sb-item-label">Orders</span>
+    </a>
+
+    <a href="<%= admin_payments_path %>" class="sb-item <%= payments_active %>">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+      </svg>
+      <span class="sb-item-label">Payments</span>
+    </a>
+
+    <a href="<%= admin_speaking_attempts_path %>" class="sb-item <%= attempts_active %>">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+        <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+      </svg>
+      <span class="sb-item-label">Speaking Attempts</span>
+    </a>
+
+    <div class="sb-divider"></div>
+
+    <!-- SYSTEM -->
+    <div class="sb-section-label">System</div>
+
+    <button class="sb-item" onclick="toggleSbDropdown('dd-settings', this)" aria-expanded="false">
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+        <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </svg>
+      <span class="sb-item-label">Settings</span>
+      <svg class="sb-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </button>
+    <div class="sb-dropdown" id="dd-settings">
+      <a href="#" class="sb-sub-item">General</a>
+      <a href="#" class="sb-sub-item">Security</a>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <!-- Sign out (button_to sends DELETE properly) -->
+    <%= button_to destroy_user_session_path, method: :delete,
+        form_class: "w-full",
+        class: "sb-item",
+        style: "background:transparent;border:none;width:100%;color:rgba(252,165,165,.65)" do %>
+      <svg class="sb-item-icon" fill="none" viewBox="0 0 24 24" stroke="#fca5a5" stroke-width="1.8">
+        <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+      </svg>
+      <span class="sb-item-label">Sign Out</span>
+    <% end %>
+
+  </nav>
+
+  <!-- User footer -->
+  <div class="sb-footer">
+    <div class="sb-user">
+      <div class="sb-user-avatar">
+        <%= current_user&.full_name&.first&.upcase || 'A' %>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div class="sb-user-name"><%= current_user&.full_name&.truncate(18) || 'Admin' %></div>
+        <div class="sb-user-role">Administrator</div>
+      </div>
+      <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,.2)" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </div>
+  </div>
+
 </aside>
 
-<div class="fixed inset-0 z-10 hidden bg-gray-900/50 dark:bg-gray-900/90" id="sidebarBackdrop"></div>
+<div id="sb-overlay" onclick="closeSidebar()"></div>
 
 <script>
-const sidebar = document.getElementById('sidebar');
-
-if (sidebar) {
-    const toggleSidebarMobile = (sidebar, sidebarBackdrop, toggleSidebarMobileHamburger, toggleSidebarMobileClose) => {
-        sidebar.classList.toggle('hidden');
-        sidebarBackdrop.classList.toggle('hidden');
-        toggleSidebarMobileHamburger.classList.toggle('hidden');
-        toggleSidebarMobileClose.classList.toggle('hidden');
-    }
-    
-    const toggleSidebarMobileEl = document.getElementById('toggleSidebarMobile');
-    const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-    const toggleSidebarMobileHamburger = document.getElementById('toggleSidebarMobileHamburger');
-    const toggleSidebarMobileClose = document.getElementById('toggleSidebarMobileClose');
-    const toggleSidebarMobileSearch = document.getElementById('toggleSidebarMobileSearch');
-    
-    toggleSidebarMobileSearch.addEventListener('click', () => {
-        toggleSidebarMobile(sidebar, sidebarBackdrop, toggleSidebarMobileHamburger, toggleSidebarMobileClose);
-    });
-    
-    toggleSidebarMobileEl.addEventListener('click', () => {
-        toggleSidebarMobile(sidebar, sidebarBackdrop, toggleSidebarMobileHamburger, toggleSidebarMobileClose);
-    });
-    
-    sidebarBackdrop.addEventListener('click', () => {
-        toggleSidebarMobile(sidebar, sidebarBackdrop, toggleSidebarMobileHamburger, toggleSidebarMobileClose);
-    });
+function toggleSbDropdown(id, btn) {
+  var dd   = document.getElementById(id);
+  var open = dd.classList.contains('open');
+  document.querySelectorAll('.sb-dropdown.open').forEach(function(el) {
+    el.classList.remove('open');
+  });
+  document.querySelectorAll('.sb-item[aria-expanded="true"]').forEach(function(el) {
+    el.setAttribute('aria-expanded', 'false');
+  });
+  if (!open) {
+    dd.classList.add('open');
+    btn.setAttribute('aria-expanded', 'true');
+  }
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.sb-dropdown').forEach(function(dd) {
+    if (dd.querySelector('.sb-sub-item.active')) {
+      dd.classList.add('open');
+      var btn = dd.previousElementSibling;
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+function openSidebar() {
+  document.getElementById('admin-sidebar').classList.add('open');
+  document.getElementById('sb-overlay').classList.add('open');
+}
+function closeSidebar() {
+  document.getElementById('admin-sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('open');
+}
+
+var hamburger = document.getElementById('toggleSidebarMobile');
+if (hamburger) hamburger.addEventListener('click', openSidebar);
 </script>
