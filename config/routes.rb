@@ -37,11 +37,13 @@ namespace :students do
   end
 
   # ================== COURSES ==================
-  resources :courses, only: [ :index, :show ] do
+  resources :courses, only: [ :index ] do
     collection do
       get :progress       
     end
     member do
+      get :landing, path: ""          
+      get :show,    path: "learn" 
       get :dashboard
     end
 
