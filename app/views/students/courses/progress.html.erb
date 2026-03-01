@@ -3,7 +3,7 @@
     Route:  GET /students/courses/progress
     Action: Students::CoursesController#progress
     ============================================================ %>
-
+<%= render "students/shared/navbar" %>
 <%# ── Ruby helpers (precomputed in controller) ── %>
 <%#
   @all_attempts      – SpeakingAttempt[]  (all user's attempts, ordered by created_at)
