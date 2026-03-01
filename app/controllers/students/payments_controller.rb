@@ -10,7 +10,7 @@ class Students::PaymentsController < ApplicationController
   require "stripe"
 
   skip_before_action :authenticate_user!,
-  only: [ :vnpay_return, :vnpay_ipn, :momo_notify, :momo_return, :stripe_webhook ],
+  only: [ :vnpay_return, :vnpay_ipn, :momo_notify, :momo_return, :stripe_webhook , :stripe_webhook ],
   if: -> { respond_to?(:authenticate_user!) },
   raise: false
 
@@ -285,4 +285,61 @@ skip_before_action :verify_authenticity_token,
 
     redirect_to session.url, allow_other_host: true
   end
+
+def stripe_webhook
+  payload = request.body.read
+  sig_header = request.env["HTTP_STRIPE_SIGNATURE"]
+  endpoint_secret = ENV["STRIPE_WEBHOOK_SECRET"]
+
+  event = Stripe::Webhook.construct_event(payload, sig_header, endpoint_secret)
+
+  if event["type"] == "checkout.session.completed"
+    session = event["data"]["object"]
+    payment = Payment.find_by(gateway_order_id: session.id)
+    return head :ok unless payment
+    return head :ok if payment.paid_status?
+
+    # Fix: thêm transaction_code từ payment_intent của Stripe
+    payment.update!(
+      status: "paid",
+      paid_at: Time.current,
+      transaction_code: session["payment_intent"]  # ← THÊM DÒNG NÀY
+    )
+
+    CourseAccess.create!(
+      user: payment.order.user,
+      course: payment.order.course,
+      payment: payment,
+      status: :active,
+      start_date: Time.current,
+      end_date: 1.year.from_now
+    )
+
+    payment.order.update!(status: :paid)
+  end
+
+  head :ok
+rescue Stripe::SignatureVerificationError => e
+  head :bad_request
+rescue => e
+  Rails.logger.error "Stripe webhook error: #{e.message}"
+  head :ok  
+end
+  
+def stripe_success
+  session_id = params[:session_id]
+  stripe_session = Stripe::Checkout::Session.retrieve(session_id)
+  payment = Payment.find_by(gateway_order_id: stripe_session.id)
+
+  if payment&.paid_status?
+    redirect_to students_dashboard_path, notice: "Thanh toán Stripe thành công 🎉"
+  else
+    # Webhook chưa kịp xử lý, vẫn redirect thành công
+    redirect_to students_dashboard_path, notice: "Đang xác nhận thanh toán..."
+  end
+end
+
+def stripe_cancel
+  redirect_to students_courses_path, alert: "Bạn đã hủy thanh toán Stripe"
+end
 end

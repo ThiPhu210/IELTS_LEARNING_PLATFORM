@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 12px; overflow: hidden; }
+    .header { background: #6c63ff; padding: 32px; text-align: center; }
+    .header h1 { color: #fff; margin: 0; font-size: 1.5rem; }
+    .body { padding: 32px; }
+    .band { text-align: center; margin-bottom: 24px; }
+    .band-number { font-size: 3rem; font-weight: 800; color: #6c63ff; }
+    .band-label { color: #888; font-size: 0.9rem; }
+    .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .score-item { background: #f8f8ff; border: 1px solid #e0e0ff; border-radius: 8px; padding: 12px; text-align: center; }
+    .score-item .label { font-size: 0.75rem; color: #888; margin-bottom: 4px; }
+    .score-item .value { font-size: 1.3rem; font-weight: 700; color: #6c63ff; }
+    .feedback { background: #f8f8ff; border-left: 4px solid #6c63ff; border-radius: 4px; padding: 16px; margin-bottom: 24px; }
+    .feedback p { margin: 0; color: #444; line-height: 1.6; font-size: 0.9rem; }
+    .footer { text-align: center; padding: 20px; color: #aaa; font-size: 0.8rem; border-top: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎤 Your IELTS Speaking Result</h1>
+    </div>
+
+    <div class="body">
+      <p>Hi <strong><%= @user.email %></strong>,</p>
+      <p>Your speaking attempt for <strong><%= @course.title %></strong> has been evaluated!</p>
+
+      <div class="band">
+        <div class="band-number"><%= @attempt.overall_band %></div>
+        <div class="band-label">Overall Band Score</div>
+      </div>
+
+      <div class="scores">
+        <div class="score-item">
+          <div class="label">🗣 Fluency</div>
+          <div class="value"><%= @attempt.fluency_score %></div>
+        </div>
+        <div class="score-item">
+          <div class="label">📚 Lexical Resource</div>
+          <div class="value"><%= @attempt.lexical_score %></div>
+        </div>
+        <div class="score-item">
+          <div class="label">✏️ Grammar</div>
+          <div class="value"><%= @attempt.grammar_score %></div>
+        </div>
+        <div class="score-item">
+          <div class="label">🎵 Pronunciation</div>
+          <div class="value"><%= @attempt.pronunciation_score %></div>
+        </div>
+      </div>
+
+      <div class="feedback">
+        <p><strong>💬 Feedback:</strong></p>
+        <p><%= @attempt.feedback %></p>
+      </div>
+
+      <p>Keep practicing to improve your band score!</p>
+    </div>
+
+    <div class="footer">
+      <p>IELTS Learning Platform</p>
+    </div>
+  </div>
+</body>
+</html>

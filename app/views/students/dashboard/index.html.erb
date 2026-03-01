@@ -1,496 +1,578 @@
+<%# ============================================================
+    app/views/students/dashboard/index.html.erb
+    Design: Red color scheme - synced with progress.html.erb + dashboard.html.erb
+    ============================================================ %>
 
- <%= render "students/shared/navbar" %>
-<section class="pt-32 pb-24">
-  <div class="max-w-7xl mx-auto px-6
-              grid grid-cols-2 gap-12 items-start">
+<%= render "students/shared/navbar" %>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS - RED COLOR SCHEME
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:         #0d0e14;
+  --ink-2:       #3a3d52;
+  --ink-3:       #7b7f96;
+  --line:        #e8eaf2;
+  --bg:          #f2f4f9;
+  --surface:     #ffffff;
+  --surface-2:   #f7f8fc;
+  --primary:     #dc2626;
+  --primary-lt:  #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
+  --teal:        #0d9488;
+  --teal-lt:     #e6faf8;
+  --amber:       #d97706;
+  --amber-lt:    #fef3e1;
+  --rose:        #e11d48;
+  --rose-lt:     #fce7ef;
+  --emerald:     #059669;
+  --emerald-lt:  #e6f7f1;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+/* ── Shared helpers ── */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+}
+.sec-title {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3vw, 36px); font-weight: 400;
+  letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px;
+}
+.sec-title em { font-style: italic; color: var(--primary); }
+.sec-sub { font-size: 15px; color: var(--ink-3); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; background: var(--primary); color: #fff;
+  font-size: 14px; font-weight: 700; border-radius: var(--r-md);
+  text-decoration: none; transition: all .2s var(--ease);
+  box-shadow: 0 4px 14px var(--primary-glow); border: none; cursor: pointer;
+}
+.btn-primary:hover { background: #b91c1c; transform: translateY(-1px); }
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; background: var(--surface); color: var(--primary);
+  font-size: 14px; font-weight: 700; border-radius: var(--r-md);
+  text-decoration: none; border: 1.5px solid #fca5a5; transition: all .2s var(--ease);
+}
+.btn-outline:hover { background: var(--primary-lt); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--line);
+  padding: 88px 0 80px;
+  overflow: hidden;
+  position: relative;
+}
+.hero::before, .hero::after {
+  content: ''; position: absolute; border-radius: 50%;
+  pointer-events: none; filter: blur(90px); opacity: .3;
+}
+.hero::before { width: 520px; height: 520px; background: var(--primary-lt); top: -140px; left: -100px; }
+.hero::after  { width: 380px; height: 380px; background: var(--teal-lt);   bottom: -100px; right: -60px; }
+
+.hero-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center;
+  position: relative; z-index: 1;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--primary); background: var(--primary-lt);
+  padding: 5px 13px; border-radius: 30px; margin-bottom: 18px;
+  border: 1px solid #fca5a5;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 4vw, 54px); font-weight: 400;
+  line-height: 1.12; letter-spacing: -.03em; color: var(--ink); margin-bottom: 18px;
+}
+.hero-title em { font-style: italic; color: var(--primary); }
+.hero-title strong { font-family: var(--font); font-weight: 800; color: var(--ink); }
+.hero-desc { font-size: 16px; color: var(--ink-3); margin-bottom: 28px; max-width: 480px; line-height: 1.7; }
+
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: var(--ink-2); font-weight: 500; }
+.check-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--emerald-lt); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; color: var(--emerald);
+}
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* Hero right */
+.hero-visual { position: relative; }
+.hero-visual img { width: 100%; border-radius: var(--r-xl); box-shadow: var(--shadow-lg); display: block; }
+.hero-float-card {
+  position: absolute; bottom: -18px; left: -18px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 14px 18px;
+  box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 12px;
+}
+.hero-float-icon {
+  width: 42px; height: 42px; border-radius: var(--r-sm);
+  background: var(--primary-lt); display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.hero-float-card strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.hero-float-card span   { font-size: 12px; color: var(--ink-3); }
+
+/* ═══════════════════════════════════════════
+   WHY SECTION
+═══════════════════════════════════════════ */
+.why-wrap { max-width: 1200px; margin: 0 auto; padding: 72px 32px; }
+.why-grid {
+  display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 40px;
+}
+.why-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 24px 20px; box-shadow: var(--shadow-xs);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  animation: fadeUp .5s var(--ease) both;
+}
+.why-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.why-card:nth-child(1) { animation-delay:.05s; } .why-card:nth-child(2) { animation-delay:.10s; }
+.why-card:nth-child(3) { animation-delay:.15s; } .why-card:nth-child(4) { animation-delay:.20s; }
+.why-icon {
+  width: 44px; height: 44px; border-radius: var(--r-md); font-size: 22px;
+  display: flex; align-items: center; justify-content: center; margin-bottom: 16px;
+}
+.why-card h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.why-card p  { font-size: 13.5px; color: var(--ink-3); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   COURSES SECTION
+═══════════════════════════════════════════ */
+.courses-section {
+  background: var(--surface);
+  border-top: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line);
+  padding: 72px 0;
+}
+.courses-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.section-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 36px; flex-wrap: wrap; gap: 16px;
+}
+
+/* slider */
+.slider-viewport { overflow: hidden; border-radius: var(--r-lg); }
+.slider-track { display: flex; transition: transform .65s var(--ease); will-change: transform; }
+.slide-item { flex-shrink: 0; width: 33.333%; padding: 0 10px; }
+
+/* course card */
+.course-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-xs);
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  display: flex; flex-direction: column;
+}
+.course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.course-thumb { position: relative; height: 190px; overflow: hidden; background: var(--primary-lt); }
+.course-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); display: block; }
+.course-card:hover .course-thumb img { transform: scale(1.04); }
+.course-thumb-ph {
+  width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 56px; font-style: italic; color: #fca5a5;
+}
+.band-chip {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(255,255,255,.92); backdrop-filter: blur(6px);
+  border: 1px solid var(--line); border-radius: 20px;
+  padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--primary);
+}
+.course-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.course-title {
+  font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.4;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.course-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: auto; padding-top: 12px; border-top: 1.5px solid var(--line); gap: 10px;
+}
+.course-price { font-family: var(--font-serif); font-size: 20px; color: var(--ink); letter-spacing: -.02em; }
+.act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: all .2s var(--ease); font-family: var(--font); }
+.act-enter   { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
+.act-enter:hover { background: #b91c1c; }
+.act-pay     { background: var(--emerald-lt); color: var(--emerald); border: 1.5px solid #a7f3d0; }
+.act-pay:hover { background: #d1fae5; }
+.act-pending { background: var(--amber-lt); color: var(--amber); border: 1.5px solid #fcd34d; cursor: default; }
+
+/* slider dots */
+.slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; list-style: none; }
+.slider-dots li button { width: 8px; height: 8px; border-radius: 4px; background: var(--line); border: none; cursor: pointer; padding: 0; transition: all .2s var(--ease); }
+.slider-dots li.active button { background: var(--primary); width: 22px; }
+
+/* ═══════════════════════════════════════════
+   TEACHERS
+═══════════════════════════════════════════ */
+.teachers-wrap { max-width: 1200px; margin: 0 auto; padding: 72px 32px; }
+.teacher-viewport { overflow: hidden; margin-top: 36px; }
+.teacher-track { display: flex; transition: transform .65s var(--ease); will-change: transform; }
+.teacher-slide { flex-shrink: 0; width: 33.333%; padding: 0 14px; }
+.teacher-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); padding: 28px 22px; text-align: center;
+  box-shadow: var(--shadow-xs); transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+}
+.teacher-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.teacher-avatar {
+  width: 88px; height: 88px; border-radius: 50%; object-fit: cover;
+  margin: 0 auto 16px; border: 3px solid var(--primary-lt); display: block;
+}
+.teacher-avatar-ph {
+  width: 88px; height: 88px; border-radius: 50%; background: var(--primary-lt);
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 16px; font-family: var(--font-serif); font-size: 32px; font-style: italic; color: var(--primary);
+}
+.teacher-name { font-size: 15.5px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.teacher-tag {
+  display: inline-block; margin-top: 7px;
+  font-size: 11.5px; font-weight: 700; color: var(--teal);
+  background: var(--teal-lt); padding: 3px 10px; border-radius: 20px;
+}
+.teacher-exp { font-size: 12px; color: var(--ink-3); margin-top: 7px; }
+.teacher-bio {
+  font-size: 13.5px; color: var(--ink-2); line-height: 1.6; margin-top: 12px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════
+   PAYMENT MODAL
+═══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  display: none; align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-bg { position: absolute; inset: 0; background: rgba(13,14,20,.5); backdrop-filter: blur(4px); }
+.modal-box {
+  position: relative; z-index: 1; background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg); max-width: 440px; width: 90%;
+  padding: 36px 32px 32px; animation: fadeUp .25s var(--ease);
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink-3); transition: all .2s var(--ease);
+}
+.modal-close:hover { background: var(--rose-lt); color: var(--rose); border-color: #fecdd3; }
+.modal-heading { font-family: var(--font-serif); font-size: 26px; margin-bottom: 4px; }
+.modal-course  { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
+.modal-price   { font-family: var(--font-serif); font-size: 32px; color: var(--primary); letter-spacing: -.02em; margin-bottom: 22px; }
+.pay-method {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; border: 1.5px solid var(--line);
+  border-radius: var(--r-md); cursor: pointer; margin-bottom: 10px;
+  background: var(--surface-2); transition: all .2s var(--ease);
+}
+.pay-method:has(input:checked) { border-color: var(--primary); background: var(--primary-lt); }
+.pay-method input { accent-color: var(--primary); }
+.pay-method span { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.modal-submit {
+  width: 100%; padding: 14px; background: var(--primary); color: #fff;
+  border: none; border-radius: var(--r-md); font-size: 15px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; margin-top: 18px;
+  transition: all .2s var(--ease); box-shadow: 0 4px 14px var(--primary-glow);
+}
+.modal-submit:hover { background: #b91c1c; transform: translateY(-1px); }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 960px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .hero-visual { display: block !important; }
+  .why-grid { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 640px) {
+  .hero { padding: 52px 0 44px; }
+  .hero-inner, .why-wrap, .courses-inner, .teachers-wrap { padding-left: 20px; padding-right: 20px; }
+  .why-grid { grid-template-columns: 1fr; }
+  .slide-item { width: 88%; }
+  .teacher-slide { width: 90%; }
+}
+</style>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero-inner">
     <!-- LEFT -->
-    <div class = "bg-pink-50 p-8 rounded-xl shadow-lg">
-      <h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
-
-        Learning Speaking with <br> IELTS Expert
-        and AI-Integration
+    <div style="animation: fadeUp .5s var(--ease) both">
+      <div class="hero-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        IELTS Speaking Platform
+      </div>
+      <h1 class="hero-title">
+        Learning Speaking<br>
+        with <em>IELTS Expert</em><br>
+        &amp; <strong>AI-Integration</strong>
       </h1>
+      <p class="hero-desc">
+        Nền tảng luyện nói IELTS kết hợp giáo viên chuyên môn và AI, giúp bạn cải thiện
+        Speaking nhanh hơn, thông minh hơn.
+      </p>
 
-      <ul class="text-red-600 space-y-3 text-lg">
-        <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Easily to improve your Speaking ability</span>
-  </li>
-
-          <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Auto-graded Speaking Test by AI-Integration</span>
-  </li>
-          <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Ensure your IELTS Speaking goal</span>
-  </li>
-            <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Improve your Speaking fluency</span>
-  </li>
-              <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Improve your Speaking </span>
-  </li>
-  </ul>
-  <div class="mt-10 bg-white p-8 rounded-xl shadow-md border border-pink-100">
-
-  <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
-    Why choose our IELTS Learning Platform?
-  </h2>
-
-  <p class="text-gray-600 mb-6 max-w-2xl">
-    Our platform combines experienced IELTS experts with Artificial Intelligence
-    to help you improve Speaking faster, smarter, and more confidently.
-  </p>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Real IELTS Speaking topics updated frequently</span>
-    </div>
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>AI feedback based on IELTS Band Descriptors</span>
-    </div>
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Personalized learning path for each learner</span>
-    </div>
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Track your Speaking progress over time</span>
-    </div>
-
-  </div>
-
-  <!-- CTA -->
-  <div class="flex flex-col sm:flex-row gap-4">
-    <%= link_to "Start Learning Now",
-      students_courses_path(paid:true),
-      class: "inline-flex justify-center items-center
-              px-8 py-3 rounded-lg bg-red-600 text-white
-              font-semibold hover:bg-red-700 transition" %>
-
-    <%= link_to "View All Courses",
-      students_courses_path,
-      class: "inline-flex justify-center items-center
-              px-8 py-3 rounded-lg border border-red-600
-              text-red-600 font-semibold hover:bg-red-50 transition" %>
-  </div>
-
-</div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div class="flex justify-end">
-      <img
-        src="https://img.freepik.com/premium-photo/large-language-model-ai-machine-learning_446633-77708.jpg"
-        class="w-full max-w-xl rounded-xl shadow-lg"
-        alt="AI Learning"
-      >
-    </div>
-
-  </div>
-</section>
-<section class="container mx-auto px-6 py-16 mt-10 mb-10">
-
-  <h1 class="text-3xl font-semibold text-gray-900 mb-6">
-    Popular Courses
-  </h1>
-
-  <% courses = @courses.to_a %>
-  <% per_page = 3 %>
-
-  <% if courses.any? %>
-
-  <!-- ================= SLIDER VIEWPORT ================= -->
-  <div id="slider"
-       class="relative overflow-hidden mx-auto"
-       style="width: 960px"> <!-- 320 * 3 -->
-
-    <!-- ================= TRACK ================= -->
-    <div id="course-track"
-         class="flex transition-transform duration-700 ease-in-out"
-         style="will-change: transform">
-
-      <% slides = courses.last(per_page) + courses + courses.first(per_page) %>
-
-      <% slides.each do |course| %>
-        <div class="flex-shrink-0 px-2" style="width: 320px">
-
-
-        <div class="bg-white border border-gray-200
-        shadow-sm hover:shadow-md
-        transition-all duration-300
-        overflow-hidden">
-
-
-
-            <!-- IMAGE -->
-            <%= link_to students_course_path(course) do %>
-              <% if course.thumbnail.attached? %>
-                <%= image_tag course.thumbnail.variant(resize_to_fill: [320, 180]),
-                  class: "w-full h-[180px] object-cover rounded-none" %>
-              <% else %>
-                <div class="w-full h-[180px] bg-pink-50 flex items-center justify-center">
-                  <span class="text-gray-400 text-sm">No image</span>
-                </div>
-              <% end %>
-            <% end %>
-
-            <!-- CONTENT -->
-            <div class="p-5">
-
-              <% if course.band_min.present? && course.band_max.present? %>
-                <p class="text-xs font-semibold text-blue-600 mb-1">
-                  IELTS <%= course.band_min %> – <%= course.band_max %>
-                </p>
-              <% end %>
-
-              <h3 class="text-base font-semibold text-gray-900 line-clamp-2 mb-3">
-                <%= course.title %>
-              </h3>
-
-              <div class="flex items-center justify-between">
-                <span class="text-lg font-bold text-gray-900">
-                  <%= number_to_currency(course.price, unit: "₫", precision: 0) %>
-                </span>
-
-           <% access = current_user.course_accesses.active_status.find_by(course: course) %>
-<% pending = current_user.orders
-      .pending_status
-      .where("created_at > ?", 1.minutes.ago)
-      .find_by(course: course) %>
-
-
-<% if access %>
-  <%= link_to "Vào học", students_course_path(course), class: "btn btn-primary" %>
-
-<% elsif pending %>
-  <span class="btn btn-warning">⏳ Đang chờ thanh toán</span>
-
-<% else %>
-  <%= button_to "Thanh toán",
-      students_course_orders_path(course),
-      method: :post,
-      class: "btn btn-success" %>
-<% end %>
-              </div>
+      <ul class="feature-list">
+        <% [
+          "Easily improve your Speaking ability",
+          "Auto-graded Speaking Test by AI",
+          "Ensure your IELTS Speaking goal",
+          "Personalized feedback & corrections",
+          "Track your Speaking progress over time"
+        ].each do |f| %>
+          <li>
+            <div class="check-dot">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
-          </div>
-
-        </div>
-      <% end %>
-
-    </div>
-  </div>
-
-  <!-- ================= DOTS ================= -->
-  <ul id="slick-dots"
-      class="slick-dots flex justify-center gap-3 mt-6 list-none">
-    <% (courses.size / per_page.to_f).ceil.times do |i| %>
-      <li class="<%= 'slick-active' if i == 0 %>">
-        <button class="w-3 h-3 rounded-full"></button>
-      </li>
-    <% end %>
-  </ul>
-
-  <% end %>
-</section>
-  <!-- ================= TEACHERS SECTION ================= -->
- <section class="container mx-auto px-6 py-20">
-
-  <div class="mb-10">
-    <h2 class="text-3xl font-semibold text-gray-900">
-      Đội ngũ giáo viên
-    </h2>
-    <p class="text-gray-500 mt-2">
-      Những giảng viên giàu kinh nghiệm, đồng hành cùng bạn
-    </p>
-  </div>
-
-  <% teachers = @teacher_profiles.to_a %>
-  <% if teachers.any? %>
-
-    <div id="teacher-slider"
-         class="relative overflow-hidden mx-auto mt-10 mb-10"
-         style="max-width: 1200px">
-
-      <div id="teacher-track"
-           class="flex transition-transform duration-700 ease-in-out">
-
-        <% slides = teachers.last(3) + teachers + teachers.first(3) %>
-
-        <% slides.each do |teacher| %>
-          <div class="w-1/3 px-4 flex-shrink-0 text-center">
-
-            <% if teacher.avatar.attached? %>
-              <%= image_tag teacher.avatar.variant(resize_to_fill: [120,120]),
-                class: "w-28 h-28 mx-auto rounded-full object-cover mb-4" %>
-            <% else %>
-              <div class="w-28 h-28 mx-auto rounded-full bg-gray-200
-                          flex items-center justify-center mb-4">
-                <span class="text-gray-400 text-xs">No avatar</span>
-              </div>
-            <% end %>
-
-            <h3 class="text-lg font-semibold text-gray-900">
-              <%= teacher.full_name.upcase %>
-            </h3>
-
-            <p class="text-sm text-blue-600 font-medium mt-1">
-              <%= teacher.expertise %>
-            </p>
-
-            <p class="text-sm text-gray-500 mt-1">
-              <%= teacher.experience_years %> năm kinh nghiệm
-            </p>
-
-            <p class="text-sm text-gray-600 mt-4 line-clamp-3">
-              <%= teacher.bio %>
-            </p>
-
-          </div>
+            <%= f %>
+          </li>
         <% end %>
+      </ul>
 
+      <div class="hero-cta">
+        <%= link_to students_courses_path(paid: true), class: "btn-primary" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Learning Now
+        <% end %>
+        <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
       </div>
     </div>
 
-  <% end %>
+    <!-- RIGHT -->
+    <div class="hero-visual" style="animation: fadeUp .5s var(--ease) .1s both">
+      <img src="https://img.freepik.com/premium-photo/large-language-model-ai-machine-learning_446633-77708.jpg" alt="AI Learning">
+      <div class="hero-float-card">
+        <div class="hero-float-icon">🎤</div>
+        <div>
+          <strong>AI Speaking Scorer</strong>
+          <span>IELTS Band 0 – 9.0</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
-<!-- PAYMENT MODAL -->
-<div id="payment-modal"
-     class="fixed inset-0 z-[9999] hidden items-center justify-center">
 
-  <!-- Overlay -->
-  <div class="absolute inset-0 bg-black/50"
-       onclick="closePaymentModal()"></div>
+<!-- ═══════ WHY ═══════ -->
+<section>
+  <div class="why-wrap">
+    <div class="eyebrow" style="color:var(--teal);background:var(--teal-lt);">Why us</div>
+    <h2 class="sec-title">Why choose our <em>IELTS Platform?</em></h2>
+    <p class="sec-sub">Kết hợp giáo viên IELTS giàu kinh nghiệm với công nghệ AI tiên tiến.</p>
+    <div class="why-grid">
+      <% [
+        { icon: "📝", bg: "var(--primary-lt)", title: "Real IELTS Topics",    desc: "Speaking topics cập nhật thường xuyên theo đề thi thực tế." },
+        { icon: "🤖", bg: "var(--teal-lt)",   title: "AI Feedback",          desc: "Chấm điểm tự động theo IELTS Band Descriptors 4 kỹ năng." },
+        { icon: "🎯", bg: "var(--amber-lt)",  title: "Personalized Path",    desc: "Lộ trình học cá nhân hoá theo band mục tiêu của bạn." },
+        { icon: "📊", bg: "var(--rose-lt)",   title: "Progress Tracking",    desc: "Biểu đồ tiến độ, lịch sử bài thi và phân tích kỹ năng." },
+      ].each do |c| %>
+        <div class="why-card">
+          <div class="why-icon" style="background:<%= c[:bg] %>"><%= c[:icon] %></div>
+          <h3><%= c[:title] %></h3>
+          <p><%= c[:desc] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
 
-  <!-- Modal box -->
-  <div class="relative bg-white rounded-3xl shadow-2xl
-              max-w-md min-h-[520px]
-              px-8 pt-10 pb-14 z-10 flex flex-col">
+<!-- ═══════ COURSES ═══════ -->
+<section class="courses-section">
+  <div class="courses-inner">
+    <div class="section-header">
+      <div>
+        <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">Popular Courses</div>
+        <h2 class="sec-title" style="margin-bottom:0">Khóa học <em>nổi bật</em></h2>
+      </div>
+      <%= link_to students_courses_path, class: "btn-outline" do %>
+        Xem tất cả
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <% end %>
+    </div>
 
-    <h2 class="text-2xl font-bold mb-6 mt-6">Thanh toán khóa học</h2>
+    <% courses = @courses.to_a %>
+    <% per_page = 3 %>
 
-    <p id="modal-course-title" class="font-semibold mb-2"></p>
-    <p id="modal-course-price" class="text-2xl text-red-500 mb-6"></p>
+    <% if courses.any? %>
+      <div class="slider-viewport">
+        <div class="slider-track" id="courseTrack">
+          <% (courses.last(per_page) + courses + courses.first(per_page)).each do |course| %>
+            <div class="slide-item">
+              <div class="course-card">
+                <div class="course-thumb">
+                  <% if course.thumbnail.attached? %>
+                    <%= image_tag url_for(course.thumbnail), alt: course.title %>
+                  <% else %>
+                    <div class="course-thumb-ph"><%= course.title[0] %></div>
+                  <% end %>
+                  <% if course.band_min.present? && course.band_max.present? %>
+                    <div class="band-chip">Band <%= course.band_min %> – <%= course.band_max %></div>
+                  <% end %>
+                </div>
+                <div class="course-body">
+                  <div class="course-title"><%= course.title %></div>
+                  <div class="course-footer">
+                    <div class="course-price"><%= number_to_currency(course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
+                    <%
+                      access  = current_user.course_accesses.active_status.find_by(course: course)
+                      pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: course)
+                    %>
+                    <% if access %>
+                      <%= link_to "Vào học", students_course_path(course), class: "act-btn act-enter" %>
+                    <% elsif pending %>
+                      <span class="act-btn act-pending">⏳ Đang chờ</span>
+                    <% else %>
+                      <%= button_to "Đăng ký", students_course_orders_path(course), method: :post, class: "act-btn act-pay" %>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
 
-    <form id="payment-form"
-      method="post">
+      <ul class="slider-dots" id="courseDots">
+        <% (courses.size / per_page.to_f).ceil.times do |i| %>
+          <li class="<%= 'active' if i == 0 %>"><button></button></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</section>
 
-  <!-- CSRF TOKEN -->
-  <input type="hidden"
-         name="authenticity_token"
-         value="<%= form_authenticity_token %>">
+<!-- ═══════ TEACHERS ═══════ -->
+<section>
+  <div class="teachers-wrap">
+    <div class="eyebrow" style="color:var(--teal);background:var(--teal-lt);">Đội ngũ</div>
+    <h2 class="sec-title">Giáo viên <em>chuyên môn</em></h2>
+    <p class="sec-sub">Những giảng viên IELTS giàu kinh nghiệm đồng hành cùng bạn.</p>
 
-  <input type="hidden"
-         name="course_id"
-         id="modal-course-id">
+    <% teachers = @teacher_profiles.to_a %>
+    <% if teachers.any? %>
+      <div class="teacher-viewport">
+        <div class="teacher-track" id="teacherTrack">
+          <% (teachers.last(3) + teachers + teachers.first(3)).each do |t| %>
+            <div class="teacher-slide">
+              <div class="teacher-card">
+                <% if t.avatar.attached? %>
+                  <%= image_tag t.avatar.variant(resize_to_fill: [88,88]), alt: t.full_name, class: "teacher-avatar" %>
+                <% else %>
+                  <div class="teacher-avatar-ph"><%= t.full_name[0] %></div>
+                <% end %>
+                <div class="teacher-name"><%= t.full_name.upcase %></div>
+                <span class="teacher-tag"><%= t.expertise %></span>
+                <div class="teacher-exp"><%= t.experience_years %> năm kinh nghiệm</div>
+                <p class="teacher-bio"><%= t.bio %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
 
-  <!-- PAYMENT METHOD -->
-  <label class="flex gap-3 p-4 border rounded-xl cursor-pointer mb-4">
-    <input type="radio"
-           name="payment_method"
-           value="vnpay"
-           checked>
-    <span>VNPay</span>
-  </label>
-
-  <button type="submit"
-          class="w-full bg-pink-500 text-white py-3 rounded-lg mb-6">
-    Xác nhận thanh toán
-  </button>
-</form>
-
-
-    <!-- Close -->
-    <button onclick="closePaymentModal()"
-      class="absolute top-4 right-4 text-xl">✕</button>
-
+<!-- ═══════ PAYMENT MODAL ═══════ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-bg" onclick="closePaymentModal()"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePaymentModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-heading">Thanh toán</div>
+    <div class="modal-course" id="modalCourseName"></div>
+    <div class="modal-price"  id="modalCoursePrice"></div>
+    <form id="paymentForm" method="post">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <input type="hidden" name="course_id" id="modalCourseId">
+      <label class="pay-method"><input type="radio" name="payment_method" value="vnpay" checked><span>💳 VNPay</span></label>
+      <label class="pay-method"><input type="radio" name="payment_method" value="momo"><span>💜 MoMo</span></label>
+      <button type="submit" class="modal-submit">Xác nhận thanh toán →</button>
+    </form>
   </div>
 </div>
 
-
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const track = document.getElementById("course-track")
-  const dots  = document.querySelectorAll("#slick-dots li")
+/* ── Course Slider ── */
+(function(){
+  const track = document.getElementById('courseTrack');
+  const dots  = document.querySelectorAll('#courseDots li');
+  if (!track) return;
+  const total = <%= courses.size %>, pp = 3;
+  const pages = Math.ceil(total / pp);
+  if (total <= pp) return;
+  let idx = 1, timer;
 
-  const totalCourses = <%= courses.size %>
-  const perPage = 3
-  const slideWidth = 320
-  const stepWidth = slideWidth * perPage
-  const totalPages = Math.ceil(totalCourses / perPage)
-
-  if (!track || totalCourses <= perPage) return
-
-  let index = 1
-  let interval = null
-  const duration = 4000
-
-  track.style.transform = `translateX(-${stepWidth}px)`
-
-  function updateDots(page) {
-    dots.forEach(d => d.classList.remove("slick-active"))
-    dots[page].classList.add("slick-active")
+  function move(i, anim=true) {
+    track.style.transition = anim ? 'transform .65s cubic-bezier(.4,0,.2,1)' : 'none';
+    track.style.transform  = `translateX(-${i * 100 / pp}%)`;
   }
-
-  function moveTo(i, animate = true) {
-    track.style.transition = animate ? "transform 0.7s ease-in-out" : "none"
-    track.style.transform = `translateX(-${i * stepWidth}px)`
+  function dot(p) { dots.forEach(d=>d.classList.remove('active')); if(dots[p]) dots[p].classList.add('active'); }
+  function next() {
+    idx++;
+    move(idx);
+    if (idx === pages+1) setTimeout(()=>{ idx=1; move(idx,false); }, 680);
+    dot((idx-1)%pages);
   }
+  move(idx, false);
+  timer = setInterval(next, 4000);
+  dots.forEach((d,i) => d.addEventListener('click', ()=>{ clearInterval(timer); idx=i+1; move(idx); dot(i); timer=setInterval(next,4000); }));
+  track.addEventListener('mouseenter', ()=>clearInterval(timer));
+  track.addEventListener('mouseleave', ()=>{ timer=setInterval(next,4000); });
+})();
 
-  function start() {
-    interval = setInterval(() => {
-      index++
-      moveTo(index)
+/* ── Teacher Slider ── */
+(function(){
+  const track = document.getElementById('teacherTrack');
+  if (!track) return;
+  const count = <%= teachers.size rescue 0 %>;
+  if (count <= 3) return;
+  let idx=3, timer;
+  function move(i,anim=true){ track.style.transition=anim?'transform .65s cubic-bezier(.4,0,.2,1)':'none'; track.style.transform=`translateX(-${(i*100)/3}%)`; }
+  function next(){ idx++; move(idx); if(idx===count+3) setTimeout(()=>{ idx=3; move(idx,false); },680); }
+  move(idx,false);
+  timer = setInterval(next, 4500);
+  track.addEventListener('mouseenter',()=>clearInterval(timer));
+  track.addEventListener('mouseleave',()=>{ timer=setInterval(next,4500); });
+})();
 
-      if (index === totalPages + 1) {
-        setTimeout(() => {
-          index = 1
-          moveTo(index, false)
-        }, 700)
-      }
-
-      updateDots((index - 1) % totalPages)
-    }, duration)
-  }
-
-  function stop() {
-    clearInterval(interval)
-    interval = null
-  }
-
-  dots.forEach((dot, i) => {
-    dot.addEventListener("click", () => {
-      stop()
-      index = i + 1
-      moveTo(index)
-      updateDots(i)
-      start()
-    })
-  })
-
-  track.addEventListener("mouseenter", stop)
-  track.addEventListener("mouseleave", start)
-
-  start()
-})
-</script>
-
-<!-- ================= STYLE ================= -->
-<style>
-.slick-dots li button {
-  background: #d1d5db;
+/* ── Modal ── */
+function openPaymentModal(courseId, title, price, actionUrl) {
+  document.getElementById('modalCourseName').textContent = title;
+  document.getElementById('modalCoursePrice').textContent = price;
+  document.getElementById('modalCourseId').value = courseId;
+  document.getElementById('paymentForm').action = actionUrl;
+  document.getElementById('paymentModal').classList.add('open');
 }
-.slick-dots li.slick-active button {
-  background: #2563eb;
-}
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const track = document.getElementById("teacher-track")
-  if (!track) return
-
-  const slideCount = <%= teachers.size %>
-  if (slideCount <= 3) return
-
-  let index = 3
-  let interval = null
-  const duration = 4500
-
-  function moveTo(i, animate = true) {
-    track.style.transition = animate ? "transform 0.7s ease-in-out" : "none"
-    track.style.transform = `translateX(-${(i * 100) / 3}%)`
-  }
-
-  function start() {
-    interval = setInterval(() => {
-      index++
-      moveTo(index)
-
-      if (index === slideCount + 3) {
-        setTimeout(() => {
-          index = 3
-          moveTo(index, false)
-        }, 700)
-      }
-    }, duration)
-  }
-
-  function stop() {
-    clearInterval(interval)
-    interval = null
-  }
-
-  moveTo(index, false)
-  start()
-
-  track.addEventListener("mouseenter", stop)
-  track.addEventListener("mouseleave", start)
-})
-</script>
-
-<style>
-  .slick-dots li button {
-    background: #d1d5db;
-  }
-  .slick-dots li.slick-active button {
-    background: #2563eb;
-  }
-  #teacher-track {
-  will-change: transform;
-}
-
-</style>
-
-<script>
-function openPaymentModal(courseId, title, price) {
-  console.log("OPEN MODAL", courseId)
-
-  document.getElementById("modal-course-title").innerText = title
-  document.getElementById("modal-course-price").innerText = price
-  document.getElementById("modal-course-id").value = courseId
-
-  const form = document.getElementById("payment-form")
-  form.action = `/students/payments?order_id=${orderId}`
-
-
-  const modal = document.getElementById("payment-modal")
-  modal.classList.remove("hidden")
-  modal.classList.add("flex")
-}
-
 function closePaymentModal() {
-  const modal = document.getElementById("payment-modal")
-  modal.classList.add("hidden")
-  modal.classList.remove("flex")
+  document.getElementById('paymentModal').classList.remove('open');
 }
-</script>
-
-<script>
-  document.querySelectorAll(".pay-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const courseId = btn.dataset.courseId
-      document.getElementById("selected-course-id").value = courseId
-
-      const form = document.getElementById("payment-form")
-      form.action = `/students/payments?order_id=${orderId}`
-
-    })
-  })
 </script>

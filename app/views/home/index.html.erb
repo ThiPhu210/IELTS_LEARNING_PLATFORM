@@ -1,1630 +1,873 @@
 <% cache ["navbar", current_user&.role] do %>
   <%= render "home/shared/navbar" %>
 <% end %>
-<section class="pt-32 pb-24">
-  <div class="max-w-7xl mx-auto px-6
-              grid grid-cols-2 gap-12 items-start">
 
-    <!-- LEFT -->
-    <div class = "bg-pink-50 p-8 rounded-xl shadow-lg">
-      <h1 class="text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight mb-6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 
-        Learning Speaking with <br> IELTS Expert
-        and AI-Integration
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-glow: rgba(220,38,38,.18);
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --rose:         #e11d48;
+  --rose-lt:      #fce7ef;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --font: 'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+@keyframes float  { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+
+/* ── Shared helpers ── */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px; margin-bottom: 14px;
+}
+.sec-title {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3vw, 38px); font-weight: 400;
+  letter-spacing: -.02em; color: var(--ink); margin-bottom: 8px;
+}
+.sec-title em { font-style: italic; color: var(--primary); }
+.sec-sub { font-size: 15px; color: var(--ink-3); }
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; background: var(--primary); color: #fff;
+  font-size: 14px; font-weight: 700; border-radius: var(--r-md);
+  text-decoration: none; transition: all .2s var(--ease);
+  box-shadow: 0 4px 14px var(--primary-glow); border: none; cursor: pointer; font-family: var(--font);
+}
+.btn-primary:hover { background: #b91c1c; transform: translateY(-1px); }
+.btn-outline {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 26px; background: var(--surface); color: var(--primary);
+  font-size: 14px; font-weight: 700; border-radius: var(--r-md);
+  text-decoration: none; border: 1.5px solid #fca5a5; transition: all .2s var(--ease);
+}
+.btn-outline:hover { background: var(--primary-lt); }
+
+/* ═══════════════════════════════════════════
+   HERO
+═══════════════════════════════════════════ */
+.hero {
+  background: var(--surface);
+  border-bottom: 1.5px solid var(--line);
+  padding: 88px 0 80px;
+  overflow: hidden; position: relative;
+}
+.hero::before, .hero::after {
+  content: ''; position: absolute; border-radius: 50%;
+  pointer-events: none; filter: blur(90px); opacity: .3;
+}
+.hero::before { width: 520px; height: 520px; background: var(--primary-lt); top: -140px; left: -100px; }
+.hero::after  { width: 380px; height: 380px; background: var(--teal-lt);   bottom: -100px; right: -60px; }
+
+.hero-inner {
+  max-width: 1200px; margin: 0 auto; padding: 0 32px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: center;
+  position: relative; z-index: 1;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--primary); background: var(--primary-lt);
+  padding: 5px 13px; border-radius: 30px; margin-bottom: 18px;
+  border: 1px solid #fca5a5;
+}
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(32px, 4vw, 54px); font-weight: 400;
+  line-height: 1.12; letter-spacing: -.03em; color: var(--ink); margin-bottom: 18px;
+}
+.hero-title em { font-style: italic; color: var(--primary); }
+.hero-title strong { font-family: var(--font); font-weight: 800; color: var(--ink); }
+.hero-desc { font-size: 16px; color: var(--ink-3); margin-bottom: 28px; max-width: 480px; line-height: 1.7; }
+
+.feature-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.feature-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 14.5px; color: var(--ink-2); font-weight: 500; }
+.check-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--emerald-lt); display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; color: var(--emerald);
+}
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.hero-visual { position: relative; animation: fadeUp .5s var(--ease) .1s both; }
+.hero-visual img { width: 100%; border-radius: var(--r-xl); box-shadow: var(--shadow-lg); display: block; }
+.hero-float-card {
+  position: absolute; bottom: -18px; left: -18px;
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 14px 18px;
+  box-shadow: var(--shadow-md); display: flex; align-items: center; gap: 12px;
+  animation: float 4s ease-in-out infinite;
+}
+.hero-float-icon {
+  width: 42px; height: 42px; border-radius: var(--r-sm);
+  background: var(--primary-lt); display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.hero-float-card strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.hero-float-card span   { font-size: 12px; color: var(--ink-3); }
+
+/* ═══════════════════════════════════════════
+   WHY
+═══════════════════════════════════════════ */
+.why-wrap { max-width: 1200px; margin: 0 auto; padding: 72px 32px; }
+.why-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 40px; }
+.why-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 24px 20px; box-shadow: var(--shadow-xs);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  animation: fadeUp .5s var(--ease) both;
+}
+.why-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.why-card:nth-child(1){animation-delay:.05s} .why-card:nth-child(2){animation-delay:.10s}
+.why-card:nth-child(3){animation-delay:.15s} .why-card:nth-child(4){animation-delay:.20s}
+.why-icon { width: 44px; height: 44px; border-radius: var(--r-md); font-size: 22px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.why-card h3 { font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.why-card p  { font-size: 13.5px; color: var(--ink-3); line-height: 1.6; }
+
+/* ═══════════════════════════════════════════
+   COURSES SLIDER
+═══════════════════════════════════════════ */
+.courses-section {
+  background: var(--surface);
+  border-top: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line);
+  padding: 72px 0;
+}
+.courses-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.section-header {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  margin-bottom: 36px; flex-wrap: wrap; gap: 16px;
+}
+.slider-viewport { overflow: hidden; border-radius: var(--r-lg); }
+.slider-track { display: flex; transition: transform .65s var(--ease); will-change: transform; }
+.slide-item { flex-shrink: 0; width: 33.333%; padding: 0 10px; }
+
+.course-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-xs);
+  transition: transform .22s var(--ease), box-shadow .22s var(--ease), border-color .22s var(--ease);
+  display: flex; flex-direction: column;
+}
+.course-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.course-thumb { position: relative; height: 190px; overflow: hidden; background: var(--primary-lt); display: block; }
+.course-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s var(--ease); display: block; }
+.course-card:hover .course-thumb img { transform: scale(1.04); }
+.course-thumb-ph { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-family: var(--font-serif); font-size: 56px; font-style: italic; color: #fca5a5; }
+.band-chip { position: absolute; top: 12px; left: 12px; background: rgba(255,255,255,.92); backdrop-filter: blur(6px); border: 1px solid var(--line); border-radius: 20px; padding: 3px 10px; font-size: 11px; font-weight: 700; color: var(--primary); }
+.course-body { padding: 18px; flex: 1; display: flex; flex-direction: column; gap: 10px; }
+.course-title { font-size: 15px; font-weight: 700; color: var(--ink); line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.course-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 12px; border-top: 1.5px solid var(--line); gap: 10px; }
+.course-price { font-family: var(--font-serif); font-size: 20px; color: var(--ink); letter-spacing: -.02em; }
+.act-btn { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; transition: all .2s var(--ease); font-family: var(--font); }
+.act-enter   { background: var(--primary); color: #fff; box-shadow: 0 2px 8px var(--primary-glow); }
+.act-enter:hover { background: #b91c1c; }
+.act-pay     { background: var(--emerald-lt); color: var(--emerald); border: 1.5px solid #a7f3d0; }
+.act-pay:hover { background: #d1fae5; }
+.act-pending { background: var(--amber-lt); color: var(--amber); border: 1.5px solid #fcd34d; cursor: default; }
+
+.slider-dots { display: flex; justify-content: center; gap: 8px; margin-top: 28px; list-style: none; }
+.slider-dots li button { width: 8px; height: 8px; border-radius: 4px; background: var(--line); border: none; cursor: pointer; padding: 0; transition: all .2s var(--ease); }
+.slider-dots li.active button { background: var(--primary); width: 22px; }
+
+/* ═══════════════════════════════════════════
+   FEATURE / AI PLATFORM
+═══════════════════════════════════════════ */
+.features-section { background: var(--bg); padding: 72px 0; }
+.features-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.feature-flip-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); padding: 40px;
+  display: flex; align-items: center; gap: 48px;
+  box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+  transition: box-shadow .3s var(--ease), transform .3s var(--ease);
+}
+.feature-flip-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+.feature-flip-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(circle at right, rgba(220,38,38,.06), transparent 60%);
+  opacity: 0; transition: opacity .4s var(--ease);
+}
+.feature-flip-card:hover::before { opacity: 1; }
+.feature-text { flex: 1; }
+.feature-text h3 { font-family: var(--font-serif); font-size: clamp(22px,2.5vw,30px); margin-bottom: 10px; }
+.feature-text h3 em { font-style: italic; color: var(--primary); }
+.feature-text p { font-size: 14.5px; color: var(--ink-3); margin-bottom: 24px; line-height: 1.7; }
+.feat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.feat-item { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.feat-icon { width: 20px; height: 20px; border-radius: 50%; background: var(--primary-lt); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: var(--primary); }
+.feature-media { width: 320px; flex-shrink: 0; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-md); position: relative; height: 240px; }
+.feature-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity .55s ease, transform .55s ease; }
+.feature-media .img-after { opacity: 0; transform: scale(1.04); }
+.feature-flip-card:hover .img-before { opacity: 0; transform: scale(1.04); }
+.feature-flip-card:hover .img-after  { opacity: 1; transform: scale(1); }
+
+/* ═══════════════════════════════════════════
+   TEACHERS
+═══════════════════════════════════════════ */
+.teachers-wrap { max-width: 1200px; margin: 0 auto; padding: 72px 32px; }
+.teacher-viewport { overflow: hidden; margin-top: 36px; }
+.teacher-track { display: flex; transition: transform .65s var(--ease); will-change: transform; }
+.teacher-slide { flex-shrink: 0; width: 33.333%; padding: 0 14px; }
+.teacher-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); padding: 28px 22px; text-align: center;
+  box-shadow: var(--shadow-xs); transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+}
+.teacher-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.teacher-avatar { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; margin: 0 auto 16px; border: 3px solid var(--primary-lt); display: block; }
+.teacher-avatar-ph { width: 88px; height: 88px; border-radius: 50%; background: var(--primary-lt); display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-family: var(--font-serif); font-size: 32px; font-style: italic; color: var(--primary); }
+.teacher-name { font-size: 15.5px; font-weight: 800; color: var(--ink); letter-spacing: -.01em; }
+.teacher-tag { display: inline-block; margin-top: 7px; font-size: 11.5px; font-weight: 700; color: var(--teal); background: var(--teal-lt); padding: 3px 10px; border-radius: 20px; }
+.teacher-exp { font-size: 12px; color: var(--ink-3); margin-top: 7px; }
+.teacher-bio { font-size: 13.5px; color: var(--ink-2); line-height: 1.6; margin-top: 12px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ═══════════════════════════════════════════
+   ACHIEVEMENTS
+═══════════════════════════════════════════ */
+.achievements-section {
+  background: var(--surface);
+  border-top: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line);
+  padding: 72px 0;
+}
+.achievements-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.achieve-viewport { overflow: hidden; margin-top: 36px; }
+.achieve-track { display: flex; transition: transform .65s var(--ease); will-change: transform; }
+.achieve-slide { flex-shrink: 0; width: 33.333%; padding: 0 14px; }
+.achieve-card {
+  background: var(--bg); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); padding: 28px 22px; text-align: center;
+  box-shadow: var(--shadow-xs); transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  cursor: pointer;
+}
+.achieve-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.achieve-avatar { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 14px; border: 3px solid var(--primary-lt); display: block; }
+.achieve-avatar-ph { width: 80px; height: 80px; border-radius: 50%; background: var(--amber-lt); display: flex; align-items: center; justify-content: center; margin: 0 auto 14px; font-family: var(--font-serif); font-size: 28px; font-style: italic; color: var(--amber); }
+.achieve-name { font-size: 15px; font-weight: 800; color: var(--ink); }
+.achieve-title-tag { display: inline-block; margin-top: 6px; font-size: 11.5px; font-weight: 700; color: var(--primary); background: var(--primary-lt); padding: 3px 10px; border-radius: 20px; }
+.achieve-year { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+.achieve-desc { font-size: 13.5px; color: var(--ink-2); line-height: 1.6; margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.band-badge { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; padding: 4px 12px; border-radius: 20px; background: var(--emerald-lt); color: var(--emerald); font-size: 12px; font-weight: 700; border: 1px solid #a7f3d0; }
+
+/* ═══════════════════════════════════════════
+   TESTIMONIALS
+═══════════════════════════════════════════ */
+.testimonials-section { background: var(--bg); padding: 72px 0; }
+.testimonials-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.testi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 40px; }
+.testi-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); padding: 22px 18px; box-shadow: var(--shadow-xs);
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  animation: fadeUp .5s var(--ease) both;
+}
+.testi-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.testi-card:nth-child(1){animation-delay:.05s} .testi-card:nth-child(2){animation-delay:.10s}
+.testi-card:nth-child(3){animation-delay:.15s} .testi-card:nth-child(4){animation-delay:.20s}
+.testi-user { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.testi-user img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-lt); flex-shrink: 0; }
+.testi-user-name { font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.testi-stars { font-size: 11px; color: var(--amber); letter-spacing: 1px; }
+.testi-quote { font-size: 13.5px; color: var(--ink-2); line-height: 1.65; font-style: italic; }
+.testi-quote::before { content: '\201C'; font-family: var(--font-serif); font-size: 24px; color: var(--primary); line-height: 0; vertical-align: -8px; margin-right: 2px; }
+
+/* ═══════════════════════════════════════════
+   PRESS LOGOS
+═══════════════════════════════════════════ */
+.press-section {
+  background: var(--surface);
+  border-top: 1.5px solid var(--line); border-bottom: 1.5px solid var(--line);
+  padding: 56px 0;
+}
+.press-inner { max-width: 1200px; margin: 0 auto; padding: 0 32px; }
+.press-header { text-align: center; margin-bottom: 36px; }
+.press-header .press-sub { font-size: 13px; font-weight: 600; color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
+.press-header .press-heading { font-family: var(--font-serif); font-size: 28px; color: var(--ink); }
+.press-heading em { font-style: italic; color: var(--primary); }
+.press-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+.press-item {
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); height: 80px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-xs); transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+  text-decoration: none;
+}
+.press-item:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #fca5a5; }
+.press-item img { max-height: 36px; max-width: 70%; object-fit: contain; filter: grayscale(100%); opacity: .7; transition: filter .2s, opacity .2s; }
+.press-item:hover img { filter: grayscale(0%); opacity: 1; }
+
+/* ═══════════════════════════════════════════
+   BANNER CTA
+═══════════════════════════════════════════ */
+.banner-cta { position: relative; overflow: hidden; height: 220px; background: var(--ink); }
+.banner-cta-bg { position: absolute; inset: 0; }
+.banner-cta-bg img { width: 100%; height: 100%; object-fit: cover; }
+.banner-cta-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(13,14,20,.85) 50%, rgba(220,38,38,.4));
+  z-index: 1;
+}
+.banner-cta-content {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 20px; text-align: center; padding: 0 24px;
+}
+.banner-cta-content h2 { font-family: var(--font-serif); font-size: clamp(24px,3vw,40px); font-weight: 400; color: #fff; letter-spacing: -.02em; }
+.banner-cta-content h2 em { font-style: italic; color: #fca5a5; }
+.banner-cta-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ═══════════════════════════════════════════
+   PAYMENT MODAL
+═══════════════════════════════════════════ */
+.modal-overlay { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal-bg { position: absolute; inset: 0; background: rgba(13,14,20,.5); backdrop-filter: blur(4px); }
+.modal-box {
+  position: relative; z-index: 1; background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: var(--r-xl);
+  box-shadow: var(--shadow-lg); max-width: 440px; width: 90%;
+  padding: 36px 32px 32px; animation: fadeUp .25s var(--ease);
+}
+.modal-close {
+  position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%;
+  background: var(--surface-2); border: 1.5px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--ink-3); transition: all .2s var(--ease);
+}
+.modal-close:hover { background: var(--rose-lt); color: var(--rose); }
+.modal-heading { font-family: var(--font-serif); font-size: 26px; margin-bottom: 4px; }
+.modal-course  { font-size: 13.5px; font-weight: 600; color: var(--ink-2); margin-bottom: 4px; }
+.modal-price   { font-family: var(--font-serif); font-size: 32px; color: var(--primary); letter-spacing: -.02em; margin-bottom: 22px; }
+.pay-method { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border: 1.5px solid var(--line); border-radius: var(--r-md); cursor: pointer; margin-bottom: 10px; background: var(--surface-2); transition: all .2s var(--ease); }
+.pay-method:has(input:checked) { border-color: var(--primary); background: var(--primary-lt); }
+.pay-method input { accent-color: var(--primary); }
+.pay-method span { font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.modal-submit { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: var(--r-md); font-size: 15px; font-weight: 700; font-family: var(--font); cursor: pointer; margin-top: 18px; transition: all .2s var(--ease); box-shadow: 0 4px 14px var(--primary-glow); }
+.modal-submit:hover { background: #b91c1c; transform: translateY(-1px); }
+
+/* Certificate Modal */
+.cert-modal-overlay { position: fixed; inset: 0; z-index: 9999; display: none; align-items: center; justify-content: center; }
+.cert-modal-overlay.open { display: flex; }
+.cert-modal-bg { position: absolute; inset: 0; background: rgba(13,14,20,.6); backdrop-filter: blur(4px); }
+.cert-modal-box { position: relative; z-index: 1; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-xl); box-shadow: var(--shadow-lg); max-width: 560px; width: 90%; overflow: hidden; animation: fadeUp .25s var(--ease); }
+.cert-modal-header { padding: 20px 24px 16px; border-bottom: 1.5px solid var(--line); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.cert-modal-header img { height: 36px; object-fit: contain; }
+.cert-modal-header h3 { font-size: 14px; font-weight: 700; color: var(--ink-2); }
+.cert-modal-body { padding: 20px; display: flex; justify-content: center; }
+.cert-modal-body img { max-height: 70vh; border-radius: var(--r-md); box-shadow: var(--shadow-md); }
+.cert-modal-close { position: absolute; top: 14px; right: 14px; width: 30px; height: 30px; border-radius: 50%; background: var(--surface-2); border: 1.5px solid var(--line); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--ink-3); transition: all .2s var(--ease); }
+.cert-modal-close:hover { background: var(--rose-lt); color: var(--rose); }
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .testi-grid { grid-template-columns: repeat(2,1fr); }
+  .why-grid   { grid-template-columns: repeat(2,1fr); }
+  .press-grid { grid-template-columns: repeat(4,1fr); }
+}
+@media (max-width: 960px) {
+  .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+  .feature-flip-card { flex-direction: column; }
+  .feature-media { width: 100%; }
+}
+@media (max-width: 640px) {
+  .hero { padding: 52px 0 44px; }
+  .hero-inner, .why-wrap, .courses-inner, .features-inner,
+  .teachers-wrap, .achievements-inner, .testimonials-inner,
+  .press-inner { padding-left: 20px; padding-right: 20px; }
+  .why-grid { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .press-grid { grid-template-columns: repeat(2,1fr); }
+  .slide-item { width: 88%; }
+  .teacher-slide, .achieve-slide { width: 90%; }
+  .feat-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- ═══════ HERO ═══════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div style="animation: fadeUp .5s var(--ease) both">
+      <div class="hero-eyebrow">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        IELTS Speaking Platform
+      </div>
+      <h1 class="hero-title">
+        Learning Speaking<br>
+        with <em>IELTS Expert</em><br>
+        &amp; <strong>AI-Integration</strong>
       </h1>
-
-      <ul class="text-red-600 space-y-3 text-lg">
-        <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Easily to improve your Speaking ability</span>
-  </li>
-
-          <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Auto-graded Speaking Test by AI-Integration</span>
-  </li>
-          <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Ensure your IELTS Speaking goal</span>
-  </li>
-            <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Improve your Speaking fluency</span>
-  </li>
-              <li class="flex items-start gap-3">
-    <%= image_tag "check-circle-svgrepo-com.svg",
-      class: "w-5 h-5 mt-1" %>
-    <span>Improve your Speaking </span>
-  </li>
-  </ul>
-  <div class="mt-10 bg-white p-8 rounded-xl shadow-md border border-pink-100">
-
-  <h2 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
-    Why choose our IELTS Learning Platform?
-  </h2>
-
-  <p class="text-gray-600 mb-6 max-w-2xl">
-    Our platform combines experienced IELTS experts with Artificial Intelligence
-    to help you improve Speaking faster, smarter, and more confidently.
-  </p>
-
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Real IELTS Speaking topics updated frequently</span>
+      <p class="hero-desc">
+        Nền tảng luyện nói IELTS kết hợp giáo viên chuyên môn và AI, giúp bạn cải thiện Speaking nhanh hơn, thông minh hơn.
+      </p>
+      <ul class="feature-list">
+        <% [
+          "Easily improve your Speaking ability",
+          "Auto-graded Speaking Test by AI",
+          "Ensure your IELTS Speaking goal",
+          "Personalized feedback & corrections",
+          "Track your Speaking progress over time"
+        ].each do |f| %>
+          <li>
+            <div class="check-dot">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <%= f %>
+          </li>
+        <% end %>
+      </ul>
+      <div class="hero-cta">
+        <%= link_to students_courses_path(paid: true), class: "btn-primary" do %>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Learning Now
+        <% end %>
+        <%= link_to "View All Courses", students_courses_path, class: "btn-outline" %>
+      </div>
     </div>
 
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>AI feedback based on IELTS Band Descriptors</span>
+    <div class="hero-visual">
+      <img src="https://img.freepik.com/premium-photo/large-language-model-ai-machine-learning_446633-77708.jpg" alt="AI Learning">
+      <div class="hero-float-card">
+        <div class="hero-float-icon">🎤</div>
+        <div>
+          <strong>AI Speaking Scorer</strong>
+          <span>IELTS Band 0 – 9.0</span>
+        </div>
+      </div>
     </div>
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Personalized learning path for each learner</span>
-    </div>
-
-    <div class="flex gap-3">
-      <%= image_tag "check-circle-svgrepo-com.svg", class: "w-5 h-5 mt-1" %>
-      <span>Track your Speaking progress over time</span>
-    </div>
-
-  </div>
-
-  <!-- CTA -->
-  <div class="flex flex-col sm:flex-row gap-4">
-    <%= link_to "Start Learning Now",
-      students_courses_path(paid:true),
-      class: "inline-flex justify-center items-center
-              px-8 py-3 rounded-lg bg-red-600 text-white
-              font-semibold hover:bg-red-700 transition" %>
-
-    <%= link_to "View All Courses",
-      students_courses_path,
-      class: "inline-flex justify-center items-center
-              px-8 py-3 rounded-lg border border-red-600
-              text-red-600 font-semibold hover:bg-red-50 transition" %>
-  </div>
-
-</div>
-
-    </div>
-
-    <!-- RIGHT -->
-    <div class="flex justify-end">
-      <img
-        src="https://img.freepik.com/premium-photo/large-language-model-ai-machine-learning_446633-77708.jpg"
-        class="w-full max-w-xl rounded-xl shadow-lg"
-        alt="AI Learning"
-      >
-    </div>
-
   </div>
 </section>
-<section class="container mx-auto mt-[50px] mb-10">
 
-  <h1 class="text-3xl font-semibold text-gray-900 mt-12 mb-6">
-    Popular Courses
-  </h1>
-
-  <% courses = @courses.to_a %>
-  <% per_page = 3 %>
-
-  <% if courses.any? %>
-
-  <!-- ================= SLIDER VIEWPORT ================= -->
-  <div id="slider"
-       class="relative overflow-hidden mx-auto"
-       style="width: 960px"> <!-- 320 * 3 -->
-
-    <!-- ================= TRACK ================= -->
-    <div id="course-track"
-         class="flex transition-transform duration-700 ease-in-out"
-         style="will-change: transform">
-
-      <% slides = courses.last(per_page) + courses + courses.first(per_page) %>
-
-      <% slides.each do |course| %>
-        <div class="flex-shrink-0 px-2" style="width: 320px">
-
-
-        <div class="bg-white border border-gray-200
-        shadow-sm hover:shadow-md
-        transition-all duration-300
-        overflow-hidden">
-
-
-
-            <!-- IMAGE -->
-            <%= link_to students_course_path(course) do %>
-              <% if course.thumbnail.attached? %>
-                <%= image_tag course.thumbnail.variant(resize_to_fill: [320, 180]),
-                  class: "w-full h-[180px] object-cover rounded-none" %>
-              <% else %>
-                <div class="w-full h-[180px] bg-pink-50 flex items-center justify-center">
-                  <span class="text-gray-400 text-sm">No image</span>
-                </div>
-              <% end %>
-            <% end %>
-
-            <!-- CONTENT -->
-            <div class="p-5">
-
-              <% if course.band_min.present? && course.band_max.present? %>
-                <p class="text-xs font-semibold text-blue-600 mb-1">
-                  IELTS <%= course.band_min %> – <%= course.band_max %>
-                </p>
-              <% end %>
-
-              <h3 class="text-base font-semibold text-gray-900 line-clamp-2 mb-3">
-                <%= course.title %>
-              </h3>
-
-              <div class="flex items-center justify-between">
-                <span class="text-lg font-bold text-gray-900">
-                  <%= number_to_currency(course.price, unit: "₫", precision: 0) %>
-                </span>
-
-           
-              </div>
-            </div>
-          </div>
-
+<!-- ═══════ WHY ═══════ -->
+<section>
+  <div class="why-wrap">
+    <div class="eyebrow" style="color:var(--teal);background:var(--teal-lt);">Why us</div>
+    <h2 class="sec-title">Why choose our <em>IELTS Platform?</em></h2>
+    <p class="sec-sub">Kết hợp giáo viên IELTS giàu kinh nghiệm với công nghệ AI tiên tiến.</p>
+    <div class="why-grid">
+      <% [
+        { icon: "📝", bg: "var(--primary-lt)", title: "Real IELTS Topics",    desc: "Speaking topics cập nhật thường xuyên theo đề thi thực tế." },
+        { icon: "🤖", bg: "var(--teal-lt)",   title: "AI Feedback",          desc: "Chấm điểm tự động theo IELTS Band Descriptors 4 kỹ năng." },
+        { icon: "🎯", bg: "var(--amber-lt)",  title: "Personalized Path",    desc: "Lộ trình học cá nhân hoá theo band mục tiêu của bạn." },
+        { icon: "📊", bg: "var(--rose-lt)",   title: "Progress Tracking",    desc: "Biểu đồ tiến độ, lịch sử bài thi và phân tích kỹ năng." },
+      ].each do |c| %>
+        <div class="why-card">
+          <div class="why-icon" style="background:<%= c[:bg] %>"><%= c[:icon] %></div>
+          <h3><%= c[:title] %></h3>
+          <p><%= c[:desc] %></p>
         </div>
       <% end %>
-
     </div>
   </div>
-
-  <!-- ================= DOTS ================= -->
-  <ul id="slick-dots"
-      class="slick-dots flex justify-center gap-3 mt-6 list-none">
-    <% (courses.size / per_page.to_f).ceil.times do |i| %>
-      <li class="<%= 'slick-active' if i == 0 %>">
-        <button class="w-3 h-3 rounded-full"></button>
-      </li>
-    <% end %>
-  </ul>
-
-  <% end %>
 </section>
-  <!-- ================= TEACHERS SECTION ================= -->
- <section class="container mx-auto px-6 py-20">
 
-  <div class="mb-10">
-    <h2 class="text-3xl font-semibold text-gray-900">
-      Đội ngũ giáo viên
-    </h2>
-    <p class="text-gray-500 mt-2">
-      Những giảng viên giàu kinh nghiệm, đồng hành cùng bạn
-    </p>
-  </div>
+<!-- ═══════ COURSES ═══════ -->
+<section class="courses-section">
+  <div class="courses-inner">
+    <div class="section-header">
+      <div>
+        <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">Popular Courses</div>
+        <h2 class="sec-title" style="margin-bottom:0">Khóa học <em>nổi bật</em></h2>
+      </div>
+      <%= link_to students_courses_path, class: "btn-outline" do %>
+        Xem tất cả
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      <% end %>
+    </div>
 
-  <% teachers = @teacher_profiles.to_a %>
-  <% if teachers.any? %>
+    <% courses = @courses.to_a %>
+    <% per_page = 3 %>
 
-    <div id="teacher-slider"
-         class="relative overflow-hidden mx-auto mt-10 mb-10"
-         style="max-width: 1200px">
-
-      <div id="teacher-track"
-           class="flex transition-transform duration-700 ease-in-out">
-
-        <% slides = teachers.last(3) + teachers + teachers.first(3) %>
-
-        <% slides.each do |teacher| %>
-          <div class="w-1/3 px-4 flex-shrink-0 text-center">
-
-            <% if teacher.avatar.attached? %>
-              <%= image_tag teacher.avatar.variant(resize_to_fill: [120,120]),
-                class: "w-28 h-28 mx-auto rounded-full object-cover mb-4" %>
-            <% else %>
-              <div class="w-28 h-28 mx-auto rounded-full bg-gray-200
-                          flex items-center justify-center mb-4">
-                <span class="text-gray-400 text-xs">No avatar</span>
+    <% if courses.any? %>
+      <div class="slider-viewport">
+        <div class="slider-track" id="courseTrack">
+          <% (courses.last(per_page) + courses + courses.first(per_page)).each do |course| %>
+            <div class="slide-item">
+              <div class="course-card">
+                <%= link_to students_course_path(course), class: "course-thumb" do %>
+                  <% if course.thumbnail.attached? %>
+                    <%= image_tag url_for(course.thumbnail), alt: course.title %>
+                  <% else %>
+                    <div class="course-thumb-ph"><%= course.title[0] %></div>
+                  <% end %>
+                  <% if course.band_min.present? && course.band_max.present? %>
+                    <div class="band-chip">Band <%= course.band_min %> – <%= course.band_max %></div>
+                  <% end %>
+                <% end %>
+                <div class="course-body">
+                  <div class="course-title"><%= course.title %></div>
+                  <div class="course-footer">
+                    <div class="course-price"><%= number_to_currency(course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
+                    <% if current_user %>
+                      <%
+                        access  = current_user.course_accesses.active_status.find_by(course: course)
+                        pending = current_user.orders.pending_status.where("created_at > ?", 1.minute.ago).find_by(course: course)
+                      %>
+                      <% if access %>
+                        <%= link_to "Vào học", students_course_path(course), class: "act-btn act-enter" %>
+                      <% elsif pending %>
+                        <span class="act-btn act-pending">⏳ Đang chờ</span>
+                      <% else %>
+                        <%= button_to "Đăng ký", students_course_orders_path(course), method: :post, class: "act-btn act-pay" %>
+                      <% end %>
+                    <% else %>
+                      <%= link_to "Đăng ký", new_user_session_path, class: "act-btn act-pay" %>
+                    <% end %>
+                  </div>
+                </div>
               </div>
-            <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <ul class="slider-dots" id="courseDots">
+        <% (courses.size / per_page.to_f).ceil.times do |i| %>
+          <li class="<%= 'active' if i == 0 %>"><button></button></li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</section>
 
-            <h3 class="text-lg font-semibold text-gray-900">
-              <%= teacher.full_name&.upcase || "IELTS SPEAKING TEACHER" %>
+<!-- ═══════ AI FEATURE CARD ═══════ -->
+<section class="features-section">
+  <div class="features-inner">
+    <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">Công nghệ AI</div>
+    <h2 class="sec-title">Nền tảng <em>tích hợp AI</em> toàn diện</h2>
+    <p class="sec-sub" style="margin-bottom:32px">Công nghệ AI mô phỏng giám khảo quốc tế, phản hồi tức thì.</p>
 
-            </h3>
+    <div class="feature-flip-card">
+      <div class="feature-text">
+        <h3>Mọi tính năng bạn <em>cần để thành công</em></h3>
+        <p>Từ luyện tập hàng ngày đến kiểm tra thực chiến — tất cả trong một nền tảng duy nhất.</p>
+        <div class="feat-grid">
+          <% [
+            "Luyện tập không giới hạn",
+            "AI chấm bài tự động",
+            "Kho bài tập đa dạng",
+            "Assignment & Material",
+            "Online & AI Mock Test",
+            "Final Test & Exercises",
+            "Thống kê chi tiết",
+            "Detailed Instruction",
+          ].each do |label| %>
+            <div class="feat-item">
+              <div class="feat-icon">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+              <%= label %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+      <div class="feature-media">
+        <img class="img-before" src="https://img.dolenglish.vn/rs:auto:::0/w:276/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL2NtOXFsa3M0cXU0Mm8wNzExb3pmajdoazY=" alt="">
+        <img class="img-after"  src="https://img.dolenglish.vn/rs:auto:::0/w:276/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL2NtOXFsa3M1NnU1em4waDB5ZHliNG42b2M=" alt="">
+      </div>
+    </div>
+  </div>
+</section>
 
-            <p class="text-sm text-blue-600 font-medium mt-1">
-              <%= teacher.expertise %>
-            </p>
+<!-- ═══════ TEACHERS ═══════ -->
+<section>
+  <div class="teachers-wrap">
+    <div class="eyebrow" style="color:var(--teal);background:var(--teal-lt);">Đội ngũ</div>
+    <h2 class="sec-title">Giáo viên <em>chuyên môn</em></h2>
+    <p class="sec-sub">Những giảng viên IELTS giàu kinh nghiệm đồng hành cùng bạn.</p>
 
-            <p class="text-sm text-gray-500 mt-1">
-              <%= teacher.experience_years %> năm kinh nghiệm
-            </p>
+    <% teachers = @teacher_profiles.to_a %>
+    <% if teachers.any? %>
+      <div class="teacher-viewport">
+        <div class="teacher-track" id="teacherTrack">
+          <% (teachers.last(3) + teachers + teachers.first(3)).each do |t| %>
+            <div class="teacher-slide">
+              <div class="teacher-card">
+                <% if t.avatar.attached? %>
+                  <%= image_tag t.avatar.variant(resize_to_fill: [88,88]), alt: t.full_name, class: "teacher-avatar" %>
+                <% else %>
+                  <div class="teacher-avatar-ph"><%= t.full_name[0] %></div>
+                <% end %>
+                <div class="teacher-name"><%= t.full_name.upcase %></div>
+                <span class="teacher-tag"><%= t.expertise %></span>
+                <div class="teacher-exp"><%= t.experience_years %> năm kinh nghiệm</div>
+                <p class="teacher-bio"><%= t.bio %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>
 
-            <p class="text-sm text-gray-600 mt-4 line-clamp-3">
-              <%= teacher.bio %>
-            </p>
+<!-- ═══════ ACHIEVEMENTS ═══════ -->
+<% achievements = @achievements.to_a %>
+<% if achievements.any? %>
+<section class="achievements-section">
+  <div class="achievements-inner">
+    <div class="eyebrow" style="color:var(--amber);background:var(--amber-lt);">🏆 Thành tích</div>
+    <h2 class="sec-title">Bảng vàng <em>thành tích học viên</em></h2>
+    <p class="sec-sub">Những kết quả thực tế từ học viên của chúng tôi.</p>
 
+    <div class="achieve-viewport">
+      <div class="achieve-track" id="achieveTrack">
+        <% (achievements.last(3) + achievements + achievements.first(3)).each do |a| %>
+          <div class="achieve-slide">
+            <div class="achieve-card" <% if a.result.attached? %>data-cert-url="<%= url_for(a.result) %>"<% end %>>
+              <% if a.user.thumbnail.attached? %>
+                <%= image_tag a.user.thumbnail.variant(resize_to_fill: [80,80]), class: "achieve-avatar" %>
+              <% else %>
+                <div class="achieve-avatar-ph"><%= (a.user.full_name || "?")[0] %></div>
+              <% end %>
+              <div class="achieve-name"><%= a.user.full_name&.upcase || "HỌC VIÊN IELTS" %></div>
+              <span class="achieve-title-tag"><%= a.title %></span>
+              <div class="achieve-year">Năm <%= a.year %></div>
+              <p class="achieve-desc"><%= a.description %></p>
+              <% if a.ielts_overall_band.present? %>
+                <div class="band-badge">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                  IELTS Overall Band <%= a.ielts_overall_band %>
+                </div>
+              <% end %>
+            </div>
           </div>
         <% end %>
-
       </div>
     </div>
-
-  <% end %>
-</section>
-<section class="feature-section">
-
-    <div class="card-left">
-    <h3>Unlock Global Opportunities with IELTS</h3>
-<p>
-  IELTS is more than a test score — it is your passport to study, work, and live globally.
-  A strong IELTS foundation opens doors to world-class universities, multinational companies, and international communities.
-</p>
-
-    <!-- SVG ICONS -->
-    
-  <%= image_tag "united-states-svgrepo-com.svg", class: "icon icon-1" %>
-  <%= image_tag "vietnam-svgrepo-com.svg", class: "icon icon-2" %>
-  <%= image_tag "australia-svgrepo-com.svg", class: "icon icon-3" %>
-  <%= image_tag "india-svgrepo-com.svg", class: "icon icon-4" %>
-  </div>
-
-  <div class="card-right">
-  <div class="icon-wrapper waving-flag">
-  <svg class="nation nation-vn" width="300" height="210" viewBox="0 0 159 89" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M25.4277 24.143C42.2824 25.3353 31.6162 7.37001 40.4569 8.13821C47.6835 8.76616 31.2039 23.5027 40.4569 24.8852C49.71 26.2677 45.5403 7.33171 54.6021 8.13821C61.8366 8.78209 42.4136 25.0243 52.1709 25.1925C58.8653 25.3078 58.9585 7.56812 68.0841 8.1382C77.2098 8.70828 53.1541 24.3341 63.0007 25.807C70.2257 26.8878 72.0624 6.75543 80.6821 8.13821C89.3018 9.52099 66.4891 23.6278 76.3366 25.1925C84.0722 26.4216 101.458 10.2892 93.2801 8.59913C85.1025 6.90907 83.3516 25.6273 90.567 24.8852C97.7824 24.1431 97.2428 15.7377 104.212 10.3814" stroke="#0077FF" stroke-opacity="0.16" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" class="nation-text-decoration"></path><g clip-path="url(#clip0_6519_363082)"><path d="M20.001 28.0005C26.6284 28.0002 32.0008 22.6274 32.0005 16C32.0002 9.37257 26.6274 4.00021 20 4.00048C13.3726 4.00076 8.00022 9.37356 8.00049 16.001C8.00077 22.6284 13.3736 28.0008 20.001 28.0005Z" fill="#F0F0F0"></path><path d="M19.4786 16.0006L32.0004 16.0001C32.0003 14.917 31.8559 13.8677 31.5868 12.8696L19.4785 12.8701L19.4786 16.0006Z" fill="#D80027"></path><path d="M19.4777 9.73958L30.2381 9.73914C29.5035 8.54048 28.5642 7.48101 27.4691 6.6088L19.4775 6.60913L19.4777 9.73958Z" fill="#D80027"></path><path d="M20.0002 28.0005C22.8244 28.0004 25.4201 27.0241 27.4699 25.3915L12.5303 25.3921C14.5802 27.0246 17.176 28.0006 20.0002 28.0005Z" fill="#D80027"></path><path d="M9.76208 22.2617L30.2395 22.2609C30.8292 21.2986 31.2865 20.2467 31.5873 19.1304L8.41406 19.1313C8.71491 20.2476 9.17231 21.2995 9.76208 22.2617Z" fill="#D80027"></path><path d="M13.5587 5.87472L14.6522 5.87467L13.6351 6.6137L14.0237 7.80942L13.0065 7.07047L11.9894 7.8095L12.325 6.7765C11.4294 7.52255 10.6445 8.39662 9.99766 9.37052L10.348 9.3705L9.70058 9.84092C9.59972 10.0092 9.50297 10.1802 9.41026 10.3537L9.71949 11.3052L9.14263 10.8862C8.99925 11.19 8.86811 11.5006 8.75023 11.8177L9.09091 12.8662L10.3482 12.8662L9.33104 13.6052L9.71963 14.8009L8.70246 14.062L8.0932 14.5047C8.03223 14.9949 8.00047 15.4942 8.00049 16.001L20.0005 16.0005C20.0002 9.37311 20.0002 8.59179 20 4.00048C17.6294 4.00058 15.4196 4.68833 13.5587 5.87472ZM14.024 14.8007L13.0068 14.0618L11.9897 14.8008L12.3782 13.6051L11.361 12.8661L12.6183 12.8661L13.0067 11.6703L13.3953 12.866L14.6525 12.866L13.6354 13.605L14.024 14.8007ZM13.6352 10.1094L14.0238 11.3051L13.0067 10.5661L11.9896 11.3052L12.378 10.1094L11.3608 9.37046L12.6181 9.37041L13.0066 8.17466L13.3951 9.37038L14.6524 9.37033L13.6352 10.1094ZM18.3283 14.8005L17.3111 14.0616L16.294 14.8006L16.6825 13.6049L15.6653 12.8659L16.9226 12.8659L17.311 11.6701L17.6996 12.8659L18.9569 12.8658L17.9397 13.6048L18.3283 14.8005ZM17.9396 10.1092L18.3282 11.3049L17.311 10.566L16.2939 11.305L16.6824 10.1092L15.6652 9.37029L16.9225 9.37023L17.3109 8.17448L17.6995 9.3702L18.9567 9.37015L17.9396 10.1092ZM17.9394 6.61352L18.328 7.80924L17.3109 7.0703L16.2937 7.80932L16.6822 6.61357L15.665 5.87463L16.9223 5.87458L17.3108 4.67883L17.6993 5.87455L18.9566 5.87449L17.9394 6.61352Z" fill="#0052B4"></path></g><rect x="5.99992" y="2.00106" width="28" height="28" rx="14" stroke="#0077FF" stroke-opacity="0.2" stroke-width="4"></rect><path d="M44.832 22.1715C44.3506 22.1715 43.9833 22.0385 43.73 21.7725C43.4766 21.5065 43.35 21.1328 43.35 20.6515V9.95449C43.35 9.47315 43.4766 9.09949 43.73 8.83349C43.9833 8.56749 44.3506 8.43449 44.832 8.43449C45.3006 8.43449 45.6616 8.56749 45.915 8.83349C46.1683 9.09949 46.295 9.47315 46.295 9.95449V13.9825H52.527V9.95449C52.527 9.47315 52.6536 9.09949 52.907 8.83349C53.1603 8.56749 53.5213 8.43449 53.99 8.43449C54.4713 8.43449 54.8386 8.56749 55.092 8.83349C55.3453 9.09949 55.472 9.47315 55.472 9.95449V20.6515C55.472 21.1328 55.3453 21.5065 55.092 21.7725C54.8386 22.0385 54.4713 22.1715 53.99 22.1715C53.5213 22.1715 53.1603 22.0385 52.907 21.7725C52.6536 21.5065 52.527 21.1328 52.527 20.6515V16.4335H46.295V20.6515C46.295 21.1328 46.1683 21.5065 45.915 21.7725C45.6743 22.0385 45.3133 22.1715 44.832 22.1715ZM62.4122 22.2095C61.4115 22.2095 60.5375 22.0132 59.7902 21.6205C59.0555 21.2278 58.4855 20.6642 58.0802 19.9295C57.6748 19.1948 57.4722 18.3272 57.4722 17.3265C57.4722 16.5792 57.5862 15.9078 57.8142 15.3125C58.0422 14.7172 58.3715 14.2105 58.8022 13.7925C59.2455 13.3618 59.7712 13.0388 60.3792 12.8235C60.9872 12.5955 61.6648 12.4815 62.4122 12.4815C63.4128 12.4815 64.2805 12.6778 65.0152 13.0705C65.7625 13.4632 66.3388 14.0205 66.7442 14.7425C67.1622 15.4645 67.3712 16.3258 67.3712 17.3265C67.3712 18.0865 67.2508 18.7642 67.0102 19.3595C66.7822 19.9548 66.4528 20.4678 66.0222 20.8985C65.5915 21.3292 65.0658 21.6585 64.4452 21.8865C63.8372 22.1018 63.1595 22.2095 62.4122 22.2095ZM62.4122 20.0625C62.8302 20.0625 63.1912 19.9612 63.4952 19.7585C63.7992 19.5558 64.0398 19.2582 64.2172 18.8655C64.3945 18.4602 64.4832 17.9472 64.4832 17.3265C64.4832 16.4018 64.2932 15.7242 63.9132 15.2935C63.5332 14.8502 63.0328 14.6285 62.4122 14.6285C62.0068 14.6285 61.6458 14.7235 61.3292 14.9135C61.0252 15.1035 60.7845 15.4012 60.6072 15.8065C60.4425 16.1992 60.3602 16.7058 60.3602 17.3265C60.3602 18.2512 60.5502 18.9415 60.9302 19.3975C61.3102 19.8408 61.8042 20.0625 62.4122 20.0625ZM72.2706 22.2095C71.5866 22.2095 70.9723 22.0765 70.4276 21.8105C69.883 21.5445 69.4586 21.1835 69.1546 20.7275C68.8506 20.2715 68.6986 19.7585 68.6986 19.1885C68.6986 18.5045 68.876 17.9662 69.2306 17.5735C69.5853 17.1682 70.1616 16.8832 70.9596 16.7185C71.7576 16.5412 72.8153 16.4525 74.1326 16.4525H75.1396V17.9345H74.1516C73.5056 17.9345 72.98 17.9725 72.5746 18.0485C72.182 18.1118 71.897 18.2258 71.7196 18.3905C71.555 18.5552 71.4726 18.7832 71.4726 19.0745C71.4726 19.4292 71.593 19.7205 71.8336 19.9485C72.087 20.1765 72.448 20.2905 72.9166 20.2905C73.284 20.2905 73.607 20.2082 73.8856 20.0435C74.177 19.8662 74.405 19.6318 74.5696 19.3405C74.7343 19.0365 74.8166 18.6945 74.8166 18.3145V16.1295C74.8166 15.5722 74.69 15.1795 74.4366 14.9515C74.1833 14.7108 73.7526 14.5905 73.1446 14.5905C72.8026 14.5905 72.429 14.6348 72.0236 14.7235C71.631 14.7995 71.194 14.9325 70.7126 15.1225C70.434 15.2492 70.187 15.2808 69.9716 15.2175C69.7563 15.1415 69.5916 15.0148 69.4776 14.8375C69.3636 14.6475 69.3066 14.4448 69.3066 14.2295C69.3066 14.0015 69.37 13.7862 69.4966 13.5835C69.6233 13.3682 69.8323 13.2098 70.1236 13.1085C70.719 12.8678 71.2763 12.7032 71.7956 12.6145C72.3276 12.5258 72.8153 12.4815 73.2586 12.4815C74.234 12.4815 75.032 12.6272 75.6526 12.9185C76.286 13.1972 76.761 13.6342 77.0776 14.2295C77.3943 14.8122 77.5526 15.5658 77.5526 16.4905V20.7085C77.5526 21.1772 77.4386 21.5382 77.2106 21.7915C76.9826 22.0448 76.6533 22.1715 76.2226 22.1715C75.792 22.1715 75.4563 22.0448 75.2156 21.7915C74.9876 21.5382 74.8736 21.1772 74.8736 20.7085V20.0055L75.0066 20.1195C74.9306 20.5502 74.766 20.9238 74.5126 21.2405C74.272 21.5445 73.9616 21.7852 73.5816 21.9625C73.2016 22.1272 72.7646 22.2095 72.2706 22.2095ZM86.7285 22.1715C86.2471 22.1715 85.8798 22.0385 85.6265 21.7725C85.3731 21.5065 85.2465 21.1328 85.2465 20.6515V9.93549C85.2465 9.45415 85.3731 9.08682 85.6265 8.83349C85.8798 8.56749 86.2471 8.43449 86.7285 8.43449C87.1971 8.43449 87.5581 8.56749 87.8115 8.83349C88.0648 9.08682 88.1915 9.45415 88.1915 9.93549V14.4385H88.2295L93.2835 9.15649C93.4988 8.92849 93.7205 8.75749 93.9485 8.64349C94.1891 8.51682 94.4615 8.45349 94.7655 8.45349C95.2088 8.45349 95.5255 8.56749 95.7155 8.79549C95.9181 9.02349 96.0068 9.28949 95.9815 9.59349C95.9561 9.89749 95.8168 10.1825 95.5635 10.4485L90.4905 15.6355L90.5095 14.3625L95.8295 20.0435C96.1208 20.3602 96.2665 20.6832 96.2665 21.0125C96.2791 21.3418 96.1715 21.6205 95.9435 21.8485C95.7281 22.0638 95.4051 22.1715 94.9745 22.1715C94.6071 22.1715 94.3095 22.0955 94.0815 21.9435C93.8661 21.7915 93.6255 21.5698 93.3595 21.2785L88.2295 15.8825H88.1915V20.6515C88.1915 21.1328 88.0648 21.5065 87.8115 21.7725C87.5708 22.0385 87.2098 22.1715 86.7285 22.1715ZM100.014 25.5915C99.6849 25.5915 99.4125 25.5028 99.1972 25.3255C98.9819 25.1482 98.8552 24.9138 98.8172 24.6225C98.7792 24.3438 98.8299 24.0462 98.9692 23.7295L100.242 20.9175V22.0955L96.8792 14.3815C96.7525 14.0522 96.7082 13.7482 96.7462 13.4695C96.7969 13.1782 96.9362 12.9502 97.1642 12.7855C97.4049 12.6082 97.7342 12.5195 98.1522 12.5195C98.4942 12.5195 98.7665 12.6018 98.9692 12.7665C99.1845 12.9185 99.3809 13.2162 99.5582 13.6595L101.8 19.3595H101.192L103.51 13.6405C103.688 13.2098 103.884 12.9185 104.099 12.7665C104.327 12.6018 104.631 12.5195 105.011 12.5195C105.341 12.5195 105.6 12.6082 105.79 12.7855C105.993 12.9502 106.113 13.1718 106.151 13.4505C106.202 13.7292 106.151 14.0332 105.999 14.3625L101.534 24.4895C101.344 24.9202 101.129 25.2115 100.888 25.3635C100.66 25.5155 100.369 25.5915 100.014 25.5915ZM100.413 11.3225L98.6272 8.85249C98.4625 8.59915 98.3992 8.36482 98.4372 8.14949C98.4752 7.92149 98.5765 7.73149 98.7412 7.57949C98.9059 7.41482 99.1022 7.30082 99.3302 7.23749C99.5709 7.17415 99.7989 7.18049 100.014 7.25649C100.242 7.33249 100.42 7.50982 100.546 7.78849L101.895 10.4675C102.009 10.6955 102.028 10.9108 101.952 11.1135C101.876 11.3035 101.743 11.4492 101.553 11.5505C101.363 11.6518 101.161 11.6898 100.945 11.6645C100.73 11.6392 100.553 11.5252 100.413 11.3225Z" fill="#21262D" class="nation-text"></path><defs><clipPath id="clip0_6519_363082"><rect x="8" y="4.00098" width="24" height="24" rx="12" fill="white"></rect></clipPath></defs>
-  </div>      
-  <div class="card-content">
-  <h3>Global IELTS Success Platform</h3>
-<p>
-  Practice with AI, get real exam feedback, and unlock worldwide opportunities.
-</p>
-  </div>
-<%= image_tag "success-achievement-award-medal-winner-svgrepo-com.svg", class: "icon icon-5" %>
-</div>
-</section>
-
-
-<section class="feature-card" mt-0>
-<p> <strong>Công nghệ AI mô phỏng giám khảo quốc tế, phản hồi tức thì</strong>
-</p>
-<div class="text-box">
-  <div class="content before">
-    <ul class="feature-list">
-
-  <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-
-    <p>Luyện tập không giới hạn mọi lúc, mọi nơi</p>
-  </li>
-
-    <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Ứng dụng công nghệ AI vào chấm bài</p>
-  </li>
-
-    <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Kho bài tập đa dạng riêng cho từng khóa</p>
-  </li>
-
-
-  <li>
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-    <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-      stroke="currentColor" stroke-width="1.5"
-      stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
-  <p>Thống kê điểm danh và làm bài</p>
-</li>
-
-</ul>
-
-  </div>
-
-  <div class="content after">
-       <ul class="feature-list">
-  <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Assignment</p>
-  </li>
-
-  <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Sample W/S</p>
-  </li>
-
-    <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Online test</p>
-  </li>
-
-    <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Material</p>
-  </li>
-
-    <li>
-    <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-      <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-        stroke="currentColor" stroke-width="1.5"
-        stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-    <p>Detailed instruction</p>
-  </li> 
-  <li>
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-    <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-      stroke="currentColor" stroke-width="1.5"
-      stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
-  <p>AI mock test</p>
-</li>
-
-  <li>
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-    <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-      stroke="currentColor" stroke-width="1.5"
-      stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
-  <p>Exercises</p>
-</li>
-
-  <li>
-  <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-    <path d="M4.58301 9.16634L8.74967 13.333L16.2497 5.83301"
-      stroke="currentColor" stroke-width="1.5"
-      stroke-linecap="round" stroke-linejoin="round" />
-  </svg>
-  <p>Final test</p>
-</li>
-</ul>
-    </div>
-  </div>
-
-  <div class="compare-right">
-    <img class="before-img" src="https://img.dolenglish.vn/rs:auto:::0/w:276/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL2NtOXFsa3M0cXU0Mm8wNzExb3pmajdoazY=">
-    <img class="after-img" src="https://img.dolenglish.vn/rs:auto:::0/w:276/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL2NtOXFsa3M1NnU1em4waDB5ZHliNG42b2M=">
   </div>
 </section>
-<section class="container mx-auto px-6 py-20 mt-6">
-
-<div class="flex items-start justify-center h-64 mt-10">
-   <svg width="58" height="47" viewBox="0 0 58 47" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M19.0004 15.97C17.2292 15.97 15.7998 17.3994 15.7998 19.1706C15.7998 20.3377 16.4206 21.3566 17.3509 21.9157C16.5058 25.2167 14.7727 28.4211 12.5161 28.7742H11.4065C9.72293 28.5661 7.704 27.4692 6.41999 25.6025C6.94465 25.0322 7.26542 24.2715 7.26542 23.4374C7.26542 21.6726 5.82957 20.2367 4.06476 20.2367C2.29995 20.2367 0.792969 21.6726 0.792969 23.4374C0.792969 25.0057 1.98309 26.3143 3.48666 26.5862L6.59855 37.1697C6.99484 38.5175 8.23176 39.4431 9.63661 39.4431L28.3689 39.4431C29.7738 39.4431 31.0107 38.5175 31.407 37.1697L34.519 26.5856C36.0211 26.3124 37.2095 25.0046 37.2095 23.4374C37.2095 21.6726 35.7026 20.2367 33.9377 20.2367C32.1729 20.2367 30.7371 21.6726 30.7371 23.4374C30.7371 24.2724 31.0586 25.0338 31.5842 25.6043C30.5362 27.1271 28.9991 28.1372 27.5543 28.5702C27.229 28.6677 26.9084 28.736 26.599 28.7742H25.4894C23.2324 28.421 21.4988 25.215 20.6542 21.9132C21.5822 21.3535 22.2011 20.3359 22.2011 19.1706C22.2011 17.3994 20.7716 15.97 19.0004 15.97Z" fill="#D42525"></path><g opacity="0.5"><path d="M6.7742 2.8791C6.77117 2.8246 6.86681 2.79654 6.89371 2.84405C7.29201 3.5476 7.82706 3.83995 8.63429 3.79511C8.68879 3.79208 8.71685 3.88772 8.66934 3.91462C7.96579 4.31292 7.67344 4.84796 7.71828 5.6552C7.72131 5.7097 7.62567 5.73775 7.59877 5.69025C7.20047 4.9867 6.66542 4.69434 5.85819 4.73919C5.80369 4.74221 5.77563 4.64657 5.82314 4.61968C6.52669 4.22138 6.81905 3.68633 6.7742 2.8791Z" fill="#D42525"></path></g><g opacity="0.5"><path d="M53.6473 25.1618C53.6236 25.1006 53.7226 25.0329 53.7711 25.0773C54.488 25.7344 55.2087 25.8702 56.1156 25.5191C56.1768 25.4954 56.2444 25.5945 56.2001 25.6429C55.543 26.3598 55.4072 27.0805 55.7582 27.9874C55.7819 28.0487 55.6829 28.1163 55.6345 28.0719C54.9176 27.4148 54.1969 27.279 53.29 27.6301C53.2287 27.6538 53.1611 27.5547 53.2055 27.5063C53.8626 26.7894 53.9984 26.0687 53.6473 25.1618Z" fill="#D42525"></path></g><g opacity="0.5"><path d="M34.2593 4.20301C34.2633 4.12186 34.4092 4.09521 34.4416 4.16971C34.9218 5.2731 35.6683 5.78908 36.8702 5.84828C36.9513 5.85228 36.9779 5.99821 36.9034 6.03063C35.8001 6.51077 35.2841 7.25728 35.2249 8.45915C35.2209 8.5403 35.0749 8.56694 35.0425 8.49244C34.5624 7.38906 33.8159 6.87307 32.614 6.81388C32.5329 6.80988 32.5062 6.66394 32.5807 6.63153C33.6841 6.15139 34.2001 5.40488 34.2593 4.20301Z" fill="#D42525"></path></g><g opacity="0.6"><path d="M44.6736 29.636C44.667 29.5169 44.876 29.4556 44.9348 29.5594C45.805 31.0966 46.9741 31.7354 48.7378 31.6374C48.8569 31.6308 48.9182 31.8398 48.8144 31.8985C47.2772 32.7688 46.6384 33.9379 46.7364 35.7016C46.743 35.8207 46.5341 35.882 46.4753 35.7782C45.605 34.241 44.436 33.6022 42.6722 33.7002C42.5531 33.7068 42.4918 33.4978 42.5956 33.4391C44.1329 32.5688 44.7716 31.3998 44.6736 29.636Z" fill="#D42525"></path></g><path d="M49.1963 10.2675C49.3032 10.0757 49.6888 10.1859 49.6781 10.4053C49.5201 13.6545 50.7113 15.7991 53.5531 17.3822C53.745 17.489 53.6348 17.8746 53.4154 17.864C50.1662 17.706 48.0216 18.8972 46.4385 21.739C46.3316 21.9309 45.946 21.8207 45.9567 21.6013C46.1147 18.3521 44.9235 16.2074 42.0817 14.6244C41.8898 14.5175 42 14.1319 42.2194 14.1426C45.4686 14.3006 47.6132 13.1094 49.1963 10.2675Z" fill="#D42525"></path><path d="M17.9974 1.37346C18.0419 1.25538 18.2704 1.28551 18.2828 1.41111C18.467 3.27129 19.3249 4.38989 21.0737 5.05009C21.1917 5.09467 21.1616 5.32314 21.036 5.33557C19.1758 5.51971 18.0572 6.3776 17.397 8.1264C17.3524 8.24448 17.124 8.21434 17.1115 8.08874C16.9274 6.22857 16.0695 5.10996 14.3207 4.44976C14.2026 4.40518 14.2328 4.17672 14.3584 4.16429C16.2185 3.98014 17.3372 3.12225 17.9974 1.37346Z" fill="#D42525"></path></svg>
-  <h2 class="text-3xl font-semibold text-gray-900">
-    Bảng vàng thành tích học viên
-  </h2>
-</div>
-  </div>
-
-  <% achievements = @achievements.to_a %>
-  <% if achievements.any? %>
-
-    <div id="achievement-slider"
-         class="relative overflow-hidden mx-auto mt-10 mb-10"
-         style="max-width: 1200px">
-
-      <div id="achievement-track"
-           class="flex transition-transform duration-700 ease-in-out">
-
-        <% slides = achievements.last(3) + achievements + achievements.first(3) %>
-
-        <% slides.each do |achievement| %>
-  <div class="w-1/3 px-4 flex-shrink-0 text-center">
-    <% if achievement.user.thumbnail.attached? %>
-      <%= image_tag achievement.user.thumbnail.variant(resize_to_fill: [120,120]),
-          class: "w-28 h-28 mx-auto rounded-full object-cover mb-4 cursor-pointer",
-          data: { certificate_url: (achievement.result.attached? ? url_for(achievement.result) : nil) } %>
-    <% else %>
-      <div class="w-28 h-28 mx-auto rounded-full bg-gray-200 flex items-center justify-center mb-4">
-        <span class="text-gray-400 text-xs">No avatar</span>
-      </div>
-    <% end %>
-
-    <h3 class="text-lg font-semibold text-gray-900">
-      <%= achievement.user.full_name&.upcase || "HỌC VIÊN IELTS" %>
-    </h3>
-    <p class="text-sm text-blue-600 font-medium mt-1"><%= achievement.title %></p>
-    <p class="text-sm text-gray-500 mt-1">Năm: <%= achievement.year %></p>
-    <p class="text-sm text-gray-600 mt-4 line-clamp-3"><%= achievement.description %></p>
-    <% if achievement.ielts_overall_band.present? %>
-      <p class="text-sm text-green-600 font-semibold mt-2">
-        IELTS Overall Band: <%= achievement.ielts_overall_band %>
-      </p>
-    <% end %>
-  </div>
 <% end %>
 
-
-      </div>
-    </div>
-
-  <% end %>
-</section>
-<section>
-  <div class="hero-container">
-  <div class="hero-left">
- <h1 class="Typography__Text-sc-1i53v7a-0 bwEqPI typography title">
- <span class="Typography__Text-sc-1i53v7a-0 iqgVvA typography brand" color="#D14242">
- <span class="highlight"><strong>IELTS LEARNING PLATFORM</strong></span>
- <div class="HeaderV2__AnimatedHeadlineIcon-sc-1wiaiw-4 bMDQKb" style="opacity: 1; transform: none;"><svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M17.044 31.8741C15.8835 31.9037 14.9368 31.2228 14.8146 30.3644C14.723 29.6835 14.723 28.9879 14.7383 28.3071C14.8299 25.3322 13.2876 23.0232 11.5163 20.8327C10.7376 19.8707 9.56183 19.4267 8.27918 19.3971C7.16449 19.3675 6.03453 19.3823 4.91984 19.3675C4.41594 19.3527 3.89679 19.3527 3.40816 19.2491C2.75156 19.1159 2.14075 18.3758 2.12548 17.7542C2.11021 17.103 2.46141 16.5701 3.04166 16.3481C4.55336 15.7857 6.06508 15.1789 7.63786 14.8385C10.9056 14.128 12.6005 11.9375 13.6541 9.12539C13.8832 8.53337 13.7457 7.79333 13.7305 7.1273C13.6999 5.85444 13.5778 4.58161 13.6236 3.30875C13.6388 2.68713 14.1122 2.22828 14.7993 2.13948C15.4865 2.05067 16.0209 2.37629 16.2652 2.95352C16.6623 3.94516 17.0898 4.9664 17.2883 6.01725C18.3114 11.2419 23.2282 14.9717 28.7253 14.6313C29.2292 14.6017 29.7331 14.4833 30.237 14.5129C30.8631 14.5425 31.4433 14.8089 31.7029 15.4157C32.0083 16.1113 31.9167 16.8218 31.3517 17.325C30.9242 17.7098 30.3592 18.0206 29.7942 18.1686C25.6103 19.2343 22.8159 22.076 20.2354 25.1398C19.5788 25.9242 19.4261 27.123 19.0749 28.1443C18.7695 29.0767 18.6168 30.0684 18.1892 30.9416C17.9907 31.3856 17.3341 31.6521 17.044 31.8741ZM22.8923 17.5618C21.518 16.6885 20.2964 16.0225 19.197 15.2085C18.1129 14.3945 17.1356 13.4324 16.0667 12.4852C14.7383 13.98 13.5167 15.3565 12.1882 16.8514C14.1275 18.0206 15.2269 19.6635 16.2805 21.3508C16.5707 21.8<h1 class="Typography__Text-sc-1i53v7a-0 dVGbqT typography title-mobile"><span class="Typography__Text-sc-1i53v7a-0 iqgVvA typography brand" color="#D14242"><div class="HeaderV2__AnimatedHeadlineIcon-sc-1wiaiw-4 bMDQKb" style="opacity: 1; transform: none;">
- 
- <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
- <path d="M17.044 31.8741C15.8835 31.9037 14.9368 31.2228 14.8146 30.3644C14.723 29.6835 14.723 28.9879 14.7383 28.3071C14.8299 25.3322 13.2876 23.0232 11.5163 20.8327C10.7376 19.8707 9.56183 19.4267 8.27918 19.3971C7.16449 19.3675 6.03453 19.3823 4.91984 19.3675C4.41594 19.3527 3.89679 19.3527 3.40816 19.2491C2.75156 19.1159 2.14075 18.3758 2.12548 17.7542C2.11021 17.103 2.46141 16.5701 3.04166 16.3481C4.55336 15.7857 6.06508 15.1789 7.63786 14.8385C10.9056 14.128 12.6005 11.9375 13.6541 9.12539C13.8832 8.53337 13.7457 7.79333 13.7305 7.1273C13.6999 5.85444 13.5778 4.58161 13.6236 3.30875C13.6388 2.68713 14.1122 2.22828 14.7993 2.13948C15.4865 2.05067 16.0209 2.37629 16.2652 2.95352C16.6623 3.94516 17.0898 4.9664 17.2883 6.01725C18.3114 11.2419 23.2282 14.9717 28.7253 14.6313C29.2292 14.6017 29.7331 14.4833 30.237 14.5129C30.8631 14.5425 31.4433 14.8089 31.7029 15.4157C32.0083 16.1113 31.9167 16.8218 31.3517 17.325C30.9242 17.7098 30.3592 18.0206 29.7942 18.1686C25.6103 19.2343 22.8159 22.076 20.2354 25.1398C19.5788 25.9242 19.4261 27.123 19.0749 28.1443C18.7695 29.0767 18.6168 30.0684 18.1892 30.9416C17.9907 31.3856 17.3341 31.6521 17.044 31.8741ZM22.8923 17.5618C21.518 16.6885 20.2964 16.0225 19.197 15.2085C18.1129 14.3945 17.1356 13.4324 16.0667 12.4852C14.7383 13.98 13.5167 15.3565 12.1882 16.8514C14.1275 18.0206 15.2269 19.6635 16.2805 21.3508C16.5707 21.8096 16.9982 22.1796 17.4563 22.6976C18.4488 21.706 19.2886 20.8624 20.159 20.0335C21.0294 19.2195 21.915 18.4498 22.8923 17.5618Z" fill="#EA7575"></path>
- </svg></div></span></h1><div class="description"><div class="HeaderV2__DescriptionItemWrapper-sc-1wiaiw-2 jXebak"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.8854 4.04858C10.4893 3.77207 8.06879 4.59589 6.33234 6.33234C4.59592 8.06876 3.7721 10.4892 4.04857 12.8852C4.11187 13.4339 3.71843 13.93 3.16978 13.9933C2.62114 14.0566 2.12506 13.6631 2.06175 13.1145C1.71594 10.1175 2.74604 7.09021 4.91813 4.91813C7.09025 2.74601 10.1176 1.71591 13.1146 2.06177C13.6633 2.12508 14.0567 2.62117 13.9934 3.16981C13.9301 3.71846 13.434 4.11189 12.8854 4.04858ZM17.1263 4.54799C17.4863 4.1292 18.1177 4.08157 18.5365 4.44162C21.3811 6.88721 22.6171 10.7195 21.7374 14.3663C20.8577 18.013 18.0104 20.8603 14.3636 21.74C10.7169 22.6197 6.88459 21.3837 4.439 18.5391C4.07895 18.1203 4.12657 17.489 4.54536 17.1289C4.96415 16.7689 5.59552 16.8165 5.95557 17.2353C7.91188 19.5108 10.9775 20.4995 13.8946 19.7958C16.8118 19.0921 19.0895 16.8144 19.7932 13.8973C20.4969 10.9801 19.5081 7.91451 17.2326 5.95819C16.8139 5.59815 16.7662 4.96678 17.1263 4.54799ZM15.7303 9.35823L15.6473 9.27364C15.2876 8.90707 14.6975 8.90707 14.3471 9.28304L11.055 12.5726L9.65294 11.1627C9.2933 10.7962 8.71235 10.7962 8.35272 11.1627L8.26973 11.2473C7.91009 11.6139 7.91009 12.206 8.26973 12.5726L10.4003 14.725C10.7599 15.0915 11.3409 15.0915 11.7005 14.725L15.7303 10.6835C16.0899 10.3169 16.0899 9.72479 15.7303 9.35823Z" fill="#D42525"></path></svg>Luyện phát âm, ngữ điệu và phản xạ tự nhiên theo chuẩn IELTS</p></div><div class="HeaderV2__DescriptionItemWrapper-sc-1wiaiw-2 jXebak"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.8854 4.04858C10.4893 3.77207 8.06879 4.59589 6.33234 6.33234C4.59592 8.06876 3.7721 10.4892 4.04857 12.8852C4.11187 13.4339 3.71843 13.93 3.16978 13.9933C2.62114 14.0566 2.12506 13.6631 2.06175 13.1145C1.71594 10.1175 2.74604 7.09021 4.91813 4.91813C7.09025 2.74601 10.1176 1.71591 13.1146 2.06177C13.6633 2.12508 14.0567 2.62117 13.9934 3.16981C13.9301 3.71846 13.434 4.11189 12.8854 4.04858ZM17.1263 4.54799C17.4863 4.1292 18.1177 4.08157 18.5365 4.44162C21.3811 6.88721 22.6171 10.7195 21.7374 14.3663C20.8577 18.013 18.0104 20.8603 14.3636 21.74C10.7169 22.6197 6.88459 21.3837 4.439 18.5391C4.07895 18.1203 4.12657 17.489 4.54536 17.1289C4.96415 16.7689 5.59552 16.8165 5.95557 17.2353C7.91188 19.5108 10.9775 20.4995 13.8946 19.7958C16.8118 19.0921 19.0895 16.8144 19.7932 13.8973C20.4969 10.9801 19.5081 7.91451 17.2326 5.95819C16.8139 5.59815 16.7662 4.96678 17.1263 4.54799ZM15.7303 9.35823L15.6473 9.27364C15.2876 8.90707 14.6975 8.90707 14.3471 9.28304L11.055 12.5726L9.65294 11.1627C9.2933 10.7962 8.71235 10.7962 8.35272 11.1627L8.26973 11.2473C7.91009 11.6139 7.91009 12.206 8.26973 12.5726L10.4003 14.725C10.7599 15.0915 11.3409 15.0915 11.7005 14.725L15.7303 10.6835C16.0899 10.3169 16.0899 9.72479 15.7303 9.35823Z" fill="#D42525"></path></svg><p class="Typography__Text-sc-1i53v7a-0 bKROVL typography" color="#505460">Nền tảng công nghệ toàn diện và đột phá</p></div><div class="HeaderV2__DescriptionItemWrapper-sc-1wiaiw-2 jXebak"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.8854 4.04858C10.4893 3.77207 8.06879 4.59589 6.33234 6.33234C4.59592 8.06876 3.7721 10.4892 4.04857 12.8852C4.11187 13.4339 3.71843 13.93 3.16978 13.9933C2.62114 14.0566 2.12506 13.6631 2.06175 13.1145C1.71594 10.1175 2.74604 7.09021 4.91813 4.91813C7.09025 2.74601 10.1176 1.71591 13.1146 2.06177C13.6633 2.12508 14.0567 2.62117 13.9934 3.16981C13.9301 3.71846 13.434 4.11189 12.8854 4.04858ZM17.1263 4.54799C17.4863 4.1292 18.1177 4.08157 18.5365 4.44162C21.3811 6.88721 22.6171 10.7195 21.7374 14.3663C20.8577 18.013 18.0104 20.8603 14.3636 21.74C10.7169 22.6197 6.88459 21.3837 4.439 18.5391C4.07895 18.1203 4.12657 17.489 4.54536 17.1289C4.96415 16.7689 5.59552 16.8165 5.95557 17.2353C7.91188 19.5108 10.9775 20.4995 13.8946 19.7958C16.8118 19.0921 19.0895 16.8144 19.7932 13.8973C20.4969 10.9801 19.5081 7.91451 17.2326 5.95819C16.8139 5.59815 16.7662 4.96678 17.1263 4.54799ZM15.7303 9.35823L15.6473 9.27364C15.2876 8.90707 14.6975 8.90707 14.3471 9.28304L11.055 12.5726L9.65294 11.1627C9.2933 10.7962 8.71235 10.7962 8.35272 11.1627L8.26973 11.2473C7.91009 11.6139 7.91009 12.206 8.26973 12.5726L10.4003 14.725C10.7599 15.0915 11.3409 15.0915 11.7005 14.725L15.7303 10.6835C16.0899 10.3169 16.0899 9.72479 15.7303 9.35823Z" fill="#D42525"></path></svg><p class="Typography__Text-sc-1i53v7a-0 bKROVL typography" color="#505460">Kho đề thi Speaking phong phú, cập nhật liên tục</p></div><div class="HeaderV2__DescriptionItemWrapper-sc-1wiaiw-2 jXebak"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M12.8854 4.04858C10.4893 3.77207 8.06879 4.59589 6.33234 6.33234C4.59592 8.06876 3.7721 10.4892 4.04857 12.8852C4.11187 13.4339 3.71843 13.93 3.16978 13.9933C2.62114 14.0566 2.12506 13.6631 2.06175 13.1145C1.71594 10.1175 2.74604 7.09021 4.91813 4.91813C7.09025 2.74601 10.1176 1.71591 13.1146 2.06177C13.6633 2.12508 14.0567 2.62117 13.9934 3.16981C13.9301 3.71846 13.434 4.11189 12.8854 4.04858ZM17.1263 4.54799C17.4863 4.1292 18.1177 4.08157 18.5365 4.44162C21.3811 6.88721 22.6171 10.7195 21.7374 14.3663C20.8577 18.013 18.0104 20.8603 14.3636 21.74C10.7169 22.6197 6.88459 21.3837 4.439 18.5391C4.07895 18.1203 4.12657 17.489 4.54536 17.1289C4.96415 16.7689 5.59552 16.8165 5.95557 17.2353C7.91188 19.5108 10.9775 20.4995 13.8946 19.7958C16.8118 19.0921 19.0895 16.8144 19.7932 13.8973C20.4969 10.9801 19.5081 7.91451 17.2326 5.95819C16.8139 5.59815 16.7662 4.96678 17.1263 4.54799ZM15.7303 9.35823L15.6473 9.27364C15.2876 8.90707 14.6975 8.90707 14.3471 9.28304L11.055 12.5726L9.65294 11.1627C9.2933 10.7962 8.71235 10.7962 8.35272 11.1627L8.26973 11.2473C7.91009 11.6139 7.91009 12.206 8.26973 12.5726L10.4003 14.725C10.7599 15.0915 11.3409 15.0915 11.7005 14.725L15.7303 10.6835C16.0899 10.3169 16.0899 9.72479 15.7303 9.35823Z" fill="#D42525"></path></svg><p class="Typography__Text-sc-1i53v7a-0 bKROVL typography" color="#505460">Giúp học viên tự tin giao tiếp và đạt điểm cao trong kỳ thi IELTS</p></div></div><div><a href="/gioi-thieu-linearthinking" target="_blank" rel="noopener noreferrer" class="NewTabLink__StyledLink-sc-hb1elp-0 heLuFp"></a></div>
-</div>
-  <!-- 4 ảnh bên phải -->
-  <div class="hero-right">
-  <img loading="eager" src="https://img.dolenglish.vn/rs:auto:::0/w:236/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL1o0NXJvckZvUmxXcEMxTUNoWDdj" alt="teamwork">
-  <div class="banner"></div><div class="banner"><img loading="eager" src="https://img.dolenglish.vn/rs:auto:::0/w:236/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuLzE3N0lTNDh5UjZ5SVdDYzYwRnZm" alt="Thành tích học viên - Thầy Phúc"></div>
-  <div class="banner"><img loading="eager" src="https://img.dolenglish.vn/rs:auto:::0/w:236/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0E5eFlmRWNNVFNHNmluNlZxQ0No" alt="Thành tích học viên - Thầy Thọ"></div>
-  <div class="banner">
-  <img loading="eager" src="https://img.dolenglish.vn/rs:auto:::0/w:236/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0k2a1ZqbmZTN09VSFRmM0g3UHh3" alt="Lớp cô Quỳnh"></div>
-  </div>
-
-
-</section>
-
-<section class="testimonial-section">
-  <div class="testimonial-container">
-    <h2 class="testimonial-title">Why people choose IELTS Learning Platform</h2>
-
-    <div class="testimonial-list">
-      <!-- CARD 1 -->
-      <div class="testimonial-card">
-        <div class="testimonial-user">
-          <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/5i5srEZb2oOiyBzsckTgCE/9e395a15dc3a0ee381ba8cad950694fa/Sarah_W..jpeg?auto=format&compress&w=64&h=64&fit=crop">
-          <div class="testimonial-name">Sarah W.</div>
-        </div>
-        <p>"IELTS Learning Platform’s reputation for high-quality lessons, combined with its flexible structure, allowed me to focus on improving my English skills while still balancing family, health, and everyday responsibilities."</p>
-      </div>
-
-      <!-- CARD 2 -->
-      <div class="testimonial-card">
-        <div class="testimonial-user">
-          <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/1hutGkdWK4YixkAB4MRESr/6d9020693440cba7c65f2ae12cdc91e8/NoerisB.jpg?auto=format&compress&w=64&h=64&fit=crop">
-          <div class="testimonial-name">Noeris B.</div>
-        </div>
-        <p>"IELTS Learning Platform rebuilt my confidence and showed me I could aim higher. It wasn’t just about improving my English—it was about believing in my potential again."</p>
-      </div>
-
-      <!-- CARD 3 -->
-      <div class="testimonial-card">
-        <div class="testimonial-user">
-          <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/4Y6jSp1xS4TKuPRNEIYAof/3e3baba688ce331ff7577f5583fc5c87/Abdullahi_M.jpg?auto=format&compress&w=64&h=64&fit=crop">
-          <div class="testimonial-name">Abdullahi M.</div>
-        </div>
-        <p>"I now feel more prepared to take on academic challenges and have already started guiding some of my peers in their IELTS journey."</p>
-      </div>
-
-      <!-- CARD 4 -->
-      <div class="testimonial-card">
-        <div class="testimonial-user">
-          <img src="https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/3H5hysCHFHUu7JWjv0FXCC/aab7b9f6be57cda1552bb52fcb6f8098/Anas_Alubaidi_pic.JPEG?auto=format&compress&w=64&h=64&fit=crop">
-          <div class="testimonial-name">Anas A.</div>
-        </div>
-        <p>"Learning with IELTS Learning Platform has expanded my academic expertise by giving me access to effective strategies, practical tools, and global perspectives on English learning."</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<section class="SectionV3-sc-ja3b3p-0 jMIpE bg-pink-50">
-  <div class="ResponsiveContainer-sc-1yjxf9x-0 PajAT">
-
-    <div class="NewsAboutDolV3__Content-sc-vjhoc1-0 hIKDWJ">
-
-      <div class="NewsAboutDolV3__Header-sc-vjhoc1-1 dqpkLf">
-        <p class="Typography__Text-sc-1i53v7a-0 eYpLRV typography">
-          Được đánh giá tốt từ các đơn vị uy tín
-        </p>
-        <p class="Typography__Text-sc-1i53v7a-0 kKObDG typography">
-          Báo chí viết về IELTS Learning Platform
-        </p>
-      </div>
-
-      <div class="NewsAboutDolV3__NewsList-sc-vjhoc1-2 lbBgnJ">
-
-        <!-- LOGO 1 -->
-        <a href="https://youtu.be/LTkW7oiLSU0" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0NmMWUwQ3ZQUlV5dnFQR1N3SUpu"></div>
-        </a>
-
-        <!-- LOGO 2 -->
-        <a href="https://www.youtube.com/watch?v=FXLBhiR90ac" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0VOWUl1aXZNUzR5OW8xaWhjUU5S"></div>
-        </a>
-
-        <!-- LOGO 3 -->
-        <a href="https://thanhnien.vn/dung-toan-de-day-hoc-tieng-anh-post1415347.html" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL1lHNXpZMmFSYmlNOVd2dDFpcmxB"></div>
-        </a>
-
-        <!-- LOGO 4 -->
-        <a href="https://tuoitre.vn/" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0JTWkdwbDlTR0NnSXFoaEx5S2VM"></div>
-        </a>
-
-        <!-- LOGO 5 -->
-        <a href="https://nhandan.vn/" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL054ZWZHckFUcUNnTGNJZnU0cm1T"></div>
-        </a>
-
-        <!-- LOGO 6 -->
-        <a href="https://edu2review.com/" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL1pUSmFYam90VEFxWXVzd3FjaVB6"></div>
-        </a>
-
-        <!-- LOGO 7 -->
-        <a href="https://www.youtube.com/watch?v=akQGNLc2r9g" class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div><img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL3FPeDU5eEpGUWlRMnRKOHNHUHZ3"></div>
-        </a>
-        <!-- LOGO 8 (clone HTV9) -->
-        <a href="https://youtu.be/LTkW7oiLSU0" target="_blank" rel="noopener noreferrer nofollow"
-           title="Truyền hình HTV vinh danh DOL"
-           class="NewsAboutDolV3__NewsItem-sc-vjhoc1-3 cQnZpW">
-          <div style="line-height:0">
-            <img src="https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0NmMWUwQ3ZQUlV5dnFQR1N3SUpu"
-                 loading="lazy"
-                 alt="HTV9 Clone"
-                 class="LazyImage__Img-sc-12k26ab-0 gnjMsz">
+<!-- ═══════ TESTIMONIALS ═══════ -->
+<section class="testimonials-section">
+  <div class="testimonials-inner">
+    <div class="eyebrow" style="color:var(--primary);background:var(--primary-lt);">Reviews</div>
+    <h2 class="sec-title">Why people choose <em>our Platform</em></h2>
+    <div class="testi-grid">
+      <% [
+        { name: "Sarah W.",     img: "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/5i5srEZb2oOiyBzsckTgCE/9e395a15dc3a0ee381ba8cad950694fa/Sarah_W..jpeg?auto=format&compress&w=64&h=64&fit=crop",   text: "High-quality lessons combined with flexible structure allowed me to focus on improving my English while balancing family and everyday responsibilities." },
+        { name: "Noeris B.",   img: "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/1hutGkdWK4YixkAB4MRESr/6d9020693440cba7c65f2ae12cdc91e8/NoerisB.jpg?auto=format&compress&w=64&h=64&fit=crop",  text: "This platform rebuilt my confidence and showed me I could aim higher. It wasn't just about improving my English — it was about believing in my potential again." },
+        { name: "Abdullahi M.",img: "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/4Y6jSp1xS4TKuPRNEIYAof/3e3baba688ce331ff7577f5583fc5c87/Abdullahi_M.jpg?auto=format&compress&w=64&h=64&fit=crop", text: "I now feel more prepared to take on academic challenges and have already started guiding some of my peers in their IELTS journey." },
+        { name: "Anas A.",     img: "https://d3njjcbhbojbot.cloudfront.net/api/utilities/v1/imageproxy/https://images.ctfassets.net/00atxywtfxvd/3H5hysCHFHUu7JWjv0FXCC/aab7b9f6be57cda1552bb52fcb6f8098/Anas_Alubaidi_pic.JPEG?auto=format&compress&w=64&h=64&fit=crop",    text: "This platform expanded my academic expertise by giving me access to effective strategies, practical tools, and global perspectives on English learning." },
+      ].each do |t| %>
+        <div class="testi-card">
+          <div class="testi-user">
+            <img src="<%= t[:img] %>" alt="<%= t[:name] %>">
+            <div>
+              <div class="testi-user-name"><%= t[:name] %></div>
+              <div class="testi-stars">★★★★★</div>
+            </div>
           </div>
+          <p class="testi-quote"><%= t[:text] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ PRESS ═══════ -->
+<section class="press-section">
+  <div class="press-inner">
+    <div class="press-header">
+      <p class="press-sub">Được đánh giá tốt từ các đơn vị uy tín</p>
+      <p class="press-heading">Báo chí viết về <em>IELTS Learning Platform</em></p>
+    </div>
+    <div class="press-grid">
+      <% [
+        ["https://youtu.be/LTkW7oiLSU0",                                      "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0NmMWUwQ3ZQUlV5dnFQR1N3SUpu"],
+        ["https://www.youtube.com/watch?v=FXLBhiR90ac",                        "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0VOWUl1aXZNUzR5OW8xaWhjUU5S"],
+        ["https://thanhnien.vn/dung-toan-de-day-hoc-tieng-anh-post1415347.html","https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL1lHNXpZMmFSYmlNOVd2dDFpcmxB"],
+        ["https://tuoitre.vn/",                                                "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0JTWkdwbDlTR0NnSXFoaEx5S2VM"],
+        ["https://nhandan.vn/",                                                "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL054ZWZHckFUcUNnTGNJZnU0cm1T"],
+        ["https://edu2review.com/",                                            "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL1pUSmFYam90VEFxWXVzd3FjaVB6"],
+        ["https://www.youtube.com/watch?v=akQGNLc2r9g",                        "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL3FPeDU5eEpGUWlRMnRKOHNHUHZ3"],
+        ["https://youtu.be/LTkW7oiLSU0",                                      "https://img.dolenglish.vn/rs:auto:::0/h:44/q:90/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL0NmMWUwQ3ZQUlV5dnFQR1N3SUpu"],
+      ].each do |url, logo| %>
+        <a href="<%= url %>" target="_blank" rel="noopener" class="press-item">
+          <img src="<%= logo %>" alt="">
         </a>
-        
-      </div>
+      <% end %>
     </div>
   </div>
 </section>
 
-
-<section>
-  <div class="AnimatedImageLayout__Main-sc-10ir0uo-0 gMuBkZ common-dol-register common-dol-register">
-    <div class="backgroundWrp">
-      <div class="imgWrp">
-        <img src="https://img.dolenglish.vn/rs:auto:::0/w:1080/q:80/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL3I1T0dac0ZCUWZTRDhyUkFoUUNI" alt="about-dol">
-      </div>
-      <div class="imgWrp">
-        <img src="https://img.dolenglish.vn/rs:auto:::0/w:1080/q:80/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL3I1T0dac0ZCUWZTRDhyUkFoUUNI" alt="about-dol">
-      </div>
-    </div>
-    <div class="gradientWrp"></div>
-    <div class="container">
-      <div class="caption">Welcome to IELTS Learning Platform</div>
+<!-- ═══════ BANNER CTA ═══════ -->
+<section class="banner-cta">
+  <div class="banner-cta-bg">
+    <img src="https://img.dolenglish.vn/rs:auto:::0/w:1080/q:80/format:webp/aHR0cHM6Ly9hc3NldC5kb2xlbmdsaXNoLnZuL3I1T0dac0ZCUWZTRDhyUkFoUUNI" alt="">
+  </div>
+  <div class="banner-cta-overlay"></div>
+  <div class="banner-cta-content">
+    <h2>Welcome to <em>IELTS Learning Platform</em></h2>
+    <div class="banner-cta-btns">
+      <%= link_to "Bắt đầu ngay", students_courses_path, class: "btn-primary" %>
+      <%= link_to "Khóa học của tôi", students_courses_path(paid: true),
+            style: "display:inline-flex;align-items:center;gap:8px;padding:12px 26px;background:transparent;color:#fff;font-size:14px;font-weight:700;border-radius:var(--r-md);text-decoration:none;border:1.5px solid rgba(255,255,255,.4);transition:all .2s;",
+            onmouseover: "this.style.background='rgba(255,255,255,.1)'",
+            onmouseout:  "this.style.background='transparent'" %>
     </div>
   </div>
 </section>
 
-
-<!-- PAYMENT MODAL -->
-<div id="payment-modal"
-     class="fixed inset-0 z-[9999] hidden items-center justify-center">
-
-  <!-- Overlay -->
-  <div class="absolute inset-0 bg-black/50"
-       onclick="closePaymentModal()"></div>
-
-  <!-- Modal box -->
-  <div class="relative bg-white rounded-3xl shadow-2xl
-              max-w-md min-h-[520px]
-              px-8 pt-10 pb-14 z-10 flex flex-col">
-
-    <h2 class="text-2xl font-bold mb-6 mt-6">Thanh toán khóa học</h2>
-
-    <p id="modal-course-title" class="font-semibold mb-2"></p>
-    <p id="modal-course-price" class="text-2xl text-red-500 mb-6"></p>
-
-    <form id="payment-form"
-      method="post">
-
-  <!-- CSRF TOKEN -->
-  <input type="hidden"
-         name="authenticity_token"
-         value="<%= form_authenticity_token %>">
-
-  <input type="hidden"
-         name="course_id"
-         id="modal-course-id">
-
-  <!-- PAYMENT METHOD -->
-  <label class="flex gap-3 p-4 border rounded-xl cursor-pointer mb-4">
-    <input type="radio"
-           name="payment_method"
-           value="vnpay"
-           checked>
-    <span>VNPay</span>
-  </label>
-
-  <button type="submit"
-          class="w-full bg-pink-500 text-white py-3 rounded-lg mb-6">
-    Xác nhận thanh toán
-  </button>
-</form>
-
-
-    <!-- Close -->
-    <button onclick="closePaymentModal()"
-      class="absolute top-4 right-4 text-xl">✕</button>
-
+<!-- ═══════ PAYMENT MODAL ═══════ -->
+<div class="modal-overlay" id="paymentModal">
+  <div class="modal-bg" onclick="closePaymentModal()"></div>
+  <div class="modal-box">
+    <button class="modal-close" onclick="closePaymentModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="modal-heading">Thanh toán</div>
+    <div class="modal-course" id="modalCourseName"></div>
+    <div class="modal-price"  id="modalCoursePrice"></div>
+    <form id="paymentForm" method="post">
+      <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+      <input type="hidden" name="course_id" id="modalCourseId">
+      <label class="pay-method"><input type="radio" name="payment_method" value="vnpay" checked><span>💳 VNPay</span></label>
+      <label class="pay-method"><input type="radio" name="payment_method" value="momo"><span>💜 MoMo</span></label>
+      <button type="submit" class="modal-submit">Xác nhận thanh toán →</button>
+    </form>
   </div>
 </div>
 
+<!-- ═══════ CERTIFICATE MODAL ═══════ -->
+<div class="cert-modal-overlay" id="certModal">
+  <div class="cert-modal-bg" onclick="closeCertModal()"></div>
+  <div class="cert-modal-box">
+    <button class="cert-modal-close" onclick="closeCertModal()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="cert-modal-header">
+      <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" alt="IELTS">
+      <h3>📜 IELTS CERTIFICATION FROM LEARNER</h3>
+    </div>
+    <div class="cert-modal-body" id="certModalBody"></div>
+  </div>
+</div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const track = document.getElementById("course-track")
-  const dots  = document.querySelectorAll("#slick-dots li")
 
+  // ── Course slider ──
+  const courseTrack = document.getElementById("courseTrack")
+  const courseDots  = document.querySelectorAll("#courseDots li")
   const totalCourses = <%= courses.size %>
   const perPage = 3
-  const slideWidth = 320
-  const stepWidth = slideWidth * perPage
   const totalPages = Math.ceil(totalCourses / perPage)
 
-  if (!track || totalCourses <= perPage) return
-
-  let index = 1
-  let interval = null
-  const duration = 4000
-
-  track.style.transform = `translateX(-${stepWidth}px)`
-
-  function updateDots(page) {
-    dots.forEach(d => d.classList.remove("slick-active"))
-    dots[page].classList.add("slick-active")
-  }
-
-  function moveTo(i, animate = true) {
-    track.style.transition = animate ? "transform 0.7s ease-in-out" : "none"
-    track.style.transform = `translateX(-${i * stepWidth}px)`
-  }
-
-  function start() {
-    interval = setInterval(() => {
-      index++
-      moveTo(index)
-
-      if (index === totalPages + 1) {
-        setTimeout(() => {
-          index = 1
-          moveTo(index, false)
-        }, 700)
-      }
-
-      updateDots((index - 1) % totalPages)
-    }, duration)
-  }
-
-  function stop() {
-    clearInterval(interval)
-    interval = null
-  }
-
-  dots.forEach((dot, i) => {
-    dot.addEventListener("click", () => {
-      stop()
-      index = i + 1
-      moveTo(index)
-      updateDots(i)
-      start()
-    })
-  })
-
-  track.addEventListener("mouseenter", stop)
-  track.addEventListener("mouseleave", start)
-
-  start()
-})
-</script>
-
-<!-- ================= STYLE ================= -->
-<style>
-
-.slick-dots li button {
-  background: #d1d5db;
-}
-.slick-dots li.slick-active button {
-  background: #2563eb;
-}
-</style>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const track = document.getElementById("teacher-track")
-  if (!track) return
-
-  const slideCount = <%= teachers.size %>
-  if (slideCount <= 3) return
-
-  let index = 3
-  let interval = null
-  const duration = 4500
-
-  function moveTo(i, animate = true) {
-    track.style.transition = animate ? "transform 0.7s ease-in-out" : "none"
-    track.style.transform = `translateX(-${(i * 100) / 3}%)`
-  }
-
-  function start() {
-    interval = setInterval(() => {
-      index++
-      moveTo(index)
-
-      if (index === slideCount + 3) {
-        setTimeout(() => {
-          index = 3
-          moveTo(index, false)
-        }, 700)
-      }
-    }, duration)
-  }
-
-  function stop() {
-    clearInterval(interval)
-    interval = null
-  }
-
-  moveTo(index, false)
-  start()
-
-  track.addEventListener("mouseenter", stop)
-  track.addEventListener("mouseleave", start)
-})
-</script>
-
-<style>
-  .slick-dots li button {
-    background: #d1d5db;
-  }
-  .slick-dots li.slick-active button {
-    background: #2563eb;
-  }
-  #teacher-track {
-  will-change: transform;
-}
-
-</style>
-
-<script>
-function openPaymentModal(courseId, title, price) {
-  console.log("OPEN MODAL", courseId)
-
-  document.getElementById("modal-course-title").innerText = title
-  document.getElementById("modal-course-price").innerText = price
-  document.getElementById("modal-course-id").value = courseId
-
-  const form = document.getElementById("payment-form")
-  form.action = `/students/payments?order_id=${orderId}`
-
-
-  const modal = document.getElementById("payment-modal")
-  modal.classList.remove("hidden")
-  modal.classList.add("flex")
-}
-
-function closePaymentModal() {
-  const modal = document.getElementById("payment-modal")
-  modal.classList.add("hidden")
-  modal.classList.remove("flex")
-}
-</script>
-
-<script>
-  document.querySelectorAll(".pay-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const courseId = btn.dataset.courseId
-      document.getElementById("selected-course-id").value = courseId
-
-      const form = document.getElementById("payment-form")
-      form.action = `/students/payments?order_id=${orderId}`
-
-    })
-  })
-</script>
-
-<style>
-/* SECTION */
-.SectionV3-sc-ja3b3p-0 {
-  padding: 80px 0;
-  background: #fff;
-}
-
-/* CONTAINER */
-.ResponsiveContainer-sc-1yjxf9x-0 {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 24px;
-}
-
-/* HEADER */
-.NewsAboutDolV3__Header-sc-vjhoc1-1 {
-  text-align: center;
-  margin-bottom: 48px;
-}
-
-/* subtitle */
-.NewsAboutDolV3__Header-sc-vjhoc1-1 .eYpLRV {
-  font-size: 20px;
-  font-weight: 600;
-  color: #555;
-  margin-bottom: 8px;
-}
-
-/* title */
-.NewsAboutDolV3__Header-sc-vjhoc1-1 .kKObDG {
-  font-size: 44px;
-  font-weight: 900;
-  color: #000;
-  letter-spacing: -0.5px;
-}
-
-/* LOGO GRID */
-.NewsAboutDolV3__NewsList-sc-vjhoc1-2 {
-  display: grid !important;
-  grid-template-columns: repeat(4, 1fr); /* 4 logo mỗi hàng */
-  gap: 32px 40px;
-  align-items: center;
-  justify-items: center;
-  margin-top: 32px;
-}
-
-/* LOGO ITEM */
-.NewsAboutDolV3__NewsItem-sc-vjhoc1-3 {
-  width: 100%;
-  height: 90px;
-  background: #fff;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 8px 22px rgba(0,0,0,0.06);
-  transition: 0.25s ease;
-}
-
-/* FIX div bọc ảnh */
-.NewsAboutDolV3__NewsItem-sc-vjhoc1-3 > div {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* hover effect */
-.NewsAboutDolV3__NewsItem-sc-vjhoc1-3:hover {
-  transform: translateY(-6px) scale(1.03);
-  box-shadow: 0 14px 30px rgba(0,0,0,0.12);
-}
-
-/* LOGO IMAGE */
-.NewsAboutDolV3__NewsItem-sc-vjhoc1-3 img {
-  max-height: 44px;
-  max-width: 80%;
-  object-fit: contain;
-  filter: grayscale(100%);
-  opacity: 0.85;
-  transition: 0.25s ease;
-}
-
-/* hover logo */
-.NewsAboutDolV3__NewsItem-sc-vjhoc1-3:hover img {
-  filter: grayscale(0%);
-  opacity: 1;
-  transform: scale(1.05);
-}
-
-/* RESPONSIVE MOBILE */
-@media (max-width: 900px) {
-  .NewsAboutDolV3__NewsList-sc-vjhoc1-2 {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-  }
-
-  .NewsAboutDolV3__Header-sc-vjhoc1-1 .kKObDG {
-    font-size: 32px;
-  }
-}
-
-/* Tổng thể section */
-.testimonial-section {
-  padding: 60px 0;
-  background: #f8f9fb;
-}
-
-.testimonial-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 20px;
-}
-
-.testimonial-title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 30px;
-}
-
-/* Container chứa card */
-.testimonial-list {
-  display: flex;
-  gap: 32px;
-  justify-content: center;
-  flex-wrap: nowrap;
-}
-
-/* Card */
-.testimonial-card {
-  flex: 0 0 calc((100% - 24px) / 4); /* 4 card, 3 gap */
- background: linear-gradient(135deg, #ffc1cc, #ffe4e1);
-  padding: 20px;
-  border-radius: 14px;
-  color: white;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  transition: 0.3s ease;
-}
-
-.testimonial-card:hover {
-  transform: translateY(-6px);
-}
-
-/* Avatar + tên */
-.testimonial-user {
-  display: flex;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.testimonial-user img {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 2px solid white;
-  margin-right: 10px;
-}
-
-.testimonial-name {
-  font-weight: 600;
-  font-size: 16px;
-}
-
-.testimonial-card p {
-  font-size: 14px;
-  line-height: 1.5;
-  font-style: italic;
-}
-/* Section container */
-
-
-.common-dol-register {
-  position: relative;
-  overflow: hidden;
-  height: 260px;
-}
-
-.CommonDolRegister__AnimatedRow-sc-1v42bl4-1 {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  will-change: transform;
-  transition: transform 0.8s ease;
-}
-
-/* mỗi slide */
-.backgroundWrp {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-}
-
-.backgroundWrp-track {
-  position: absolute;
-  width: 100%;
-  will-change: transform;
-}
-
-.backgroundWrp .imgWrp {
-  width: 100%;
-  height: 150vh;
-}
-
-.backgroundWrp img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.backgroundWrp::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.27); /* chỉnh độ trắng */
-  z-index: 2;
-  pointer-events: none;
-}
-
-#form-register {
-  max-width: 700px;
-  color: white;
-}
-
-#form-register h2 {
-  font-size: 42px;
-  font-weight: 800;
-  line-height: 1.2;
-  margin-bottom: 40px;
-}
-
-/* Contact cards */
-/* Contact cards - RÕ RÀNG */
-.DolContact__InfoLink-sc-1777iym-0 {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-.DolContact__InfoLink-sc-1777iym-0 > :not(.icon) {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* ===== CARD CONTAINER ===== */
-
-
-
-.card-right:hover .waving-flag svg {
-  animation-duration: 1.2s;
-  transform: scale(1.1);
-}
-
-
-/* SVG góc phải */
-.icon-wrapper {
-  position: absolute;
-  top: 20px;
-  right: -20px;
-  opacity: 0.25;
-  transition: all 0.4s ease;
-}
-
-.card-right:hover .icon-wrapper {
-  opacity: 0.5;
-  transform: scale(1.1);
-}
-  card-content h3 {
-  font-size: 22px;
-  font-weight: 700;
-  margin-bottom: 12px;
-}
-
-.card-content p {
-  color: #555;
-  line-height: 1.6;
-  max-width: 80%;
-}
-.card-left h3 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 12px;
-}
-.icon-5 
-{ width: 200px; 
-height: 200px; 
-bottom: -20px;
-right: 50px;
-} 
-.card-left p {
-  font-size: 15px;
-  color: #505460;
-  line-height: 1.6;
-  max-width: 420px;
-}
-
-.card-right h3 {
-  font-size: 26px;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 12px;
-}
-
-.card-right p {
-  font-size: 15px;
-  color: #505460;
-  line-height: 1.6;
-  max-width: 420px;
-}
-
-.tagline {
-  font-size: 14px;
-  color: #2B61D4;
-  font-weight: 600;
-  margin-top: 6px;
-}
-
-.icon {
-  position: absolute;
-  width: 60px;
-  transition: all 0.6s ease;
-  opacity: 0.85;
-}
-
-/* trên trái */
-.icon-1 {
-  top: 30px;
-  left: 30px;
-}
-
-/* giữa phải */
-.icon-2 {
-  bottom: 0px;
-  right: 10px;
-  transform: translateY(-50%);
-}
-
-/* dưới trái */
-.icon-3 {
-  bottom: 40px;
-  left: 60px;
-}
-
-.icon-4 {
-  top: 40px;
-  right: 15px;
-}
-
-.feature-card:hover .icon-2 {
-  transform: translate(0px, -30px) rotate(25deg);
-}
-
-.feature-card:hover .icon-3 {
-  transform: translate(12px, -18px) rotate(30deg);
-}
-
-feature-card:hover .icon-3 {
-  transform: translate(25px, -10px) rotate(45deg);
-}
-.card-left:hover .icon-1 {
-  transform: translateX(40px) translateY(-10px) scale(1.1);
-  opacity: 1;
-}
-
-.card-left:hover .icon-2 {
-  transform: translateX(80px) translateY(-20px) rotate(10deg);
-  opacity: 1;
-}
-
-.card-left:hover .icon-3 {
-  transform: translateX(120px) translateY(-40px) scale(1.2);
-  opacity: 1;
-}
-.card-left:hover .icon-4 {
-  transform: translateX(140px) translateY(-20px) scale(1.2);
-  opacity: 1;
-}
-.feature-section {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* trái | phải */
-  gap: 40px;
-  max-width: 1400px; /* hoặc bỏ luôn */
-  width: 100%;
-  margin: 0 auto;
-  padding: 80px 20px;
-}
-.card-left {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  min-height: 320px;
-  width: 100%;          /* chiếm full container */
-  max-width: 920px;     /* giới hạn độ rộng card */
-  margin-left: 0;       /* dính bên trái */
-  margin-right: auto;   /* không center */
-  margin-top: 45px;
-  margin-bottom: 18px;
-  padding: 28px;
-  background: #f6f8fe;
-  border-radius: 22px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.08);
-  overflow: hidden;
-
-  transition: transform .45s ease, box-shadow .45s ease;
-}
-.card-right {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  min-height: 320px;
-  width: 100%;          /* chiếm full container */
-  max-width: 920px;     /* giới hạn độ rộng card */
-  margin-bottom: 18px;
-  margin-left: auto;    /* dính bên phải */
-  margin-right: 0;      /* không center */
-  margin-top: 45px;
-
-  padding: 28px;
-  background: #f6f8fe;
-  border-radius: 22px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.08);
-  overflow: hidden;
-
-  transition: transform .45s ease, box-shadow .45s ease;
-}
-
-.feature-card {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 32px;
-  flex: 1;
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 28px;
-  margin-top: -18px;
-  background: #f6f8fe;
-  border-radius: 22px;
-  box-shadow: 0 18px 50px rgba(0,0,0,.08);
-  overflow: hidden;
-
-  transition: transform .45s ease, box-shadow .45s ease;
-}
-
-/* hover nâng card */
-.feature-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 28px 80px rgba(0,0,0,.12);
-}
-
-/* ===== TEXT WRAPPER ===== */
-.text-box {
-  position: relative;
-  width: 55%;
-  min-height: 180px;
-}
-
-/* BEFORE + AFTER CONTENT */
-.feature-card .content {
-  transition: opacity .4s ease, transform .4s ease;
-}
-
-/* after hidden */
-.feature-card .content.after {
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transform: translateY(14px);
-  pointer-events: none;
-}
-.feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-.bg-pink-50 {
-  background: #fff1f2 !important; /* giống Tailwind pink-50 */
-}
-
-.feature-list li {
-  display: flex;            /* QUAN TRỌNG */
-  align-items: center;       /* icon + text cùng hàng */
-  gap: 10px;  
-  margin-bottom: 20px;                /* khoảng cách icon - text */
-}
-
-/* remove margin của p */
-.feature-list p {
-  margin: 0;
-  display: inline-block;     /* tránh xuống dòng */
-  font-size: 14px;
-  color: #505460;
-}
-
-.feature-list svg {
-  flex-shrink: 0;
-  color: #2B61D4;
-}
-
-/* BEFORE hover out */
-.feature-card:hover .content.before {
-  opacity: 0;
-  transform: translateY(-14px);
-}
-
-/* AFTER hover in */
-.feature-card:hover .content.after {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ===== AFTER LIST 2 COLUMNS ===== */
-.feature-card .content.after ul {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 6px 22px;
-  padding-left: 18px;
-  font-size: 14px;
-}
-
-/* ===== IMAGE RIGHT ===== */
-.compare-right {
-  position: relative;
-  width: 320px;
-  height: 300px;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 18px 40px rgba(0,0,0,.22);
-  flex-shrink: 0;
-}
-
-/* stack images */
-.compare-right img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity .55s ease, transform .55s ease;
-}
-
-/* after image hidden */
-.after-img {
-  opacity: 0;
-  transform: scale(1.03);
-}
-
-/* hover switch image */
-.feature-card:hover .before-img {
-  opacity: 0;
-  transform: scale(1.05);
-}
-
-.feature-card:hover .after-img {
-  opacity: 1;
-  transform: scale(1);
-}
-
-/* ===== LIST STAGGER ANIMATION (xịn) ===== */
-.feature-card .content.after li {
-  opacity: 0;
-  transform: translateY(8px);
-  transition: all .35s ease;
-}
-
-.feature-card:hover .content.after li {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.feature-card:hover .content.after li:nth-child(1) { transition-delay: .05s; }
-.feature-card:hover .content.after li:nth-child(2) { transition-delay: .1s; }
-.feature-card:hover .content.after li:nth-child(3) { transition-delay: .15s; }
-.feature-card:hover .content.after li:nth-child(4) { transition-delay: .2s; }
-.feature-card:hover .content.after li:nth-child(5) { transition-delay: .25s; }
-.feature-card:hover .content.after li:nth-child(6) { transition-delay: .3s; }
-
-/* ===== PREMIUM GLOW EFFECT ===== */
-.feature-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at right, rgba(79,70,229,.15), transparent 60%);
-  opacity: 0;
-  transition: opacity .4s ease;
-}
-
-.feature-card:hover::before {
-  opacity: 1;
-}
-
-/* ===== PERFORMANCE BOOST ===== */
-.feature-card, 
-.compare-right img {
-  will-change: transform, opacity;
-}
-
-.hero-wrapper {
-  width: 100%;
-  background: #fff;
-}
-
-.hero-container {
-  max-width: 1200px;
-  margin: auto;
-  padding: 60px 20px;
-
-  display: flex;
-  align-items: center; /* canh giữa theo chiều dọc */
-  gap: 40px;
-}
-
-/* LEFT TEXT */
-.hero-left {
-  flex: 1; /* chiếm 50% */
-
-}
-
-/* RIGHT IMAGES */
-.hero-right {
-  flex: 1; /* chiếm 50% */
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
-.hero-right img {
-  width: 100%;
-  border-radius: 16px;
-  object-fit: cover;
-}
-
-
-@media (min-width: 1144px) {
-  .iqgVvA {
-    font-size: 40px;
-    line-height: 52px;
-    font-weight: 700;
-  }
-}
-@media (min-width: 458px) {
-  .iqgVvA {
-    font-size: 32px;
-    line-height: 40px;
-    font-weight: 700;
-  }
-}
-.iqgVvA {
-  margin-block: 0px;
-  margin-inline: 0px;
-  color: rgb(209, 66, 66);
-  font-size: 32px;
-  line-height: 40px;
-  font-weight: 700;
-}
-
-.jXebak {
-  display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 12px; 
-  margin-bottom: 8px;
-}
-*, ::before, ::after {
-  box-sizing: border-box;
-}
-.iynLCX .content .description {
-  white-space: pre-wrap;
-}
-.iPYSmy {
-  font-family: "Inter";
-}
-
-.HeaderV2__AnimatedHeadlineIcon-sc-1wiaiw-4 {
-  display: inline-block;
-  margin-left: 12px;
-  vertical-align: middle;
-}
-.HeaderV2__DescriptionItemWrapper-sc-1wiaiw-2 {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 8px; /* giảm spacing */
-}
-
-
-</style>
-
-<!-- Certificate Modal -->
-<div id="certificate-modal"
-     class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-  <div class="bg-white rounded-xl shadow-xl max-w-xl relative">
-    <button id="close-certificate"
-            class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
-      ✕
-    </button>
-    <!-- Modal header --> 
-    <!-- Modal header --> <div class="px-6 py-4 border-b flex flex-col items-center"> <!-- Logo --> <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" class="h-12 mb-8" alt="IELTS Logo"/> <!-- Title --> <h2 class="text-lg font-semibold text-gray-800" mt-6>📜 IELTS CERTIFICATION FROM LEARNER</h2> </div>
-    <div id="certificate-body" class="p-4 text-center">
-    <div id="certificate-body" class="p-6 flex justify-center items-center"> <!-- ảnh chứng chỉ sẽ load vào đây --> </div>
-    </div>
-  </div>
-</div>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const modal = document.getElementById("certificate-modal");
-    const modalBody = document.getElementById("certificate-body");
-    const closeBtn = document.getElementById("close-certificate");
-
-    document.querySelectorAll("img[data-certificate-url]").forEach(img => {
-      img.addEventListener("click", () => {
-        const url = img.getAttribute("data-certificate-url");
-        if (url) {
-          modalBody.innerHTML = `<img src="${url}" class="max-h-[80vh] mx-auto rounded shadow"/>`;
-          modal.classList.remove("hidden");
-        }
-      });
-    });
-
-    closeBtn.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      modalBody.innerHTML = "";
-    });
-  });
-</script>
-
-<script>
-const gradient = document.querySelector('.gradientWrp');
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      gradient.classList.add('active');
+  if (courseTrack && totalCourses > perPage) {
+    let ci = 1, cTimer = null
+    const cStep = 100 / perPage
+    courseTrack.style.transform = `translateX(-${cStep * perPage}%)`
+
+    function moveCourse(i, a = true) {
+      courseTrack.style.transition = a ? "transform .65s cubic-bezier(.4,0,.2,1)" : "none"
+      courseTrack.style.transform = `translateX(-${i * cStep * perPage}%)`
     }
-  });
-});
-observer.observe(gradient);
+    function updateCourseDots(page) {
+      courseDots.forEach(d => d.classList.remove("active"))
+      if (courseDots[page]) courseDots[page].classList.add("active")
+    }
+    function startCourse() {
+      cTimer = setInterval(() => {
+        ci++; moveCourse(ci)
+        if (ci === totalPages + 1) setTimeout(() => { ci = 1; moveCourse(ci, false) }, 700)
+        updateCourseDots((ci - 1) % totalPages)
+      }, 4000)
+    }
+    function stopCourse() { clearInterval(cTimer) }
 
-</script>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const bg = document.querySelector(".backgroundWrp");
-  const images = bg.querySelectorAll(".imgWrp");
-
-  // tạo track wrapper
-  const track = document.createElement("div");
-  track.className = "backgroundWrp-track";
-
-  images.forEach(img => track.appendChild(img.cloneNode(true)));
-  images.forEach(img => track.appendChild(img.cloneNode(true))); // clone lần 2
-
-  bg.innerHTML = "";
-  bg.appendChild(track);
-
-  let y = 0;
-  const speed = 0.5; // chỉnh tốc độ
-
-  function loop() {
-    y += speed;
-    track.style.transform = `translateY(-${y}px)`;
-
-    const height = track.scrollHeight / 2;
-    if (y >= height) y = 0;
-
-    requestAnimationFrame(loop);
+    courseDots.forEach((dot, i) => {
+      dot.addEventListener("click", () => { stopCourse(); ci = i + 1; moveCourse(ci); updateCourseDots(i); startCourse() })
+    })
+    courseTrack.addEventListener("mouseenter", stopCourse)
+    courseTrack.addEventListener("mouseleave", startCourse)
+    startCourse()
   }
 
-  loop();
-});
+  // ── Teacher slider ──
+  const teacherTrack = document.getElementById("teacherTrack")
+  const teacherCount = <%= teachers.size %>
+  if (teacherTrack && teacherCount > 3) {
+    let ti = 3, tTimer = null
+    function moveTeacher(i, a = true) {
+      teacherTrack.style.transition = a ? "transform .65s cubic-bezier(.4,0,.2,1)" : "none"
+      teacherTrack.style.transform = `translateX(-${(i * 100) / 3}%)`
+    }
+    function startTeacher() {
+      tTimer = setInterval(() => {
+        ti++; moveTeacher(ti)
+        if (ti === teacherCount + 3) setTimeout(() => { ti = 3; moveTeacher(ti, false) }, 700)
+      }, 4500)
+    }
+    moveTeacher(ti, false)
+    teacherTrack.addEventListener("mouseenter", () => clearInterval(tTimer))
+    teacherTrack.addEventListener("mouseleave", startTeacher)
+    startTeacher()
+  }
 
+  // ── Achievement slider ──
+  const achieveTrack = document.getElementById("achieveTrack")
+  const achieveCount = <%= achievements.size %>
+  if (achieveTrack && achieveCount > 3) {
+    let ai = 3, aTimer = null
+    function moveAchieve(i, a = true) {
+      achieveTrack.style.transition = a ? "transform .65s cubic-bezier(.4,0,.2,1)" : "none"
+      achieveTrack.style.transform = `translateX(-${(i * 100) / 3}%)`
+    }
+    function startAchieve() {
+      aTimer = setInterval(() => {
+        ai++; moveAchieve(ai)
+        if (ai === achieveCount + 3) setTimeout(() => { ai = 3; moveAchieve(ai, false) }, 700)
+      }, 4200)
+    }
+    moveAchieve(ai, false)
+    achieveTrack.addEventListener("mouseenter", () => clearInterval(aTimer))
+    achieveTrack.addEventListener("mouseleave", startAchieve)
+    startAchieve()
+  }
+
+  // ── Certificate modal ──
+  document.querySelectorAll(".achieve-card[data-cert-url]").forEach(card => {
+    card.addEventListener("click", () => {
+      document.getElementById("certModalBody").innerHTML = `<img src="${card.dataset.certUrl}" alt="Certificate">`
+      document.getElementById("certModal").classList.add("open")
+    })
+  })
+})
+
+function closePaymentModal() { document.getElementById("paymentModal").classList.remove("open") }
+function closeCertModal() {
+  document.getElementById("certModal").classList.remove("open")
+  document.getElementById("certModalBody").innerHTML = ""
+}
 </script>

@@ -1,502 +1,1060 @@
-<!-- NAVBAR -->
+<%# ============================================================
+    app/views/admin/courses/edit.html.erb
+    Design: Blue/Slate admin theme — synced with students/courses/show.html.erb style
+    ============================================================ %>
+
 <%= render "admin/shared/navbar" %>
-<div id="alert-container"
-     class="fixed top-20 right-6 z-50 w-full max-w-md space-y-3">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — BLUE/ADMIN COLOR SCHEME
+═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #2563eb;
+  --primary-lt:   #dbeafe;
+  --primary-glow: rgba(37,99,235,.18);
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --rose:         #e11d48;
+  --rose-lt:      #fce7ef;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --shadow-md: 0 6px 24px rgba(0,0,0,.09);
+  --shadow-lg: 0 16px 48px rgba(0,0,0,.12);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease: cubic-bezier(.4,0,.2,1);
+}
+
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); line-height: 1.6; }
+
+@keyframes fadeUp  { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+@keyframes slideUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:none; } }
+
+/* ═══════════════════════════════════════════
+   ALERT TOAST
+═══════════════════════════════════════════ */
+#alert-container { position:fixed; top:88px; right:24px; z-index:9999; width:100%; max-width:360px; display:flex; flex-direction:column; gap:8px; pointer-events:none; }
+.alert-toast {
+  display:flex; align-items:flex-start; gap:10px;
+  padding:13px 16px; border-radius:var(--r-md); font-size:13px; font-weight:500;
+  box-shadow:var(--shadow-md); pointer-events:auto; animation: fadeUp .25s var(--ease);
+  border:1.5px solid;
+}
+.alert-toast.danger  { background:#fff1f2; color:#be123c; border-color:#fecdd3; }
+.alert-toast.success { background:#f0fdf4; color:#15803d; border-color:#bbf7d0; }
+.alert-icon { width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+
+/* ═══════════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════════ */
+.page-hero {
+  position:relative; padding-top:80px;
+  background:var(--ink); overflow:hidden; min-height:160px;
+}
+.page-hero-bg {
+  position:absolute; inset:0;
+  background:linear-gradient(135deg,#1e3a8a 0%,#1e1b4b 100%);
+}
+.page-hero::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to right, rgba(13,14,20,.92) 0%, rgba(13,14,20,.65) 60%, rgba(13,14,20,.25) 100%);
+  pointer-events:none;
+}
+.page-hero-inner {
+  position:relative; z-index:1;
+  max-width:1100px; margin:0 auto; padding:36px 32px 42px;
+  display:flex; align-items:center; justify-content:space-between; gap:24px;
+}
+.hero-breadcrumb {
+  display:flex; align-items:center; gap:6px;
+  font-size:11px; font-weight:600; color:rgba(255,255,255,.4); margin-bottom:10px;
+  animation:fadeUp .35s var(--ease) both;
+}
+.hero-breadcrumb a { color:#93c5fd; text-decoration:none; transition:opacity .15s; }
+.hero-breadcrumb a:hover { opacity:.8; }
+.page-hero-eyebrow {
+  display:inline-flex; align-items:center; gap:6px;
+  font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  color:#93c5fd; background:rgba(37,99,235,.22); padding:3px 10px; border-radius:20px;
+  border:1px solid rgba(147,197,253,.28); margin-bottom:10px;
+  animation:fadeUp .35s var(--ease) .04s both;
+}
+.page-hero-title {
+  font-family:var(--font-serif); font-size:clamp(22px,2.5vw,34px); font-weight:400;
+  color:#fff; line-height:1.2; letter-spacing:-.02em;
+  animation:fadeUp .35s var(--ease) .07s both;
+}
+.page-hero-title em { font-style:italic; color:#93c5fd; }
+.hero-course-name {
+  font-size:13px; font-weight:600; color:rgba(255,255,255,.5);
+  font-family:var(--font-mono); margin-top:6px; animation:fadeUp .35s var(--ease) .1s both;
+  max-width:420px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.hero-actions { display:flex; align-items:center; gap:10px; animation:fadeUp .35s var(--ease) .12s both; }
+.hero-btn-cancel {
+  display:inline-flex; align-items:center; gap:7px; padding:10px 18px;
+  background:rgba(255,255,255,.08); color:rgba(255,255,255,.7); border:1.5px solid rgba(255,255,255,.18);
+  border-radius:var(--r-md); font-size:13px; font-weight:600; text-decoration:none;
+  transition:all .2s var(--ease); font-family:var(--font); cursor:pointer; backdrop-filter:blur(8px);
+}
+.hero-btn-cancel:hover { background:rgba(255,255,255,.14); color:#fff; }
+.hero-btn-save {
+  display:inline-flex; align-items:center; gap:7px; padding:10px 22px;
+  background:var(--primary); color:#fff; border:none; border-radius:var(--r-md);
+  font-size:13px; font-weight:700; cursor:pointer; transition:all .2s var(--ease);
+  box-shadow:0 4px 14px var(--primary-glow); font-family:var(--font);
+}
+.hero-btn-save:hover { background:#1d4ed8; transform:translateY(-1px); }
+
+/* ═══════════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════════ */
+.edit-layout {
+  max-width:1100px; margin:0 auto; padding:32px 32px 80px;
+  display:grid; grid-template-columns:1fr 300px; gap:24px; align-items:start;
+}
+.edit-main { min-width:0; }
+.edit-sidebar { position:sticky; top:88px; display:flex; flex-direction:column; gap:16px; }
+
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
+.edit-card {
+  background:var(--surface); border:1.5px solid var(--line);
+  border-radius:var(--r-xl); box-shadow:var(--shadow-xs);
+  margin-bottom:20px; overflow:hidden; animation:fadeUp .45s var(--ease) both;
+}
+.card-head {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 24px; background:var(--surface-2); border-bottom:1.5px solid var(--line);
+}
+.card-head-left { display:flex; align-items:center; gap:10px; }
+.card-icon {
+  width:32px; height:32px; border-radius:var(--r-sm); display:flex; align-items:center;
+  justify-content:center; font-size:15px; flex-shrink:0;
+  background:var(--primary-lt); border:1.5px solid #bfdbfe;
+}
+.card-title { font-size:13px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.06em; }
+.card-body { padding:24px; }
+
+/* ═══════════════════════════════════════════
+   FORM FIELDS
+═══════════════════════════════════════════ */
+.field-group { margin-bottom:18px; }
+.field-group:last-child { margin-bottom:0; }
+.field-label {
+  display:block; font-size:11px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.07em; color:var(--ink-3); margin-bottom:7px;
+}
+.field-input, .field-textarea, .field-select {
+  width:100%; border:1.5px solid var(--line); border-radius:var(--r-md);
+  padding:11px 14px; font-size:14px; font-family:var(--font); color:var(--ink);
+  background:var(--surface); transition:border-color .15s, box-shadow .15s;
+  outline:none;
+}
+.field-input:focus, .field-textarea:focus, .field-select:focus {
+  border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.1);
+}
+.field-textarea { resize:vertical; min-height:90px; }
+.field-grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+
+/* ═══════════════════════════════════════════
+   FILE UPLOAD ZONES
+═══════════════════════════════════════════ */
+.upload-zone {
+  border:2px dashed var(--line); border-radius:var(--r-md); padding:14px;
+  background:var(--surface-2); transition:border-color .2s, background .2s; cursor:pointer;
+}
+.upload-zone:hover { border-color:var(--primary); background:var(--primary-lt); }
+.upload-zone input[type="file"] { display:none; }
+.upload-zone-inner { display:flex; align-items:center; gap:12px; }
+.upload-zone-icon {
+  width:38px; height:38px; border-radius:var(--r-sm); flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:17px;
+  background:var(--surface); border:1.5px solid var(--line);
+}
+.upload-zone-text { font-size:13px; font-weight:600; color:var(--ink-2); }
+.upload-zone-sub  { font-size:11px; color:var(--ink-3); margin-top:2px; }
+.upload-zone-btn  { font-size:11px; font-weight:700; color:var(--primary); margin-top:4px; cursor:pointer; display:inline-block; }
+.file-preview-wrap {
+  margin-top:10px; border-radius:var(--r-md); overflow:hidden;
+  border:1.5px solid var(--line); background:#000; box-shadow:var(--shadow-xs);
+}
+.file-preview-wrap img   { width:100%; height:auto; display:block; max-height:160px; object-fit:cover; }
+.file-preview-wrap video { width:100%; display:block; max-height:240px; }
+.pdf-pill {
+  display:inline-flex; align-items:center; gap:6px; padding:6px 12px;
+  background:var(--amber-lt); border:1.5px solid #fde68a; border-radius:var(--r-sm);
+  font-size:12px; font-weight:600; color:var(--amber); text-decoration:none;
+  transition:all .15s; margin:3px;
+}
+.pdf-pill:hover { background:#fef9c3; border-color:var(--amber); }
+.pdf-list-existing { display:flex; flex-wrap:wrap; gap:4px; margin-top:10px; }
+
+/* ═══════════════════════════════════════════
+   SECTION BLOCKS
+═══════════════════════════════════════════ */
+.sections-wrap { display:flex; flex-direction:column; gap:16px; }
+
+.section-block {
+  background:var(--surface-2); border:2px solid var(--line);
+  border-radius:var(--r-xl); overflow:hidden; transition:box-shadow .2s, border-color .2s;
+}
+.section-block.drag-over { border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+
+.section-handle-bar {
+  display:flex; align-items:center; gap:12px; padding:14px 20px;
+  background:linear-gradient(90deg,var(--surface-2),var(--surface));
+  border-bottom:1.5px solid var(--line); cursor:grab;
+}
+.section-handle-bar:active { cursor:grabbing; }
+.drag-handle { color:var(--ink-3); font-size:16px; letter-spacing:1px; flex-shrink:0; user-select:none; }
+.section-num-badge {
+  width:24px; height:24px; border-radius:50%; background:var(--primary); color:#fff;
+  font-size:11px; font-weight:800; font-family:var(--font-mono);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+}
+.section-title-input {
+  flex:1; border:1.5px solid var(--line); border-radius:var(--r-sm);
+  padding:8px 12px; font-size:14px; font-weight:600; font-family:var(--font); color:var(--ink);
+  background:var(--surface); transition:border-color .15s, box-shadow .15s; outline:none;
+}
+.section-title-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.1); }
+.btn-icon {
+  width:32px; height:32px; border-radius:var(--r-sm); display:flex; align-items:center;
+  justify-content:center; border:none; cursor:pointer; transition:all .15s; flex-shrink:0;
+  font-size:13px;
+}
+.btn-icon.danger  { background:var(--rose-lt); color:var(--rose); }
+.btn-icon.danger:hover  { background:#ffe4e6; }
+
+.section-content { padding:16px 20px; display:flex; flex-direction:column; gap:14px; }
+
+/* ═══════════════════════════════════════════
+   LESSON BLOCKS
+═══════════════════════════════════════════ */
+.lesson-block {
+  background:var(--surface); border:1.5px solid var(--line);
+  border-radius:var(--r-lg); overflow:hidden; box-shadow:var(--shadow-xs);
+}
+.lesson-header {
+  display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:var(--surface-2); border-bottom:1.5px solid var(--line); cursor:pointer;
+  user-select:none; transition:background .15s;
+}
+.lesson-header:hover { background:var(--primary-lt); }
+.lesson-header.open  { background:var(--primary-lt); border-bottom-color:#bfdbfe; }
+.lesson-icon {
+  width:30px; height:30px; border-radius:var(--r-sm); flex-shrink:0;
+  background:var(--primary-lt); border:1.5px solid #bfdbfe; color:var(--primary);
+  display:flex; align-items:center; justify-content:center; font-size:13px;
+}
+.lesson-meta-row { flex:1; display:flex; align-items:center; gap:8px; flex-wrap:wrap; min-width:0; }
+.lesson-title-preview { font-size:13px; font-weight:700; color:var(--ink); }
+.lesson-tag { font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; font-family:var(--font-mono); text-transform:uppercase; }
+.tag-video    { background:var(--primary-lt); color:var(--primary); border:1px solid #bfdbfe; }
+.tag-pdf      { background:var(--amber-lt);   color:var(--amber);   border:1px solid #fde68a; }
+.tag-speaking { background:var(--teal-lt);    color:var(--teal);    border:1px solid #99f6e4; }
+.lesson-chevron { color:var(--ink-3); transition:transform .25s var(--ease); flex-shrink:0; }
+.lesson-header.open .lesson-chevron { transform:rotate(180deg); }
+.lesson-body {
+  display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s var(--ease);
+}
+.lesson-body.open { grid-template-rows:1fr; }
+.lesson-body-inner { overflow:hidden; }
+.lesson-body-content { padding:20px; display:flex; flex-direction:column; gap:16px; }
+
+/* ═══════════════════════════════════════════
+   SPEAKING TOPIC SECTION
+═══════════════════════════════════════════ */
+.speaking-section-wrap {
+  background:linear-gradient(135deg,var(--teal-lt),#f0fdfa);
+  border:2px solid #99f6e4; border-radius:var(--r-lg); padding:16px;
+}
+.speaking-section-head {
+  display:flex; align-items:center; gap:8px; margin-bottom:14px; padding-bottom:12px;
+  border-bottom:1.5px solid #99f6e4;
+}
+.speaking-section-title { font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.09em; color:var(--teal); }
+
+.topic-block {
+  background:var(--surface); border:1.5px solid #99f6e4; border-radius:var(--r-lg);
+  overflow:hidden; margin-bottom:12px; box-shadow:var(--shadow-xs);
+}
+.topic-block:last-child { margin-bottom:0; }
+.topic-header {
+  display:flex; align-items:center; gap:10px; padding:11px 14px;
+  background:var(--teal-lt); border-bottom:1.5px solid #99f6e4;
+}
+.topic-dot { width:8px; height:8px; border-radius:50%; background:var(--teal); flex-shrink:0; }
+.topic-body { padding:14px; display:flex; flex-direction:column; gap:12px; }
+
+.question-block {
+  background:var(--surface-2); border:1.5px solid var(--line);
+  border-radius:var(--r-md); padding:14px;
+}
+.q-num-badge {
+  display:inline-flex; align-items:center; justify-content:center;
+  width:20px; height:20px; border-radius:50%; background:var(--primary-lt);
+  color:var(--primary); font-size:10px; font-weight:800; font-family:var(--font-mono);
+  margin-right:6px; vertical-align:middle; flex-shrink:0;
+}
+
+/* ═══════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════ */
+.btn {
+  display:inline-flex; align-items:center; gap:7px; padding:9px 16px;
+  border-radius:var(--r-md); font-family:var(--font); font-size:12px; font-weight:700;
+  border:none; cursor:pointer; transition:all .2s var(--ease); white-space:nowrap;
+}
+.btn-primary  { background:var(--primary); color:#fff; box-shadow:0 2px 8px var(--primary-glow); }
+.btn-primary:hover  { background:#1d4ed8; transform:translateY(-1px); }
+.btn-outline  { background:transparent; color:var(--ink-2); border:1.5px solid var(--line); }
+.btn-outline:hover  { border-color:var(--primary); color:var(--primary); background:var(--primary-lt); }
+.btn-sm { padding:6px 12px; font-size:11px; }
+.btn-submit {
+  display:inline-flex; align-items:center; gap:8px; padding:13px 28px;
+  background:linear-gradient(135deg,var(--primary),#1d4ed8); color:#fff;
+  border-radius:var(--r-md); font-size:14px; font-weight:700; border:none; cursor:pointer;
+  box-shadow:0 4px 20px var(--primary-glow); transition:all .2s var(--ease); font-family:var(--font);
+}
+.btn-submit:hover { transform:translateY(-1px); box-shadow:0 8px 28px var(--primary-glow); }
+
+/* ═══════════════════════════════════════════
+   SIDEBAR CARDS
+═══════════════════════════════════════════ */
+.sidebar-card {
+  background:var(--surface); border:1.5px solid var(--line);
+  border-radius:var(--r-xl); overflow:hidden; box-shadow:var(--shadow-xs);
+  animation:fadeUp .4s var(--ease) both;
+}
+.sidebar-card-head { padding:13px 18px; border-bottom:1.5px solid var(--line); background:var(--surface-2); }
+.sidebar-card-title { font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.09em; color:var(--ink-3); }
+.sidebar-card-body { padding:16px 18px; }
+
+.stat-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.stat-box { text-align:center; padding:10px 8px; background:var(--surface-2); border:1.5px solid var(--line); border-radius:var(--r-sm); }
+.stat-num   { font-family:var(--font-mono); font-size:20px; font-weight:700; color:var(--primary); line-height:1; }
+.stat-label { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-3); margin-top:3px; }
+
+.tips-list { list-style:none; padding:0; margin:0; }
+.tips-list li {
+  display:flex; align-items:flex-start; gap:8px;
+  padding:8px 0; border-bottom:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-2); font-weight:500; line-height:1.5;
+}
+.tips-list li:last-child { border-bottom:none; }
+.tip-check {
+  width:17px; height:17px; border-radius:50%; background:var(--emerald-lt); color:var(--emerald);
+  display:inline-flex; align-items:center; justify-content:center;
+  font-size:9px; font-weight:900; flex-shrink:0; margin-top:2px;
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media(max-width:900px) {
+  .edit-layout { grid-template-columns:1fr; }
+  .edit-sidebar { position:static; }
+  .page-hero-inner { flex-direction:column; align-items:flex-start; gap:16px; }
+}
+@media(max-width:640px) {
+  .page-hero-inner, .edit-layout { padding-left:16px; padding-right:16px; }
+  .field-grid-2 { grid-template-columns:1fr; }
+}
+
+.cue-card-field.hidden { display:none; }
+</style>
+
+<!-- ALERT CONTAINER -->
+<div id="alert-container"></div>
+
+<!-- ══════ PAGE HERO ══════ -->
+<div class="page-hero">
+  <div class="page-hero-bg"></div>
+  <div class="page-hero-inner">
+    <div>
+      <nav class="hero-breadcrumb">
+        <a href="<%= admin_courses_path %>">Courses</a>
+        <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+        <span>Edit</span>
+      </nav>
+      <div class="page-hero-eyebrow">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Admin · Course Editor
+      </div>
+      <h1 class="page-hero-title">Chỉnh sửa <em>Khóa học</em></h1>
+      <div class="hero-course-name"><%= @course.title %></div>
+    </div>
+    <div class="hero-actions">
+      <%= link_to "← Hủy", admin_courses_path, class: "hero-btn-cancel" %>
+    </div>
+  </div>
 </div>
-<div class="pt-24 px-8 pb-16 bg-slate-100 min-h-screen">
-<div class="max-w-6xl mx-auto">
-<h1 class="text-3xl font-bold text-slate-800 mb-10">
-🎓 Admin Course Editor
-</h1>
 
-<%= form_with model: [:admin,@course], local:true, multipart:true do |f| %>
+<%= form_with model: [:admin, @course], local: true, multipart: true, id: "course-form" do |f| %>
 
-<!-- COURSE INFO -->
-<div class="bg-white rounded-2xl shadow-lg p-8 mb-10 space-y-6">
+<div class="edit-layout">
 
-<h2 class="text-xl font-semibold border-b pb-3">📘 Course Information</h2>
+  <!-- ══════════ MAIN COLUMN ══════════ -->
+  <div class="edit-main">
 
-<%= f.text_field :title,class:"w-full border rounded-lg px-4 py-2",placeholder:"Course Title"%>
+    <!-- COURSE INFO -->
+    <div class="edit-card" style="animation-delay:.05s">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-icon">📚</div>
+          <div class="card-title">Thông tin khóa học</div>
+        </div>
+      </div>
+      <div class="card-body">
 
-<%= f.text_area :description,rows:4,class:"w-full border rounded-lg px-4 py-2",placeholder:"Description"%>
+        <div class="field-group">
+          <label class="field-label">Tên khóa học</label>
+          <%= f.text_field :title, class: "field-input", placeholder: "VD: IELTS Speaking Band 7+" %>
+        </div>
 
-<div class="grid grid-cols-2 gap-6">
+        <div class="field-group">
+          <label class="field-label">Mô tả khóa học</label>
+          <%= f.text_area :description, rows: 4, class: "field-textarea", placeholder: "Mô tả chi tiết về nội dung và mục tiêu khóa học..." %>
+        </div>
 
-<%= f.number_field :price,min:0,step:1000,class:"w-full border rounded-lg px-4 py-2"%>
+        <div class="field-grid-2">
+          <div class="field-group" style="margin-bottom:0">
+            <label class="field-label">Giá (VNĐ)</label>
+            <%= f.number_field :price, min: 0, step: 1000, class: "field-input", placeholder: "0" %>
+          </div>
+          <div class="field-group" style="margin-bottom:0">
+            <label class="field-label">Hình Thumbnail</label>
+            <% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
+              <div class="file-preview-wrap" style="margin-bottom:10px">
+                <%= image_tag @course.thumbnail.variant(resize_to_limit: [300,180]) %>
+              </div>
+            <% end %>
+            <div class="upload-zone" onclick="this.querySelector('input[type=file]').click()">
+              <%= f.file_field :thumbnail, class: "" %>
+              <div class="upload-zone-inner">
+                <div class="upload-zone-icon">🖼️</div>
+                <div>
+                  <div class="upload-zone-text">Chọn ảnh thumbnail</div>
+                  <div class="upload-zone-sub">JPG, PNG, WEBP</div>
+                  <div class="upload-zone-btn">Tải lên ảnh →</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<div>
-<% if @course.thumbnail.attached? && @course.thumbnail.persisted? %>
+      </div>
+    </div>
 
-  <%= image_tag(
-        @course.thumbnail.variant(resize_to_limit:[260,160]),
-        class:"rounded-lg mb-3 border"
-      ) %>
+    <!-- COURSE STRUCTURE -->
+    <div class="edit-card" style="animation-delay:.10s">
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-icon">📖</div>
+          <div class="card-title">Cấu trúc khóa học</div>
+        </div>
+        <button type="button" onclick="addSection()" class="btn btn-primary btn-sm">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Thêm chương
+        </button>
+      </div>
+      <div class="card-body" style="padding:16px">
 
+        <div id="sections" class="sections-wrap">
+
+          <%= f.fields_for :course_sections do |section| %>
+          <div class="section-block"
+               draggable="true"
+               data-section-id="<%= section.index %>">
+
+            <%= section.hidden_field :_destroy %>
+
+            <div class="section-handle-bar">
+              <span class="drag-handle" title="Kéo để sắp xếp">⠿⠿</span>
+              <div class="section-num-badge"><%= section.index.to_i + 1 %></div>
+              <input type="text"
+                     value="<%= section.object.title %>"
+                     name="<%= section.object_name %>[title]"
+                     placeholder="Tên chương"
+                     class="section-title-input"
+                     onclick="event.stopPropagation()"/>
+              <button type="button" onclick="removeSection(this)" class="btn-icon danger" title="Xóa chương">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              </button>
+            </div>
+
+            <div class="section-content">
+              <%= section.fields_for :lessons do |lesson| %>
+              <div class="lesson-block">
+
+                <div class="lesson-header" onclick="toggleLessonBlock(this)">
+                  <div class="lesson-icon">📹</div>
+                  <div class="lesson-meta-row">
+                    <span class="lesson-title-preview"><%= lesson.object.title.present? ? lesson.object.title : "Bài học" %></span>
+                    <% if lesson.object.persisted? && lesson.object.video.attached? %>
+                      <span class="lesson-tag tag-video">Video</span>
+                    <% end %>
+                    <% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
+                      <span class="lesson-tag tag-pdf">PDF</span>
+                    <% end %>
+                    <% if lesson.object.persisted? && lesson.object.speaking_topics.any? %>
+                      <span class="lesson-tag tag-speaking">Speaking</span>
+                    <% end %>
+                  </div>
+                  <svg class="lesson-chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                </div>
+
+                <div class="lesson-body">
+                  <div class="lesson-body-inner">
+                    <div class="lesson-body-content">
+
+                      <div class="field-grid-2">
+                        <div class="field-group" style="margin-bottom:0">
+                          <label class="field-label">Tên bài học</label>
+                          <%= lesson.text_field :title, class: "field-input",
+                              placeholder: "Tên bài học...",
+                              oninput: "updateLessonTitle(this)" %>
+                        </div>
+                        <div class="field-group" style="margin-bottom:0">
+                          <label class="field-label">Thời lượng (phút)</label>
+                          <%= lesson.number_field :duration, class: "field-input", placeholder: "60" %>
+                        </div>
+                      </div>
+
+                      <div class="field-group" style="margin-bottom:0">
+                        <label class="field-label">Video bài học (MP4)</label>
+                        <div class="upload-zone" onclick="this.querySelector('input[type=file]').click()">
+                          <%= lesson.file_field :video, accept: "video/mp4", class: "",
+                              onchange: "handleVideoUpload(this)" %>
+                          <div class="upload-zone-inner">
+                            <div class="upload-zone-icon">🎬</div>
+                            <div>
+                              <div class="upload-zone-text">Chọn video MP4</div>
+                              <div class="upload-zone-sub">Tối đa 5MB</div>
+                              <div class="upload-zone-btn">Tải lên video →</div>
+                            </div>
+                          </div>
+                        </div>
+                        <% if lesson.object.persisted? && lesson.object.video.attached? %>
+                          <div class="file-preview-wrap" style="margin-top:10px">
+                            <video controls preload="none">
+                              <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
+                            </video>
+                          </div>
+                        <% end %>
+                      </div>
+
+                      <div class="field-group" style="margin-bottom:0">
+                        <label class="field-label">Tài liệu PDF</label>
+                        <div class="upload-zone" onclick="this.querySelector('input[type=file]').click()">
+                          <%= lesson.file_field :pdfs, multiple: true, accept: "application/pdf",
+                              class: "", onchange: "handlePDFUpload(this)" %>
+                          <div class="upload-zone-inner">
+                            <div class="upload-zone-icon">📄</div>
+                            <div>
+                              <div class="upload-zone-text">Chọn file PDF</div>
+                              <div class="upload-zone-sub">Nhiều file, tối đa 500KB / file</div>
+                              <div class="upload-zone-btn">Tải lên PDF →</div>
+                            </div>
+                          </div>
+                        </div>
+                        <% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
+                          <div class="pdf-list-existing">
+                            <% lesson.object.pdfs.each do |pdf| %>
+                              <% next unless pdf.persisted? %>
+                              <a href="<%= rails_blob_url(pdf) %>" target="_blank" class="pdf-pill">
+                                📄 <%= pdf.filename %>
+                              </a>
+                            <% end %>
+                          </div>
+                        <% end %>
+                      </div>
+
+                      <!-- Speaking Topics -->
+                      <div class="speaking-section-wrap">
+                        <div class="speaking-section-head">
+                          <span style="font-size:16px">🎤</span>
+                          <span class="speaking-section-title">Bài tập nói</span>
+                        </div>
+
+                        <%= lesson.fields_for :speaking_topics do |topic| %>
+                        <div class="topic-block">
+                          <div class="topic-header">
+                            <div class="topic-dot"></div>
+                            <input type="text"
+                                   value="<%= topic.object.title %>"
+                                   name="<%= topic.object_name %>[title]"
+                                   placeholder="Tên chủ đề..."
+                                   class="section-title-input"
+                                   style="font-size:13px;padding:6px 10px"
+                                   onclick="event.stopPropagation()"/>
+                            <%= topic.select :part,
+                                SpeakingTopic.parts.keys.map { |p| [p.upcase, p] },
+                                {},
+                                class: "field-select part-select",
+                                style: "width:auto;min-width:120px;padding:6px 10px;font-size:12px",
+                                onchange: "toggleCueCard(this)" %>
+                          </div>
+                          <div class="topic-body">
+                            <%= topic.fields_for :speaking_questions do |q| %>
+                            <div class="question-block">
+                              <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+                                <span class="q-num-badge"><%= q.index.to_i + 1 %></span>
+                                <span style="font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em">Câu hỏi</span>
+                              </div>
+                              <%= q.text_area :question_text, rows: 3, class: "field-textarea",
+                                  placeholder: "Nhập câu hỏi...", style: "margin-bottom:10px" %>
+                              <div class="cue-card-field <%= topic.object.part == 'part2' ? '' : 'hidden' %>">
+                                <label class="field-label">Cue Card</label>
+                                <%= q.text_area :cue_card, rows: 3, class: "field-textarea",
+                                    placeholder: "Nội dung cue card...", style: "margin-bottom:10px" %>
+                              </div>
+                              <div class="field-grid-2" style="gap:10px">
+                                <div>
+                                  <label class="field-label">Thời gian chuẩn bị (s)</label>
+                                  <%= q.number_field :preparation_time, class: "field-input",
+                                      value: (q.object.preparation_time.present? ? q.object.preparation_time : 60) %>
+                                </div>
+                                <div>
+                                  <label class="field-label">Thời gian nói (s)</label>
+                                  <%= q.number_field :speaking_time, class: "field-input",
+                                      value: (q.object.speaking_time.present? ? q.object.speaking_time : 120) %>
+                                </div>
+                              </div>
+                            </div>
+                            <% end %>
+                          </div>
+                        </div>
+                        <% end %>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <% end %>
+            </div>
+          </div>
+          <% end %>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ACTION BAR -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-top:1.5px solid var(--line);margin-top:4px;animation:fadeUp .5s var(--ease) .2s both">
+      <%= link_to "← Hủy bỏ", admin_courses_path, class: "btn btn-outline" %>
+      <%= f.submit "💾  Lưu khóa học", class: "btn-submit" %>
+    </div>
+
+  </div><!-- /edit-main -->
+
+  <!-- ══════════ SIDEBAR ══════════ -->
+  <div class="edit-sidebar">
+
+    <div class="sidebar-card" style="animation-delay:.08s">
+      <div class="sidebar-card-head"><div class="sidebar-card-title">Thống kê khóa học</div></div>
+      <div class="sidebar-card-body">
+        <div class="stat-grid">
+          <div class="stat-box">
+            <div class="stat-num" id="stat-sections"><%= @course.course_sections.count %></div>
+            <div class="stat-label">Chương</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="stat-lessons"><%= @course.course_sections.sum { |s| s.lessons.count } %></div>
+            <div class="stat-label">Bài học</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num"><%= @course.course_sections.sum { |s| s.lessons.sum { |l| l.speaking_topics.count rescue 0 } } %></div>
+            <div class="stat-label">Topics</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-card" style="animation-delay:.12s">
+      <div class="sidebar-card-head"><div class="sidebar-card-title">💡 Mẹo sử dụng</div></div>
+      <div class="sidebar-card-body" style="padding:12px 16px">
+        <ul class="tips-list">
+          <li><span class="tip-check">✓</span>Kéo thả chương để sắp xếp lại thứ tự</li>
+          <li><span class="tip-check">✓</span>Click tên bài học để mở/đóng chỉnh sửa</li>
+          <li><span class="tip-check">✓</span>Video MP4 tối đa 5MB mỗi file</li>
+          <li><span class="tip-check">✓</span>PDF tối đa 500KB mỗi file</li>
+          <li><span class="tip-check">✓</span>Part 2 sẽ hiển thị thêm ô Cue Card</li>
+          <li><span class="tip-check">✓</span>Nhớ bấm Lưu sau khi chỉnh sửa xong</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sidebar-card" style="animation-delay:.16s">
+      <div class="sidebar-card-head"><div class="sidebar-card-title">Lưu nhanh</div></div>
+      <div class="sidebar-card-body">
+        <button type="submit" form="course-form" class="btn-submit" style="width:100%;justify-content:center">
+          💾 Lưu khóa học
+        </button>
+        <div style="margin-top:10px;text-align:center">
+          <%= link_to "← Quay lại danh sách", admin_courses_path,
+              style: "font-size:12px;color:var(--ink-3);text-decoration:none;font-weight:600" %>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
 <% end %>
 
-<%= f.file_field :thumbnail %>
-</div>
-
-</div>
-</div>
-
-<!-- COURSE STRUCTURE -->
-<div class="bg-white rounded-2xl shadow-lg p-8">
-
-<h2 class="text-xl font-semibold mb-8 border-b pb-3">
-📚 Course Structure
-</h2>
-
-<button type="button"
-onclick="addSection()"
-class="mb-6 px-5 py-2 bg-indigo-600 text-white rounded-lg">
-➕ Add Section
-</button>
-
-<div id="sections" class="space-y-8">
-
-<%= f.fields_for :course_sections do |section| %>
-
-<div class="bg-slate-50 border rounded-xl p-6 section-item">
-
-<%= section.hidden_field :_destroy %>
-
-<%= section.text_field :title,
-placeholder:"Section Title",
-class:"border rounded px-3 py-2 w-full mb-6"%>
-
-<div class="lessons space-y-6">
-
-<%= section.fields_for :lessons do |lesson| %>
-
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
-
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<%= lesson.text_field :title,class:"border rounded px-3 py-2"%>
-
-<%= lesson.number_field :duration,class:"border rounded px-3 py-2"%>
-
-</div>
-
-<label class="text-sm font-semibold">🎬 Video Upload</label>
-<%= lesson.file_field :video,accept:"video/mp4",class:"mt-2",
-onchange:"handleVideoUpload(this)" %>
-<% if lesson.object.persisted? && lesson.object.video.attached? %>
-  <video controls class="mt-3 w-64 rounded">
-    <source src="<%= url_for(lesson.object.video) %>" type="video/mp4">
-  </video>
-<% end %>
-
-
-
-<label class="text-sm font-semibold mt-4 block">📄 PDF Materials</label>
-<%= lesson.file_field :pdfs,multiple:true,accept:"application/pdf",class:"mt-2",onchange:"handlePDFUpload(this)"%>
-
-<% if lesson.object.persisted? && lesson.object.pdfs.attached? %>
-
-  <ul class="mt-3 space-y-1 text-sm">
-
-    <% lesson.object.pdfs.each do |pdf| %>
-
-      <% next unless pdf.persisted? %>
-
-      <li>
-        📄 <%= link_to pdf.filename,
-              rails_blob_url(pdf),
-              target:"_blank",
-              class:"text-indigo-600 underline" %>
-      </li>
-
-    <% end %>
-
-  </ul>
-
-<% end %>
-
-
-
-<!-- SPEAKING -->
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises
-</h5>
-
-<%= lesson.fields_for :speaking_topics do |topic| %>
-
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
-
-<div class="grid grid-cols-2 gap-3 mb-3">
-
-<%= topic.text_field :title,class:"border px-3 py-2"%>
-
-<%= topic.select :part,
-SpeakingTopic.parts.keys.map{|p|[p.upcase,p]},
-{},
-class:"border px-3 py-2 part-select",
-onchange:"toggleCueCard(this)"%>
-
-</div>
-
-<div class="questions">
-
-<%= topic.fields_for :speaking_questions do |q| %>
-
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
-
-<label class="text-xs font-semibold">Question</label>
-
-<%= q.text_area :question_text,class:"border w-full px-3 py-2 mb-3"%>
-
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-<%= q.text_area :cue_card,class:"border w-full px-3 py-2 mb-3"%>
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<%= q.number_field :preparation_time,class:"border px-3 py-2 w-full"%>
-
-<%= q.number_field :speaking_time,class:"border px-3 py-2 w-full"%>
-
-</div>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
-<% end %>
-
-</div>
-
-</div>
-
-<% end %>
-
-</div>
-
-<button type="button"
-onclick="removeSection(this)"
-class="text-red-500 mt-4">
-🗑 Remove Section
-</button>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
-<!-- TEMPLATE -->
+<!-- ══════ SECTION TEMPLATE ══════ -->
 <template id="section-template">
-
-<div class="bg-slate-50 border rounded-xl p-6 mt-8 section-item">
-
-<input type="hidden"
-name="course[course_sections_attributes][NEW_SECTION][_destroy]"
-value="0">
-
-<h3 class="font-bold text-lg mb-4 text-indigo-700">
-📂 Section
-</h3>
-
-<button type="button"
-onclick="removeSection(this)"
-class="text-sm text-red-500 mb-4">
-🗑 Remove Section
-</button>
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][title]"
-placeholder="Section Title"
-class="border rounded px-3 py-2 w-full mb-6"/>
-
-<div class="lesson-item bg-white border rounded-xl p-6 shadow-sm">
-
-<h4 class="font-semibold mb-4">🎬 Lesson</h4>
-
-<div class="grid grid-cols-2 gap-4 mb-4">
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
-placeholder="Lesson Title"
-class="border rounded px-3 py-2"/>
-
-<input type="number"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"
-placeholder="Duration"
-class="border rounded px-3 py-2"/>
-
+<div class="section-block" draggable="true" data-section-id="NEW_SECTION">
+  <input type="hidden" name="course[course_sections_attributes][NEW_SECTION][_destroy]" value="0">
+  <div class="section-handle-bar">
+    <span class="drag-handle">⠿⠿</span>
+    <div class="section-num-badge">?</div>
+    <input type="text" placeholder="Tên chương mới..."
+           name="course[course_sections_attributes][NEW_SECTION][title]"
+           class="section-title-input" onclick="event.stopPropagation()"/>
+    <button type="button" onclick="removeSection(this)" class="btn-icon danger">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+    </button>
+  </div>
+  <div class="section-content">
+    <div class="lesson-block">
+      <div class="lesson-header open" onclick="toggleLessonBlock(this)">
+        <div class="lesson-icon">📹</div>
+        <div class="lesson-meta-row"><span class="lesson-title-preview">Bài học mới</span></div>
+        <svg class="lesson-chevron" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="lesson-body open">
+        <div class="lesson-body-inner">
+          <div class="lesson-body-content">
+            <div class="field-grid-2">
+              <div class="field-group" style="margin-bottom:0">
+                <label class="field-label">Tên bài học</label>
+                <input type="text" placeholder="Tên bài học..." class="field-input"
+                       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][title]"
+                       oninput="updateLessonTitle(this)"/>
+              </div>
+              <div class="field-group" style="margin-bottom:0">
+                <label class="field-label">Thời lượng (phút)</label>
+                <input type="number" placeholder="60" class="field-input"
+                       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][duration]"/>
+              </div>
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label">Video bài học (MP4)</label>
+              <div class="upload-zone" onclick="this.querySelector('input[type=file]').click()">
+                <input type="file" accept="video/mp4"
+                       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
+                       onchange="handleVideoUpload(this)"/>
+                <div class="upload-zone-inner">
+                  <div class="upload-zone-icon">🎬</div>
+                  <div>
+                    <div class="upload-zone-text">Chọn video MP4</div>
+                    <div class="upload-zone-sub">Tối đa 5MB</div>
+                    <div class="upload-zone-btn">Tải lên video →</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="field-group" style="margin-bottom:0">
+              <label class="field-label">Tài liệu PDF</label>
+              <div class="upload-zone" onclick="this.querySelector('input[type=file]').click()">
+                <input type="file" multiple accept="application/pdf"
+                       name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
+                       onchange="handlePDFUpload(this)"/>
+                <div class="upload-zone-inner">
+                  <div class="upload-zone-icon">📄</div>
+                  <div>
+                    <div class="upload-zone-text">Chọn file PDF</div>
+                    <div class="upload-zone-sub">Nhiều file, tối đa 500KB / file</div>
+                    <div class="upload-zone-btn">Tải lên PDF →</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="speaking-section-wrap">
+              <div class="speaking-section-head">
+                <span style="font-size:16px">🎤</span>
+                <span class="speaking-section-title">Bài tập nói</span>
+              </div>
+              <div class="topic-block">
+                <div class="topic-header">
+                  <div class="topic-dot"></div>
+                  <input type="text" placeholder="Tên chủ đề..." class="section-title-input"
+                         style="font-size:13px;padding:6px 10px"
+                         name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
+                         onclick="event.stopPropagation()"/>
+                  <select name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
+                          class="field-select part-select"
+                          style="width:auto;min-width:120px;padding:6px 10px;font-size:12px"
+                          onchange="toggleCueCard(this)">
+                    <option value="part1">PART 1</option>
+                    <option value="part2">PART 2</option>
+                    <option value="part3">PART 3</option>
+                  </select>
+                </div>
+                <div class="topic-body">
+                  <div class="question-block">
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">
+                      <span class="q-num-badge">1</span>
+                      <span style="font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em">Câu hỏi</span>
+                    </div>
+                    <textarea rows="3" class="field-textarea" placeholder="Nhập câu hỏi..."
+                              name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
+                              style="margin-bottom:10px"></textarea>
+                    <div class="cue-card-field hidden">
+                      <label class="field-label">Cue Card</label>
+                      <textarea rows="3" class="field-textarea" placeholder="Nội dung cue card..."
+                                name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
+                                style="margin-bottom:10px"></textarea>
+                    </div>
+                    <div class="field-grid-2" style="gap:10px">
+                      <div>
+                        <label class="field-label">Thời gian chuẩn bị (s)</label>
+                        <input type="number" value="60" class="field-input"
+                               name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"/>
+                      </div>
+                      <div>
+                        <label class="field-label">Thời gian nói (s)</label>
+                        <input type="number" value="120" class="field-input"
+                               name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-
-<label class="text-sm font-semibold">🎬 Admin Video Upload</label>
-
-<input type="file"
-accept="video/mp4"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][video]"
-class="video-input mt-2"
-onchange="handleVideoUpload(this)"/>
-
-<label class="text-sm font-semibold mt-4 block">📄 Admin PDF Materials</label>
-
-<input type="file"
-multiple
-accept="application/pdf"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][pdfs][]"
-class="pdf-input mt-2"
-onchange="handlePDFUpload(this)"/>
-
-<div class="bg-yellow-50 border rounded-xl p-5 mt-6">
-
-<h5 class="font-bold text-yellow-700 mb-4">
-🎤 Speaking Exercises (Admin)
-</h5>
-
-<div class="topic-box bg-white border rounded-lg p-4 mb-4">
-
-<div class="grid grid-cols-2 gap-3 mb-3">
-
-<input type="text"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][title]"
-placeholder="Topic Title"
-class="border px-3 py-2"/>
-
-<select
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][part]"
-class="border px-3 py-2 part-select"
-onchange="toggleCueCard(this)">
-
-<option value="part1">PART1</option>
-<option value="part2">PART2</option>
-<option value="part3">PART3</option>
-
-</select>
-
-</div>
-
-<div class="question-item border rounded-lg p-4 mb-3 bg-slate-50">
-
-<label class="text-xs font-semibold">Question</label>
-
-<textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][question_text]"
-class="border w-full px-3 py-2 mb-3"></textarea>
-
-<div class="cue-card-field hidden">
-
-<label class="text-xs font-semibold">Cue Card</label>
-
-<textarea
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][cue_card]"
-class="border w-full px-3 py-2 mb-3"></textarea>
-
-</div>
-
-<div class="grid grid-cols-2 gap-3">
-
-<input type="number"
-placeholder="Preparation Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][preparation_time]"
-class="border px-3 py-2"/>
-
-<input type="number"
-placeholder="Speaking Time"
-name="course[course_sections_attributes][NEW_SECTION][lessons_attributes][0][speaking_topics_attributes][0][speaking_questions_attributes][0][speaking_time]"
-class="border px-3 py-2"/>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
 </template>
 
-
-<div class="flex justify-end gap-4 mt-10">
-
-<%= link_to "Cancel",admin_courses_path,class:"px-6 py-2 border rounded-lg bg-white"%>
-
-<%= f.submit "💾 Save Course",
-class:"px-8 py-3 bg-indigo-600 text-white rounded-xl shadow hover:bg-indigo-700"%>
-
-</div>
-
-<% end %>
-
-</div>
-</div>
-
+<!-- ══════ JAVASCRIPT ══════ -->
 <script>
-
-function addSection(){
-
-  let template =
-    document.getElementById("section-template").innerHTML
-
-  let uniqueId = new Date().getTime()
-
-  template = template.replace(/NEW_SECTION/g, uniqueId)
-
-  let wrapper = document.createElement("div")
-  wrapper.innerHTML = template
-
-  let newSection = wrapper.firstElementChild
-
-  document.getElementById("sections")
-          .appendChild(newSection)
-
-  newSection
-    .querySelectorAll(".part-select")
-    .forEach(select => toggleCueCard(select))
+/* ── Lesson accordion ── */
+function toggleLessonBlock(header) {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  setupDragDrop();
+  setupCueCards();
+  updateSectionNumbers();
+});
 
-
-function removeSection(btn){
-
-let section=btn.closest(".section-item")
-
-let destroyInput=section.querySelector("input[name*='_destroy']")
-
-if(destroyInput){
-destroyInput.value="1"
-section.style.display="none"
-}else{
-section.remove()
+/* ── Lesson title sync ── */
+function updateLessonTitle(input) {
+  const preview = input.closest('.lesson-block')?.querySelector('.lesson-title-preview');
+  if (preview) preview.textContent = input.value || 'Bài học';
 }
 
+/* ── Drag & drop ── */
+let draggedEl = null;
+
+function setupDragDrop() {
+  document.querySelectorAll('.section-block').forEach(el => attachDrag(el));
 }
 
+function attachDrag(el) {
+  el.addEventListener('dragstart', e => {
+    draggedEl = el; el.style.opacity = '0.45';
+    e.dataTransfer.effectAllowed = 'move';
+  });
+  el.addEventListener('dragend', () => {
+    el.style.opacity = '1';
+    document.querySelectorAll('.section-block').forEach(s => s.classList.remove('drag-over'));
+    draggedEl = null;
+    updateSectionNumbers();
+    reorderSectionAttributes();
+  });
+  el.addEventListener('dragover',  e => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; });
+  el.addEventListener('dragenter', () => { if (el !== draggedEl) el.classList.add('drag-over'); });
+  el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+  el.addEventListener('drop', e => {
+    e.preventDefault();
+    if (draggedEl && el !== draggedEl) {
+      const all = [...document.querySelectorAll('#sections .section-block')];
+      if (all.indexOf(draggedEl) < all.indexOf(el)) el.after(draggedEl); else el.before(draggedEl);
+    }
+    el.classList.remove('drag-over');
+  });
+}
 
-function toggleCueCard(select){
+function updateSectionNumbers() {
+  document.querySelectorAll('#sections .section-block').forEach((el, i) => {
+    const badge = el.querySelector('.section-num-badge');
+    if (badge) badge.textContent = i + 1;
+  });
+}
 
-  const box = select.closest(".topic-box")
-  const cue = box.querySelector(".cue-card-field")
+function reorderSectionAttributes() {
+  document.querySelectorAll('#sections .section-block').forEach((section, si) => {
+    section.querySelectorAll('input,textarea,select').forEach(inp => {
+      if (!inp.name) return;
+      inp.name = inp.name.replace(/course_sections_attributes\]\[([^\]]+)\]/, `course_sections_attributes][${si}]`);
+    });
+    section.querySelectorAll('.lesson-block').forEach((lesson, li) => {
+      lesson.querySelectorAll('input,textarea,select').forEach(inp => {
+        if (!inp.name) return;
+        inp.name = inp.name.replace(/lessons_attributes\]\[([^\]]+)\]/, `lessons_attributes][${li}]`);
+      });
+      lesson.querySelectorAll('.topic-block').forEach((topic, ti) => {
+        topic.querySelectorAll('input,textarea,select').forEach(inp => {
+          if (!inp.name) return;
+          inp.name = inp.name.replace(/speaking_topics_attributes\]\[([^\]]+)\]/, `speaking_topics_attributes][${ti}]`);
+        });
+        topic.querySelectorAll('.question-block').forEach((q, qi) => {
+          q.querySelectorAll('input,textarea,select').forEach(inp => {
+            if (!inp.name) return;
+            inp.name = inp.name.replace(/speaking_questions_attributes\]\[([^\]]+)\]/, `speaking_questions_attributes][${qi}]`);
+          });
+        });
+      });
+    });
+  });
+}
 
-  if(select.value==="part2"){
-    cue.classList.remove("hidden")
-  }else{
-    cue.classList.add("hidden")
+/* ── Add section ── */
+function addSection() {
+  const id = Date.now();
+  const html = document.getElementById('section-template').innerHTML.replace(/NEW_SECTION/g, id);
+  const wrap = document.createElement('div');
+  wrap.innerHTML = html;
+  const newSection = wrap.firstElementChild;
+  document.getElementById('sections').appendChild(newSection);
+  attachDrag(newSection);
+  newSection.querySelectorAll('.part-select').forEach(s => {
+    s.addEventListener('change', () => toggleCueCard(s));
+    toggleCueCard(s);
+  });
+  updateSectionNumbers();
+  reorderSectionAttributes();
+  newSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ── Remove section ── */
+function removeSection(btn) {
+  const section = btn.closest('.section-block');
+  const destroyInput = section.querySelector("input[name*='_destroy']");
+  if (destroyInput) {
+    destroyInput.value = '1';
+    section.style.opacity = '0.35';
+    section.style.pointerEvents = 'none';
+    section.style.filter = 'grayscale(1)';
+  } else {
+    section.remove();
   }
+  updateSectionNumbers();
 }
-</script>
 
-<script>
+/* ── Cue card toggle ── */
+function setupCueCards() {
+  document.querySelectorAll('.part-select').forEach(s => toggleCueCard(s));
+}
+function toggleCueCard(select) {
+  const box = select.closest('.topic-block');
+  if (!box) return;
+  const cue = box.querySelector('.cue-card-field');
+  if (cue) cue.classList.toggle('hidden', select.value !== 'part2');
+}
 
-const MAX_VIDEO = 5 * 1024 * 1024
-const MAX_PDF   = 500 * 1024
-function showAlert(type, message){
+/* ── File validation ── */
+const MAX_VIDEO = 5 * 1024 * 1024;
+const MAX_PDF   = 500 * 1024;
 
-  const container = document.getElementById("alert-container")
-  if(!container) return
+function showAlert(type, message) {
+  const container = document.getElementById('alert-container');
+  if (!container) return;
+  const icons = {
+    danger:  `<svg class="alert-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+    success: `<svg class="alert-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>`
+  };
+  const div = document.createElement('div');
+  div.className = `alert-toast ${type}`;
+  div.innerHTML = (icons[type] || '') + `<span>${message}</span>`;
+  container.appendChild(div);
+  setTimeout(() => div.remove(), 4000);
+}
 
-  const div = document.createElement("div")
-
-  if(type==="danger"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-pink-800 rounded-xl bg-pink-100 border border-pink-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M10 11h2v5m-2 0h4m-2.592-8.5h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
-      </svg>
-      <p><span class="font-semibold me-1">Error:</span>${message}</p>
-    `
+function handleVideoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (!file.type.includes('mp4')) { showAlert('danger', 'Video phải là định dạng MP4'); input.value = ''; return; }
+  if (file.size > MAX_VIDEO) { showAlert('danger', `Video <b>${file.name}</b> vượt quá 5MB`); input.value = ''; return; }
+  const zone = input.closest('.upload-zone');
+  if (zone) {
+    zone.querySelector('.upload-zone-text').textContent = file.name;
+    zone.querySelector('.upload-zone-btn').textContent = '✓ Đã chọn';
   }
+  showAlert('success', `Video đã chọn: <b>${file.name}</b>`);
+}
 
-  if(type==="success"){
-    div.className="flex items-start sm:items-center p-4 text-sm text-emerald-800 rounded-xl bg-emerald-100 border border-emerald-200 shadow"
-    div.innerHTML=`
-      <svg class="w-4 h-4 me-2 shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor">
-      <path stroke-linecap="round"
-      stroke-linejoin="round"
-      stroke-width="2"
-      d="M5 13l4 4L19 7"/>
-      </svg>
-      <p><span class="font-semibold me-1">Success:</span>${message}</p>
-    `
+function handlePDFUpload(input) {
+  const files = Array.from(input.files);
+  if (!files.length) return;
+  for (const f of files) {
+    if (f.type !== 'application/pdf') { showAlert('danger', `${f.name} không phải PDF`); input.value = ''; return; }
+    if (f.size > MAX_PDF) { showAlert('danger', `${f.name} vượt quá 500KB`); input.value = ''; return; }
   }
-
-  container.appendChild(div)
-
-  setTimeout(()=>{
-    div.remove()
-  },4000)
+  const zone = input.closest('.upload-zone');
+  if (zone) {
+    zone.querySelector('.upload-zone-text').textContent = `${files.length} file PDF đã chọn`;
+    zone.querySelector('.upload-zone-btn').textContent = '✓ Đã chọn';
+  }
+  showAlert('success', `Đã chọn <b>${files.length}</b> file PDF`);
 }
 
-
-function handleVideoUpload(input){
-const file=input.files[0]
-if(!file)return
-
-if(!file.type.includes("mp4")){
-showAlert("danger","❌ Video phải là MP4")
-input.value=""
-return
-}
-
-if(file.size>MAX_VIDEO){
-showAlert("danger","❌ Video vượt quá 5MB")
-input.value=""
-return
-}
-
-showAlert("success",`🎬 Upload video: <b>${file.name}</b>`)
-}
-
-function handlePDFUpload(input){
-
-const files=Array.from(input.files)
-if(files.length===0)return
-
-for(const file of files){
-
-if(file.type!=="application/pdf"){
-showAlert("danger",`❌ ${file.name} không phải PDF`)
-input.value=""
-return
-}
-
-if(file.size>MAX_PDF){
-showAlert("danger",`❌ ${file.name} vượt quá 500KB`)
-input.value=""
-return
-}
-
-}
-
-showAlert("success",`📄 Upload ${files.length} file PDF`)
-}
-</script>
-<script>
-document.addEventListener("DOMContentLoaded",()=>{
-
-  document.querySelectorAll(".part-select").forEach(select=>{
-    toggleCueCard(select)
-  })
-
-})
-
+/* ── Form submit: inject course_section_id ── */
+document.getElementById('course-form').addEventListener('submit', function() {
+  document.querySelectorAll('.section-block').forEach((section, si) => {
+    const destroyInput = section.querySelector("input[name*='_destroy']");
+    if (!destroyInput || destroyInput.value === '1') return;
+    const match = destroyInput.name.match(/course_sections_attributes\]\[(\d+)\]/);
+    if (!match) return;
+    const idx = match[1];
+    const idInput = section.querySelector(`input[name*="course_sections_attributes][${idx}][id]"]`);
+    if (!idInput) return;
+    section.querySelectorAll('.lesson-block').forEach(lesson => {
+      if (lesson.querySelector("input[name*='course_section_id']")) return;
+      const firstInp = lesson.querySelector('input[name],textarea[name],select[name]');
+      if (!firstInp) return;
+      const lm = firstInp.name.match(/lessons_attributes\]\[(\d+)\]/);
+      if (!lm) return;
+      const h = document.createElement('input');
+      h.type = 'hidden';
+      h.name = `course[course_sections_attributes][${si}][lessons_attributes][${lm[1]}][course_section_id]`;
+      h.value = idInput.value;
+      lesson.prepend(h);
+    });
+  });
+});
 </script>

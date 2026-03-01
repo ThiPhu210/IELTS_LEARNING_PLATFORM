@@ -5,11 +5,8 @@ class User < ApplicationRecord
          :rememberable,
          :validatable,
          :confirmable
-
   has_one_attached :thumbnail
-
   after_commit :compress_thumbnail, if: :thumbnail_attached_changed?
-
   # ===== associations =====
   has_many :orders, dependent: :destroy
   has_many :courses, through: :orders
@@ -17,10 +14,9 @@ class User < ApplicationRecord
   has_many :speaking_attempts
   has_many :course_progresses
   has_many :achievements, dependent: :destroy
-
+  has_many :chat_messages, dependent: :destroy  # ← THÊM DÒNG NÀY
   enum :role, { admin: 0, student: 1 }, suffix: true
   scope :students, -> { where(role: :student) }
-
   # ===== validations =====
   validates :email, presence: true, uniqueness: true
   validates :role, presence: true
@@ -34,32 +30,25 @@ class User < ApplicationRecord
             allow_blank: true
   validate :thumbnail_type
   after_initialize :set_default_role, if: :new_record?
-
   def set_default_role
     self.role ||= "student"
   end
-
   def has_course_access?(course)
     course_accesses.exists?(
       course_id: course.id,
       status: CourseAccess.statuses[:active]
     )
   end
-
   private
-
   def thumbnail_attached_changed?
     thumbnail.attached? && thumbnail.blob&.new_record?
   end
-
   def compress_thumbnail
     downloaded = Tempfile.new([ "original", ".jpg" ])
     downloaded.binmode
     downloaded.write(thumbnail.download)
     downloaded.rewind
-
     compressed = ImageCompressor.compress(downloaded)
-
     thumbnail.detach
     thumbnail.attach(
       io: compressed,
@@ -69,17 +58,14 @@ class User < ApplicationRecord
   ensure
     downloaded.close!
   end
-
   def thumbnail_type
     return unless thumbnail.attached?
-
     allowed_types = %w[
       image/png
       image/jpg
       image/jpeg
       image/webp
     ]
-
     unless allowed_types.include?(thumbnail.blob.content_type)
       thumbnail.purge
       errors.add(:thumbnail, "chỉ cho phép ảnh PNG, JPG, JPEG, WEBP")

@@ -6,9 +6,9 @@ class Students::OrdersController < ApplicationController
   # ======================
   # GET /students/courses/:course_id/orders/new
   # ======================
- def new
-    @order = current_user.orders.build(course: @course)
-  end
+def new
+  @order = Order.find_or_create_by(user: current_user, course: @course, status: "pending")
+end
 
   # ======================
   # POST /students/courses/:course_id/orders

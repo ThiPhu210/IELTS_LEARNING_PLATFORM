@@ -1,187 +1,478 @@
-  <!-- NAVBAR -->
-  <%= render "admin/shared/navbar" %>
+<%# app/views/admin/teachers/index.html.erb %>
 
-  <!-- SIDEBAR -->
-  <%= render "admin/shared/sidebar" %>
+<%= render "admin/shared/navbar" %>
+<%= render "admin/shared/sidebar" %>
 
-  <!-- MAIN CONTENT -->
-  <main class="pt-16 sm:ml-64 p-6">
-
-    <!-- PAGE TITLE -->
-    <h1 class="text-2xl font-bold mb-6">👩‍🏫 Teacher Management</h1>
-
-    <!-- CARD -->
-    <div class="p-4 bg-white border-b border-gray-200 rounded-lg mb-6">
-
-      <!-- BREADCRUMB -->
-      <nav class="flex mb-4 text-sm font-medium">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
-          <li class="inline-flex items-center">
-            <%= link_to admin_dashboard_path,
-                class: "text-gray-700 hover:text-indigo-600 flex items-center" do %>
-              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 2L2 9h3v9h10V9h3L10 2z"/>
-              </svg>
-              Dashboard
-            <% end %>
-          </li>
-          <li class="flex items-center">
-            <svg class="w-6 h-6 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M7.293 14.707L10.586 11 7.293 7.293 8.707 5.879 13.828 11 8.707 16.121z"/>
-            </svg>
-            <span class="text-gray-500">Teachers</span>
-          </li>
-        </ol>
-      </nav>
-
-      <!-- TITLE + ACTION -->
-      <div class="flex items-center justify-between">
-        <h2 class="text-xl font-semibold text-gray-900">All teachers</h2>
-      </div>
-    </div>
-
-    <!-- TABLE -->
-    <div class="overflow-x-auto bg-white rounded-lg shadow">
-      <table class="w-full text-sm text-left text-gray-500">
-        <thead class="bg-gray-100 text-xs uppercase">
-          <tr>
-            <th class="p-4">Teacher</th>
-            <th class="p-4">Expertise</th>
-            <th class="p-4">Experience</th>
-            <th class="p-4">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody class="divide-y">
-          <% @teachers.each do |teacher| %>
-            <tr class="hover:bg-gray-50">
-
-              <!-- AVATAR + NAME -->
-              <td class="p-4 flex items-center gap-3">
-
-              <% avatar = teacher.avatar %>
-
-
-                <% if avatar&.attached? %>
-                  <%= image_tag avatar.variant(resize_to_fill: [40, 40]),
-                      class: "w-10 h-10 rounded-full object-cover" %>
-                <% else %>
-                  <div class="w-10 h-10 rounded-full bg-indigo-500
-                              flex items-center justify-center text-white font-bold">
-                    <%= teacher.full_name.first.upcase || "Teacher" %>
-                  </div>
-                <% end %>
-
-                <div>
-                  <div class="font-medium text-gray-900">
-                    <%= teacher.full_name %>
-                  </div>
-                  <div class="text-xs text-gray-500">
-                    ID: <%= teacher.id %>
-                  </div>
-                </div>
-              </td>
-
-  
-              <!-- EXPERTISE -->
-              <td class="p-4">
-                <%= teacher.expertise || "N/A" %>
-              </td>
-
-              <!-- EXPERIENCE -->
-              <td class="p-4">
-                <%= teacher.experience_years || 0 %> years
-              </td>
-
-              <!-- ACTIONS -->
-              <td class="p-4 flex gap-2">
-<%= link_to "Edit",
-    "#",
-    class: "btn-edit px-3 py-1 text-sm text-white bg-blue-600 rounded",
-    data: { teacher_id: teacher.id } %>
-
-
-<%= button_to "Destroy",
-    admin_teacher_path(teacher),
-    method: :delete,
-    data: { confirm: "Bạn chắc chắn?" },
-    class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
-
-
-
-              </td>
-
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
-      <!-- PAGINATION -->
-      <div class="p-4">
-        <%= paginate @teachers %>
-      </div>
-    </div>
-
-  </main>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-nav.pagination {
-  display: flex;
-  gap: 0.5rem;
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-brd:  #fca5a5;
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --indigo:       #4f46e5;
+  --indigo-lt:    #eef2ff;
+  --r-sm: 10px; --r-md: 14px; --r-lg: 20px; --r-xl: 26px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,.08);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease:       cubic-bezier(.4,0,.2,1);
 }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+.tc-wrapper {
+  margin-left: 256px;
+  padding-top: 64px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+@media (max-width: 640px) { .tc-wrapper { margin-left: 0; padding-top: 56px; } }
+
+/* ════════ HERO ════════ */
+.tc-hero {
+  position: relative; overflow: hidden;
+  background: var(--ink); padding: 28px 32px 36px;
+  animation: fadeUp .4s var(--ease) both;
+}
+.tc-hero::before {
+  content: ''; position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+.tc-hero-glow {
+  position: absolute; right: -60px; top: -60px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.tc-hero-glow2 {
+  position: absolute; left: 8%; bottom: -80px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(13,148,136,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.tc-hero-inner { position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+.tc-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,.3); margin-bottom: 12px; letter-spacing: .04em;
+}
+.tc-breadcrumb a { color: rgba(255,255,255,.4); text-decoration: none; transition: color .15s; }
+.tc-breadcrumb a:hover { color: #fca5a5; }
+.tc-breadcrumb-sep { color: rgba(255,255,255,.18); }
+.tc-hero-title {
+  font-family: var(--font-serif); font-size: clamp(22px, 2.4vw, 34px);
+  font-weight: 400; letter-spacing: -.02em; color: #fff; line-height: 1.15;
+}
+.tc-hero-title em { font-style: italic; color: #fca5a5; }
+.tc-hero-sub { font-size: 12.5px; color: rgba(255,255,255,.4); margin-top: 6px; }
+
+.tc-hero-stats { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; }
+.tc-hero-stat {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-md); padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.tc-hero-stat-icon {
+  width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.tc-hero-stat-num  { font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: #fff; line-height: 1; }
+.tc-hero-stat-label{ font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+/* ════════ BODY ════════ */
+.tc-body { padding: 28px 32px 64px; }
+@media (max-width: 640px) { .tc-body { padding: 18px; } }
+
+/* Toolbar */
+.tc-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; margin-bottom: 20px;
+  animation: fadeUp .45s var(--ease) .05s both;
+}
+.tc-search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 340px; }
+.tc-search-icon {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  width: 14px; height: 14px; color: var(--ink-3); pointer-events: none;
+}
+.tc-search {
+  width: 100%; padding: 9px 12px 9px 34px;
+  border: 1.5px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); font-family: var(--font); font-size: 13px;
+  color: var(--ink); outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.tc-search:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(220,38,38,.08); }
+.tc-search::placeholder { color: var(--ink-3); }
+
+.tc-count { font-family: var(--font-mono); font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+
+/* Teacher cards */
+.tc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px; margin-bottom: 24px;
+  animation: fadeUp .5s var(--ease) .08s both;
+}
+
+.tc-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); overflow: hidden;
+  transition: box-shadow .2s, transform .2s, border-color .2s;
+  position: relative;
+}
+.tc-card:hover { box-shadow: var(--shadow-sm); transform: translateY(-2px); border-color: rgba(220,38,38,.22); }
+.tc-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2.5px;
+  background: linear-gradient(90deg, var(--teal), #5eead4);
+  opacity: 0; transition: opacity .2s;
+}
+.tc-card:hover::before { opacity: 1; }
+
+.tc-card-body { padding: 20px; display: flex; align-items: flex-start; gap: 14px; }
+
+.tc-avatar {
+  width: 52px; height: 52px; border-radius: 50%; flex-shrink: 0;
+  background: var(--teal-lt); border: 2px solid #99f6e4;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 20px; font-style: italic;
+  color: var(--teal); overflow: hidden;
+}
+.tc-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.tc-info { flex: 1; min-width: 0; }
+.tc-name {
+  font-size: 14px; font-weight: 800; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  line-height: 1.2; margin-bottom: 3px;
+}
+.tc-expertise { font-size: 12px; color: var(--teal); font-weight: 700; margin-bottom: 6px; }
+.tc-expertise-empty { color: var(--ink-3); font-weight: 500; font-style: italic; }
+
+.tc-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.tc-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 700; font-family: var(--font-mono);
+  padding: 2px 8px; border-radius: 20px;
+  background: var(--surface-2); color: var(--ink-3); border: 1px solid var(--line);
+}
+.tc-chip.exp { background: var(--amber-lt); color: var(--amber); border-color: #fde68a; }
+
+.tc-id-badge {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,.7); background: var(--ink-2);
+  padding: 1px 6px; border-radius: 4px; flex-shrink: 0; align-self: flex-start;
+}
+
+/* Bio preview */
+.tc-bio-preview {
+  padding: 10px 20px; border-top: 1px solid var(--line);
+  font-size: 12px; color: var(--ink-3); line-height: 1.5;
+  background: var(--surface-2);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.tc-bio-preview.empty { font-style: italic; }
+
+/* Card footer */
+.tc-card-footer {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: 6px; padding: 10px 16px;
+  border-top: 1.5px solid var(--line);
+}
+
+.tc-btn-edit {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  background: var(--indigo-lt); color: var(--indigo);
+  border: 1px solid #c7d2fe; font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+  text-decoration: none;
+}
+.tc-btn-edit:hover { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+
+.tc-btn-del {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 10px; border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink-3);
+  border: 1.5px solid var(--line); font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+}
+.tc-btn-del:hover { background: #fef2f2; color: var(--primary); border-color: var(--primary-brd); }
+
+/* Empty state */
+.tc-empty {
+  text-align: center; padding: 64px 32px;
+  background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-xl);
+}
+.tc-empty-icon { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.tc-empty-title { font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink-2); }
+.tc-empty-sub { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+
+/* Pagination */
+.tc-pagination { display: flex; justify-content: center; margin-top: 4px; animation: fadeUp .5s var(--ease) .12s both; }
+nav.pagination { display: flex; gap: 4px; align-items: center; }
 nav.pagination a,
 nav.pagination span {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--line); background: var(--surface);
+  color: var(--ink-3); text-decoration: none; transition: all .15s;
 }
-nav.pagination .current { 
-  background: #4f46e5;
-  color: white;
-}   
+nav.pagination a:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+nav.pagination .current { background: var(--primary); color: #fff; border-color: var(--primary); }
+nav.pagination .disabled { opacity: .35; pointer-events: none; }
+
+/* ════════ EDIT MODAL ════════ */
+.tc-modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(13,14,20,.7); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.tc-modal-overlay.open { display: flex; }
+.tc-modal {
+  background: var(--surface); border-radius: var(--r-xl);
+  width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+  animation: fadeUp .25s var(--ease) both; position: relative;
+}
+.tc-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1.5px solid var(--line);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.tc-modal-title { font-family: var(--font-serif); font-size: 20px; font-style: italic; color: var(--ink); }
+.tc-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--line); background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; color: var(--ink-3); font-size: 16px;
+}
+.tc-modal-close:hover { background: var(--primary-lt); border-color: var(--primary-brd); color: var(--primary); }
+.tc-modal-body { padding: 24px; }
+
+/* Flash toast */
+.tc-toast {
+  position: fixed; top: 80px; right: 20px; z-index: 9999;
+  background: var(--ink); color: #fff;
+  padding: 12px 18px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  display: flex; align-items: center; gap: 8px;
+  border-left: 3px solid var(--emerald);
+  animation: fadeUp .3s var(--ease) both;
+  max-width: 300px;
+}
 </style>
 
-<!-- EDIT MODAL -->
-<div id="edit-modal"
-     class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
+<%
+  total_teachers  = TeacherProfile.count
+  avg_experience  = TeacherProfile.where.not(experience_years: nil).average(:experience_years)&.round(1)
+%>
 
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
-    <button id="close-modal"
-            class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
-      ✕
-    </button>
+<div class="tc-wrapper">
 
-    <div id="modal-body" class="p-2">
-      <!-- form load vào đây -->
+  <!-- ═══ HERO ═══ -->
+  <div class="tc-hero">
+    <div class="tc-hero-glow"></div>
+    <div class="tc-hero-glow2"></div>
+    <div class="tc-hero-inner">
+      <div>
+        <div class="tc-breadcrumb">
+          <a href="<%= admin_dashboard_path %>">Dashboard</a>
+          <span class="tc-breadcrumb-sep">›</span>
+          <span>Teachers</span>
+        </div>
+        <h1 class="tc-hero-title">Teacher <em>Management</em></h1>
+        <p class="tc-hero-sub">Manage instructor profiles and expertise</p>
+
+        <div class="tc-hero-stats">
+          <div class="tc-hero-stat">
+            <div class="tc-hero-stat-icon" style="background:rgba(13,148,136,.2)">👩‍🏫</div>
+            <div>
+              <div class="tc-hero-stat-num"><%= total_teachers %></div>
+              <div class="tc-hero-stat-label">Total Teachers</div>
+            </div>
+          </div>
+          <div class="tc-hero-stat">
+            <div class="tc-hero-stat-icon" style="background:rgba(217,119,6,.2)">⭐</div>
+            <div>
+              <div class="tc-hero-stat-num"><%= avg_experience || '—' %></div>
+              <div class="tc-hero-stat-label">Avg. Experience (yrs)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BODY ═══ -->
+  <div class="tc-body">
+
+    <% if notice.present? %>
+      <div class="tc-toast" id="flash-toast">✓ <%= notice %></div>
+      <script>setTimeout(function(){ var t=document.getElementById('flash-toast'); if(t){t.style.transition='opacity .4s';t.style.opacity='0';} }, 3500);</script>
+    <% end %>
+
+    <!-- Toolbar -->
+    <div class="tc-toolbar">
+      <div class="tc-search-wrap">
+        <svg class="tc-search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text" class="tc-search" placeholder="Search teachers…"
+               id="tc-search-input" oninput="filterTeachers(this.value)">
+      </div>
+      <span class="tc-count" id="tc-count"><%= @teachers.total_count %> teachers</span>
+    </div>
+
+    <!-- Cards grid -->
+    <% if @teachers.any? %>
+      <div class="tc-grid" id="tc-grid">
+        <% @teachers.each_with_index do |teacher, i| %>
+          <div class="tc-card" data-name="<%= teacher.full_name&.downcase %>" data-expertise="<%= teacher.expertise&.downcase %>"
+               style="animation: fadeUp .4s var(--ease) <%= (i * 0.05).round(2) %>s both">
+
+            <div class="tc-card-body">
+              <!-- Avatar -->
+              <div class="tc-avatar">
+                <% if teacher.avatar&.attached? %>
+                  <%= image_tag teacher.avatar.variant(resize_to_fill: [52, 52]), alt: teacher.full_name %>
+                <% else %>
+                  <%= teacher.full_name&.first&.upcase || 'T' %>
+                <% end %>
+              </div>
+
+              <!-- Info -->
+              <div class="tc-info">
+                <div class="tc-name"><%= teacher.full_name %></div>
+                <div class="tc-expertise <%= teacher.expertise.blank? ? 'tc-expertise-empty' : '' %>">
+                  <%= teacher.expertise.presence || 'No expertise listed' %>
+                </div>
+                <div class="tc-chips">
+                  <% if teacher.experience_years.present? && teacher.experience_years > 0 %>
+                    <span class="tc-chip exp">⭐ <%= teacher.experience_years %> yrs exp</span>
+                  <% end %>
+                </div>
+              </div>
+
+              <span class="tc-id-badge">#<%= teacher.id %></span>
+            </div>
+
+            <!-- Bio preview -->
+            <div class="tc-bio-preview <%= teacher.bio.blank? ? 'empty' : '' %>">
+              <%= teacher.bio.presence || 'No bio provided.' %>
+            </div>
+
+            <!-- Footer -->
+            <div class="tc-card-footer">
+              <a href="#" class="tc-btn-edit btn-edit" data-teacher-id="<%= teacher.id %>">
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit
+              </a>
+              <%= button_to admin_teacher_path(teacher), method: :delete,
+                  class: "tc-btn-del",
+                  form: { data: { turbo_confirm: "Remove #{teacher.full_name}?" } } do %>
+                <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="3 6 5 6 21 6"/>
+                  <path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/>
+                </svg>
+              <% end %>
+            </div>
+
+          </div>
+        <% end %>
+      </div>
+
+    <% else %>
+      <div class="tc-empty">
+        <div class="tc-empty-icon">👩‍🏫</div>
+        <div class="tc-empty-title">No teachers yet</div>
+        <div class="tc-empty-sub">Teacher profiles will appear here once added.</div>
+      </div>
+    <% end %>
+
+    <!-- Pagination -->
+    <div class="tc-pagination">
+      <%= paginate @teachers %>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="tc-modal-overlay" id="edit-modal">
+  <div class="tc-modal">
+    <div class="tc-modal-header">
+      <span class="tc-modal-title">Edit <em>Teacher</em></span>
+      <button class="tc-modal-close" id="close-modal">✕</button>
+    </div>
+    <div class="tc-modal-body" id="modal-body">
+      <div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>
     </div>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const editButtons = document.querySelectorAll(".btn-edit");
-    const modal = document.getElementById("edit-modal");
-    const modalBody = document.getElementById("modal-body");
-    const closeModalBtn = document.getElementById("close-modal");
+document.addEventListener('DOMContentLoaded', function() {
+  var editBtns  = document.querySelectorAll('.btn-edit');
+  var modal     = document.getElementById('edit-modal');
+  var modalBody = document.getElementById('modal-body');
+  var closeBtn  = document.getElementById('close-modal');
 
-    editButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        const teacherId = button.getAttribute("data-teacher-id");
-
-        fetch(`/admin/teachers/${teacherId}/edit`, {
-          headers: { "Accept": "text/html" }
-        })
-
-        .then(response => response.text())
-        .then(html => {
-          modalBody.innerHTML = html;
-          modal.classList.remove("hidden");
-        });
-      });
-    });
-
-    closeModalBtn.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      modalBody.innerHTML = "";
+  editBtns.forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var id = btn.getAttribute('data-teacher-id');
+      modalBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>';
+      modal.classList.add('open');
+      fetch('/admin/teachers/' + id + '/edit', { headers: { 'Accept': 'text/html' } })
+        .then(function(r) { return r.text(); })
+        .then(function(html) { modalBody.innerHTML = html; });
     });
   });
+
+  closeBtn.addEventListener('click', function() {
+    modal.classList.remove('open');
+    modalBody.innerHTML = '';
+  });
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) { modal.classList.remove('open'); modalBody.innerHTML = ''; }
+  });
+});
+
+// Client-side filter (within current page)
+function filterTeachers(q) {
+  var cards = document.querySelectorAll('.tc-card');
+  var lower = q.toLowerCase();
+  var visible = 0;
+  cards.forEach(function(card) {
+    var match = card.dataset.name.includes(lower) || card.dataset.expertise.includes(lower);
+    card.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  var countEl = document.getElementById('tc-count');
+  if (countEl) countEl.textContent = visible + ' teachers';
+}
 </script>

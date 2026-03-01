@@ -1,0 +1,709 @@
+<%# app/views/students/courses/landing.html.erb
+    Trang công khai giới thiệu khóa học — không cần đăng nhập
+    Navbar: dùng navbar ngoài (landing page navbar, đã có sẵn)
+%>
+
+<%= render "students/shared/navbar" rescue render "navbar" rescue nil %>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ── TOKENS ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red:        #dc2626;
+  --red-dark:   #b91c1c;
+  --red-lt:     #fee2e2;
+  --red-glow:   rgba(220,38,38,.18);
+  --ink:        #0d0e14;
+  --ink-2:      #374151;
+  --ink-3:      #6b7280;
+  --line:       #e8eaf2;
+  --bg:         #f2f4f9;
+  --surface:    #fff;
+  --emerald:    #059669;
+  --emerald-lt: #d1fae5;
+  --amber:      #d97706;
+  --amber-lt:   #fef3c7;
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --serif:      'Instrument Serif', serif;
+  --ease:       cubic-bezier(.4,0,.2,1);
+  --r-sm: 8px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
+@keyframes pulseRed { 0%,100% { box-shadow: 0 4px 20px var(--red-glow); } 50% { box-shadow: 0 4px 32px rgba(220,38,38,.35); } }
+
+/* ══════════════════════════════════════════
+   HERO
+══════════════════════════════════════════ */
+.lp-hero {
+  position: relative;
+  background: var(--ink);
+  padding-top: 60px; /* navbar offset */
+  overflow: hidden;
+}
+.lp-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: .15;
+}
+.lp-hero-bg.placeholder {
+  background: linear-gradient(135deg, #7f1d1d 0%, #1e1b4b 100%);
+  opacity: 1;
+}
+.lp-hero::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(to right,
+    rgba(13,14,20,.95) 0%,
+    rgba(13,14,20,.75) 55%,
+    rgba(13,14,20,.25) 100%);
+  pointer-events: none;
+}
+.lp-hero-inner {
+  position: relative; z-index: 1;
+  max-width: 1200px; margin: 0 auto;
+  padding: 56px 32px 64px;
+  display: grid; grid-template-columns: 1fr 340px; gap: 52px; align-items: start;
+}
+
+/* Breadcrumb */
+.lp-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; color: rgba(255,255,255,.4);
+  margin-bottom: 18px; animation: fadeUp .4s var(--ease) both;
+}
+.lp-breadcrumb a { color: #fca5a5; text-decoration: none; }
+.lp-breadcrumb a:hover { opacity: .8; }
+
+/* Eyebrow */
+.lp-eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: #fca5a5; background: rgba(220,38,38,.2);
+  padding: 4px 12px; border-radius: 20px;
+  border: 1px solid rgba(252,165,165,.25);
+  margin-bottom: 16px; animation: fadeUp .4s var(--ease) .05s both;
+}
+
+/* Title */
+.lp-title {
+  font-family: var(--serif);
+  font-size: clamp(28px, 3.5vw, 46px); font-weight: 400;
+  line-height: 1.12; letter-spacing: -.025em; color: #fff;
+  margin-bottom: 16px; animation: fadeUp .4s var(--ease) .08s both;
+}
+.lp-title em { font-style: italic; color: #fca5a5; }
+
+/* Description */
+.lp-desc {
+  font-size: 15px; color: rgba(255,255,255,.62); line-height: 1.75;
+  max-width: 560px; margin-bottom: 26px;
+  animation: fadeUp .4s var(--ease) .11s both;
+}
+
+/* Stats row */
+.lp-stats {
+  display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+  animation: fadeUp .4s var(--ease) .14s both; margin-bottom: 26px;
+}
+.lp-stat { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; color: rgba(255,255,255,.65); }
+.lp-stat svg { color: #fca5a5; flex-shrink: 0; }
+.lp-stat-div { width: 1px; height: 14px; background: rgba(255,255,255,.15); }
+
+/* Teacher mini */
+.lp-teacher {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,.07); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.1); border-radius: var(--r-md);
+  padding: 10px 14px; width: fit-content;
+  animation: fadeUp .4s var(--ease) .17s both;
+}
+.lp-teacher-avatar {
+  width: 36px; height: 36px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(252,165,165,.4); flex-shrink: 0;
+}
+.lp-teacher-avatar-ph {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(220,38,38,.3);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 16px; font-style: italic;
+  color: #fca5a5; flex-shrink: 0;
+}
+.lp-teacher-name { font-size: 13px; font-weight: 700; color: #fff; }
+.lp-teacher-role { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
+
+/* ══════════════════════════════════════════
+   PURCHASE CARD (right of hero, sticky)
+══════════════════════════════════════════ */
+.buy-card {
+  background: var(--surface);
+  border-radius: var(--r-xl);
+  box-shadow: 0 20px 60px rgba(0,0,0,.28), 0 4px 12px rgba(0,0,0,.1);
+  overflow: hidden;
+  animation: fadeUp .4s var(--ease) .1s both;
+  position: sticky; top: 80px;
+}
+
+.buy-card-thumb {
+  width: 100%; height: 190px;
+  background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 60%, #1e1b4b 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 60px; font-style: italic;
+  color: rgba(255,255,255,.18); letter-spacing: -2px; overflow: hidden;
+}
+.buy-card-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.buy-card-body { padding: 22px 20px; }
+
+/* Price */
+.buy-price-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+.buy-price {
+  font-family: var(--serif); font-size: 36px; font-weight: 400;
+  letter-spacing: -.03em; color: var(--ink); line-height: 1;
+}
+.buy-price-free { color: var(--emerald); }
+.buy-price-orig {
+  font-size: 14px; color: var(--ink-3); text-decoration: line-through; font-weight: 500;
+}
+.buy-discount {
+  font-size: 11px; font-weight: 800; color: var(--red);
+  background: var(--red-lt); padding: 2px 7px; border-radius: 5px;
+}
+.buy-timer {
+  font-size: 12px; font-weight: 700; color: var(--red);
+  display: flex; align-items: center; gap: 5px; margin-bottom: 16px;
+}
+
+/* CTA buttons */
+.btn-buy {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 15px; background: var(--red); color: #fff;
+  font-size: 15px; font-weight: 800; border-radius: var(--r-md);
+  text-decoration: none; border: none; cursor: pointer; font-family: var(--font);
+  transition: all .2s var(--ease);
+  animation: pulseRed 2.5s ease-in-out infinite;
+  margin-bottom: 10px;
+}
+.btn-buy:hover { background: var(--red-dark); transform: translateY(-1px); }
+
+.btn-login {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  width: 100%; padding: 13px; background: transparent; color: var(--ink);
+  font-size: 14px; font-weight: 700; border-radius: var(--r-md);
+  border: 1.5px solid var(--line); text-decoration: none; font-family: var(--font);
+  transition: all .15s var(--ease); margin-bottom: 16px;
+}
+.btn-login:hover { border-color: var(--red); color: var(--red); }
+
+/* Includes */
+.buy-includes { border-top: 1.5px solid var(--line); padding-top: 16px; }
+.buy-includes-label {
+  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--ink-3); margin-bottom: 11px;
+}
+.buy-include {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 500; color: var(--ink-2);
+  margin-bottom: 8px;
+}
+.buy-include svg { color: var(--emerald); flex-shrink: 0; }
+
+.buy-guarantee {
+  margin-top: 13px; padding: 10px 13px;
+  background: #f0fdf4; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 600; color: #065f46;
+  display: flex; align-items: center; gap: 7px;
+}
+
+/* Share */
+.buy-share {
+  margin-top: 12px; text-align: center;
+  font-size: 12px; font-weight: 600; color: var(--ink-3);
+  cursor: pointer; text-decoration: none; display: block; transition: color .15s;
+}
+.buy-share:hover { color: var(--red); }
+
+/* ══════════════════════════════════════════
+   BODY — 2-col layout
+══════════════════════════════════════════ */
+.lp-body {
+  max-width: 1200px; margin: 0 auto;
+  padding: 40px 32px 80px;
+  display: grid; grid-template-columns: 1fr 340px; gap: 32px;
+}
+.lp-main { min-width: 0; }
+.lp-aside { /* card dưới thay thế sticky khi cuộn ra khỏi hero */ }
+
+/* Section cards */
+.lp-card {
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--r-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  animation: fadeUp .5s var(--ease) both;
+}
+.lp-card-head {
+  padding: 18px 24px;
+  border-bottom: 1.5px solid var(--line);
+  font-size: 16px; font-weight: 800; color: var(--ink);
+  display: flex; align-items: center; gap: 10px;
+}
+.lp-card-body { padding: 22px 24px; }
+
+/* Objectives grid */
+.obj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.obj-item {
+  display: flex; align-items: flex-start; gap: 9px;
+  font-size: 13.5px; font-weight: 500; color: var(--ink-2); line-height: 1.45;
+}
+.obj-item svg { color: var(--emerald); flex-shrink: 0; margin-top: 2px; }
+
+/* Curriculum accordion */
+.curr-section { border-bottom: 1.5px solid var(--line); }
+.curr-section:last-child { border-bottom: none; }
+.curr-section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px; cursor: pointer;
+  background: var(--surface); transition: background .12s;
+  user-select: none;
+}
+.curr-section-head:hover { background: var(--bg); }
+.curr-section-left { display: flex; align-items: center; gap: 11px; }
+.curr-num {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--red); color: #fff;
+  font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.curr-section-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.curr-section-count { font-size: 11.5px; color: var(--ink-3); margin-top: 1px; }
+.curr-chevron { color: var(--ink-3); transition: transform .25s var(--ease); flex-shrink: 0; }
+.curr-section-head.open .curr-chevron { transform: rotate(180deg); }
+
+.curr-lessons {
+  display: grid; grid-template-rows: 0fr;
+  transition: grid-template-rows .3s var(--ease);
+}
+.curr-lessons.open { grid-template-rows: 1fr; }
+.curr-lessons-inner { overflow: hidden; }
+
+.curr-lesson {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 24px; border-top: 1px solid var(--line);
+  font-size: 13.5px; color: var(--ink-2); font-weight: 500;
+  transition: background .1s;
+}
+.curr-lesson:hover { background: var(--bg); }
+.curr-lesson-icon {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--red-lt); color: var(--red);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.curr-lesson-name { flex: 1; }
+.curr-lesson-lock { color: var(--ink-3); flex-shrink: 0; }
+.preview-tag {
+  font-size: 10px; font-weight: 800; color: var(--red);
+  background: var(--red-lt); padding: 2px 7px; border-radius: 20px; flex-shrink: 0;
+}
+
+/* Instructor */
+.instructor-wrap { display: flex; gap: 16px; align-items: flex-start; }
+.instructor-avatar {
+  width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
+  border: 3px solid var(--red-lt); flex-shrink: 0;
+}
+.instructor-avatar-ph {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: var(--red-lt); display: flex; align-items: center; justify-content: center;
+  font-family: var(--serif); font-size: 28px; font-style: italic;
+  color: var(--red); flex-shrink: 0;
+}
+.instructor-name { font-size: 16px; font-weight: 800; color: var(--ink); margin-bottom: 3px; }
+.instructor-tag {
+  display: inline-block; font-size: 11px; font-weight: 700; color: #0d9488;
+  background: #e6faf8; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px;
+}
+.instructor-bio { font-size: 13.5px; color: var(--ink-2); line-height: 1.7; }
+
+/* Requirements */
+.req-list { list-style: none; }
+.req-list li {
+  display: flex; align-items: flex-start; gap: 9px;
+  padding: 7px 0; border-bottom: 1px solid var(--line);
+  font-size: 13.5px; font-weight: 500; color: var(--ink-2); line-height: 1.5;
+}
+.req-list li:last-child { border-bottom: none; }
+.req-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; margin-top: 6px; }
+
+/* ── Aside ── */
+.lp-aside-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-lg); margin-bottom: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05); overflow: hidden;
+}
+.lp-aside-head {
+  padding: 12px 18px; border-bottom: 1.5px solid var(--line);
+  background: var(--bg); font-size: 11px; font-weight: 800;
+  text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3);
+}
+.lp-aside-body { padding: 14px 18px; }
+.aside-include {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 500; color: var(--ink-2);
+  margin-bottom: 9px;
+}
+.aside-include svg { color: var(--emerald); flex-shrink: 0; }
+.aside-include:last-child { margin-bottom: 0; }
+
+/* CTA sticky bar (mobile only) */
+.sticky-cta-bar {
+  display: none;
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 999;
+  background: var(--surface); border-top: 1.5px solid var(--line);
+  padding: 12px 20px; gap: 10px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+}
+.sticky-cta-bar .buy-price { font-size: 22px; }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 980px) {
+  .lp-hero-inner, .lp-body { grid-template-columns: 1fr; }
+  .buy-card { position: static; }
+  /* Hero: move card above title on mobile */
+  .lp-hero-inner { flex-direction: column; }
+  .lp-aside { display: none; }
+  .sticky-cta-bar { display: flex; align-items: center; justify-content: space-between; }
+  .obj-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .lp-hero-inner, .lp-body { padding-left: 16px; padding-right: 16px; }
+  .lp-card-body { padding: 16px; }
+  .lp-card-head { padding: 14px 16px; }
+  .curr-section-head, .curr-lesson { padding-left: 16px; padding-right: 16px; }
+}
+</style>
+
+<!-- ══════════ HERO ══════════ -->
+<section class="lp-hero">
+  <% if @course.respond_to?(:thumbnail) && @course.thumbnail.attached? %>
+    <div class="lp-hero-bg" style="background-image:url('<%= url_for(@course.thumbnail) %>')"></div>
+  <% else %>
+    <div class="lp-hero-bg placeholder"></div>
+  <% end %>
+
+  <div class="lp-hero-inner">
+    <!-- LEFT: Info -->
+    <div>
+      <!-- Breadcrumb -->
+      <nav class="lp-breadcrumb" aria-label="breadcrumb">
+        <a href="<%= root_path %>">Home</a>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <a href="<%= students_courses_path %>">Courses</a>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        <span><%= @course.title.truncate(32) %></span>
+      </nav>
+
+      <!-- Eyebrow -->
+      <% if @course.band_min.present? %>
+        <div class="lp-eyebrow">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Target Band <%= @course.band_min %><% if @course.band_max.present? %> – <%= @course.band_max %><% end %>
+        </div>
+      <% end %>
+
+      <!-- Title -->
+      <h1 class="lp-title">
+        <em><%= @course.title.split.first(2).join(' ') %></em>
+        <% rest = @course.title.split.drop(2).join(' ') %>
+        <%= " #{rest}" if rest.present? %>
+      </h1>
+
+      <!-- Description -->
+      <% if @course.description.present? %>
+        <p class="lp-desc"><%= @course.description %></p>
+      <% end %>
+
+      <!-- Stats -->
+      <div class="lp-stats">
+        <div class="lp-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          <%= @sections.count %> Sections
+        </div>
+        <div class="lp-stat-div"></div>
+        <div class="lp-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <%= @total_lessons %> Lessons
+        </div>
+        <div class="lp-stat-div"></div>
+        <div class="lp-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Self-paced
+        </div>
+        <div class="lp-stat-div"></div>
+        <div class="lp-stat">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+          AI Speaking Practice
+        </div>
+      </div>
+
+      <!-- Teacher mini -->
+      <% if @teacher_profile %>
+        <div class="lp-teacher">
+          <% if @teacher_profile.respond_to?(:avatar) && @teacher_profile.avatar.attached? %>
+            <%= image_tag @teacher_profile.avatar.variant(resize_to_fill: [36, 36]),
+                          class: "lp-teacher-avatar", alt: @teacher_profile.full_name %>
+          <% else %>
+            <div class="lp-teacher-avatar-ph"><%= @teacher_profile.full_name[0] %></div>
+          <% end %>
+          <div>
+            <div class="lp-teacher-name"><%= @teacher_profile.full_name %></div>
+            <div class="lp-teacher-role">
+              <%= @teacher_profile.respond_to?(:expertise) ? @teacher_profile.expertise : "IELTS Instructor" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- RIGHT: Purchase card -->
+    <div>
+      <%= render 'students/courses/buy_card' %>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ BODY ══════════ -->
+<div class="lp-body">
+  <main class="lp-main">
+
+    <!-- What you'll learn -->
+    <div class="lp-card" style="animation-delay:.05s">
+      <div class="lp-card-head">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--emerald)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Bạn sẽ học được gì?
+      </div>
+      <div class="lp-card-body">
+        <div class="obj-grid">
+          <% objectives = @course.respond_to?(:objectives) && @course.objectives.present? ?
+              @course.objectives :
+              ["Nắm vững 4 kỹ năng Listening, Reading, Writing, Speaking",
+               "Chiến lược làm bài thi IELTS hiệu quả cao",
+               "Mở rộng vốn từ vựng học thuật Band 7+",
+               "Kỹ thuật quản lý thời gian trong phòng thi",
+               "Luyện Speaking với AI phản hồi tức thì",
+               "Cải thiện phát âm và ngữ điệu tự nhiên"] %>
+          <% objectives.each do |obj| %>
+            <div class="obj-item">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              <%= obj %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Curriculum -->
+    <div class="lp-card" style="animation-delay:.10s">
+      <div class="lp-card-head">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="2.5"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        Nội dung khóa học
+        <span style="font-size:12px;font-weight:600;color:var(--ink-3);margin-left:auto">
+          <%= @sections.count %> sections · <%= @total_lessons %> bài học
+        </span>
+      </div>
+
+      <% @sections.each_with_index do |section, i| %>
+        <div class="curr-section">
+          <div class="curr-section-head <%= i == 0 ? 'open' : '' %>"
+               onclick="toggleCurr(this)">
+            <div class="curr-section-left">
+              <div class="curr-num"><%= i + 1 %></div>
+              <div>
+                <div class="curr-section-title"><%= section.title %></div>
+                <div class="curr-section-count"><%= section.lessons.count %> bài học</div>
+              </div>
+            </div>
+            <svg class="curr-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                 style="<%= i == 0 ? 'transform:rotate(180deg)' : '' %>">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+
+          <div class="curr-lessons <%= i == 0 ? 'open' : '' %>">
+            <div class="curr-lessons-inner">
+              <% section.lessons.each_with_index do |lesson, li| %>
+                <div class="curr-lesson">
+                  <div class="curr-lesson-icon">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </div>
+                  <span class="curr-lesson-name"><%= lesson.title %></span>
+                  <%# Bài đầu tiên mỗi section cho xem thử %>
+                  <% if li == 0 %>
+                    <span class="preview-tag">Xem thử</span>
+                  <% else %>
+                    <span class="curr-lesson-lock">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                    </span>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Requirements -->
+    <div class="lp-card" style="animation-delay:.15s">
+      <div class="lp-card-head">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Yêu cầu đầu vào
+      </div>
+      <div class="lp-card-body">
+        <ul class="req-list">
+          <% requirements = @course.respond_to?(:requirements) && @course.requirements.present? ?
+              @course.requirements :
+              ["Trình độ tiếng Anh tương đương IELTS 4.5+",
+               "Sẵn sàng học tập ít nhất 2–3 tiếng mỗi ngày",
+               "Máy tính hoặc điện thoại có kết nối internet",
+               "Microphone để luyện Speaking AI (khuyến nghị)"] %>
+          <% requirements.each do |req| %>
+            <li><span class="req-dot"></span><%= req %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Instructor -->
+    <% if @teacher_profile %>
+      <div class="lp-card" style="animation-delay:.20s">
+        <div class="lp-card-head">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2.5"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Giảng viên
+        </div>
+        <div class="lp-card-body">
+          <div class="instructor-wrap">
+            <% if @teacher_profile.respond_to?(:avatar) && @teacher_profile.avatar.attached? %>
+              <%= image_tag @teacher_profile.avatar.variant(resize_to_fill: [72, 72]),
+                            class: "instructor-avatar", alt: @teacher_profile.full_name %>
+            <% else %>
+              <div class="instructor-avatar-ph"><%= @teacher_profile.full_name[0] %></div>
+            <% end %>
+            <div>
+              <div class="instructor-name"><%= @teacher_profile.full_name.upcase %></div>
+              <span class="instructor-tag">
+                <%= @teacher_profile.respond_to?(:expertise) ? @teacher_profile.expertise : "IELTS Expert" %>
+              </span>
+              <% bio = @teacher_profile.respond_to?(:bio) ? @teacher_profile.bio : nil %>
+              <% if bio.present? %>
+                <p class="instructor-bio"><%= bio %></p>
+              <% else %>
+                <p class="instructor-bio">Giảng viên IELTS với nhiều năm kinh nghiệm, đã giúp hàng trăm học viên đạt điểm mục tiêu thông qua phương pháp học cá nhân hóa và luyện tập thực chiến.</p>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+  </main>
+
+  <!-- ASIDE (desktop) — mirror includes -->
+  <aside class="lp-aside">
+    <div class="lp-aside-card">
+      <div class="lp-aside-head">Khóa học bao gồm</div>
+      <div class="lp-aside-body">
+        <div class="aside-include">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <%= @total_lessons %> bài học video
+        </div>
+        <div class="aside-include">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2"/></svg>
+          AI Speaking Practice
+        </div>
+        <div class="aside-include">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Truy cập trọn đời
+        </div>
+        <div class="aside-include">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+          Học mọi thiết bị
+        </div>
+        <div class="aside-include">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+          Chứng chỉ hoàn thành
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ══════════ STICKY CTA BAR (mobile) ══════════ -->
+<div class="sticky-cta-bar" id="sticky-cta">
+  <div>
+    <% if @course.respond_to?(:price) && @course.price.present? && @course.price > 0 %>
+      <div class="buy-price"><%= number_to_currency(@course.price, unit: "₫", precision: 0, delimiter: ".") %></div>
+    <% else %>
+      <div class="buy-price buy-price-free">Miễn phí</div>
+    <% end %>
+  </div>
+  <% if user_signed_in? %>
+    <% if @course.respond_to?(:price) && @course.price.present? && @course.price > 0 %>
+      <%= link_to "🛒 Đăng ký ngay", new_students_course_order_path(@course),
+                  style: "background:var(--red);color:#fff;padding:12px 22px;border-radius:10px;font-weight:800;text-decoration:none;font-size:14px;" %>
+    <% else %>
+      <a href="#" style="background:var(--red);color:#fff;padding:12px 22px;border-radius:10px;font-weight:800;text-decoration:none;font-size:14px;">
+        🎉 Đăng ký miễn phí
+      </a>
+    <% end %>
+  <% else %>
+    <%= link_to "🔐 Đăng nhập để đăng ký",
+                new_user_session_path(return_to: request.path),
+                style: "background:var(--red);color:#fff;padding:12px 22px;border-radius:10px;font-weight:800;text-decoration:none;font-size:14px;" %>
+  <% end %>
+</div>
+
+<script>
+/* Curriculum accordion */
+function toggleCurr(head) {
+  const chevron = head.querySelector('.curr-chevron');
+  const lessons  = head.nextElementSibling;
+  const isOpen   = lessons.classList.toggle('open');
+  head.classList.toggle('open', isOpen);
+  chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
+}
+
+/* Hide sticky bar when buy card is visible */
+const buyCard  = document.querySelector('.buy-card');
+const stickyBar = document.getElementById('sticky-cta');
+if (buyCard && stickyBar) {
+  const obs = new IntersectionObserver(([e]) => {
+    stickyBar.style.display = e.isIntersecting ? 'none' : '';
+  }, { threshold: 0.1 });
+  obs.observe(buyCard);
+}
+
+/* Share */
+document.querySelectorAll('.buy-share').forEach(el => {
+  el.addEventListener('click', e => {
+    e.preventDefault();
+    if (navigator.share) {
+      navigator.share({ title: '<%= j @course.title %>', url: location.href });
+    } else {
+      navigator.clipboard.writeText(location.href).then(() => {
+        el.textContent = '✅ Đã copy link!';
+        setTimeout(() => el.textContent = '🔗 Chia sẻ khóa học', 2000);
+      });
+    }
+  });
+});
+</script>

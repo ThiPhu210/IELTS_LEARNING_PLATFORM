@@ -1,0 +1,213 @@
+<%# app/views/admin/students/show.html.erb
+    Rendered inside View modal via AJAX — read-only profile display %>
+
+<style>
+.sp-hero {
+  background: linear-gradient(135deg, #0d0e14 0%, #1a1b2e 100%);
+  padding: 24px 24px 36px; position: relative; overflow: hidden;
+  margin: -24px -24px 0;
+}
+.sp-hero::before {
+  content: '';
+  position: absolute; inset: 0; opacity: .03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.sp-hero-glow {
+  position: absolute; right: -40px; top: -40px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.2) 0%, transparent 70%);
+}
+.sp-hero-inner { position: relative; z-index: 1; display: flex; align-items: flex-end; gap: 18px; }
+
+.sp-avatar {
+  width: 72px; height: 72px; border-radius: 50%; flex-shrink: 0;
+  background: #fee2e2; border: 3px solid rgba(252,165,165,.4);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Instrument Serif', serif; font-size: 28px; font-style: italic;
+  color: #dc2626; overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+.sp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.sp-hero-info { flex: 1; min-width: 0; }
+.sp-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 22px; font-weight: 400; font-style: italic;
+  color: #fff; line-height: 1.2; margin-bottom: 3px;
+}
+.sp-email { font-size: 12px; color: rgba(255,255,255,.45); font-family: 'JetBrains Mono', monospace; }
+.sp-id-badge {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700;
+  color: rgba(255,255,255,.5); background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1); border-radius: 4px;
+  padding: 2px 8px; margin-top: 6px; display: inline-block;
+}
+
+/* Stat row */
+.sp-stats {
+  display: flex; gap: 0;
+  background: #fff; border-bottom: 1.5px solid #e8eaf2;
+}
+.sp-stat {
+  flex: 1; text-align: center; padding: 14px 8px;
+  border-right: 1.5px solid #e8eaf2;
+}
+.sp-stat:last-child { border-right: none; }
+.sp-stat-num {
+  font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 700;
+  color: #0d0e14; line-height: 1;
+}
+.sp-stat-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #7b7f96; margin-top: 3px; }
+
+/* Info sections */
+.sp-body { padding: 20px 0 0; }
+.sp-section-title {
+  font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+  color: #7b7f96; padding-bottom: 8px; border-bottom: 1.5px solid #e8eaf2;
+  margin-bottom: 14px;
+}
+.sp-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.sp-row { display: flex; align-items: baseline; gap: 8px; }
+.sp-row-label {
+  font-size: 11px; font-weight: 700; color: #7b7f96; min-width: 100px; flex-shrink: 0;
+}
+.sp-row-val { font-size: 13px; font-weight: 600; color: #0d0e14; }
+.sp-row-val.empty { color: #b0b4c8; font-style: italic; font-weight: 400; font-size: 12px; }
+.sp-bio {
+  padding: 12px 14px; background: #f7f8fc; border: 1.5px solid #e8eaf2;
+  border-radius: 10px; font-size: 13px; color: #3a3d52; line-height: 1.6;
+  margin-bottom: 20px;
+}
+.sp-bio.empty { color: #b0b4c8; font-style: italic; }
+
+/* Chips */
+.sp-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+  padding: 3px 10px; border-radius: 20px;
+  background: #f2f4f9; color: #7b7f96; border: 1px solid #e8eaf2;
+}
+.sp-chip.active { background: #e6f7f1; color: #059669; border-color: #a7f3d0; }
+.sp-chip.inactive { background: #f7f8fc; color: #b0b4c8; border-color: #e8eaf2; }
+
+/* Joined badge */
+.sp-joined {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; background: #f7f8fc; border-radius: 10px;
+  font-size: 11.5px; color: #7b7f96; font-weight: 600;
+  border: 1.5px solid #e8eaf2;
+}
+</style>
+
+<%
+  enrollments   = @student.course_accesses.count rescue 0
+  attempts      = @student.speaking_attempts.count rescue 0
+  avg_band      = @student.speaking_attempts.where.not(overall_band: nil).average(:overall_band)&.round(1) rescue nil
+%>
+
+<!-- Hero -->
+<div class="sp-hero">
+  <div class="sp-hero-glow"></div>
+  <div class="sp-hero-inner">
+    <div class="sp-avatar">
+      <% if @student.thumbnail&.attached? %>
+        <%= image_tag @student.thumbnail.variant(resize_to_fill: [72, 72]) %>
+      <% else %>
+        <%= @student.full_name&.first&.upcase || '?' %>
+      <% end %>
+    </div>
+    <div class="sp-hero-info">
+      <div class="sp-name"><%= @student.full_name %></div>
+      <div class="sp-email"><%= @student.email %></div>
+      <div class="sp-id-badge">ID #<%= @student.id %></div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick stats -->
+<div class="sp-stats">
+  <div class="sp-stat">
+    <div class="sp-stat-num"><%= enrollments %></div>
+    <div class="sp-stat-label">Enrollments</div>
+  </div>
+  <div class="sp-stat">
+    <div class="sp-stat-num"><%= attempts %></div>
+    <div class="sp-stat-label">Attempts</div>
+  </div>
+  <div class="sp-stat">
+    <div class="sp-stat-num"><%= avg_band || '—' %></div>
+    <div class="sp-stat-label">Avg Band</div>
+  </div>
+</div>
+
+<div class="sp-body">
+
+  <!-- Personal info -->
+  <div class="sp-section-title">Personal Information</div>
+  <div class="sp-rows">
+    <div class="sp-row">
+      <span class="sp-row-label">Full Name</span>
+      <span class="sp-row-val"><%= @student.full_name.presence || '—' %></span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">Email</span>
+      <span class="sp-row-val"><%= @student.email %></span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">Phone</span>
+      <span class="sp-row-val <%= @student.phone.blank? ? 'empty' : '' %>">
+        <%= @student.phone.presence || 'Not provided' %>
+      </span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">School</span>
+      <span class="sp-row-val <%= @student.school.blank? ? 'empty' : '' %>">
+        <%= @student.school.presence || 'Not provided' %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Bio -->
+  <div class="sp-section-title">Bio</div>
+  <div class="sp-bio <%= @student.bio.blank? ? 'empty' : '' %>" style="margin-bottom:20px">
+    <%= @student.bio.presence || 'No bio provided.' %>
+  </div>
+
+  <!-- Location -->
+  <div class="sp-section-title">Location</div>
+  <div class="sp-rows">
+    <div class="sp-row">
+      <span class="sp-row-label">Country</span>
+      <span class="sp-row-val <%= @student.country.blank? ? 'empty' : '' %>">
+        <%= @student.country.presence || 'Not provided' %>
+      </span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">City</span>
+      <span class="sp-row-val <%= @student.city.blank? ? 'empty' : '' %>">
+        <%= @student.city.presence || 'Not provided' %>
+      </span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">Province</span>
+      <span class="sp-row-val <%= @student.province.blank? ? 'empty' : '' %>">
+        <%= @student.province.presence || 'Not provided' %>
+      </span>
+    </div>
+    <div class="sp-row">
+      <span class="sp-row-label">Postal Code</span>
+      <span class="sp-row-val <%= @student.postal_code.blank? ? 'empty' : '' %>">
+        <%= @student.postal_code.presence || 'Not provided' %>
+      </span>
+    </div>
+  </div>
+
+  <!-- Joined -->
+  <div class="sp-joined">
+    <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    Member since <%= @student.created_at.strftime("%B %d, %Y") %>
+  </div>
+
+</div>
