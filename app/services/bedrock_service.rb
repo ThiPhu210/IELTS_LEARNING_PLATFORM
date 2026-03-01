@@ -13,7 +13,6 @@ class BedrockService
       #{transcript}
 
       ## Evaluation Criteria
-
       Evaluate strictly according to the official IELTS Speaking band descriptors (0–9 scale, 0.5 increments allowed):
 
       ### 1. Fluency & Coherence
@@ -49,8 +48,10 @@ class BedrockService
       - 3 and below: Extremely limited or no meaningful communication
 
       ## Output Format
-
-      Return ONLY a valid JSON object with NO markdown, NO backticks, NO explanation outside the JSON:
+      Return ONLY a valid JSON object. Follow these rules strictly:
+      - NO markdown, NO backticks, NO text outside the JSON
+      - Do NOT use double quotes inside string values. Use single quotes instead (e.g. 'idiomatic' not "idiomatic")
+      - All string values must be properly JSON-escaped
 
       {
         "overall": <number: average of 4 criteria, rounded to nearest 0.5>,
@@ -81,12 +82,82 @@ class BedrockService
       accept: "application/json"
     )
 
-    result    = JSON.parse(response.body.read)
-    raw_text  = result["content"][0]["text"]
+    result   = JSON.parse(response.body.read)
+    raw_text = result["content"][0]["text"]
 
-    # Strip markdown code fences if model wraps in ```json
-    clean = raw_text.gsub(/```json\s*/i, "").gsub(/```\s*/, "").strip
+    parse_ai_response(raw_text)
+  end
 
-    JSON.parse(clean)
+  # ---------------------------------------------------------------
+  # Robust JSON parser — handles unescaped quotes & markdown fences
+  # ---------------------------------------------------------------
+  def self.parse_ai_response(raw_text)
+    # 1. Strip markdown code fences
+    clean = raw_text
+      .gsub(/```json\s*/i, "")
+      .gsub(/```\s*/, "")
+      .strip
+
+    # 2. Extract the JSON object in case there is surrounding text
+    json_str = clean.match(/\{.*\}/m)&.[](0) || clean
+
+    # 3. Try direct parse first
+    begin
+      return JSON.parse(json_str)
+    rescue JSON::ParserError
+      # Continue to repair step
+    end
+
+    # 4. Repair: escape unescaped double quotes inside JSON string values.
+    #    Strategy: for each string value region, replace bare " with \"
+    repaired = repair_json_string(json_str)
+
+    JSON.parse(repaired)
+  rescue JSON::ParserError => e
+    raise "Could not parse AI response as JSON: #{e.message}. Raw response: #{raw_text.truncate(300)}"
+  end
+
+  # Escapes unescaped double quotes that appear inside JSON string values.
+  # Works by scanning character-by-character to respect JSON structure.
+  def self.repair_json_string(json_str)
+    result      = +""
+    in_string   = false
+    escape_next = false
+
+    json_str.each_char.with_index do |char, idx|
+      if escape_next
+        result << char
+        escape_next = false
+        next
+      end
+
+      if char == "\\"
+        result << char
+        escape_next = true
+        next
+      end
+
+      if char == '"'
+        if in_string
+          # Peek ahead: if next non-space char is one of : , } ] then this is a closing quote
+          rest = json_str[idx + 1..]&.lstrip
+          if rest && rest.match?(/\A[,}\]:]/)
+            in_string = false
+            result << char
+          else
+            # This is an unescaped quote inside a value — escape it
+            result << '\\"'
+          end
+        else
+          in_string = true
+          result << char
+        end
+        next
+      end
+
+      result << char
+    end
+
+    result
   end
 end
