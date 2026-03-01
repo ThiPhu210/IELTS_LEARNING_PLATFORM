@@ -1,62 +1,236 @@
-<nav class="fixed top-0 left-0 z-50 w-full h-16 bg-white border-b border-gray-200">
-  <div class="h-full px-3 lg:px-5 lg:pl-3 flex items-center">
-    <div class="flex items-center justify-between w-full py-2">
-      <div class="flex items-center justify-between">
-        <a href="<%= students_dashboard_path %>" class="flex items-center ml-6 md:mr-24">
-          <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" class="h-10"/>
-        </a>
-      </div>
-      <div class="flex items-center">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-        <!-- Profile -->
-        <div class="flex items-center ml-3">
-          <div>
-            <button type="button" class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600" id="user-menu-button-2" aria-expanded="false" data-dropdown-toggle="dropdown-2">
-              <span class="sr-only">Open user menu</span>
-              <% if current_user&.thumbnail&.attached? %>
-                <%= safe_avatar(current_user, size: 38) %>
-              <% else %>
-                <img class="w-8 h-8 rounded-full"
-                     src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
-                     alt="user photo">
-              <% end %>
-            </button>
+  .snav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    height: 60px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid #f0f0f0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  }
+
+  .snav-inner {
+    max-width: 1240px; margin: 0 auto; height: 100%;
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* ── Logo ── */
+  .snav-logo {
+    display: flex; align-items: center; flex-shrink: 0;
+    text-decoration: none;
+  }
+  .snav-logo img { height: 28px; width: auto; display: block; }
+
+  /* ── Right side ── */
+  .snav-right { display: flex; align-items: center; gap: 12px; }
+
+  /* Progress link pill */
+  .snav-progress-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: 30px;
+    font-size: 13px; font-weight: 700; color: #dc2626;
+    background: #fee2e2; text-decoration: none;
+    transition: background .15s, transform .15s;
+    white-space: nowrap;
+  }
+  .snav-progress-link:hover { background: #fecaca; transform: translateY(-1px); }
+
+  /* ── Avatar button ── */
+  .snav-avatar-wrap { position: relative; }
+
+  .snav-avatar-btn {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 12px 5px 5px;
+    border-radius: 40px; border: 1.5px solid #e5e7eb;
+    background: #fff; cursor: pointer;
+    transition: border-color .15s, box-shadow .15s;
+    font-family: inherit;
+  }
+  .snav-avatar-btn:hover { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+
+  .snav-avatar-img {
+    width: 32px; height: 32px; border-radius: 50%;
+    object-fit: cover; flex-shrink: 0;
+    background: #fee2e2;
+  }
+
+  .snav-avatar-name {
+    font-size: 13.5px; font-weight: 700; color: #1c1d1f;
+    max-width: 120px; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .snav-avatar-chevron {
+    width: 16px; height: 16px; color: #9ca3af;
+    transition: transform .2s;
+    flex-shrink: 0;
+  }
+  .snav-avatar-wrap.open .snav-avatar-chevron { transform: rotate(180deg); }
+  .snav-avatar-wrap.open .snav-avatar-btn { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,.1); }
+
+  /* ── Dropdown ── */
+  .snav-dropdown {
+    position: absolute; top: calc(100% + 10px); right: 0;
+    min-width: 240px;
+    background: #fff; border: 1.5px solid #f0f0f0;
+    border-radius: 16px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.12), 0 2px 8px rgba(0,0,0,.06);
+    opacity: 0; pointer-events: none;
+    transform: translateY(-6px) scale(.97);
+    transform-origin: top right;
+    transition: opacity .18s ease, transform .18s ease;
+    overflow: hidden;
+  }
+  .snav-avatar-wrap.open .snav-dropdown {
+    opacity: 1; pointer-events: auto; transform: translateY(0) scale(1);
+  }
+
+  /* User info header */
+  .snav-dd-header {
+    padding: 16px 18px 14px;
+    border-bottom: 1px solid #f3f4f6;
+    background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+  }
+  .snav-dd-fullname {
+    font-size: 14px; font-weight: 800; color: #1c1d1f;
+    margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .snav-dd-email {
+    font-size: 12px; color: #9ca3af; font-weight: 500;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* Menu items */
+  .snav-dd-menu { padding: 8px; }
+
+  .snav-dd-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 10px; border-radius: 8px;
+    font-size: 13.5px; font-weight: 600; color: #374151;
+    text-decoration: none; cursor: pointer;
+    transition: background .12s, color .12s;
+    border: none; background: none; width: 100%;
+    font-family: inherit; text-align: left;
+  }
+  .snav-dd-item:hover { background: #fef2f2; color: #dc2626; }
+  .snav-dd-item:hover .snav-dd-icon { color: #dc2626; }
+
+  .snav-dd-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: #f3f4f6; display: flex; align-items: center;
+    justify-content: center; flex-shrink: 0; font-size: 14px;
+    color: #6b7280; transition: color .12s; line-height: 1;
+  }
+
+  .snav-dd-divider { height: 1px; background: #f3f4f6; margin: 4px 8px; }
+</style>
+
+<nav class="snav">
+  <div class="snav-inner">
+
+    <!-- Logo -->
+    <a href="<%= students_dashboard_path %>" class="snav-logo">
+      <img src="https://vectorseek.com/wp-content/uploads/2023/08/Ielts-Logo-Vector.svg-.png" alt="IELTS">
+    </a>
+
+    <!-- Right -->
+    <div class="snav-right">
+
+      <!-- Speaking Progress pill -->
+      <a href="<%= progress_students_courses_path %>" class="snav-progress-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Speaking Progress
+      </a>
+
+      <!-- Avatar dropdown -->
+      <div class="snav-avatar-wrap" id="snavAvatarWrap">
+        <button class="snav-avatar-btn" id="snavAvatarBtn" type="button" aria-expanded="false">
+          <% if current_user&.thumbnail&.attached? %>
+            <%= safe_avatar(current_user, size: 32, class: "snav-avatar-img") %>
+          <% else %>
+            <img class="snav-avatar-img"
+                 src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
+                 alt="avatar">
+          <% end %>
+          <span class="snav-avatar-name"><%= current_user&.full_name %></span>
+          <svg class="snav-avatar-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+
+        <!-- Dropdown -->
+        <div class="snav-dropdown" id="snavDropdown" role="menu">
+
+          <!-- User info -->
+          <div class="snav-dd-header">
+            <div class="snav-dd-fullname"><%= current_user&.full_name %></div>
+            <div class="snav-dd-email"><%= current_user&.email %></div>
           </div>
-          <!-- Dropdown menu -->
-          <div class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600" id="dropdown-2">
-            <div class="px-4 py-3" role="none">
-              <p class="text-sm font-medium text-red-500 truncate dark:text-gray-300" role="none">
-                <%= current_user&.full_name %>
-              </p>
-              <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-                <%= current_user&.email %>
-              </p>
-            </div>
-            <ul class="py-1" role="none">
-              <li>
-                <a href="<%= progress_students_courses_path %>" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white" role="menuitem">Speaking Progress</a>
-              </li>
-              <li>
-                <%= link_to "Settings",
-                    edit_students_profile_path,
-                    class: "block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100
-                            dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white",
-                    role: "menuitem" %>
-              </li>
-              <li>
-                <%= button_to "Sign out",
-                    destroy_user_session_path,
-                    method: :delete,
-                    form_class: "w-full",
-                    class: "w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100
-                            dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white bg-transparent border-0" %>
-              </li>
-            </ul>
+
+          <div class="snav-dd-menu">
+
+            <a href="<%= students_dashboard_path %>" class="snav-dd-item" role="menuitem">
+              <span class="snav-dd-icon">🏠</span>
+              Dashboard
+            </a>
+
+            <a href="<%= progress_students_courses_path %>" class="snav-dd-item" role="menuitem">
+              <span class="snav-dd-icon">📈</span>
+              Speaking Progress
+            </a>
+
+            <%= link_to edit_students_profile_path, class: "snav-dd-item", role: "menuitem" do %>
+              <span class="snav-dd-icon">⚙️</span>
+              Settings
+            <% end %>
+
+            <div class="snav-dd-divider"></div>
+
+            <%= button_to destroy_user_session_path,
+                method: :delete,
+                form_class: "w-full",
+                class: "snav-dd-item" do %>
+              <span class="snav-dd-icon">🚪</span>
+              Sign out
+            <% end %>
+
           </div>
         </div>
       </div>
     </div>
+
   </div>
 </nav>
-<!-- Flowbite JS -->
-<script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
+
+<script>
+(function () {
+  const wrap = document.getElementById('snavAvatarWrap');
+  const btn  = document.getElementById('snavAvatarBtn');
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var isOpen = wrap.classList.toggle('open');
+    btn.setAttribute('aria-expanded', isOpen);
+  });
+
+  document.addEventListener('click', function(e) {
+    if (!wrap.contains(e.target)) {
+      wrap.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      wrap.classList.remove('open');
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  });
+})();
+</script>
