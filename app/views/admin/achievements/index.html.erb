@@ -1,146 +1,451 @@
-<!-- NAVBAR -->
-  <%= render "admin/shared/navbar" %>
+<%# app/views/admin/achievements/index.html.erb
+    Design: Red + Ink — synced with LMS design system %>
 
-  <!-- SIDEBAR -->
-  <%= render "admin/shared/sidebar" %>
+<%= render "admin/shared/navbar" %>
+<%= render "admin/shared/sidebar" %>
 
-  <!-- MAIN CONTENT -->
-  <main class="pt-16 sm:ml-64 p-6">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-  <!-- PAGE TITLE -->
-  <h1 class="text-2xl font-bold mb-6">Achievement Management</h1>
-
-  <!-- CARD -->
-  <div class="p-4 bg-white border-b border-gray-200 rounded-lg mb-6">
-
-    <!-- BREADCRUMB -->
-    <nav class="flex mb-4 text-sm font-medium">
-      <ol class="inline-flex items-center space-x-1 md:space-x-2">
-        <li class="inline-flex items-center">
-          <%= link_to admin_dashboard_path,
-              class: "text-gray-700 hover:text-indigo-600 flex items-center" do %>
-            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 2L2 9h3v9h10V9h3L10 2z"/>
-            </svg>
-            Dashboard
-          <% end %>
-        </li>
-        <li class="flex items-center">
-          <svg class="w-6 h-6 text-gray-400 mx-1" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M7.293 14.707L10.586 11 7.293 7.293 8.707 5.879 13.828 11 8.707 16.121z"/>
-          </svg>
-          <span class="text-gray-500">Achievements</span>
-        </li>
-      </ol>
-    </nav>
-
-    <!-- TITLE + ACTION -->
-    <div class="flex items-center justify-between">
-      <h2 class="text-xl font-semibold text-gray-900">All Achievements</h2>
-    </div>
-  </div>
-  
-
-<div class="overflow-x-auto bg-white rounded-lg shadow">
-  <table class="w-full text-sm text-left text-gray-500">
-    <thead class="bg-gray-100 text-xs uppercase">
-      <tr>
-        <th class="p-4">Student</th>
-        <th class="p-4">Title</th>
-        <th class="p-4">Year</th>
-        <th class="p-4">Band</th>
-        <th class="p-4">Actions</th>
-      </tr>
-    </thead>
-
-    <tbody class="divide-y">
-      <% @achievements.each do |achievement| %>
-        <tr class="hover:bg-gray-50">
-          <td class="p-4"><%= achievement.user.full_name %></td>
-          <td class="p-4"><%= achievement.title %></td>
-          <td class="p-4"><%= achievement.year %></td>
-          <td class="p-4"><%= achievement.ielts_overall_band %></td>
-          <td class="p-4 flex gap-2">
-            <%= link_to "Edit",
-                "#",
-                class: "btn-edit px-3 py-1 text-sm text-white bg-blue-600 rounded",
-                data: { achievement_id: achievement.id } %>
-
-            <%= button_to "Destroy",
-                admin_achievement_path(achievement),
-                method: :delete,
-                data: { confirm: "Bạn chắc chắn?" },
-                class: "px-3 py-1 text-sm text-white bg-red-600 rounded" %>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
- 
-  <div class="p-4">
-    <%= paginate @achievements %>
-  </div>
-</div>
-</main>
 <style>
-nav.pagination {
-  display: flex;
-  gap: 0.5rem;
+:root {
+  --ink:          #0d0e14;
+  --ink-2:        #3a3d52;
+  --ink-3:        #7b7f96;
+  --line:         #e8eaf2;
+  --bg:           #f2f4f9;
+  --surface:      #ffffff;
+  --surface-2:    #f7f8fc;
+  --primary:      #dc2626;
+  --primary-lt:   #fee2e2;
+  --primary-brd:  #fca5a5;
+  --teal:         #0d9488;
+  --teal-lt:      #e6faf8;
+  --amber:        #d97706;
+  --amber-lt:     #fef3e1;
+  --emerald:      #059669;
+  --emerald-lt:   #e6f7f1;
+  --indigo:       #4f46e5;
+  --indigo-lt:    #eef2ff;
+  --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 28px;
+  --shadow-xs: 0 1px 3px rgba(0,0,0,.06);
+  --shadow-sm: 0 2px 10px rgba(0,0,0,.07);
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+  --font-mono:  'JetBrains Mono', monospace;
+  --ease:       cubic-bezier(.4,0,.2,1);
 }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--ink); }
+
+@keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+
+.ach-wrapper {
+  margin-left: 256px;
+  padding-top: 64px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+@media (max-width: 640px) { .ach-wrapper { margin-left: 0; padding-top: 56px; } }
+
+/* ── HERO ── */
+.ach-hero {
+  position: relative; overflow: hidden;
+  background: var(--ink); padding: 28px 32px 36px;
+  animation: fadeUp .4s var(--ease) both;
+}
+.ach-hero::before {
+  content: '';
+  position: absolute; inset: 0; opacity: .025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+.ach-hero-glow {
+  position: absolute; right: -60px; top: -60px;
+  width: 300px; height: 300px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(220,38,38,.16) 0%, transparent 70%);
+  pointer-events: none;
+}
+.ach-hero-inner { position: relative; z-index: 1; }
+.ach-breadcrumb {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  color: rgba(255,255,255,.3); margin-bottom: 12px; letter-spacing: .04em;
+}
+.ach-breadcrumb a { color: rgba(255,255,255,.4); text-decoration: none; transition: color .15s; }
+.ach-breadcrumb a:hover { color: #fca5a5; }
+.ach-breadcrumb-sep { color: rgba(255,255,255,.18); }
+.ach-hero-title {
+  font-family: var(--font-serif); font-size: clamp(24px, 2.4vw, 36px);
+  font-weight: 400; letter-spacing: -.02em; color: #fff; line-height: 1.15;
+}
+.ach-hero-title em { font-style: italic; color: #fca5a5; }
+.ach-hero-sub { font-size: 12.5px; color: rgba(255,255,255,.4); margin-top: 6px; }
+
+.ach-hero-stats {
+  display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;
+}
+.ach-hero-stat {
+  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+  border-radius: var(--r-md); padding: 10px 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.ach-hero-stat-icon {
+  width: 32px; height: 32px; border-radius: var(--r-sm); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 15px;
+}
+.ach-hero-stat-num {
+  font-family: var(--font-mono); font-size: 20px; font-weight: 700; color: #fff; line-height: 1;
+}
+.ach-hero-stat-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,.4); margin-top: 2px; }
+
+/* ── BODY ── */
+.ach-body { padding: 28px 32px 64px; }
+@media (max-width: 640px) { .ach-body { padding: 18px; } }
+
+/* ── Toast ── */
+.ach-toast {
+  position: fixed; top: 80px; right: 20px; z-index: 9999;
+  background: var(--ink); color: #fff;
+  padding: 12px 18px; border-radius: var(--r-md);
+  font-size: 13px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.2);
+  display: flex; align-items: center; gap: 8px;
+  animation: fadeUp .3s var(--ease) both;
+  border-left: 3px solid var(--emerald);
+  max-width: 320px;
+}
+
+/* ── Table card ── */
+.ach-table-card {
+  background: var(--surface); border: 1.5px solid var(--line);
+  border-radius: var(--r-xl); overflow: hidden;
+  animation: fadeUp .45s var(--ease) .05s both;
+}
+
+.ach-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.ach-table thead {
+  background: var(--surface-2);
+  border-bottom: 1.5px solid var(--line);
+}
+.ach-table thead th {
+  padding: 12px 16px;
+  font-family: var(--font-mono); font-size: 9px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--ink-3);
+  text-align: left; white-space: nowrap;
+}
+.ach-table tbody tr {
+  border-bottom: 1.5px solid var(--line);
+  transition: background .12s;
+}
+.ach-table tbody tr:last-child { border-bottom: none; }
+.ach-table tbody tr:hover { background: var(--surface-2); }
+.ach-table td { padding: 14px 16px; vertical-align: middle; }
+
+/* Student cell */
+.ach-student {
+  display: flex; align-items: center; gap: 10px;
+}
+.ach-student-avatar {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  background: var(--primary-lt); border: 1.5px solid var(--primary-brd);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-serif); font-size: 13px; font-style: italic;
+  color: var(--primary); overflow: hidden;
+}
+.ach-student-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.ach-student-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+/* Title cell */
+.ach-title-cell { font-weight: 600; color: var(--ink-2); }
+
+/* Year chip */
+.ach-year-chip {
+  display: inline-flex; align-items: center;
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+  padding: 2px 10px; border-radius: 20px;
+  background: var(--indigo-lt); color: var(--indigo);
+  border: 1px solid #c7d2fe;
+}
+
+/* Band chip */
+.ach-band-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+}
+.ach-band-chip.high   { background: var(--emerald-lt); color: var(--emerald); border: 1px solid #a7f3d0; }
+.ach-band-chip.mid    { background: var(--amber-lt);   color: var(--amber);   border: 1px solid #fcd34d; }
+.ach-band-chip.low    { background: var(--primary-lt); color: var(--primary); border: 1px solid var(--primary-brd); }
+.ach-band-chip.none   { background: var(--surface-2);  color: var(--ink-3);   border: 1px solid var(--line); }
+
+/* Action buttons */
+.ach-actions { display: flex; gap: 6px; align-items: center; }
+.btn-ach-edit {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  background: var(--indigo-lt); color: var(--indigo);
+  border: 1px solid #c7d2fe; font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+  text-decoration: none;
+}
+.btn-ach-edit:hover { background: var(--indigo); color: #fff; border-color: var(--indigo); }
+
+.btn-ach-del {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 10px; border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink-3);
+  border: 1.5px solid var(--line); font-size: 11px; font-weight: 700;
+  font-family: var(--font); cursor: pointer; transition: all .15s;
+}
+.btn-ach-del:hover { background: var(--primary-lt); color: var(--primary); border-color: var(--primary-brd); }
+
+/* Empty state */
+.ach-empty {
+  text-align: center; padding: 64px 32px;
+}
+.ach-empty-icon  { font-size: 48px; margin-bottom: 16px; opacity: .4; }
+.ach-empty-title { font-family: var(--font-serif); font-size: 22px; font-style: italic; color: var(--ink-2); }
+.ach-empty-sub   { font-size: 13px; color: var(--ink-3); margin-top: 6px; }
+
+/* Pagination */
+.ach-pagination { display: flex; justify-content: center; padding: 16px; border-top: 1.5px solid var(--line); }
+nav.pagination { display: flex; gap: 4px; align-items: center; }
 nav.pagination a,
 nav.pagination span {
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.375rem;
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+  padding: 6px 12px; border-radius: var(--r-sm);
+  border: 1.5px solid var(--line); background: var(--surface);
+  color: var(--ink-3); text-decoration: none; transition: all .15s;
 }
-nav.pagination .current { 
-  background: #4f46e5;
-  color: white;
-}   
+nav.pagination a:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-lt); }
+nav.pagination .current { background: var(--primary); color: #fff; border-color: var(--primary); }
+nav.pagination .disabled { opacity: .35; pointer-events: none; }
+
+/* ── EDIT MODAL ── */
+.ach-modal-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(13,14,20,.7); backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 20px;
+}
+.ach-modal-overlay.open { display: flex; }
+.ach-modal {
+  background: var(--surface); border-radius: var(--r-xl);
+  width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.25);
+  animation: fadeUp .25s var(--ease) both;
+  position: relative;
+}
+.ach-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1.5px solid var(--line);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.ach-modal-title { font-family: var(--font-serif); font-size: 20px; font-style: italic; color: var(--ink); }
+.ach-modal-close {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 1.5px solid var(--line); background: var(--surface-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .15s; color: var(--ink-3);
+  font-size: 16px; line-height: 1;
+}
+.ach-modal-close:hover { background: var(--primary-lt); border-color: var(--primary-brd); color: var(--primary); }
+.ach-modal-body { padding: 24px; }
 </style>
 
+<div class="ach-wrapper">
+
+  <!-- HERO -->
+  <div class="ach-hero">
+    <div class="ach-hero-glow"></div>
+    <div class="ach-hero-inner">
+      <div class="ach-breadcrumb">
+        <a href="<%= admin_dashboard_path %>">Dashboard</a>
+        <span class="ach-breadcrumb-sep">›</span>
+        <span>Achievements</span>
+      </div>
+      <h1 class="ach-hero-title">Achievement <em>Management</em></h1>
+      <p class="ach-hero-sub">View and manage all student IELTS achievements</p>
+
+      <div class="ach-hero-stats">
+        <div class="ach-hero-stat">
+          <div class="ach-hero-stat-icon" style="background:rgba(220,38,38,.2)">🏅</div>
+          <div>
+            <div class="ach-hero-stat-num"><%= @achievements.total_count %></div>
+            <div class="ach-hero-stat-label">Total Achievements</div>
+          </div>
+        </div>
+        <div class="ach-hero-stat">
+          <div class="ach-hero-stat-icon" style="background:rgba(5,150,105,.2)">🎤</div>
+          <div>
+            <div class="ach-hero-stat-num">
+              <%= Achievement.where.not(ielts_overall_band: nil).average(:ielts_overall_band)&.round(1) || '—' %>
+            </div>
+            <div class="ach-hero-stat-label">Avg Band Score</div>
+          </div>
+        </div>
+        <div class="ach-hero-stat">
+          <div class="ach-hero-stat-icon" style="background:rgba(79,70,229,.2)">📅</div>
+          <div>
+            <div class="ach-hero-stat-num">
+              <%= Achievement.where('created_at >= ?', Time.current.beginning_of_month).count %>
+            </div>
+            <div class="ach-hero-stat-label">This Month</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BODY -->
+  <div class="ach-body">
+
+    <!-- Flash -->
+    <% if notice.present? %>
+      <div class="ach-toast" id="flash-toast">
+        <span>✓</span> <%= notice %>
+      </div>
+    <% end %>
+
+    <div class="ach-table-card">
+      <% if @achievements.any? %>
+        <table class="ach-table">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Title</th>
+              <th>Year</th>
+              <th>Band Score</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @achievements.each_with_index do |achievement, i| %>
+              <tr style="animation: fadeUp .4s var(--ease) <%= (i * 0.03).round(2) %>s both">
+                <!-- Student -->
+                <td>
+                  <div class="ach-student">
+                    <div class="ach-student-avatar">
+                      <% if achievement.user.respond_to?(:thumbnail) && achievement.user.thumbnail&.attached? %>
+                        <%= image_tag achievement.user.thumbnail.variant(resize_to_fill: [34, 34]), alt: achievement.user.full_name %>
+                      <% else %>
+                        <%= achievement.user.full_name&.first&.upcase || '?' %>
+                      <% end %>
+                    </div>
+                    <span class="ach-student-name"><%= achievement.user.full_name %></span>
+                  </div>
+                </td>
+
+                <!-- Title -->
+                <td>
+                  <span class="ach-title-cell"><%= achievement.title %></span>
+                </td>
+
+                <!-- Year -->
+                <td>
+                  <span class="ach-year-chip"><%= achievement.year || '—' %></span>
+                </td>
+
+                <!-- Band -->
+                <td>
+                  <% band = achievement.ielts_overall_band&.to_f %>
+                  <% chip_class = band.nil? ? 'none' : (band >= 7.0 ? 'high' : (band >= 5.5 ? 'mid' : 'low')) %>
+                  <span class="ach-band-chip <%= chip_class %>">
+                    <%= band.nil? ? '—' : band %>
+                  </span>
+                </td>
+
+                <!-- Actions -->
+                <td>
+                  <div class="ach-actions">
+                    <a href="#" class="btn-ach-edit" data-achievement-id="<%= achievement.id %>">
+                      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                      Edit
+                    </a>
+                    <%= button_to admin_achievement_path(achievement),
+                        method: :delete,
+                        class: "btn-ach-del",
+                        form: { data: { turbo_confirm: "Remove this achievement? This cannot be undone." } } do %>
+                      <svg width="11" height="11" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6l-1 14H6L5 6"/>
+                        <path d="M10 11v6M14 11v6"/>
+                      </svg>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+
+        <div class="ach-pagination">
+          <%= paginate @achievements %>
+        </div>
+
+      <% else %>
+        <div class="ach-empty">
+          <div class="ach-empty-icon">🏅</div>
+          <div class="ach-empty-title">No achievements yet</div>
+          <div class="ach-empty-sub">Student achievements will appear here once added.</div>
+        </div>
+      <% end %>
+    </div>
+
+  </div>
+</div>
+
 <!-- EDIT MODAL -->
-<div id="edit-modal"
-     class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center">
-
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-3xl relative">
-    <button id="close-modal"
-            class="absolute top-3 right-4 text-xl text-gray-500 hover:text-black">
-      ✕
-    </button>
-
-    <div id="modal-body" class="p-2">
-      <!-- form load vào đây -->
+<div class="ach-modal-overlay" id="edit-modal">
+  <div class="ach-modal">
+    <div class="ach-modal-header">
+      <span class="ach-modal-title">Edit <em>Achievement</em></span>
+      <button class="ach-modal-close" id="close-modal">✕</button>
+    </div>
+    <div class="ach-modal-body" id="modal-body">
+      <div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>
     </div>
   </div>
 </div>
 
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const editButtons = document.querySelectorAll(".btn-edit");
-    const modal = document.getElementById("edit-modal");
-    const modalBody = document.getElementById("modal-body");
-    const closeModalBtn = document.getElementById("close-modal");
+document.addEventListener("DOMContentLoaded", function() {
+  var editBtns  = document.querySelectorAll(".btn-ach-edit");
+  var modal     = document.getElementById("edit-modal");
+  var modalBody = document.getElementById("modal-body");
+  var closeBtn  = document.getElementById("close-modal");
 
-    editButtons.forEach(button => {
-      button.addEventListener("click", () => {
-        // đổi sang data-achievement-id
-        const achievementId = button.getAttribute("data-achievement-id");
-
-        // fetch đúng URL của achievements
-        fetch(`/admin/achievements/${achievementId}/edit`, {
-          headers: { "Accept": "text/html" }
-        })
-        .then(response => response.text())
-        .then(html => {
-          modalBody.innerHTML = html;
-          modal.classList.remove("hidden");
-        });
-      });
-    });
-
-    closeModalBtn.addEventListener("click", () => {
-      modal.classList.add("hidden");
-      modalBody.innerHTML = "";
+  editBtns.forEach(function(btn) {
+    btn.addEventListener("click", function(e) {
+      e.preventDefault();
+      var id = btn.getAttribute("data-achievement-id");
+      modalBody.innerHTML = '<div style="text-align:center;padding:40px;color:var(--ink-3)">Loading…</div>';
+      modal.classList.add("open");
+      fetch("/admin/achievements/" + id + "/edit", { headers: { "Accept": "text/html" } })
+        .then(function(r) { return r.text(); })
+        .then(function(html) { modalBody.innerHTML = html; });
     });
   });
+
+  closeBtn.addEventListener("click", function() {
+    modal.classList.remove("open");
+    modalBody.innerHTML = "";
+  });
+
+  modal.addEventListener("click", function(e) {
+    if (e.target === modal) { modal.classList.remove("open"); modalBody.innerHTML = ""; }
+  });
+});
+
+// Auto-dismiss flash
+setTimeout(function() {
+  var t = document.getElementById("flash-toast");
+  if (t) { t.style.transition = "opacity .4s"; t.style.opacity = "0"; }
+}, 3500);
 </script>
