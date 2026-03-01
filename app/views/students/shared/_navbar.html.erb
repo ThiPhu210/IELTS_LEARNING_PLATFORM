@@ -152,7 +152,9 @@
       <div class="snav-avatar-wrap" id="snavAvatarWrap">
         <button class="snav-avatar-btn" id="snavAvatarBtn" type="button" aria-expanded="false">
           <% if current_user&.thumbnail&.attached? %>
-            <%= safe_avatar(current_user, size: 32, class: "snav-avatar-img") %>
+            <span class="snav-avatar-img" style="overflow:hidden;display:inline-flex;">
+              <%= safe_avatar(current_user, size: 32) %>
+            </span>
           <% else %>
             <img class="snav-avatar-img"
                  src="https://flowbite.com/docs/images/people/profile-picture-5.jpg"
