@@ -1,94 +1,350 @@
 <%# app/views/students/courses/_chat_widget.html.erb %>
 
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-.cw{position:fixed;bottom:24px;right:24px;z-index:9990;font-family:'Plus Jakarta Sans',sans-serif}
-.cw-fab{width:54px;height:54px;border-radius:50%;background:#dc2626;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 18px rgba(220,38,38,.45);transition:transform .2s cubic-bezier(.34,1.56,.64,1),background .15s;position:relative}
-.cw-fab:hover{background:#b91c1c;transform:scale(1.1)}
-.cw-fab:active{transform:scale(.95)}
-.cw-fab-ic,.cw-fab-x{position:absolute;transition:opacity .2s,transform .2s cubic-bezier(.4,0,.2,1)}
-.cw-fab-x{opacity:0;transform:rotate(-80deg) scale(.5)}
-.cw.open .cw-fab-ic{opacity:0;transform:rotate(80deg) scale(.5)}
-.cw.open .cw-fab-x{opacity:1;transform:rotate(0) scale(1)}
-.cw-fab::before{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid rgba(220,38,38,.3);animation:cw-ring 2.5s ease-in-out infinite}
-@keyframes cw-ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:0}}
-.cw-badge{position:absolute;top:-3px;right:-3px;min-width:18px;height:18px;border-radius:9px;background:#fbbf24;border:2px solid #fff;font-size:9px;font-weight:800;color:#78350f;display:flex;align-items:center;justify-content:center;padding:0 4px;opacity:0;transform:scale(0);transition:all .25s cubic-bezier(.34,1.56,.64,1)}
-.cw-badge.show{opacity:1;transform:scale(1)}
-.cw-panel{position:absolute;bottom:66px;right:0;width:356px;background:#fff;border-radius:20px;border:1.5px solid #e8eaf2;box-shadow:0 24px 64px rgba(0,0,0,.16);display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none;transform:translateY(14px) scale(.96);transform-origin:bottom right;transition:opacity .22s,transform .22s cubic-bezier(.4,0,.2,1);max-height:560px}
-.cw.open .cw-panel{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
-.cw-head{display:flex;align-items:center;gap:10px;padding:13px 16px;background:#dc2626;flex-shrink:0}
-.cw-head-icon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
-.cw-head-info{flex:1;min-width:0}
-.cw-head-name{font-size:14px;font-weight:800;color:#fff;line-height:1.2}
-.cw-head-sub{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:5px;margin-top:1px}
-.cw-online-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;animation:cw-blink 2s ease-in-out infinite}
-@keyframes cw-blink{0%,100%{opacity:1}50%{opacity:.35}}
-.cw-quota{font-size:11px;font-weight:700;color:#fff;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.25);padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
-.cw-quota.warn{background:rgba(251,191,36,.3);color:#fef3c7}
-.cw-quota.danger{background:rgba(239,68,68,.3);color:#fecaca}
+/* ════════════════════════════════════════════
+   CHAT WIDGET — LMS Professional Edition
+   No emojis · Bot avatar · Dark header
+════════════════════════════════════════════ */
+:root {
+  --cw-red:      #dc2626;
+  --cw-red-dk:   #b91c1c;
+  --cw-red-lt:   #fee2e2;
+  --cw-ink:      #0f1117;
+  --cw-ink-2:    #374151;
+  --cw-ink-3:    #9ca3af;
+  --cw-line:     #e8eaf2;
+  --cw-bg:       #f7f8fc;
+  --cw-surface:  #ffffff;
+  --cw-font:     'DM Sans', sans-serif;
+  --cw-mono:     'DM Mono', monospace;
+}
 
-/* ── Messages scroll area ── */
-.cw-msgs{flex:1;overflow-y:auto;padding:14px 12px 8px;display:flex;flex-direction:column;gap:10px;min-height:260px;max-height:320px;scroll-behavior:smooth}
-.cw-msgs::-webkit-scrollbar{width:3px}
-.cw-msgs::-webkit-scrollbar-thumb{background:#e8eaf2;border-radius:2px}
+.cw {
+  position: fixed; bottom: 28px; right: 28px; z-index: 9990;
+  font-family: var(--cw-font);
+}
 
-.cw-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 14px;text-align:center;color:#9ca3af}
-.cw-empty-emoji{font-size:34px}
-.cw-empty-title{font-size:14px;font-weight:700;color:#374151}
-.cw-empty-body{font-size:12.5px;line-height:1.6;max-width:260px}
+/* ── FAB ── */
+.cw-fab {
+  width: 56px; height: 56px; border-radius: 16px;
+  background: var(--cw-ink);
+  color: #fff; border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 24px rgba(15,17,23,.28), 0 2px 6px rgba(15,17,23,.18);
+  transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .2s, background .15s;
+  position: relative;
+}
+.cw-fab:hover {
+  background: #1c1f2e;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(15,17,23,.32), 0 4px 10px rgba(15,17,23,.2);
+}
+.cw-fab:active { transform: scale(.94); }
+
+.cw-fab-bot { transition: opacity .18s, transform .18s; }
+.cw-fab-x   { position: absolute; opacity: 0; transform: rotate(-70deg) scale(.5); transition: opacity .18s, transform .18s; }
+.cw.open .cw-fab-bot { opacity: 0; transform: rotate(70deg) scale(.5); }
+.cw.open .cw-fab-x   { opacity: 1; transform: rotate(0) scale(1); }
+
+.cw-fab::before {
+  content: ''; position: absolute; inset: -5px;
+  border-radius: 20px;
+  border: 2px solid rgba(15,17,23,.15);
+  animation: cw-pulse 3s ease-in-out infinite;
+}
+@keyframes cw-pulse {
+  0%,100% { transform: scale(1); opacity: .5; }
+  50%      { transform: scale(1.12); opacity: 0; }
+}
+
+.cw-badge {
+  position: absolute; top: -5px; right: -5px;
+  min-width: 19px; height: 19px; border-radius: 10px;
+  background: var(--cw-red); border: 2.5px solid #fff;
+  font-size: 9px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px;
+  opacity: 0; transform: scale(0);
+  transition: all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.cw-badge.show { opacity: 1; transform: scale(1); }
+
+/* ── Panel ── */
+.cw-panel {
+  position: absolute; bottom: 72px; right: 0;
+  width: 368px;
+  background: var(--cw-surface);
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,.07);
+  box-shadow: 0 32px 80px rgba(0,0,0,.18), 0 8px 24px rgba(0,0,0,.1);
+  display: flex; flex-direction: column; overflow: hidden;
+  opacity: 0; pointer-events: none;
+  transform: translateY(16px) scale(.96);
+  transform-origin: bottom right;
+  transition: opacity .24s cubic-bezier(.4,0,.2,1), transform .24s cubic-bezier(.4,0,.2,1);
+  max-height: 580px;
+}
+.cw.open .cw-panel { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
+
+/* ── Header ── */
+.cw-head {
+  background: var(--cw-ink);
+  padding: 16px 18px;
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0;
+  position: relative; overflow: hidden;
+}
+.cw-head::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at 85% -10%, rgba(220,38,38,.3) 0%, transparent 55%);
+  pointer-events: none;
+}
+
+.cw-head-avatar {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; position: relative;
+}
+
+.cw-head-info { flex: 1; min-width: 0; position: relative; }
+.cw-head-name {
+  font-size: 14.5px; font-weight: 700; color: #fff;
+  letter-spacing: -.01em; line-height: 1.2;
+}
+.cw-head-sub {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 500;
+  color: rgba(255,255,255,.5); margin-top: 2px;
+}
+.cw-online-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 2px rgba(74,222,128,.2);
+  animation: cw-blink 2.2s ease-in-out infinite;
+}
+@keyframes cw-blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+.cw-quota {
+  font-size: 11px; font-weight: 700;
+  color: rgba(255,255,255,.65);
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12);
+  padding: 4px 10px; border-radius: 20px;
+  flex-shrink: 0; white-space: nowrap;
+  position: relative;
+  font-family: var(--cw-mono);
+}
+.cw-quota.warn   { background: rgba(251,191,36,.2); color: #fde68a; border-color: rgba(251,191,36,.25); }
+.cw-quota.danger { background: rgba(239,68,68,.25); color: #fca5a5; border-color: rgba(239,68,68,.3); }
+
+/* ── Messages ── */
+.cw-msgs {
+  flex: 1; overflow-y: auto;
+  padding: 16px 14px 10px;
+  display: flex; flex-direction: column; gap: 12px;
+  min-height: 260px; max-height: 320px;
+  scroll-behavior: smooth;
+  background: #fafbfd;
+}
+.cw-msgs::-webkit-scrollbar { width: 3px; }
+.cw-msgs::-webkit-scrollbar-thumb { background: var(--cw-line); border-radius: 2px; }
+
+.cw-empty {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 10px; padding: 24px 16px;
+  text-align: center; flex: 1;
+}
+.cw-empty-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  background: linear-gradient(135deg, #1c1f2e 0%, #374151 100%);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(15,17,23,.18);
+}
+.cw-empty-title {
+  font-size: 14.5px; font-weight: 700; color: var(--cw-ink);
+  letter-spacing: -.01em;
+}
+.cw-empty-body {
+  font-size: 12.5px; line-height: 1.65;
+  max-width: 265px; color: var(--cw-ink-3);
+}
 
 /* Bubbles */
-.cw-row{display:flex;align-items:flex-end;gap:6px;animation:cw-up .2s ease both}
-.cw-row.usr{flex-direction:row-reverse}
-@keyframes cw-up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.cw-av{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;margin-bottom:2px}
-.cw-av.ai{background:#fee2e2;color:#dc2626}
-.cw-av.usr{background:#e8eaf2;color:#374151}
-.cw-bub{max-width:80%;padding:9px 12px;font-size:13.5px;line-height:1.6;word-wrap:break-word;white-space:pre-wrap}
-.cw-bub.ai{background:#f7f8fc;border:1.5px solid #e8eaf2;color:#0d0e14;border-radius:14px 14px 14px 3px}
-.cw-bub.usr{background:#dc2626;color:#fff;border:none;border-radius:14px 14px 3px 14px}
-.cw-bub ul{margin:6px 0 0 16px}
-.cw-bub li{margin-bottom:3px}
-.cw-bub strong{font-weight:700}
+.cw-row {
+  display: flex; align-items: flex-end; gap: 7px;
+  animation: cw-up .22s ease both;
+}
+.cw-row.usr { flex-direction: row-reverse; }
+@keyframes cw-up { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
 
-/* Typing — nằm TRONG .cw-msgs */
-.cw-typing{display:none;align-items:flex-end;gap:6px}
-.cw-typing.on{display:flex}
-.cw-typ-bub{background:#f7f8fc;border:1.5px solid #e8eaf2;border-radius:14px 14px 14px 3px;padding:10px 13px;display:flex;gap:4px;align-items:center}
-.cw-dot{width:6px;height:6px;border-radius:50%;background:#9ca3af;animation:cw-bounce .85s ease-in-out infinite}
-.cw-dot:nth-child(2){animation-delay:.14s}
-.cw-dot:nth-child(3){animation-delay:.28s}
+.cw-av {
+  width: 26px; height: 26px; border-radius: 8px;
+  flex-shrink: 0; display: flex; align-items: center;
+  justify-content: center; margin-bottom: 2px;
+}
+.cw-av.ai {
+  background: var(--cw-ink);
+  box-shadow: 0 2px 8px rgba(15,17,23,.2);
+}
+.cw-av.usr {
+  background: var(--cw-red-lt);
+  font-size: 11px; font-weight: 700; color: var(--cw-red);
+}
+
+.cw-bub {
+  max-width: 78%; padding: 10px 13px;
+  font-size: 13.5px; line-height: 1.65;
+  word-wrap: break-word; white-space: pre-wrap;
+}
+.cw-bub.ai {
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  color: var(--cw-ink);
+  border-radius: 14px 14px 14px 3px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.cw-bub.usr {
+  background: var(--cw-ink); color: #fff;
+  border: none;
+  border-radius: 14px 14px 3px 14px;
+  box-shadow: 0 2px 10px rgba(15,17,23,.2);
+}
+.cw-bub ul { margin: 6px 0 0 16px; }
+.cw-bub li { margin-bottom: 3px; }
+.cw-bub strong { font-weight: 700; }
+
+/* Typing */
+.cw-typing { display: none; align-items: flex-end; gap: 7px; }
+.cw-typing.on { display: flex; }
+.cw-typ-bub {
+  background: var(--cw-surface); border: 1px solid var(--cw-line);
+  border-radius: 14px 14px 14px 3px;
+  padding: 11px 14px; display: flex; gap: 4px; align-items: center;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+}
+.cw-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--cw-ink-3);
+  animation: cw-bounce .9s ease-in-out infinite;
+}
+.cw-dot:nth-child(2){animation-delay:.16s}
+.cw-dot:nth-child(3){animation-delay:.32s}
 @keyframes cw-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
 
-.cw-chips{padding:0 12px 8px;display:flex;flex-wrap:wrap;gap:5px;flex-shrink:0}
-.cw-chip{font-size:11.5px;font-weight:600;color:#dc2626;background:#fee2e2;border:1px solid rgba(220,38,38,.22);border-radius:20px;padding:4px 11px;cursor:pointer;transition:all .13s;font-family:inherit;white-space:nowrap}
-.cw-chip:hover{background:#fecaca}
-.cw-warn{margin:0 12px 8px;padding:8px 11px;background:#fef3c7;border:1px solid #fde68a;border-radius:9px;font-size:12px;font-weight:600;color:#92400e;display:none;align-items:center;gap:6px;flex-shrink:0}
-.cw-warn.on{display:flex}
-.cw-err{margin:0 12px 8px;padding:8px 11px;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;font-size:11px;font-weight:600;color:#991b1b;display:none;word-break:break-all;font-family:monospace;flex-shrink:0}
-.cw-err.on{display:block}
-.cw-foot{padding:9px 11px 11px;border-top:1.5px solid #f3f4f6;background:#fafafa;flex-shrink:0}
-.cw-irow{display:flex;align-items:flex-end;gap:7px}
-.cw-ta{flex:1;resize:none;border:1.5px solid #e8eaf2;border-radius:11px;padding:8px 11px;font-size:13.5px;font-family:inherit;color:#0d0e14;background:#fff;outline:none;line-height:1.5;max-height:96px;min-height:38px;transition:border-color .14s}
-.cw-ta:focus{border-color:#dc2626}
-.cw-ta::placeholder{color:#9ca3af}
-.cw-ta:disabled{background:#f3f4f6;cursor:not-allowed}
-.cw-send{width:36px;height:36px;border-radius:9px;flex-shrink:0;background:#dc2626;color:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s;box-shadow:0 2px 8px rgba(220,38,38,.22)}
-.cw-send:hover:not(:disabled){background:#b91c1c}
-.cw-send:disabled{background:#e5e7eb;box-shadow:none;cursor:not-allowed}
-.cw-meta{display:flex;align-items:center;justify-content:space-between;margin-top:5px;padding:0 1px}
-.cw-hint{font-size:10.5px;color:#9ca3af;font-weight:500}
-.cw-left{font-size:11px;font-weight:700;color:#9ca3af}
-.cw-left.warn{color:#d97706}
-.cw-left.danger{color:#dc2626}
-@media(max-width:420px){.cw{bottom:16px;right:16px}.cw-panel{width:calc(100vw - 32px)}}
+/* Chips */
+.cw-chips {
+  padding: 10px 14px;
+  display: flex; flex-wrap: wrap; gap: 5px;
+  flex-shrink: 0; background: #fafbfd;
+  border-top: 1px solid var(--cw-line);
+}
+.cw-chip {
+  font-size: 11.5px; font-weight: 600;
+  color: var(--cw-ink-2);
+  background: var(--cw-surface);
+  border: 1px solid var(--cw-line);
+  border-radius: 20px; padding: 5px 12px;
+  cursor: pointer; transition: all .14s;
+  font-family: var(--cw-font); white-space: nowrap;
+}
+.cw-chip:hover {
+  background: var(--cw-ink); color: #fff;
+  border-color: var(--cw-ink);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(15,17,23,.15);
+}
+
+/* Alerts */
+.cw-warn {
+  margin: 0 14px 8px;
+  padding: 9px 12px;
+  background: #fffbeb; border: 1px solid #fde68a;
+  border-radius: 10px; font-size: 12px; font-weight: 600;
+  color: #92400e; display: none; align-items: center; gap: 6px;
+  flex-shrink: 0;
+}
+.cw-warn.on { display: flex; }
+.cw-err {
+  margin: 0 14px 8px; padding: 9px 12px;
+  background: #fef2f2; border: 1px solid #fecaca;
+  border-radius: 10px; font-size: 11px; font-weight: 600;
+  color: #991b1b; display: none; word-break: break-all;
+  font-family: var(--cw-mono); flex-shrink: 0;
+}
+.cw-err.on { display: block; }
+
+/* Input */
+.cw-foot {
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--cw-line);
+  background: var(--cw-surface);
+  flex-shrink: 0;
+}
+.cw-irow { display: flex; align-items: flex-end; gap: 8px; }
+.cw-ta {
+  flex: 1; resize: none;
+  border: 1.5px solid var(--cw-line);
+  border-radius: 12px; padding: 9px 13px;
+  font-size: 13.5px; font-family: var(--cw-font);
+  color: var(--cw-ink); background: var(--cw-bg);
+  outline: none; line-height: 1.55;
+  max-height: 96px; min-height: 40px;
+  transition: border-color .15s, background .15s;
+}
+.cw-ta:focus { border-color: var(--cw-ink); background: var(--cw-surface); }
+.cw-ta::placeholder { color: var(--cw-ink-3); }
+.cw-ta:disabled { background: var(--cw-line); cursor: not-allowed; }
+
+.cw-send {
+  width: 40px; height: 40px; border-radius: 11px;
+  flex-shrink: 0;
+  background: var(--cw-ink); color: #fff;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  box-shadow: 0 2px 8px rgba(15,17,23,.2);
+}
+.cw-send:hover:not(:disabled) {
+  background: var(--cw-red);
+  box-shadow: 0 4px 14px rgba(220,38,38,.3);
+  transform: translateY(-1px);
+}
+.cw-send:disabled { background: var(--cw-line); box-shadow: none; cursor: not-allowed; }
+
+.cw-meta {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 6px; padding: 0 2px;
+}
+.cw-hint { font-size: 10.5px; color: var(--cw-ink-3); font-weight: 500; }
+.cw-left {
+  font-size: 11px; font-weight: 700;
+  color: var(--cw-ink-3);
+  font-family: var(--cw-mono);
+}
+.cw-left.warn   { color: #d97706; }
+.cw-left.danger { color: var(--cw-red); }
+
+@media(max-width:420px){
+  .cw { bottom: 18px; right: 18px; }
+  .cw-panel { width: calc(100vw - 36px); }
+}
 </style>
 
 <div class="cw" id="cw">
-  <button class="cw-fab" id="cw-fab">
-    <svg class="cw-fab-ic" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-      <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-      <path d="M19 10v2a7 7 0 01-14 0v-2"/>
-      <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+
+  <!-- FAB -->
+  <button class="cw-fab" id="cw-fab" aria-label="Open AI Coach">
+    <svg class="cw-fab-bot" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+      <rect x="3" y="8" width="18" height="12" rx="3"/>
+      <path d="M8 8V6a4 4 0 018 0v2"/>
+      <circle cx="9" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+      <path d="M9.5 18h5" stroke-linecap="round"/>
     </svg>
     <svg class="cw-fab-x" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
       <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -96,56 +352,88 @@
     <div class="cw-badge" id="cw-badge"></div>
   </button>
 
+  <!-- Panel -->
   <div class="cw-panel" id="cw-panel">
+
+    <!-- Header -->
     <div class="cw-head">
-      <div class="cw-head-icon">🎤</div>
+      <div class="cw-head-avatar">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.9)" stroke-width="1.7">
+          <rect x="3" y="8" width="18" height="12" rx="3"/>
+          <path d="M8 8V6a4 4 0 018 0v2"/>
+          <circle cx="9" cy="14" r="1.3" fill="rgba(255,255,255,.9)" stroke="none"/>
+          <circle cx="15" cy="14" r="1.3" fill="rgba(255,255,255,.9)" stroke="none"/>
+          <path d="M9.5 18h5" stroke-linecap="round" stroke-width="1.8"/>
+        </svg>
+      </div>
       <div class="cw-head-info">
         <div class="cw-head-name">IELTS Speaking Coach</div>
-        <div class="cw-head-sub"><div class="cw-online-dot"></div>AI · Sẵn sàng hỗ trợ</div>
+        <div class="cw-head-sub">
+          <div class="cw-online-dot"></div>
+          AI Assistant &middot; Online
+        </div>
       </div>
-      <div class="cw-quota" id="cw-quota">10 lượt</div>
+      <div class="cw-quota" id="cw-quota">10 left</div>
     </div>
 
-    <%# ── Messages: typing indicator nằm TRONG đây ── %>
+    <!-- Messages -->
     <div class="cw-msgs" id="cw-msgs">
       <div class="cw-empty" id="cw-empty">
-        <div class="cw-empty-emoji">🎯</div>
-        <div class="cw-empty-title">Xin chào! Tôi là Coach của bạn</div>
-        <div class="cw-empty-body">Hỏi tôi bất cứ điều gì về IELTS Speaking — tips, band scores, cách luyện tập, hay nhờ tôi sửa câu trả lời.</div>
+        <div class="cw-empty-icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.7">
+            <rect x="3" y="8" width="18" height="12" rx="3"/>
+            <path d="M8 8V6a4 4 0 018 0v2"/>
+            <circle cx="9" cy="14" r="1.3" fill="rgba(255,255,255,.85)" stroke="none"/>
+            <circle cx="15" cy="14" r="1.3" fill="rgba(255,255,255,.85)" stroke="none"/>
+            <path d="M9.5 18h5" stroke-linecap="round" stroke-width="1.8"/>
+          </svg>
+        </div>
+        <div class="cw-empty-title">Your IELTS Speaking Coach</div>
+        <div class="cw-empty-body">Ask me anything about IELTS Speaking — tips, band scores, practice strategies, or have me review your answers.</div>
       </div>
-      <%# Typing dots — nằm TRONG .cw-msgs để insertBefore hoạt động %>
       <div class="cw-typing" id="cw-typing">
-        <div class="cw-av ai">AI</div>
+        <div class="cw-av ai">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8">
+            <rect x="3" y="8" width="18" height="12" rx="3"/>
+            <path d="M8 8V6a4 4 0 018 0v2"/>
+            <circle cx="9" cy="14" r="1.2" fill="rgba(255,255,255,.8)" stroke="none"/>
+            <circle cx="15" cy="14" r="1.2" fill="rgba(255,255,255,.8)" stroke="none"/>
+          </svg>
+        </div>
         <div class="cw-typ-bub">
           <div class="cw-dot"></div><div class="cw-dot"></div><div class="cw-dot"></div>
         </div>
       </div>
     </div>
 
+    <!-- Quick Chips -->
     <div class="cw-chips" id="cw-chips">
-      <button class="cw-chip" data-msg="Cho tôi tips quan trọng nhất để làm tốt IELTS Speaking Part 1.">💡 Tips Part 1</button>
-      <button class="cw-chip" data-msg="Làm thế nào để cải thiện từ Band 6 lên Band 7 Speaking?">📈 Band 6→7</button>
-      <button class="cw-chip" data-msg="Hướng dẫn cách trả lời Cue Card trong Part 2 hiệu quả.">🎯 Cue Card</button>
-      <button class="cw-chip" data-msg="Tôi muốn bạn sửa câu trả lời IELTS Speaking của tôi.">✏️ Sửa câu</button>
+      <button class="cw-chip" data-msg="Give me the most important tips to do well in IELTS Speaking Part 1.">Part 1 Tips</button>
+      <button class="cw-chip" data-msg="How do I improve from Band 6 to Band 7 in Speaking?">Band 6 &rarr; 7</button>
+      <button class="cw-chip" data-msg="Guide me on how to answer a Cue Card effectively in Part 2.">Cue Card</button>
+      <button class="cw-chip" data-msg="Please review and correct my IELTS Speaking answer.">Review Answer</button>
     </div>
 
     <div class="cw-warn" id="cw-warn"></div>
     <div class="cw-err"  id="cw-err"></div>
 
+    <!-- Input -->
     <div class="cw-foot">
       <div class="cw-irow">
-        <textarea class="cw-ta" id="cw-ta" rows="1" maxlength="600" placeholder="Hỏi về IELTS Speaking..."></textarea>
-        <button class="cw-send" id="cw-send" disabled>
+        <textarea class="cw-ta" id="cw-ta" rows="1" maxlength="600" placeholder="Ask about IELTS Speaking..."></textarea>
+        <button class="cw-send" id="cw-send" disabled aria-label="Send">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/>
           </svg>
         </button>
       </div>
       <div class="cw-meta">
-        <span class="cw-hint">Enter gửi · Shift+Enter xuống dòng</span>
-        <span class="cw-left" id="cw-left">— / 10 hôm nay</span>
+        <span class="cw-hint">Enter to send &middot; Shift+Enter for newline</span>
+        <span class="cw-left" id="cw-left">— / 10 today</span>
       </div>
     </div>
+
   </div>
 </div>
 
@@ -163,7 +451,7 @@
   const badge   = document.getElementById('cw-badge');
   const msgsEl  = document.getElementById('cw-msgs');
   const emptyEl = document.getElementById('cw-empty');
-  const typEl   = document.getElementById('cw-typing'); // ← nằm trong msgsEl
+  const typEl   = document.getElementById('cw-typing');
   const chipsEl = document.getElementById('cw-chips');
   const warnEl  = document.getElementById('cw-warn');
   const errEl   = document.getElementById('cw-err');
@@ -174,21 +462,19 @@
 
   let isOpen = false, loading = false, remaining = LIMIT, loaded = false;
 
-  /* ── Toggle ── */
   fab.addEventListener('click', () => {
     isOpen = !isOpen;
     root.classList.toggle('open', isOpen);
     if (isOpen) {
       badge.classList.remove('show');
       if (!loaded) { loaded = true; loadHistory(); }
-      setTimeout(() => ta.focus(), 220);
+      setTimeout(() => ta.focus(), 240);
     }
   });
   document.addEventListener('click', e => {
     if (isOpen && !root.contains(e.target)) { isOpen = false; root.classList.remove('open'); }
   });
 
-  /* ── Textarea ── */
   ta.addEventListener('input', () => {
     ta.style.height = 'auto';
     ta.style.height = Math.min(ta.scrollHeight, 96) + 'px';
@@ -199,7 +485,6 @@
   });
   sendBtn.addEventListener('click', send);
 
-  /* ── Quick chips ── */
   chipsEl.querySelectorAll('.cw-chip').forEach(btn => {
     btn.addEventListener('click', () => {
       ta.value = btn.dataset.msg;
@@ -208,7 +493,6 @@
     });
   });
 
-  /* ── Load history ── */
   async function loadHistory() {
     try {
       const res  = await fetch(API_HIST, { headers: { 'X-CSRF-Token': CSRF, Accept: 'application/json' } });
@@ -222,7 +506,6 @@
     } catch(e) { showErr('History error: ' + e.message); }
   }
 
-  /* ── Send ── */
   async function send() {
     const text = ta.value.trim();
     if (!text || loading || remaining <= 0) return;
@@ -249,14 +532,17 @@
 
       let data;
       try { data = JSON.parse(rawText); }
-      catch(_) { showErr('Bad response (' + res.status + '): ' + rawText.slice(0, 200)); loading = false; sendBtn.disabled = false; return; }
+      catch(_) {
+        showErr('Bad response (' + res.status + '): ' + rawText.slice(0, 200));
+        loading = false; sendBtn.disabled = false; return;
+      }
 
       if (res.status === 429 || data.error === 'limit_reached') {
         setRemaining(0);
-        showWarn(data.message || 'Hết lượt hôm nay 🌙');
+        showWarn(data.message || 'Daily limit reached. Come back tomorrow.');
       } else if (!res.ok || data.error) {
         showErr(data.error || 'HTTP ' + res.status);
-        addBubble('assistant', '❌ ' + (data.error || 'Lỗi không xác định'));
+        addBubble('assistant', 'An error occurred: ' + (data.error || 'Unknown error'));
       } else {
         addBubble('assistant', data.message);
         setRemaining(data.remaining ?? 0);
@@ -265,7 +551,7 @@
     } catch(e) {
       showTyping(false);
       showErr('Network error: ' + e.message);
-      addBubble('assistant', '❌ Không thể kết nối.');
+      addBubble('assistant', 'Unable to connect. Please try again.');
     }
 
     loading = false;
@@ -273,23 +559,26 @@
     scrollDown();
   }
 
-  /* ── Helpers ── */
   function addBubble(role, content, animate = true) {
     const isUser = role === 'user';
     const row = document.createElement('div');
     row.className = 'cw-row ' + (isUser ? 'usr' : 'ai');
     if (!animate) row.style.animation = 'none';
 
-    const av  = document.createElement('div');
+    const av = document.createElement('div');
     av.className = 'cw-av ' + (isUser ? 'usr' : 'ai');
-    av.textContent = isUser ? UINIT : 'AI';
+
+    if (isUser) {
+      av.textContent = UINIT;
+    } else {
+      av.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1.8"><rect x="3" y="8" width="18" height="12" rx="3"/><path d="M8 8V6a4 4 0 018 0v2"/><circle cx="9" cy="14" r="1.2" fill="rgba(255,255,255,.8)" stroke="none"/><circle cx="15" cy="14" r="1.2" fill="rgba(255,255,255,.8)" stroke="none"/></svg>';
+    }
 
     const bub = document.createElement('div');
     bub.className = 'cw-bub ' + (isUser ? 'usr' : 'ai');
     bub.innerHTML = fmt(content);
 
     row.appendChild(av); row.appendChild(bub);
-    // insertBefore typEl — cả hai đều là con của msgsEl nên hoạt động đúng
     msgsEl.insertBefore(row, typEl);
   }
 
@@ -308,15 +597,19 @@
 
   function setRemaining(n) {
     remaining = n;
-    quotaEl.textContent = n + ' lượt';
+    quotaEl.textContent = n + ' left';
     quotaEl.className   = 'cw-quota' + (n <= 0 ? ' danger' : n <= 3 ? ' warn' : '');
-    leftEl.textContent  = n + ' / ' + LIMIT + ' hôm nay';
+    leftEl.textContent  = n + ' / ' + LIMIT + ' today';
     leftEl.className    = 'cw-left'  + (n <= 0 ? ' danger' : n <= 3 ? ' warn' : '');
-    if (n <= 0) { ta.disabled = true; sendBtn.disabled = true; showWarn('Hết ' + LIMIT + ' lượt hôm nay. Quay lại ngày mai! 🌙'); }
-    else if (n <= 3) showWarn('⚠️ Còn ' + n + ' lượt hỏi hôm nay.');
+    if (n <= 0) {
+      ta.disabled = true; sendBtn.disabled = true;
+      showWarn('Daily limit of ' + LIMIT + ' reached. Come back tomorrow.');
+    } else if (n <= 3) {
+      showWarn('Warning: only ' + n + ' questions remaining today.');
+    }
   }
 
   function showWarn(msg) { warnEl.textContent = msg; warnEl.classList.add('on'); }
-  function showErr(msg)  { errEl.textContent  = '🔴 ' + msg; errEl.classList.add('on'); console.error('[CW]', msg); }
+  function showErr(msg)  { errEl.textContent  = '[ERR] ' + msg; errEl.classList.add('on'); console.error('[CW]', msg); }
 })();
 </script>
