@@ -46,14 +46,12 @@ Rails.application.routes.draw do
         get :dashboard
       end
 
-      # Orders lồng trong course
       resources :orders, only: [ :new, :create, :show ] do
         member do
           get :checkout
         end
       end
 
-      # ← Chatbot lồng trong course (KHÔNG phải trong orders)
       resources :chats, only: [ :create ] do
         collection do
           get :history
