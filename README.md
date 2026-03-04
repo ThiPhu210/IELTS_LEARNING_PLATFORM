@@ -326,10 +326,10 @@ IELTS Learning Platform follows the standard **Model-View-Controller (MVC)** pat
 ┌────────────────▼───────────────────────────────────────┐
 │              Rails 8 Application (Puma)                │
 │                                                        │
-│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐ │
-│  │  Admin   │  │ Students │  │      Teacher         │ │
-│  │Namespace │  │Namespace │  │     Namespace        │ │
-│  └──────────┘  └──────────┘  └──────────────────────┘ │
+│  ┌──────────┐  ┌──────────┐  ┌──────────────────────┐  │
+│  │  Admin   │  │ Students │  │      Teacher         │  │
+│  │Namespace │  │Namespace │  │     Namespace        │  │
+│  └──────────┘  └──────────┘  └──────────────────────┘  │
 │                                                        │
 │  ┌──────────────────────────────────────────────────┐  │
 │  │              Service Layer                       │  │
@@ -338,17 +338,17 @@ IELTS Learning Platform follows the standard **Model-View-Controller (MVC)** pat
 │  └────────────────────────────┬─────────────────────┘  │
 │                               │                        │
 │  ┌──────────────────────────┐ │ ┌────────────────────┐ │
-│  │     Background Jobs      │ │ │    Action Mailer    │ │
+│  │     Background Jobs      │ │ │    Action Mailer   │ │
 │  │  SpeakingEvaluateJob     │ │ │  SpeakingResult    │ │
 │  │  (Sidekiq / SolidQueue)  │ │ │  InvoiceMailer     │ │
 │  └──────────────────────────┘ │ └────────────────────┘ │
 └───────────────────────────────┼────────────────────────┘
                                 │
-          ┌─────────────────────┼──────────────────────┐
-          │                     │                      │
+          ┌─────────────────────┼─────────────────────┐
+          │                     │                     │
 ┌─────────▼──────┐   ┌──────────▼───────┐   ┌─────────▼──────┐
-│  PostgreSQL DB │   │    AWS S3         │   │  AWS Bedrock   │
-│                │   │ (Audio + Images)  │   │ Claude 3 Sonnet│
+│  PostgreSQL DB │   │    AWS S3        │   │  AWS Bedrock   │
+│                │   │ (Audio + Images) │   │ Claude 3 Sonnet│
 └────────────────┘   └──────────────────┘   └────────────────┘
 ```
 
