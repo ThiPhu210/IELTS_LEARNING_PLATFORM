@@ -2,7 +2,7 @@
 
 ## Overview
 
-IELTS Learning Platform follows the standard **Model-View-Controller (MVC)** pattern of Ruby on Rails 8, extended with Service Objects and Background Jobs for AI processing. The system is designed around three user roles — Admin, Teacher, Student — each with its own namespaced controller scope.
+IELTS Learning Platform follows the standard **Model-View-Controller (MVC)** pattern of Ruby on Rails 8, extended with Service Objects and Background Jobs for AI processing. The system is designed around two user roles — Admin, Student — each with its own namespaced controller scope.
 
 ---
 
@@ -17,12 +17,11 @@ graph TB
         subgraph Namespaces["Controller Namespaces"]
             Admin["Admin\nNamespace"]
             Students["Students\nNamespace"]
-            Teacher["Teacher\nNamespace"]
         end
 
         subgraph Services["Service Layer"]
-            BS["BedrockService\nAI Evaluation"]
-            BCS["BedrockChatService\nAI Chatbot"]
+            BS["BedrockService (AI-Evaluation)"]
+            BCS["BedrockChatService (AI-Chatbot)"]
             IC["ImageCompressor"]
             ATS["AwsTranscribeService"]
         end
@@ -38,9 +37,9 @@ graph TB
     end
 
     subgraph AWS["AWS Cloud"]
-        RDS["🗄️ AWS RDS\nPostgreSQL"]
-        S3["📦 AWS S3\nAudio & Images"]
-        Bedrock["🤖 AWS Bedrock\nClaude 3 Sonnet"]
+        RDS["🗄️ AWS RDS (PostgreSQL)"]
+        S3["📦 AWS S3 (Audio & Images)"]
+        Bedrock["🤖 AWS Bedrock (Claude-3-Sonnet)"]
     end
 
     Browser -->|"HTTP / WebSocket"| Rails
@@ -292,7 +291,7 @@ sequenceDiagram
     actor Student
     participant App as Rails App
     participant S3 as AWS S3
-    participant Bedrock as AWS Bedrock<br/>(Claude 3 Sonnet)
+    participant Bedrock as AWS Bedrock<br/>(Claude-3-Sonnet)
     participant DB as PostgreSQL
     participant Mailer as SpeakingResultMailer
 
@@ -346,7 +345,7 @@ sequenceDiagram
     actor Student
     participant App as Rails App
     participant DB as PostgreSQL
-    participant Bedrock as AWS Bedrock<br/>(Claude 3 Sonnet)
+    participant Bedrock as AWS Bedrock<br/>(Claude-3-Sonnet)
 
     Student->>App: POST /students/courses/:id/chats<br/>(message text)
 
@@ -430,7 +429,7 @@ flowchart LR
     A([Student]) -->|POST /momo_create| B[Build MoMo payload\nHMAC-SHA256 signed]
     B -->|HTTP POST| C[MoMo Endpoint]
     C -->|payUrl redirect| D[MoMo Payment UI]
-    D -->|momo_return| E{resultCode == 0?}
+    D -->|momo_return| E{resultCode == 00?}
     E -->|Yes ✅| F[Grant CourseAccess]
     E -->|No ❌| G[Show error]
     C -.->|IPN POST /momo_notify| H[Verify signature\nUpdate Payment record]
@@ -464,7 +463,7 @@ All file uploads use **Active Storage** backed by **AWS S3** in production.
 
 ## Background Job Infrastructure
 
-Rails 8 ships with **Solid Queue** (DB-backed) as default. The project also includes **Sidekiq** in the Gemfile for Redis-backed processing.
+The project uses **Sidekiq** in the Gemfile for Redis-backed processing.
 
 | Job | Queue | Trigger |
 |---|---|---|
@@ -475,7 +474,7 @@ Rails 8 ships with **Solid Queue** (DB-backed) as default. The project also incl
 
 ## Deployment
 
-The platform is containerized with Docker and deployed via **Kamal** (Basecamp's deployment tool).
+The platform is containerized with Docker and deployed via **GITHUB ACTION** (Basecamp's deployment tool).
 
 ```
 Dockerfile          ← Production image
@@ -491,7 +490,7 @@ Kamal hooks support pre/post deploy scripts for zero-downtime deploys.
 
 - **Authentication:** Devise with email confirmation required (`confirmable`)
 - **Authorization:** Role-based via `before_action` checks in each namespace's `base_controller.rb`
-- **CSRF:** Standard Rails CSRF protection; webhook endpoints explicitly skip with `skip_before_action :verify_authenticity_token`
+- **CSRF:** Standard Rails CSRF protection
 - **Webhook Verification:** Each gateway's signature verified before processing
 - **File Uploads:** Content-type validation enforced on user thumbnails (PNG/JPG/JPEG/WEBP only)
 - **Password Security:** bcrypt via Devise
